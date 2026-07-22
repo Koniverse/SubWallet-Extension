@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**109 stories** — 76 done (shipped), 9 in flight (ready / in-progress /
-review, from the Projects board), 11 backlog (open, not yet started), 12 deprecated
+**108 stories** — 75 done (shipped), 9 in flight (ready / in-progress /
+review, from the Projects board), 11 backlog (open, not yet started), 13 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -120,7 +120,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-31.68](../stories/US-31.68-update-content-in-app-for-swap.md) | ✅ done | Update content in-app for swap | [#4259](https://github.com/Koniverse/SubWallet-Extension/issues/4259) | bluezdot | 1.3.35 |
 | [US-31.69](../stories/US-31.69-extension-improve-some-ux-for-swap.md) | 📋 backlog | Extension - Improve some UX for swap | [#4260](https://github.com/Koniverse/SubWallet-Extension/issues/4260) | Quangdm-cdm | — |
 | [US-31.70](../stories/US-31.70-support-asset-hub-testnet-swap-for-chainflip.md) | ✅ done | Support Asset Hub Testnet swap for Chainflip | [#4265](https://github.com/Koniverse/SubWallet-Extension/issues/4265) | bluezdot | 1.3.41 |
-| [US-31.71](../stories/US-31.71-extension-apply-new-i18n-format-for-transfer-swap-scree.md) | ✅ done | Extension - Apply new i18n format for Transfer, Swap screens | [#4279](https://github.com/Koniverse/SubWallet-Extension/issues/4279) | — | — |
 | [US-31.72](../stories/US-31.72-support-gigadot-token-for-hydration.md) | ✅ done | Support GIGADOT token for Hydration | [#4283](https://github.com/Koniverse/SubWallet-Extension/issues/4283) | bluezdot | 1.3.31 |
 | [US-31.73](../stories/US-31.73-support-uniswapx-dutch-swap.md) | ✅ done | Support UniswapX Dutch Swap | [#4293](https://github.com/Koniverse/SubWallet-Extension/issues/4293) | bluezdot | 1.3.36 |
 | [US-31.74](../stories/US-31.74-add-more-swap-pairs-from-simple-swap.md) | ✅ done | Add more swap pairs from Simple swap | [#4306](https://github.com/Koniverse/SubWallet-Extension/issues/4306) | bluezdot | — |

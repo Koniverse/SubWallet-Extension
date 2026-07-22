@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**498 stories** — 375 done (shipped), 13 in flight (ready / in-progress /
-review, from the Projects board), 65 backlog (open, not yet started), 45 deprecated
+**489 stories** — 369 done (shipped), 12 in flight (ready / in-progress /
+review, from the Projects board), 63 backlog (open, not yet started), 45 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -199,7 +199,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.147](../stories/US-41.147-webapp-portforlio-show-incorrect.md) | ✅ done | WebApp - Portforlio % show incorrect | [#1675](https://github.com/Koniverse/SubWallet-Extension/issues/1675) | lw-cdm | 1.1.36 |
 | [US-41.148](../stories/US-41.148-webapp-re-check-apply-master-password-feature.md) | ✅ done | WebApp - Re-check apply master password feature | [#1681](https://github.com/Koniverse/SubWallet-Extension/issues/1681) | lw-cdm | 1.1.36 |
 | [US-41.149](../stories/US-41.149-webapp-still-show-modal-when-user-perform-back-browser.md) | 📋 backlog | WebApp - Still show modal when user perform Back browser | [#1689](https://github.com/Koniverse/SubWallet-Extension/issues/1689) | Thiendekaco | — |
-| [US-41.150](../stories/US-41.150-webapp-airdrop-tracking.md) | ✅ done | WebApp - AirDrop Tracking | [#1700](https://github.com/Koniverse/SubWallet-Extension/issues/1700) | lw-cdm | 1.1.36 |
 | [US-41.151](../stories/US-41.151-webapp-update-netlify-workflow.md) | ✅ done | WebApp - Update netlify workflow | [#1701](https://github.com/Koniverse/SubWallet-Extension/issues/1701) | saltict | — |
 | [US-41.152](../stories/US-41.152-webapp-can-not-get-to-address-in-case-below.md) | ✅ done | WebApp - Can not get to address in case below | [#1702](https://github.com/Koniverse/SubWallet-Extension/issues/1702) | lw-cdm | — |
 | [US-41.153](../stories/US-41.153-update-logo-for-avail-network.md) | ✅ done | Update logo for Avail network | [#1708](https://github.com/Koniverse/SubWallet-Extension/issues/1708) | S2kael | 1.1.5 |
@@ -223,7 +222,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.171](../stories/US-41.171-update-confirmation-openpmodal-logic.md) | ✅ done | Update confirmation openPModal logic | [#1885](https://github.com/Koniverse/SubWallet-Extension/issues/1885) | lw-cdm | — |
 | [US-41.172](../stories/US-41.172-keep-update-webapp-with-newest-version-of-extension.md) | ✅ done | Keep update webapp with newest version of extension | [#1889](https://github.com/Koniverse/SubWallet-Extension/issues/1889) | saltict | 1.1.36 |
 | [US-41.173](../stories/US-41.173-improve-amount-input-field.md) | ✅ done | Improve Amount input field | [#1905](https://github.com/Koniverse/SubWallet-Extension/issues/1905) | frenkie-ng | 1.2.28 |
-| [US-41.174](../stories/US-41.174-update-web-runner-for-i18n-for-background.md) | ✅ done | Update web-runner for i18n for background | [#1915](https://github.com/Koniverse/SubWallet-Extension/issues/1915) | S2kael | 1.1.12 |
 | [US-41.175](../stories/US-41.175-re-check-the-border-on-window-os-after-updating-to-the.md) | ⏸️ deprecated | Re-check the border on Window OS after updating to the latest browser version | [#1928](https://github.com/Koniverse/SubWallet-Extension/issues/1928) | S2kael | — |
 | [US-41.176](../stories/US-41.176-update-chain-list.md) | ✅ done | Update chain list | [#1941](https://github.com/Koniverse/SubWallet-Extension/issues/1941) | S2kael | 1.1.15 |
 | [US-41.177](../stories/US-41.177-an-error-occurs-when-using-zk-mode-with-authenticate-wi.md) | ✅ done | An error occurs when using ZK mode with authenticate with password = When needed | [#1943](https://github.com/Koniverse/SubWallet-Extension/issues/1943) | S2kael | 1.1.36 |
@@ -277,7 +275,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.225](../stories/US-41.225-show-minutes-when-withdraw-time-1-hour.md) | ⏸️ deprecated | Show minutes when withdraw time < 1 hour | [#2384](https://github.com/Koniverse/SubWallet-Extension/issues/2384) | nulllpc | — |
 | [US-41.226](../stories/US-41.226-handle-fallback-for-online-content.md) | ✅ done | Handle fallback for online content | [#2391](https://github.com/Koniverse/SubWallet-Extension/issues/2391) | Thiendekaco | 1.1.30 |
 | [US-41.227](../stories/US-41.227-allow-access-extension-from-iframe.md) | ✅ done | Allow access extension from iframe | [#2406](https://github.com/Koniverse/SubWallet-Extension/issues/2406) | saltict | 1.1.28 |
-| [US-41.228](../stories/US-41.228-extension-multilingual-processing-for-terms-of-use.md) | 📋 backlog | [Extension] Multilingual processing for Terms of use | [#2423](https://github.com/Koniverse/SubWallet-Extension/issues/2423) | — | — |
 | [US-41.229](../stories/US-41.229-webapp-add-t-c-for-webapp.md) | ✅ done | WebApp - Add T&C for webapp | [#2427](https://github.com/Koniverse/SubWallet-Extension/issues/2427) | Thiendekaco | 1.1.36 |
 | [US-41.230](../stories/US-41.230-webapp-update-latest-code-for-webapp-v1-1-29-extension.md) | ✅ done | WebApp - Update latest code for webapp (v1.1.29 extension) | [#2431](https://github.com/Koniverse/SubWallet-Extension/issues/2431) | lw-cdm | 1.1.36 |
 | [US-41.231](../stories/US-41.231-extension-update-newest-t-c-content.md) | ⏸️ deprecated | Extension - Update newest T&C content | [#2432](https://github.com/Koniverse/SubWallet-Extension/issues/2432) | Thiendekaco | — |
@@ -297,7 +294,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.245](../stories/US-41.245-research-more-ulitilies-features-based-on-user-s-feedba.md) | 📋 backlog | Research more ulitilies features based on user's feedback | [#2526](https://github.com/Koniverse/SubWallet-Extension/issues/2526) | Sokol142196 | — |
 | [US-41.246](../stories/US-41.246-figure-out-and-test-tracking-users-on-web-app-via-url-c.md) | 📋 backlog | Figure out and test tracking users on web app via URL custom | [#2527](https://github.com/Koniverse/SubWallet-Extension/issues/2527) | saltict | — |
 | [US-41.247](../stories/US-41.247-research-and-select-user-support-system-development.md) | 📋 backlog | Research and select user support system development | [#2530](https://github.com/Koniverse/SubWallet-Extension/issues/2530) | saltict | — |
-| [US-41.248](../stories/US-41.248-clean-up-i18n-data-and-re-apply-i18n.md) | 🟢 ready | Clean up i18n data and re-apply i18n | [#2531](https://github.com/Koniverse/SubWallet-Extension/issues/2531) | frenkie-ng | — |
 | [US-41.249](../stories/US-41.249-fixed-bug-sending-avl-on-avail-goldberg-testnet.md) | ✅ done | Fixed bug sending AVL on Avail Goldberg testnet | [#2538](https://github.com/Koniverse/SubWallet-Extension/issues/2538) | S2kael | 1.1.41 |
 | [US-41.250](../stories/US-41.250-add-show-hide-password-for-case-input-password.md) | ✅ done | Add show/hide password for case input password | [#2555](https://github.com/Koniverse/SubWallet-Extension/issues/2555) | frenkie-ng | 1.1.58 |
 | [US-41.251](../stories/US-41.251-update-chain-list.md) | ✅ done | Update chain-list | [#2570](https://github.com/Koniverse/SubWallet-Extension/issues/2570) | bluezdot | 1.1.38 |
@@ -344,7 +340,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.292](../stories/US-41.292-update-chain-list.md) | ✅ done | Update chain-list | [#3040](https://github.com/Koniverse/SubWallet-Extension/issues/3040) | bluezdot | 1.1.65 |
 | [US-41.293](../stories/US-41.293-webapp-update-latest-code-v1-1-64.md) | ✅ done | WebApp - Update latest code v1.1.64 | [#3044](https://github.com/Koniverse/SubWallet-Extension/issues/3044) | saltict | — |
 | [US-41.294](../stories/US-41.294-webapp-auto-reset-currency-when-reloading-browser.md) | ⏸️ deprecated | WebApp - Auto reset currency when reloading browser | [#3049](https://github.com/Koniverse/SubWallet-Extension/issues/3049) | frenkie-ng | — |
-| [US-41.295](../stories/US-41.295-test-new-i18n-flow.md) | ✅ done | Test new i18n flow | [#3051](https://github.com/Koniverse/SubWallet-Extension/issues/3051) | frenkie-ng | — |
 | [US-41.296](../stories/US-41.296-update-chain-list.md) | ✅ done | Update chain-list | [#3055](https://github.com/Koniverse/SubWallet-Extension/issues/3055) | bluezdot | 1.1.66 |
 | [US-41.297](../stories/US-41.297-remove-support-for-moonbeam-on-polkadot-vault.md) | ✅ done | Remove support for Moonbeam on Polkadot vault | [#3056](https://github.com/Koniverse/SubWallet-Extension/issues/3056) | S2kael | 1.2.2 |
 | [US-41.298](../stories/US-41.298-refactor-logic-parsing-data-from-contract-response.md) | ✅ done | Refactor logic parsing data from contract response | [#3070](https://github.com/Koniverse/SubWallet-Extension/issues/3070) | PDTnhah | 1.3.5 |
@@ -499,10 +494,8 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.447](../stories/US-41.447-update-gears-library.md) | ✅ done | Update Gears Library | [#4443](https://github.com/Koniverse/SubWallet-Extension/issues/4443) | tunghp2002 | 1.3.47 |
 | [US-41.448](../stories/US-41.448-support-custom-auto-compound-for-moonbeam-moonriver-moo.md) | 📋 backlog | Support custom auto compound for Moonbeam/Moonriver/Moonbase | [#4450](https://github.com/Koniverse/SubWallet-Extension/issues/4450) | — | — |
 | [US-41.449](../stories/US-41.449-webapp-upgrade-codebase-to-version-1-3-41-sync-from-ext.md) | ✅ done | [WebApp] Upgrade codebase to version 1.3.41 (sync from Extension) | [#4457](https://github.com/Koniverse/SubWallet-Extension/issues/4457) | lw-cdm | — |
-| [US-41.450](../stories/US-41.450-extension-research-and-propose-improved-i18n-solution.md) | ✅ done | Extension - Research and propose improved i18n solution | [#4484](https://github.com/Koniverse/SubWallet-Extension/issues/4484) | frenkie-ng | — |
 | [US-41.451](../stories/US-41.451-extension-hide-feature-advanced-address-detection.md) | ✅ done | Extension - Hide feature Advanced address detection | [#4488](https://github.com/Koniverse/SubWallet-Extension/issues/4488) | lw-cdm | — |
 | [US-41.452](../stories/US-41.452-re-check-for-paseo-after-migrated.md) | ✅ done | Re-check for Paseo after migrated | [#4507](https://github.com/Koniverse/SubWallet-Extension/issues/4507) | bluezdot | 1.3.61 |
-| [US-41.453](../stories/US-41.453-replace-hardcoded-strings-with-i18n-keys.md) | ✅ done | Replace Hardcoded Strings with i18n Keys | [#4515](https://github.com/Koniverse/SubWallet-Extension/issues/4515) | frenkie-ng | 1.3.55 |
 | [US-41.454](../stories/US-41.454-support-for-polkavm-compatibility.md) | ✅ done | Support for PolkaVM Compatibility | [#4518](https://github.com/Koniverse/SubWallet-Extension/issues/4518) | PDTnhah | — |
 | [US-41.455](../stories/US-41.455-update-chain-list-stable-v0-2-110.md) | ✅ done | Update chain-list stable v0.2.110 | [#4521](https://github.com/Koniverse/SubWallet-Extension/issues/4521) | PDTnhah | 1.3.48 |
 | [US-41.456](../stories/US-41.456-fixed-issue-can-not-update-patch-and-online-resources.md) | ✅ done | Fixed issue can not update patch and online resources | [#4536](https://github.com/Koniverse/SubWallet-Extension/issues/4536) | PDTnhah | 1.3.62 |
@@ -518,7 +511,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.466](../stories/US-41.466-update-chainlist-stable-v0-2-113.md) | ✅ done | Update chainlist stable v0.2.113 | [#4616](https://github.com/Koniverse/SubWallet-Extension/issues/4616) | PDTnhah | 1.3.55 |
 | [US-41.467](../stories/US-41.467-webapp-update-code-to-v1-3-54.md) | ✅ done | WebApp - Update code to v1.3.54 | [#4640](https://github.com/Koniverse/SubWallet-Extension/issues/4640) | Thiendekaco | — |
 | [US-41.468](../stories/US-41.468-update-chain-list-stable-v0-2-114.md) | ✅ done | Update chain-list stable v0.2.114 | [#4651](https://github.com/Koniverse/SubWallet-Extension/issues/4651) | PDTnhah | 1.3.56 |
-| [US-41.469](../stories/US-41.469-webapp-replace-hardcoded-strings-with-i18n-keys-for-web.md) | 📋 backlog | WebApp - Replace Hardcoded Strings with i18n Keys for WebApp | [#4656](https://github.com/Koniverse/SubWallet-Extension/issues/4656) | — | — |
 | [US-41.470](../stories/US-41.470-update-chain-list-stable-v0-2-115.md) | ✅ done | Update chain-list stable v0.2.115 | [#4668](https://github.com/Koniverse/SubWallet-Extension/issues/4668) | PDTnhah | 1.3.58 |
 | [US-41.471](../stories/US-41.471-webapp-update-code-to-v1-3-56.md) | ✅ done | WebApp - Update code to v1.3.56 | [#4673](https://github.com/Koniverse/SubWallet-Extension/issues/4673) | Thiendekaco | — |
 | [US-41.472](../stories/US-41.472-support-hollar-mainnet.md) | ✅ done | Support HOLLAR mainnet | [#4692](https://github.com/Koniverse/SubWallet-Extension/issues/4692) | lw-cdm | 1.3.59 |
@@ -543,7 +535,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.491](../stories/US-41.491-replace-console-usage-with-centralized-logger-across-al.md) | 📋 backlog | Replace console usage with centralized logger across all packages (excluding extension-base) | [#4930](https://github.com/Koniverse/SubWallet-Extension/issues/4930) | — | — |
 | [US-41.492](../stories/US-41.492-update-subwallet-monorepos-subwallet-services-sdk-0-1-1.md) | ✅ done | Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 | [#4957](https://github.com/Koniverse/SubWallet-Extension/issues/4957) | bluezdot | 1.3.73 |
 | [US-41.493](../stories/US-41.493-support-stdot-lsd-sunset.md) | ✅ done | Support stDOT LSD sunset | [#4968](https://github.com/Koniverse/SubWallet-Extension/issues/4968) | tunghp2002 | 1.3.77 |
-| [US-41.494](../stories/US-41.494-webapp-replace-hardcoded-strings-with-i18n-keys.md) | ✅ done | [ Webapp ] Replace Hardcoded Strings with i18n Keys | [#4983](https://github.com/Koniverse/SubWallet-Extension/issues/4983) | tunghp2002 | — |
 | [US-41.495](../stories/US-41.495-extension-some-issues-when-merging-in-version-1-3-78.md) | ✅ done | Extension – Some issues when merging in version 1.3.78 | [#4988](https://github.com/Koniverse/SubWallet-Extension/issues/4988) | tunghp2002 | 1.3.79 |
 | [US-41.496](../stories/US-41.496-webapp-update-the-latest-code-1-3-83.md) | 🚧 in-progress | WebApp - Update the latest code 1.3.83 | [#5004](https://github.com/Koniverse/SubWallet-Extension/issues/5004) | tunghp2002 | — |
 | [US-41.497](../stories/US-41.497-extension-some-issues-are-open-when-upgrade-version.md) | 👀 review | [ Extension ] Some issues are open when upgrade version | [#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013) | tunghp2002 | — |

@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**201 stories** — 168 done (shipped), 1 in flight (ready / in-progress /
+**200 stories** — 167 done (shipped), 1 in flight (ready / in-progress /
 review, from the Projects board), 17 backlog (open, not yet started), 15 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -179,7 +179,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-28.127](../stories/US-28.127-webapp-update-transaction-result-screen.md) | ✅ done | WebApp - Update transaction result screen | [#2706](https://github.com/Koniverse/SubWallet-Extension/issues/2706) | frenkie-ng | 1.1.55 |
 | [US-28.128](../stories/US-28.128-extension-handle-the-case-of-scan-address-of-polkadot-v.md) | 📋 backlog | Extension - Handle the case of scan address of Polkadot vault when transfer | [#2712](https://github.com/Koniverse/SubWallet-Extension/issues/2712) | saltict | — |
 | [US-28.129](../stories/US-28.129-support-transferring-unique-nfts.md) | ✅ done | Support transferring Unique NFTs | [#2727](https://github.com/Koniverse/SubWallet-Extension/issues/2727) | bluezdot | — |
-| [US-28.130](../stories/US-28.130-webapp-update-i18n-for-transaction-result-screen-round.md) | ✅ done | WebApp - Update i18n for transaction result screen (Round 2) | [#2728](https://github.com/Koniverse/SubWallet-Extension/issues/2728) | frenkie-ng | — |
 | [US-28.131](../stories/US-28.131-webapp-send-crash-log-feature.md) | ✅ done | WebApp - Send crash log feature | [#2730](https://github.com/Koniverse/SubWallet-Extension/issues/2730) | frenkie-ng | 1.1.62 |
 | [US-28.132](../stories/US-28.132-check-transfer-not-being-submitted-on-polimec.md) | ✅ done | Check transfer not being submitted on Polimec | [#2757](https://github.com/Koniverse/SubWallet-Extension/issues/2757) | S2kael | — |
 | [US-28.133](../stories/US-28.133-do-not-allow-send-to-empty-account-native-token-balance.md) | ✅ done | Do not allow send to empty account (Native token balance = 0) | [#2783](https://github.com/Koniverse/SubWallet-Extension/issues/2783) | bluezdot | 1.2.25 |

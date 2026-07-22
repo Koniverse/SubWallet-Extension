@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**253 stories** — 206 done (shipped), 3 in flight (ready / in-progress /
-review, from the Projects board), 22 backlog (open, not yet started), 21 deprecated
+**245 stories** — 198 done (shipped), 3 in flight (ready / in-progress /
+review, from the Projects board), 22 backlog (open, not yet started), 22 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -132,10 +132,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.80](../stories/US-23.80-fixed-bug-automatically-activate-tokens-based-on-accoun.md) | ✅ done | Fixed bug automatically activate tokens based on account balance | [#1500](https://github.com/Koniverse/SubWallet-Extension/issues/1500) | S2kael | 1.1.23 |
 | [US-23.81](../stories/US-23.81-allow-user-download-seed-phrase-file.md) | ✅ done | Allow user download seed phrase file | [#1560](https://github.com/Koniverse/SubWallet-Extension/issues/1560) | S2kael | 1.0.11 |
 | [US-23.82](../stories/US-23.82-still-showing-all-tokens-when-in-all-accounts-mode-in-c.md) | ⏸️ deprecated | Still showing all tokens when in All accounts mode in case the wallet has only 1 account type | [#1574](https://github.com/Koniverse/SubWallet-Extension/issues/1574) | S2kael | — |
-| [US-23.83](../stories/US-23.83-support-language-vietnamese-chinese.md) | ✅ done | Support language: Vietnamese, Chinese | [#1630](https://github.com/Koniverse/SubWallet-Extension/issues/1630) | S2kael | 1.1.2 |
-| [US-23.84](../stories/US-23.84-support-multi-language-for-messages-returned-from-the-b.md) | ✅ done | Support multi-language for messages returned from the background (round 1) | [#1640](https://github.com/Koniverse/SubWallet-Extension/issues/1640) | S2kael | 1.1.10 |
 | [US-23.85](../stories/US-23.85-support-qr-for-zkassets.md) | ⏸️ deprecated | Support QR for ZkAssets | [#1649](https://github.com/Koniverse/SubWallet-Extension/issues/1649) | nulllpc | — |
-| [US-23.86](../stories/US-23.86-support-new-language-russia.md) | ✅ done | Support new language: Russia | [#1658](https://github.com/Koniverse/SubWallet-Extension/issues/1658) | S2kael | 1.1.11 |
 | [US-23.87](../stories/US-23.87-webapp-show-incorrect-locked-balance-of-the-account.md) | ✅ done | WebApp - Show incorrect locked balance of the account | [#1680](https://github.com/Koniverse/SubWallet-Extension/issues/1680) | lw-cdm | 1.1.36 |
 | [US-23.88](../stories/US-23.88-webapp-show-incorrect-the-current-account.md) | ✅ done | WebApp - Show incorrect the current account | [#1682](https://github.com/Koniverse/SubWallet-Extension/issues/1682) | lw-cdm | 1.1.36 |
 | [US-23.89](../stories/US-23.89-webapp-do-not-import-account-by-private-key-starting-wi.md) | ✅ done | WebApp - Do not import account by private key starting without 0x | [#1687](https://github.com/Koniverse/SubWallet-Extension/issues/1687) | lw-cdm | — |
@@ -181,7 +178,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.129](../stories/US-23.129-unable-to-export-account-when-input-valid-master-passwo.md) | ✅ done | Unable to export account when input valid master password | [#2376](https://github.com/Koniverse/SubWallet-Extension/issues/2376) | S2kael | — |
 | [US-23.130](../stories/US-23.130-fixed-bug-do-not-detect-phishing-page-in-case-have-no-a.md) | ✅ done | Fixed bug Do not detect phishing page in case have no account in wallet | [#2390](https://github.com/Koniverse/SubWallet-Extension/issues/2390) | saltict | 1.1.31 |
 | [US-23.131](../stories/US-23.131-keyring-for-bitcoin.md) | ✅ done | Keyring for Bitcoin | [#2398](https://github.com/Koniverse/SubWallet-Extension/issues/2398) | S2kael | — |
-| [US-23.132](../stories/US-23.132-export-i18n-file.md) | ✅ done | Export i18n file | [#2424](https://github.com/Koniverse/SubWallet-Extension/issues/2424) | saltict | — |
 | [US-23.133](../stories/US-23.133-fixed-bug-do-not-display-the-account-in-the-account-det.md) | ✅ done | Fixed bug Do not display the account in the account details tab in case the entire account balance is locked | [#2429](https://github.com/Koniverse/SubWallet-Extension/issues/2429) | frenkie-ng | 1.1.30 |
 | [US-23.134](../stories/US-23.134-auto-import-evm-network-with-source-from-online-resourc.md) | ✅ done | Auto import EVM network with source from online resources | [#2472](https://github.com/Koniverse/SubWallet-Extension/issues/2472) | saltict | 1.1.33 |
 | [US-23.135](../stories/US-23.135-ui-bug-when-account-address-is-long.md) | ⏸️ deprecated | Ui bug when account address is long | [#2473](https://github.com/Koniverse/SubWallet-Extension/issues/2473) | — | — |
@@ -196,7 +192,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.144](../stories/US-23.144-webapp-implement-ui-for-export-multi-account.md) | ✅ done | WebApp - Implement UI for export multi-account | [#2845](https://github.com/Koniverse/SubWallet-Extension/issues/2845) | frenkie-ng | 1.2.26 |
 | [US-23.145](../stories/US-23.145-extension-improve-ui-for-export-all-account.md) | 📋 backlog | Extension - Improve UI for export all account | [#2887](https://github.com/Koniverse/SubWallet-Extension/issues/2887) | — | — |
 | [US-23.146](../stories/US-23.146-block-attach-account-polkadot-vault-for-network-moonbea.md) | ⏸️ deprecated | Block attach account Polkadot vault for network Moonbeam, Moonriver, Moonbase | [#3022](https://github.com/Koniverse/SubWallet-Extension/issues/3022) | nulllpc | — |
-| [US-23.147](../stories/US-23.147-add-popup-remind-backup-account-popup-hi-n-th-ngay-khi.md) | ✅ done | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) | [#3050](https://github.com/Koniverse/SubWallet-Extension/issues/3050) | Thiendekaco | 1.1.68 |
 | [US-23.148](../stories/US-23.148-fix-bug-show-blank-screen-when-attach-account.md) | ✅ done | Fix bug Show blank screen when attach account | [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054) | frenkie-ng | 1.2.22 |
 | [US-23.149](../stories/US-23.149-webapp-qr-code-of-the-receiving-address-is-lost.md) | ⏸️ deprecated | WebApp - QR code of the receiving address is lost | [#3083](https://github.com/Koniverse/SubWallet-Extension/issues/3083) | frenkie-ng | — |
 | [US-23.150](../stories/US-23.150-add-highlight-button-export-multi-account-when-navigate.md) | ✅ done | Add highlight button Export multi account when navigate to select account screen | [#3090](https://github.com/Koniverse/SubWallet-Extension/issues/3090) | Thiendekaco | 1.1.68 |
@@ -204,7 +199,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.152](../stories/US-23.152-support-mv3-on-firefox.md) | ✅ done | Support MV3 on Firefox | [#3108](https://github.com/Koniverse/SubWallet-Extension/issues/3108) | frenkie-ng | 1.2.7 |
 | [US-23.153](../stories/US-23.153-extension-mv3-still-show-icon-zk-mode-on-export-account.md) | ✅ done | Extension - MV3 - Still show icon ZK mode on Export account screen in case upgrade version MV2 -> MV3 | [#3117](https://github.com/Koniverse/SubWallet-Extension/issues/3117) | Thiendekaco | 1.2.1 |
 | [US-23.154](../stories/US-23.154-fix-bug-do-not-show-root-screen-after-remove-account.md) | ✅ done | Fix bug do not show root screen after remove account | [#3148](https://github.com/Koniverse/SubWallet-Extension/issues/3148) | frenkie-ng | 1.2.22 |
-| [US-23.155](../stories/US-23.155-hide-the-popup-remind-backup-seed-phrase.md) | ✅ done | Hide the popup Remind backup seed phrase | [#3198](https://github.com/Koniverse/SubWallet-Extension/issues/3198) | frenkie-ng | 1.2.6 |
 | [US-23.156](../stories/US-23.156-support-import-substrate-account-by-private-key.md) | 📋 backlog | Support import Substrate account by private key | [#3213](https://github.com/Koniverse/SubWallet-Extension/issues/3213) | nulllpc | — |
 | [US-23.157](../stories/US-23.157-fix-bug-do-not-show-account-to-get-address-when-stand-o.md) | ✅ done | Fix bug Do not show account to get address when stand on All accounts mode | [#3283](https://github.com/Koniverse/SubWallet-Extension/issues/3283) | lw-cdm | 1.2.13 |
 | [US-23.158](../stories/US-23.158-bug-import-custom-evm-rpc.md) | ⏸️ deprecated | [Bug] Import custom EVM Rpc | [#3318](https://github.com/Koniverse/SubWallet-Extension/issues/3318) | bluezdot | — |
@@ -235,7 +229,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.183](../stories/US-23.183-unified-account-can-t-export-multi-account.md) | ✅ done | Unified account - Can't export multi account | [#3592](https://github.com/Koniverse/SubWallet-Extension/issues/3592) | Thiendekaco | — |
 | [US-23.184](../stories/US-23.184-unified-account-update-ui-for-import-account-feature.md) | ✅ done | Unified account - Update UI for import account feature | [#3593](https://github.com/Koniverse/SubWallet-Extension/issues/3593) | Thiendekaco | 1.3.1 |
 | [US-23.185](../stories/US-23.185-unified-account-update-content.md) | ✅ done | Unified account - Update content | [#3604](https://github.com/Koniverse/SubWallet-Extension/issues/3604) | frenkie-ng | 1.3.1 |
-| [US-23.186](../stories/US-23.186-unified-account-recheck-remind-backup-seed-phrase-featu.md) | ✅ done | Unified account - Recheck Remind backup seed phrase features | [#3607](https://github.com/Koniverse/SubWallet-Extension/issues/3607) | Thiendekaco | — |
 | [US-23.187](../stories/US-23.187-unified-account-support-save-contact-for-ton-address.md) | ✅ done | Unified account - Support save contact for TON address | [#3610](https://github.com/Koniverse/SubWallet-Extension/issues/3610) | frenkie-ng | 1.3.1 |
 | [US-23.188](../stories/US-23.188-allow-importing-assets-on-asset-hub.md) | ✅ done | Allow importing assets on Asset Hub | [#3636](https://github.com/Koniverse/SubWallet-Extension/issues/3636) | PDTnhah | 1.3.4 |
 | [US-23.189](../stories/US-23.189-unified-account-improve-ui-with-feedback.md) | 📋 backlog | Unified account - Improve UI with feedback | [#3638](https://github.com/Koniverse/SubWallet-Extension/issues/3638) | Quangdm-cdm | — |
@@ -289,7 +282,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-23.237](../stories/US-23.237-support-bitcoin-derivation-with-unified-account.md) | ✅ done | Support bitcoin derivation with unified account | [#4261](https://github.com/Koniverse/SubWallet-Extension/issues/4261) | S2kael | 1.3.42 |
 | [US-23.238](../stories/US-23.238-support-import-export-bitcoin-account.md) | ✅ done | Support import/export Bitcoin account | [#4262](https://github.com/Koniverse/SubWallet-Extension/issues/4262) | S2kael | 1.3.42 |
 | [US-23.239](../stories/US-23.239-extension-added-support-for-export-method-for-unified-a.md) | 📋 backlog | Extension - Added support for export method for Unified accounts | [#4270](https://github.com/Koniverse/SubWallet-Extension/issues/4270) | — | — |
-| [US-23.240](../stories/US-23.240-extension-apply-new-i18n-format-for-create-import-accou.md) | ✅ done | Extension - Apply new i18n format for create/import account screens | [#4281](https://github.com/Koniverse/SubWallet-Extension/issues/4281) | — | — |
 | [US-23.241](../stories/US-23.241-fixed-bug-related-to-price-chart-for-derivation-token.md) | ✅ done | Fixed bug related to price chart for derivation token | [#4332](https://github.com/Koniverse/SubWallet-Extension/issues/4332), [#4344](https://github.com/Koniverse/SubWallet-Extension/issues/4344) | lw-cdm | 1.3.35 |
 | [US-23.242](../stories/US-23.242-unable-to-show-balance-for-cardano-account.md) | ✅ done | Unable to show balance for Cardano account | [#4558](https://github.com/Koniverse/SubWallet-Extension/issues/4558) | saltict | — |
 | [US-23.243](../stories/US-23.243-fixed-bug-can-not-import-json-account-from-polkadot-js.md) | ✅ done | Fixed bug Can not import Json Account from Polkadot{.js} extension | [#4565](https://github.com/Koniverse/SubWallet-Extension/issues/4565) | Thiendekaco | 1.3.53 |

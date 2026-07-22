@@ -31,6 +31,30 @@ wallet's core money-path; together they are the connective tissue that turns the
 engine + read-surface epics into a product a real person can pick up, understand,
 and stay engaged with.
 
+> **Implementation ledger →** the tracker issues that built these capabilities live **inside the
+> stories below**, each a row in that story's own incremental-work table. The former
+> one-issue-per-story maintenance ledger was dissolved on 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22.md#e-epic-39-maintenance--onboarding--engagement-merged-into-epic-19).
+
+### Umbrella issues — owned by this epic, not by a story
+
+An issue that **has sub-issues and no CHANGELOG line of its own** delegated all its scope; the epic
+records it and the children are the story rows ([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive
+with `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
+
+| Issue | Title | Tracker state | Children |
+|---|---|---|---|
+| [#4182](https://github.com/Koniverse/SubWallet-Extension/issues/4182) | Improve MKT campaign features | 📋 open | #4180, #4137, #3737 (UI/UX ledger) · #4432 (transactions ledger) · #3454 ([US-19.10](../stories/US-19.10-webapp-marketing-campaign-round-2.md)) |
+| [#4370](https://github.com/Koniverse/SubWallet-Extension/issues/4370) | In-app Notifications | ✅ closed COMPLETED | #3507, #3515, #1599, #2038, #1639 (UI/UX ledger) · #1385 (transactions ledger) · #2230, #4064 ([US-19.8](../stories/US-19.8-in-app-notification-center.md)) |
+| [#4154](https://github.com/Koniverse/SubWallet-Extension/issues/4154) | Support adding some new languages on the wallet | 📋 open | #4126, #2123 ([US-19.3](../stories/US-19.3-additional-ui-languages.md)) · #2004, #2423 ([US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md), [US-19.11](../stories/US-19.11-onboarding-gate-follow-ups.md)) · #2531 |
+| [#2531](https://github.com/Koniverse/SubWallet-Extension/issues/2531) | Clean up i18n data and re-apply i18n | 📋 open | 10 shipped i18n-format issues ([US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md)) · #4564, #4656 ([US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md)) · #4560 ([US-1.4](../stories/US-1.4-online-i18n-hot-update.md)) |
+| [#4527](https://github.com/Koniverse/SubWallet-Extension/issues/4527) | Request for Additional Language Support (Spanish and more) | 📋 open | #4528 ([US-19.3](../stories/US-19.3-additional-ui-languages.md)) |
+
+> **Four of the listed "sub-issues" are pull requests, not issues** — #1940, #1832 and #1716 under
+> #4182, and #913 under #4370. Their titles are PR titles (`[Issue-N] …`) and they appear nowhere
+> in the docs, correctly. This is the same board noise as #138, #145 and #43 found on 2026-07-22;
+> the tree is evidence, not truth.
+
 ## Overview
 
 ### Business context
@@ -132,9 +156,26 @@ notification feed and bundled locale files ride the same delivery substrate.
 | [US-19.6](../stories/US-19.6-nft-mint-campaigns.md) | NFT mint campaigns | Display and enter NFT-mint campaigns from in-app surfaces | 📋 backlog | — |
 | [US-19.7](../stories/US-19.7-mission-pools-reward-program.md) | Mission Pools reward program | The Mission Pools reward-program surface (eligibility, rewards, entry) | ✅ done | 1.1.46 |
 | [US-19.8](../stories/US-19.8-in-app-notification-center.md) | In-app notification center | One feed for transaction status, campaign alerts and system messages | ✅ done | 1.3.4 |
+| [US-19.9](../stories/US-19.9-notification-reliability-and-spam-control.md) | Notification reliability & spam control | Improvement on US-19.8 — stop duplicate/spam notifications (#3845) and the wider improvement round (#3798) | 🚧 in-progress | — |
+| [US-19.10](../stories/US-19.10-webapp-marketing-campaign-round-2.md) | WebApp marketing campaign, round 2 | Improvement on US-19.4 — round 2 of the WebApp campaign surface (#3454) | 📋 backlog | — |
+| [US-19.11](../stories/US-19.11-onboarding-gate-follow-ups.md) | Onboarding gate follow-ups | Improvement on US-19.1 — WebApp backup reminder (#3010) and multilingual Terms of use (#2423) | 📋 backlog | — |
+| [US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md) | i18n coverage & key hygiene | Improvement on US-19.2 — hardcoded strings (#4564, #4656), key format (#2460), Welcome-screen picker (#2004) | 📋 backlog | — |
+| [US-19.13](../stories/US-19.13-avail-space-mission-pool-improvement.md) | Avail Space mission pool improvement | Improvement on US-19.7 — refinement of the Avail Space surface (#3529) | 📋 backlog | — |
 
 > US-19.1, US-19.2, US-19.4..19.8 are **retroactive** (the capability already ships);
-> US-19.3 is **forward** (📋 planned, FR-154). Each story materializes exactly one FR.
+> US-19.3 is **forward** (📋 planned, FR-154). Each of those materializes exactly one FR.
+>
+> **US-19.9 … US-19.13 carry no FR.** They are the unfinished halves of US-19.8, US-19.4, US-19.1,
+> US-19.2 and US-19.7, split out on 2026-07-22 so each parent can be judged on what it delivered
+> ([AGENTS.md](../../../AGENTS.md) rule 9). An FR is earned when a capability is specified, not
+> when someone files a follow-up
+> ([D104](../../CONTEXT.md#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)).
+>
+> **Five of the eight original stories had no issue table until 2026-07-22.** Their tracker issues
+> were not missing — they sat in the account, UI/UX, transaction, swap, earning and uncategorized
+> ledgers, routed there by the *screen* each touched rather than the concern it served. 49 issues
+> were pulled back; the Mission Pools set alone had 11 filed under **Earning**, because the area
+> heuristic matched the word *pool*.
 
 ## Object map & user-story interactions
 

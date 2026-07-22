@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 10:06:05 UTC
-> Total stories: 2728
+> Last generated: 2026-07-22 11:06:20 UTC
+> Total stories: 2664
 
-## 📋 Backlog (289)
+## 📋 Backlog (281)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -31,6 +31,10 @@
 | US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
+| US-19.10 | WebApp marketing campaign, round 2 (improvement on US-19.4) | EPIC-19 | P3 | 1 | — | — |
+| US-19.11 | Onboarding gate follow-ups (improvement on US-19.1) | EPIC-19 | P3 | 1 | — | — |
+| US-19.12 | i18n coverage & key hygiene (improvement on US-19.2) | EPIC-19 | P3 | 1 | — | — |
+| US-19.13 | Avail Space mission pool improvement (improvement on US-19.7) | EPIC-19 | P3 | 1 | — | — |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
@@ -91,13 +95,9 @@
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
 | US-26.91 | [QRScanner] Update style | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.116 | Improve UI for reset wallet feature | EPIC-26 | P3 | 1 | — | — |
-| US-26.129 | Add language selection on the Welcome screen | EPIC-26 | P3 | 1 | — | — |
-| US-26.136 | Multi-language - add support Portuguese | EPIC-26 | P3 | 1 | — | saltict |
 | US-26.139 | Extension - Update some UX for extension and webapp | EPIC-26 | P3 | 1 | — | Thiendekaco |
-| US-26.146 | Update localization with key format | EPIC-26 | P3 | 1 | — | saltict |
 | US-26.153 | WebApp - Change the position of the toast and popup | EPIC-26 | P3 | 1 | — | — |
 | US-26.156 | WebApp - Show incorrect information on Confirmation screen for Avail | EPIC-26 | P3 | 1 | — | lw-cdm |
-| US-26.159 | WebApp - Add popup to remind users to perform backups | EPIC-26 | P3 | 1 | — | Thiendekaco |
 | US-26.170 | Add hard reload button | EPIC-26 | P3 | 1 | — | nulllpc |
 | US-26.172 | Extension - Bug UI for MKT campaign | EPIC-26 | P3 | 1 | — | — |
 | US-26.173 | Extension - Add some feature on Settings screen | EPIC-26 | P3 | 1 | — | — |
@@ -107,8 +107,6 @@
 | US-26.181 | 🧠 High-Impact, Low-Effort UX Improvements | EPIC-26 | P3 | 1 | — | — |
 | US-26.182 | High Impact – High Effort UX Issues | EPIC-26 | P3 | 1 | — | — |
 | US-26.183 | 🟡 Low Impact UX Issues | EPIC-26 | P3 | 1 | — | — |
-| US-26.184 | 🌐 Request for Additional Language Support (Spanish and more) | EPIC-26 | P3 | 1 | — | — |
-| US-26.186 | Extension - Missing i18n Wrapping for Strings in UI and Background Code | EPIC-26 | P3 | 1 | — | — |
 | US-26.188 | [Extension] Improve some UI | EPIC-26 | P3 | 1 | — | — |
 | US-28.86 | Re-check case send Max on some tokens | EPIC-28 | P3 | 1 | — | S2kael |
 | US-28.99 | Handle the case of transfer Max for some tokens | EPIC-28 | P3 | 1 | — | — |
@@ -180,7 +178,6 @@
 | US-32.268 | WebApp - Improve Earning feature | EPIC-32 | P3 | 1 | — | — |
 | US-32.275 | WebApp - Handle case click back button on the Start earning | EPIC-32 | P3 | 1 | — | — |
 | US-32.285 | WebApp - Cancel stake button is disabled even though this action is available | EPIC-32 | P3 | 1 | — | — |
-| US-32.300 | Avail Space - Improve mission pool feature | EPIC-32 | P3 | 1 | — | frenkie-ng |
 | US-32.302 | Extension - Update content for popup notice of need to unstake | EPIC-32 | P3 | 1 | — | — |
 | US-32.314 | Extension - Support Claim reward for Amplitude | EPIC-32 | P3 | 1 | — | — |
 | US-32.315 | Extension - Error auto reset data on validator field | EPIC-32 | P3 | 1 | — | — |
@@ -209,9 +206,6 @@
 | US-36.61 | Optimize swap pair selection | EPIC-36 | P3 | 1 | — | — |
 | US-36.64 | Avail Space - Support Avail Recovery Ledger app | EPIC-36 | P3 | 1 | — | — |
 | US-36.76 | Remove @polkadot/hw-ledger from ledger connector | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-39.10 | WebApp - Support marketing campaign feature for webapp ( Round 2 ) | EPIC-39 | P3 | 1 | — | — |
-| US-39.12 | Extension - Improve Notification | EPIC-39 | P3 | 1 | — | — |
-| US-39.17 | Improve MKT campaign features | EPIC-39 | P3 | 1 | — | nulllpc |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
 | US-4.13 | Bitcoin UTXO multi-asset transfer & custom fee | EPIC-4 | P1 | 5 | — | — |
 | US-4.16 | Cosmos ecosystem support | EPIC-4 | P1 | 5 | — | — |
@@ -235,7 +229,6 @@
 | US-41.211 | Update some error message | EPIC-41 | P3 | 1 | — | ThaoNguyen998 |
 | US-41.223 | Bug related to reset all | EPIC-41 | P3 | 1 | — | — |
 | US-41.224 | Review subscription in case there are multiple functions to subscribe to | EPIC-41 | P3 | 1 | — | nulllpc |
-| US-41.228 | [Extension] Multilingual processing for Terms of use | EPIC-41 | P3 | 1 | — | — |
 | US-41.245 | Research more ulitilies features based on user's feedback | EPIC-41 | P3 | 1 | — | Sokol142196 |
 | US-41.246 | Figure out and test tracking users on web app via URL custom | EPIC-41 | P3 | 1 | — | saltict |
 | US-41.247 | Research and select user support system development | EPIC-41 | P3 | 1 | — | saltict |
@@ -272,7 +265,6 @@
 | US-41.436 | WebApp - Update link for 'Contact support' | EPIC-41 | P3 | 1 | — | — |
 | US-41.439 | Extension - Index UTXOs | EPIC-41 | P3 | 1 | — | — |
 | US-41.448 | Support custom auto compound for Moonbeam/Moonriver/Moonbase | EPIC-41 | P3 | 1 | — | — |
-| US-41.469 | WebApp - Replace Hardcoded Strings with i18n Keys for WebApp | EPIC-41 | P3 | 1 | — | — |
 | US-41.479 | Recheck usage of currentEra in code base | EPIC-41 | P3 | 1 | — | bluezdot |
 | US-41.481 | Update SubWallet libraries | EPIC-41 | P3 | 1 | — | saltict |
 | US-41.483 | [Extension] Sync back updates from WebApp branch | EPIC-41 | P3 | 1 | — | — |
@@ -298,7 +290,7 @@
 | US-9.23 | WebApp address display & validation, round 2 (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.24 | Client-side NFT Service — full SDK migration (improvement on US-9.20) | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
-## 🟢 Ready (16)
+## 🟢 Ready (14)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -310,8 +302,6 @@
 | US-30.56 | Integrate with AirGap Vault for QR signer | EPIC-30 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-31.25 | Extension - Show incorrect fee when swap | EPIC-31 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-31.79 | Extension - Update content in-app for Swap (Round 2) | EPIC-31 | P3 | 1 | sprint-2026-W28 | Quangdm-cdm |
-| US-39.13 | Extension - Check bug spam notification | EPIC-39 | P3 | 1 | sprint-2026-W28 | bluezdot |
-| US-41.248 | Clean up i18n data and re-apply i18n | EPIC-41 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
@@ -319,12 +309,13 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (32)
+## 🟡 In Progress (33)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
+| US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
 | US-23.222 | WebApp - Wallet account injection feature (related to unified account feature) | EPIC-23 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
@@ -372,7 +363,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2182)
+## ✅ Done (2131)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -515,9 +506,6 @@
 | US-23.79 | Fixed bug Do not Apply master password in case import multi account but file json have information 'IsMasterPassword' | EPIC-23 | P3 | 1 | sprint-2023-M06 | S2kael |
 | US-23.80 | Fixed bug automatically activate tokens based on account balance | EPIC-23 | P3 | 1 | sprint-2023-M11 | S2kael |
 | US-23.81 | Allow user download seed phrase file | EPIC-23 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-23.83 | Support language: Vietnamese, Chinese | EPIC-23 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-23.84 | Support multi-language for messages returned from the background (round 1) | EPIC-23 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-23.86 | Support new language: Russia | EPIC-23 | P3 | 1 | sprint-2023-M09 | S2kael |
 | US-23.87 | WebApp - Show incorrect locked balance of the account | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
 | US-23.88 | WebApp - Show incorrect the current account | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
 | US-23.89 | WebApp - Do not import account by private key starting without 0x | EPIC-23 | P3 | 1 | sprint-2023-M07 | lw-cdm |
@@ -560,7 +548,6 @@
 | US-23.129 | Unable to export account when input valid master password | EPIC-23 | P3 | 1 | sprint-2024-M01 | S2kael |
 | US-23.130 | Fixed bug Do not detect phishing page in case have no account in wallet | EPIC-23 | P3 | 1 | sprint-2024-M01 | saltict |
 | US-23.131 | Keyring for Bitcoin | EPIC-23 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-23.132 | Export i18n file | EPIC-23 | P3 | 1 | sprint-2024-M01 | saltict |
 | US-23.133 | Fixed bug Do not display the account in the account details tab in case the entire account balance is locked | EPIC-23 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
 | US-23.134 | Auto import EVM network with source from online resources | EPIC-23 | P3 | 1 | sprint-2024-M01 | saltict |
 | US-23.136 | Fixed bug Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported | EPIC-23 | P3 | 1 | sprint-2024-M02 | lw-cdm |
@@ -569,13 +556,11 @@
 | US-23.140 | Handle case displayed account with specific network | EPIC-23 | P3 | 1 | sprint-2024-M05 | saltict |
 | US-23.143 | Support Export all accounts feature | EPIC-23 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
 | US-23.144 | WebApp - Implement UI for export multi-account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.147 | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-23.148 | Fix bug Show blank screen when attach account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-23.150 | Add highlight button Export multi account when navigate to select account screen | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-23.152 | Support MV3 on Firefox | EPIC-23 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-23.153 | Extension - MV3 - Still show icon ZK mode on Export account screen in case upgrade version MV2 -> MV3 | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-23.154 | Fix bug do not show root screen after remove account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.155 | Hide the popup Remind backup seed phrase | EPIC-23 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-23.157 | Fix bug Do not show account to get address when stand on All accounts mode | EPIC-23 | P3 | 1 | sprint-2024-M07 | lw-cdm |
 | US-23.160 | Integrate unified account | EPIC-23 | P3 | 1 | sprint-2024-M08 | S2kael |
 | US-23.161 | Update UI to support unified account | EPIC-23 | P3 | 1 | sprint-2024-M08 | lw-cdm |
@@ -600,7 +585,6 @@
 | US-23.183 | Unified account - Can't export multi account | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
 | US-23.184 | Unified account - Update UI for import account feature | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
 | US-23.185 | Unified account - Update content | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.186 | Unified account - Recheck Remind backup seed phrase features | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
 | US-23.187 | Unified account - Support save contact for TON address | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-23.188 | Allow importing assets on Asset Hub | EPIC-23 | P3 | 1 | sprint-2024-M10 | PDTnhah |
 | US-23.190 | Unified account - Update content for some features | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
@@ -640,7 +624,6 @@
 | US-23.236 | Support watch-only account for Bitcoin | EPIC-23 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
 | US-23.237 | Support bitcoin derivation with unified account | EPIC-23 | P3 | 1 | sprint-2025-M06 | S2kael |
 | US-23.238 | Support import/export Bitcoin account | EPIC-23 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-23.240 | Extension - Apply new i18n format for create/import account screens | EPIC-23 | P3 | 1 | sprint-2025-M08 | — |
 | US-23.241 | Fixed bug related to price chart for derivation token | EPIC-23 | P3 | 1 | sprint-2025-M05 | lw-cdm |
 | US-23.242 | Unable to show balance for Cardano account | EPIC-23 | P3 | 1 | sprint-2025-M07 | saltict |
 | US-23.243 | Fixed bug Can not import Json Account from Polkadot{.js} extension | EPIC-23 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
@@ -1024,11 +1007,9 @@
 | US-26.90 | Update some screens follow by design | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
 | US-26.92 | Update login & welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M05 | saltict |
 | US-26.93 | Fixed UI bugs | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.94 | Multi-language support | EPIC-26 | P3 | 1 | sprint-2024-M09 | Sokol142196 |
 | US-26.95 | Fixed UI bugs on the Expand view | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
 | US-26.96 | Improve Notifcation Logic And UI | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
 | US-26.97 | Update UI for notification | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.98 | Support new language: Japanese | EPIC-26 | P3 | 1 | sprint-2023-M08 | S2kael |
 | US-26.99 | Improve lock UX | EPIC-26 | P3 | 1 | sprint-2023-M08 | saltict |
 | US-26.100 | WebApp - UI bugs on the Welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
 | US-26.101 | WebApp - Do not attach watch any wallet from Welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
@@ -1053,7 +1034,6 @@
 | US-26.123 | WebApp - Update welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M09 | lw-cdm |
 | US-26.124 | Extension - Improve history list view | EPIC-26 | P3 | 1 | sprint-2023-M09 | S2kael |
 | US-26.125 | WebApp - The display is very slow when opened for the first time | EPIC-26 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-26.126 | WebApp - Support multiple language | EPIC-26 | P3 | 1 | sprint-2025-M03 | saltict |
 | US-26.127 | WebApp - UI bug on DApps screen | EPIC-26 | P3 | 1 | sprint-2023-M11 | Thiendekaco |
 | US-26.128 | In App marketing banners, features | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
 | US-26.131 | Improve banner campaign in app | EPIC-26 | P3 | 1 | sprint-2024-M01 | S2kael |
@@ -1063,21 +1043,16 @@
 | US-26.135 | Add button on the Minting success screen to navigate user to Airlyft | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
 | US-26.137 | Fixed some UI bug | EPIC-26 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
 | US-26.138 | WebApp - UI bug on the small screen | EPIC-26 | P3 | 1 | sprint-2023-M11 | Thiendekaco |
-| US-26.140 | Add popup to remind users to perform backups account (popup hiển thị định kỳ) | EPIC-26 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-26.141 | WebApp \| Extension - Incorrect display of filter results when filtering by 'Failed' criteria | EPIC-26 | P3 | 1 | sprint-2023-M12 | lw-cdm |
 | US-26.142 | Fixed bug show EVM transaction history | EPIC-26 | P3 | 1 | sprint-2023-M12 | lw-cdm |
 | US-26.143 | Add 'time-out' status for transaction history | EPIC-26 | P3 | 1 | sprint-2024-M01 | Thiendekaco |
 | US-26.144 | WebApp \| Extension - Fix some UI bug (Round 2) | EPIC-26 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
 | US-26.145 | Extension - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
 | US-26.147 | Improve notification/banner in app feature (Round 2) | EPIC-26 | P3 | 1 | sprint-2025-M03 | — |
-| US-26.149 | Research and build system for i18n (localization management) | EPIC-26 | P3 | 1 | sprint-2025-M03 | saltict |
 | US-26.151 | Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-26.152 | WebApp - Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-26.154 | Improve display collators list | EPIC-26 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
-| US-26.155 | Improve UI for Mission Pools | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-26.157 | Extension - Currency settings are reset when upgrade version | EPIC-26 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-26.158 | WebApp - Improve UI for Mission pools feature | EPIC-26 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-26.160 | Apply new i18n format for Settings screens | EPIC-26 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
 | US-26.161 | Fixed bug Unable to back screen in case open General settings to Marketing campaign | EPIC-26 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-26.162 | Fix bug Screen flickering error when interacting with extensions | EPIC-26 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-26.163 | Extension - Add popup to remind user upgrade Firefox version | EPIC-26 | P3 | 1 | sprint-2024-M06 | Thiendekaco |
@@ -1090,7 +1065,6 @@
 | US-26.171 | Review API to track TON tx history | EPIC-26 | P3 | 1 | sprint-2024-M10 | bluezdot |
 | US-26.175 | Turn off the update manifest v3 popup | EPIC-26 | P3 | 1 | sprint-2025-M05 | frenkie-ng |
 | US-26.178 | Update UI to clearly display fees | EPIC-26 | P3 | 1 | sprint-2025-M05 | frenkie-ng |
-| US-26.179 | Extension - Add the missing keys to the settings section | EPIC-26 | P3 | 1 | sprint-2025-M05 | anhntk54 |
 | US-26.185 | WebApp - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2025-M07 | lw-cdm |
 | US-26.187 | Improve UX for the 'Advanced phishing detection' feature | EPIC-26 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
 | US-26.189 | [Energy Web X] Display APY for collators in collator list | EPIC-26 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
@@ -1251,7 +1225,6 @@
 | US-28.125 | [Hotfix] Temporary disable transfer on NUUM token | EPIC-28 | P3 | 1 | sprint-2024-M03 | bluezdot |
 | US-28.127 | WebApp - Update transaction result screen | EPIC-28 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-28.129 | Support transferring Unique NFTs | EPIC-28 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-28.130 | WebApp - Update i18n for transaction result screen (Round 2) | EPIC-28 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-28.131 | WebApp - Send crash log feature | EPIC-28 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
 | US-28.132 | Check transfer not being submitted on Polimec | EPIC-28 | P3 | 1 | sprint-2024-M03 | S2kael |
 | US-28.133 | Do not allow send to empty account (Native token balance = 0) | EPIC-28 | P3 | 1 | sprint-2024-M08 | bluezdot |
@@ -1536,7 +1509,6 @@
 | US-31.67 | Fixed bug Error page when perform sign permit from Uniswap | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
 | US-31.68 | Update content in-app for swap | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
 | US-31.70 | Support Asset Hub Testnet swap for Chainflip | EPIC-31 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-31.71 | Extension - Apply new i18n format for Transfer, Swap screens | EPIC-31 | P3 | 1 | sprint-2025-M09 | — |
 | US-31.72 | Support GIGADOT token for Hydration | EPIC-31 | P3 | 1 | sprint-2025-M04 | bluezdot |
 | US-31.73 | Support UniswapX Dutch Swap | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
 | US-31.74 | Add more swap pairs from Simple swap | EPIC-31 | P3 | 1 | sprint-2025-M07 | bluezdot |
@@ -1718,7 +1690,6 @@
 | US-32.172 | Show incorrect earning status on All accounts mode | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-32.174 | Update API staking for Astar | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
 | US-32.176 | Add Azero Domains is default pool | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.177 | WebApp - Update mission pool feature | EPIC-32 | P3 | 1 | sprint-2023-M12 | saltict |
 | US-32.178 | Fix bug 'Invalid character' on earning | EPIC-32 | P3 | 1 | sprint-2023-M12 | nulllpc |
 | US-32.179 | Update Astar dapp staking v3 | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
 | US-32.180 | WebApp \| Extension - Handle the case of default untick checkbox Bond reward when Claim reward | EPIC-32 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
@@ -1757,14 +1728,12 @@
 | US-32.218 | Extension - Bugs related to the earning feature (Round 3) | EPIC-32 | P3 | 1 | sprint-2024-M02 | S2kael |
 | US-32.219 | [Extension] Fix unstaking info for liquid staking on Bifrost | EPIC-32 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
 | US-32.221 | Fix bug related to Aleph Zero transfer and staking | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.222 | WebApp - Add status tag on Mission Pool list screen | EPIC-32 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-32.223 | WebApp - Bug related to earning feature on WebApp (Round 2) | EPIC-32 | P3 | 1 | sprint-2024-M03 | lw-cdm |
 | US-32.224 | Update pool default for VARA | EPIC-32 | P3 | 1 | sprint-2024-M02 | saltict |
 | US-32.225 | Fixed bug related to earning feature | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
 | US-32.226 | Re-check case update data after performing actions (unstake, cancel unstake, withdraw) | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
 | US-32.228 | Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-32.229 | WebApp - Bug related to earning feature on WebApp (Round 3) | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.231 | [Growth] Request to add  Mission Pool to Settings screen on Extension | EPIC-32 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-32.232 | WebApp - Update TVS for earning feature | EPIC-32 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
 | US-32.233 | WebApp - Update earning preview screen | EPIC-32 | P3 | 1 | sprint-2024-M03 | lw-cdm |
 | US-32.234 | Fixed bug show earnings screen although back to home | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
@@ -1796,12 +1765,10 @@
 | US-32.264 | Refactoring code earning service | EPIC-32 | P3 | 1 | sprint-2024-M06 | bluezdot |
 | US-32.265 | Fixed error auto reset data on Pool field | EPIC-32 | P3 | 1 | sprint-2024-M11 | S2kael |
 | US-32.266 | Do not show crowdloan data on the Check crowdloan result site | EPIC-32 | P3 | 1 | sprint-2025-M03 | — |
-| US-32.267 | Fixed bug Don't display network on Mission pool details | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
 | US-32.269 | Check Avail Turing staking APY | EPIC-32 | P3 | 1 | sprint-2024-M05 | bluezdot |
 | US-32.270 | WebApp - Error getting wrong validator address | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-32.271 | WebApp - Implement UI in case Disallow staking to collators/pools that maxed out member threshold | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-32.272 | Show nomination pool with block status | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.273 | Extension - Apply new i18n format for Tokens, NFTs, Crowdloan screens | EPIC-32 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
 | US-32.274 | [Extension] Fix earning data for update chain online | EPIC-32 | P3 | 1 | sprint-2024-M05 | S2kael |
 | US-32.276 | Update UI for Earning position details | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
 | US-32.277 | WebApp - Remove Parallel liquid staking | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
@@ -1809,17 +1776,14 @@
 | US-32.279 | WebApp- Add portfolio for earning position | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-32.280 | Check error logs in earning feature | EPIC-32 | P3 | 1 | sprint-2024-M06 | bluezdot |
 | US-32.281 | WebApp - Show nomination pool with block status | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-32.284 | Fix bug Cannot read properties of undefined (reading 'filter') related to Mission pool | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-32.286 | Staking rewards not being updated for injected accounts on webapp | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-32.287 | Improve the staking reward information retrieval | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-32.288 | Fix bug Show incorrect withdrawal information of the Bifrost liquid staking when all accounts mode | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-32.289 | WebApp - Re-check case totalStake < unstakeBalance | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-32.290 | WebApp - Improve Mission pool feature | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-32.291 | Set default pool and default validator for Avail | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-32.292 | WebApp -  Set default pool and default validator for Avail | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
 | US-32.293 | WebApp - Do not show earning position for Bifrost liquid staking | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
 | US-32.294 | Update balance calculation for nomination pool runtime update | EPIC-32 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-32.295 | Avail Space - Support mission pool feature | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
 | US-32.296 | Re-check validator display information on DENTnet network | EPIC-32 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
 | US-32.297 | Add warning in case user earn for both nomination pool and direct | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
 | US-32.298 | Add Notice of need to unstake for users who are simultaneously staking for both Direct and Nomination Pool | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
@@ -1829,7 +1793,6 @@
 | US-32.305 | Fix bug do not show lock balance in case account have Kusama nomination pool | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-32.306 | Fix bug display wrong APY for Polkadot staking option | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-32.308 | Extension - Transaction has a bad signature when perform earning for Moonbase Alpha | EPIC-32 | P3 | 1 | sprint-2025-M01 | S2kael |
-| US-32.309 | Unified account - UI bug on the Mission pool screen and Buy token | EPIC-32 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
 | US-32.310 | Extension - Update message in case perform Liquid staking have XCM | EPIC-32 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
 | US-32.311 | Unified account - Bug related to Earning feature | EPIC-32 | P3 | 1 | sprint-2024-M10 | S2kael |
 | US-32.312 | Update content on unstake screen for some earning options | EPIC-32 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
@@ -1849,8 +1812,6 @@
 | US-32.328 | Support Change validator feature | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
 | US-32.329 | Add APY information for TAO and dTao staking | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
 | US-32.330 | Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver | EPIC-32 | P3 | 1 | sprint-2025-M06 | PDTnhah |
-| US-32.331 | Extension - Apply new i18n format for Earning screens | EPIC-32 | P3 | 1 | sprint-2025-M09 | — |
-| US-32.332 | Extension - Apply new i18n format for remain screens (Mission pool, Notification...) | EPIC-32 | P3 | 1 | sprint-2025-M09 | — |
 | US-32.333 | Fixed bug when stake for subnet | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
 | US-32.334 | Change TAO's position in Earning options | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
 | US-32.335 | Stake TAO with Seamless Validator Switching | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
@@ -2093,21 +2054,6 @@
 | US-36.79 | [Extension] Update metadata runtime for Ledger app - Round 4 | EPIC-36 | P3 | 1 | sprint-2025-M11 | PDTnhah |
 | US-36.80 | [Extension] Update metadata runtime for Ledger app - Round 5 | EPIC-36 | P3 | 1 | sprint-2025-M12 | PDTnhah |
 | US-36.81 | Recheck Ledger signing on Bittensor network | EPIC-36 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-39.1 | Create PR to intergrate SubWallet into web3-onboard | EPIC-39 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-39.2 | Update manage message and notification in extension | EPIC-39 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-39.3 | Support notification in browser and banner in app | EPIC-39 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-39.4 | WebApp - Disable Browser notification type setting | EPIC-39 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-39.5 | Re-check order campaign | EPIC-39 | P3 | 1 | sprint-2023-M11 | saltict |
-| US-39.6 | Set up notifications for mobile devices in case of data loss on iOS 17.1 | EPIC-39 | P3 | 1 | sprint-2023-M11 | Sokol142196 |
-| US-39.7 | WebApp - Support marketing campaign feature for webapp | EPIC-39 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-39.8 | Improve the Marketing Campaign application mechanism | EPIC-39 | P3 | 1 | sprint-2024-M06 | Quangdm-cdm |
-| US-39.9 | Improve performance upon showing Marketing Campaign | EPIC-39 | P3 | 1 | sprint-2024-M08 | Quangdm-cdm |
-| US-39.11 | Improve condition for Marketing campaign | EPIC-39 | P3 | 1 | sprint-2024-M09 | Quangdm-cdm |
-| US-39.15 | Avail Space - Support Notification in-app | EPIC-39 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-39.16 | WebApp - Support Notification in-app | EPIC-39 | P3 | 1 | sprint-2025-M03 | frenkie-ng |
-| US-39.18 | In-app Notifications | EPIC-39 | P3 | 1 | sprint-2025-M05 | — |
-| US-39.19 | Fixed bug Error page when use marketing campaign | EPIC-39 | P3 | 1 | sprint-2025-M06 | lw-cdm |
-| US-39.20 | [Grab 100 MDOT] Mint NFT | EPIC-39 | P3 | 1 | sprint-2023-M10 | saltict |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -2262,7 +2208,6 @@
 | US-41.146 | Update IPFS gateway list | EPIC-41 | P3 | 1 | sprint-2023-M09 | saltict |
 | US-41.147 | WebApp - Portforlio % show incorrect | EPIC-41 | P3 | 1 | sprint-2023-M08 | lw-cdm |
 | US-41.148 | WebApp - Re-check apply master password feature | EPIC-41 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-41.150 | WebApp - AirDrop Tracking | EPIC-41 | P3 | 1 | sprint-2023-M10 | lw-cdm |
 | US-41.151 | WebApp - Update netlify workflow | EPIC-41 | P3 | 1 | sprint-2023-M08 | saltict |
 | US-41.152 | WebApp - Can not get to address in case below | EPIC-41 | P3 | 1 | sprint-2023-M07 | lw-cdm |
 | US-41.153 | Update logo for Avail network | EPIC-41 | P3 | 1 | sprint-2023-M07 | S2kael |
@@ -2281,7 +2226,6 @@
 | US-41.171 | Update confirmation openPModal logic | EPIC-41 | P3 | 1 | sprint-2023-M10 | lw-cdm |
 | US-41.172 | Keep update webapp with newest version of extension | EPIC-41 | P3 | 1 | sprint-2023-M10 | saltict |
 | US-41.173 | Improve Amount input field | EPIC-41 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-41.174 | Update web-runner for i18n for background | EPIC-41 | P3 | 1 | sprint-2023-M09 | S2kael |
 | US-41.176 | Update chain list | EPIC-41 | P3 | 1 | sprint-2023-M09 | S2kael |
 | US-41.177 | An error occurs when using ZK mode with authenticate with password = When needed | EPIC-41 | P3 | 1 | sprint-2024-M07 | S2kael |
 | US-41.179 | Update chain list | EPIC-41 | P3 | 1 | sprint-2023-M10 | S2kael |
@@ -2371,7 +2315,6 @@
 | US-41.290 | Handle the case of not resetting the wallet to the default state when click Erase all | EPIC-41 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
 | US-41.292 | Update chain-list | EPIC-41 | P3 | 1 | sprint-2024-M05 | bluezdot |
 | US-41.293 | WebApp - Update latest code v1.1.64 | EPIC-41 | P3 | 1 | sprint-2024-M05 | saltict |
-| US-41.295 | Test new i18n flow | EPIC-41 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
 | US-41.296 | Update chain-list | EPIC-41 | P3 | 1 | sprint-2024-M05 | bluezdot |
 | US-41.297 | Remove support for Moonbeam on Polkadot vault | EPIC-41 | P3 | 1 | sprint-2024-M05 | S2kael |
 | US-41.298 | Refactor logic parsing data from contract response | EPIC-41 | P3 | 1 | sprint-2024-M10 | PDTnhah |
@@ -2483,10 +2426,8 @@
 | US-41.446 | Create flexible `BACKEND_URL` changing mechanism for pull requests | EPIC-41 | P3 | 1 | sprint-2025-M06 | S2kael |
 | US-41.447 | Update Gears Library | EPIC-41 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
 | US-41.449 | [WebApp] Upgrade codebase to version 1.3.41 (sync from Extension) | EPIC-41 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-41.450 | Extension - Research and propose improved i18n solution | EPIC-41 | P3 | 1 | sprint-2025-M07 | frenkie-ng |
 | US-41.451 | Extension - Hide feature Advanced address detection | EPIC-41 | P3 | 1 | sprint-2025-M06 | lw-cdm |
 | US-41.452 | Re-check for Paseo after migrated | EPIC-41 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-41.453 | Replace Hardcoded Strings with i18n Keys | EPIC-41 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
 | US-41.454 | Support for PolkaVM Compatibility | EPIC-41 | P3 | 1 | sprint-2025-M07 | PDTnhah |
 | US-41.455 | Update chain-list stable v0.2.110 | EPIC-41 | P3 | 1 | sprint-2025-M07 | PDTnhah |
 | US-41.456 | Fixed issue can not update patch and online resources | EPIC-41 | P3 | 1 | sprint-2025-M10 | PDTnhah |
@@ -2512,7 +2453,6 @@
 | US-41.488 | Migrate to ParaSpell V5 | EPIC-41 | P3 | 1 | sprint-2026-M01 | PDTnhah |
 | US-41.492 | Update @subwallet-monorepos/subwallet-services-sdk 0.1.16 | EPIC-41 | P3 | 1 | sprint-2026-M01 | bluezdot |
 | US-41.493 | Support stDOT LSD sunset | EPIC-41 | P3 | 1 | sprint-2026-M04 | tunghp2002 |
-| US-41.494 | [ Webapp ] Replace Hardcoded Strings with i18n Keys | EPIC-41 | P3 | 1 | sprint-2026-M07 | tunghp2002 |
 | US-41.495 | Extension – Some issues when merging in version 1.3.78 | EPIC-41 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-41.498 | Wallet | EPIC-41 | P3 | 1 | sprint-2026-M07 | — |
 | US-42.1 | Test — Stake/unstake screen bugs after upgrade (#5013) | EPIC-42 | P2 | 3 | sprint-2026-W29 | MaiThuongNinni |
@@ -2563,7 +2503,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (198)
+## 🗑️ Deprecated (194)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2614,7 +2554,6 @@ _No stories_
 | US-26.77 | Upgrade UI - Address book | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.86 | Update the decimal display rule | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.104 | WebApp - Update apply apply master password screen | EPIC-26 | P3 | 1 | — | lw-cdm |
-| US-26.113 | WebApp - Support multiple language | EPIC-26 | P3 | 1 | — | — |
 | US-26.130 | Vara's withdrawal amount is displayed incorrectly | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.148 | Optimize UX/UI round 1 | EPIC-26 | P3 | 1 | — | Sokol142196 |
 | US-26.150 | Extension - Improved display order of campain banner | EPIC-26 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
@@ -2688,14 +2627,12 @@ _No stories_
 | US-32.88 | Re-check Staking Max Bifrost Kusama | EPIC-32 | P3 | 1 | — | S2kael |
 | US-32.156 | Follow-up get metadataStaking for Bifrost testnet | EPIC-32 | P3 | 1 | — | Sokol142196 |
 | US-32.160 | Showing incorrect data in staking feature in some cases | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-32.175 | Update UI for mission pool feature | EPIC-32 | P3 | 1 | — | nguyenduythuc |
 | US-32.199 | Mobile - Add popup want to user claim reward when Astar update dApp staking v3 | EPIC-32 | P3 | 1 | — | — |
 | US-32.212 | Extension - Show log campaign unlock when click to any earning option to stake | EPIC-32 | P3 | 1 | — | saltict |
 | US-32.217 | Extension - Show incorrect balance in case earning have withdraw | EPIC-32 | P3 | 1 | — | — |
 | US-32.220 | Do not withdraw for Lending staking | EPIC-32 | P3 | 1 | — | PDTnhah |
 | US-32.244 | Support setting reward permission for nomination pool | EPIC-32 | P3 | 1 | — | bluezdot |
 | US-32.282 | Re-check and update earning for Edgware | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.283 | Extension - Handles display of mission pool contents | EPIC-32 | P3 | 1 | — | — |
 | US-32.301 | Extension - Do not allow entering Amount without selecting an account in the Stake, Unstake screen | EPIC-32 | P3 | 1 | — | — |
 | US-32.307 | WebApp - Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | — | — |
 | US-33.9 | Support sorting the default token list in the send fund/xcm transfer screen by network, by assets that have balances | EPIC-33 | P3 | 1 | — | — |
@@ -2719,7 +2656,6 @@ _No stories_
 | US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
 | US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-39.14 | WebApp - Support Notification in app | EPIC-39 | P3 | 1 | — | — |
 | US-41.3 | Intergrate Collab.Land for private channel in Discord | EPIC-41 | P3 | 1 | — | — |
 | US-41.21 | Get Data subtoken from Subquery: | EPIC-41 | P3 | 1 | — | — |
 | US-41.28 | Support txn Queueing | EPIC-41 | P3 | 1 | — | — |
@@ -2770,12 +2706,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 289
-- 🟢 **Ready**: 16
-- 🟡 **In Progress**: 32
+- 📋 **Backlog**: 281
+- 🟢 **Ready**: 14
+- 🟡 **In Progress**: 33
 - 👀 **Review**: 11
-- ✅ **Done**: 2182
+- ✅ **Done**: 2131
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 198
+- 🗑️ **Deprecated**: 194
 
-⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).

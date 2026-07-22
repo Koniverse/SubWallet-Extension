@@ -95,12 +95,12 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#2616](https://github.com/Koniverse/SubWallet-Extension/issues/2616) | Fixed bug show incorrect token in case the wallet has only 1 account type (#2616) | 1.1.39 | 2024-02-24 | US-23.137 |
 | [#2709](https://github.com/Koniverse/SubWallet-Extension/issues/2709) | Handle case displayed account with specific network (#2709) | 1.2.1 | 2024-05-28 | US-23.140 |
 | [#2819](https://github.com/Koniverse/SubWallet-Extension/issues/2819) | Support Export all accounts feature (#2819) | 1.1.55 | 2024-04-14 | US-23.143 |
-| [#3050](https://github.com/Koniverse/SubWallet-Extension/issues/3050) | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) (#3050) | 1.1.68 | 2024-05-25 | US-23.147 |
+| [#3050](https://github.com/Koniverse/SubWallet-Extension/issues/3050) | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) (#3050) | 1.1.68 | 2024-05-25 | US-19.1 |
 | [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054) | Fix bug Show blank screen when attach account (#3054) | 1.2.22 | 2024-07-31 | US-23.148 |
 | [#3090](https://github.com/Koniverse/SubWallet-Extension/issues/3090) | Add highlight button Export multi account when navigate to select account screen (#3090, #3108) | 1.1.68 | 2024-05-25 | US-23.150 |
 | [#3108](https://github.com/Koniverse/SubWallet-Extension/issues/3108) | Support MV3 on Firefox (#3108) | 1.2.7 | 2024-06-20 | US-23.152 |
 | [#3148](https://github.com/Koniverse/SubWallet-Extension/issues/3148) | Fix bug do not show root screen after remove account (#3148) | 1.2.22 | 2024-07-31 | US-23.154 |
-| [#3198](https://github.com/Koniverse/SubWallet-Extension/issues/3198) | Hide the popup Remind backup seed phrase (#3198) | 1.2.6 | 2024-06-19 | US-23.155 |
+| [#3198](https://github.com/Koniverse/SubWallet-Extension/issues/3198) | Hide the popup Remind backup seed phrase (#3198) | 1.2.6 | 2024-06-19 | US-19.1 |
 | [#3283](https://github.com/Koniverse/SubWallet-Extension/issues/3283) | Fix bug Do not show account to get address when stand on All accounts mode (#3283) | 1.2.13 | 2024-07-05 | US-23.157 |
 | [#120](https://github.com/Koniverse/SubWallet-Extension/issues/120) | Fix network list is incorrect in case importing an account from seed phrase when there is no account yet (issue #120) | 0.3.4 | 2022-04-16 | US-23.16 |
 | [#145](https://github.com/Koniverse/SubWallet-Extension/issues/145) | Fix account balance still gets calculating from test net (#145) | 0.5.2 | 2022-07-22 | US-23.18 |
@@ -154,9 +154,9 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1490](https://github.com/Koniverse/SubWallet-Extension/issues/1490) | Fixed bug Do not Apply master password in case import multi account but file json have information "IsMasterPassword" (#1490) | 1.0.8 | 2023-06-08 | US-23.79 |
 | [#1500](https://github.com/Koniverse/SubWallet-Extension/issues/1500) | Fixed bug automatically activate tokens based on account balance (#1500) | 1.1.23 | 2023-11-24 | US-23.80 |
 | [#1560](https://github.com/Koniverse/SubWallet-Extension/issues/1560) | Allow user download seed phrase file (#1560) | 1.0.11 | 2023-06-24 | US-23.81 |
-| [#1630](https://github.com/Koniverse/SubWallet-Extension/issues/1630) | Support language: Vietnamese, Chinese (#1630) | 1.1.2 | 2023-07-14 | US-23.83 |
-| [#1640](https://github.com/Koniverse/SubWallet-Extension/issues/1640) | Support multi-language for messages returned from the background (round 1) (#1640) | 1.1.10 | 2023-08-26 | US-23.84 |
-| [#1658](https://github.com/Koniverse/SubWallet-Extension/issues/1658) | Support new language: Russia (#1658) | 1.1.11 | 2023-09-09 | US-23.86 |
+| [#1630](https://github.com/Koniverse/SubWallet-Extension/issues/1630) | Support language: Vietnamese, Chinese (#1630) | 1.1.2 | 2023-07-14 | US-19.2 |
+| [#1640](https://github.com/Koniverse/SubWallet-Extension/issues/1640) | Support multi-language for messages returned from the background (round 1) (#1640) | 1.1.10 | 2023-08-26 | US-19.2 |
+| [#1658](https://github.com/Koniverse/SubWallet-Extension/issues/1658) | Support new language: Russia (#1658) | 1.1.11 | 2023-09-09 | US-19.2 |
 | [#1731](https://github.com/Koniverse/SubWallet-Extension/issues/1731) | Fixed bug Still show history of the removed account (#1731) | 1.1.6 | 2023-08-04 | US-23.93 |
 | [#1750](https://github.com/Koniverse/SubWallet-Extension/issues/1750) | Integrate Azero domain (#1750) | 1.1.8 | 2023-08-12 | US-23.98 |
 | [#909](https://github.com/Koniverse/SubWallet-Extension/issues/909) | Add the missing networks in Kusama & Parachain group (#909) | 0.7.6 | 2022-12-17 | US-24.100 |
@@ -339,12 +339,12 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#377](https://github.com/Koniverse/SubWallet-Extension/issues/377) | Improve request permission screen (#377) | 0.4.7 | 2022-06-24 | US-26.13 |
 | [#2038](https://github.com/Koniverse/SubWallet-Extension/issues/2038) | Improve banner campaign in app (#2038) | 1.1.33 | 2024-01-23 | US-26.131 |
 | [#2203](https://github.com/Koniverse/SubWallet-Extension/issues/2203) | Fixed some UI bug (#2203) | 1.1.29 | 2023-12-29 | US-26.137 |
-| [#2317](https://github.com/Koniverse/SubWallet-Extension/issues/2317) | Add popup to remind users to perform backups account (popup hiển thị định kỳ) (#2317) | 1.1.68 | 2024-05-25 | US-26.140 |
+| [#2317](https://github.com/Koniverse/SubWallet-Extension/issues/2317) | Add popup to remind users to perform backups account (popup hiển thị định kỳ) (#2317) | 1.1.68 | 2024-05-25 | US-19.1 |
 | [#2362](https://github.com/Koniverse/SubWallet-Extension/issues/2362) | Fixed bug show EVM transaction history (#2362) | 1.1.27 | 2023-12-20 | US-26.142 |
 | [#2387](https://github.com/Koniverse/SubWallet-Extension/issues/2387) | Add "time-out" status for transaction history (#2387) | 1.1.33 | 2024-01-23 | US-26.143 |
 | [#2647](https://github.com/Koniverse/SubWallet-Extension/issues/2647) | Restructure Settings screen (#2647) | 1.1.41 | 2024-03-02 | US-26.151 |
 | [#2751](https://github.com/Koniverse/SubWallet-Extension/issues/2751) | Improve display collators list (#2751) | 1.3.7 | 2024-11-23 | US-26.154 |
-| [#2796](https://github.com/Koniverse/SubWallet-Extension/issues/2796) | Improve UI for Mission Pools (#2796) | 1.1.49 | 2024-03-26 | US-26.155 |
+| [#2796](https://github.com/Koniverse/SubWallet-Extension/issues/2796) | Improve UI for Mission Pools (#2796) | 1.1.49 | 2024-03-26 | US-19.7 |
 | [#585](https://github.com/Koniverse/SubWallet-Extension/issues/585) | Improved decimal display UX (#585) | 0.5.7 | 2022-09-06 | US-26.16 |
 | [#3062](https://github.com/Koniverse/SubWallet-Extension/issues/3062) | Fixed bug Unable to back screen in case open General settings to Marketing campaign (#3062) | 1.1.65 | 2024-05-16 | US-26.161 |
 | [#3131](https://github.com/Koniverse/SubWallet-Extension/issues/3131) | Fix bug Screen flickering error when interacting with extensions (#3131) | 1.2.10 | 2024-06-25 | US-26.162 |
@@ -377,7 +377,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1548](https://github.com/Koniverse/SubWallet-Extension/issues/1548) | Fixed UI bugs (#1548, #1507) | 1.1.2 | 2023-07-14 | US-26.93 |
 | [#1569](https://github.com/Koniverse/SubWallet-Extension/issues/1569) | Fixed UI bugs on the Expand view (#1569) | 1.0.12 | 2023-06-29 | US-26.95 |
 | [#1639](https://github.com/Koniverse/SubWallet-Extension/issues/1639) | Update UI for notification (#1639) | 1.1.3 | 2023-07-21 | US-26.97 |
-| [#1644](https://github.com/Koniverse/SubWallet-Extension/issues/1644) | Support new language: Japanese (#1644) | 1.1.10 | 2023-08-26 | US-26.98 |
+| [#1644](https://github.com/Koniverse/SubWallet-Extension/issues/1644) | Support new language: Japanese (#1644) | 1.1.10 | 2023-08-26 | US-19.2 |
 | [#1684](https://github.com/Koniverse/SubWallet-Extension/issues/1684) | Improve lock UX (#1684) | 1.1.10 | 2023-08-26 | US-26.99 |
 | [#981](https://github.com/Koniverse/SubWallet-Extension/issues/981) | Fix bug getting multiple balances for Equilibrium (#981) | 0.7.9 | 2023-01-30 | US-27.10 |
 | [#1360](https://github.com/Koniverse/SubWallet-Extension/issues/1360) | Fixed bug get balance (#1360) | 1.0.5 | 2023-05-21 | US-27.13 |
@@ -727,7 +727,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#2680](https://github.com/Koniverse/SubWallet-Extension/issues/2680) | Fixed bug related to earning feature (#2680) | 1.1.61 | 2024-05-02 | US-32.225 |
 | [#2682](https://github.com/Koniverse/SubWallet-Extension/issues/2682) | Re-check case update data after performing actions (unstake, cancel unstake, withdraw) (#2682) | 1.1.41 | 2024-03-02 | US-32.226 |
 | [#2703](https://github.com/Koniverse/SubWallet-Extension/issues/2703) | Adjust showing/validating address on Earning actions (#2703) | 1.2.29 | 2024-09-13 | US-32.228 |
-| [#2781](https://github.com/Koniverse/SubWallet-Extension/issues/2781) | Support Mission Pool for Extension (#2781) | 1.1.46 | 2024-03-22 | US-32.231 |
+| [#2781](https://github.com/Koniverse/SubWallet-Extension/issues/2781) | Support Mission Pool for Extension (#2781) | 1.1.46 | 2024-03-22 | US-19.7 |
 | [#2742](https://github.com/Koniverse/SubWallet-Extension/issues/2742) | Fixed bug show earnings screen although back to home (#2742) | 1.1.52 | 2024-04-05 | US-32.234 |
 | [#2743](https://github.com/Koniverse/SubWallet-Extension/issues/2743) | Disallow staking to collators/pools that maxed out member threshold (#2743, 2754) | 1.1.62 | 2024-05-08 | US-32.235 |
 | [#2821](https://github.com/Koniverse/SubWallet-Extension/issues/2821) | Fixed bug Error getting wrong validator address (#2821) | 1.1.62 | 2024-05-08 | US-32.239 |
@@ -748,13 +748,13 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#2998](https://github.com/Koniverse/SubWallet-Extension/issues/2998) | Update Validator name/ Collator name (#2998) | 1.1.62 | 2024-05-08 | US-32.263 |
 | [#3000](https://github.com/Koniverse/SubWallet-Extension/issues/3000) | Refactoring code earning service (#3000) | 1.2.5 | 2024-06-11 | US-32.264 |
 | [#3001](https://github.com/Koniverse/SubWallet-Extension/issues/3001) | Fixed error auto reset data on Pool field (#3001) | 1.3.6 | 2024-11-07 | US-32.265 |
-| [#3005](https://github.com/Koniverse/SubWallet-Extension/issues/3005) | Fixed bug Don't display network on Mission pool details (#3005) | 1.1.62 | 2024-05-08 | US-32.267 |
+| [#3005](https://github.com/Koniverse/SubWallet-Extension/issues/3005) | Fixed bug Don't display network on Mission pool details (#3005) | 1.1.62 | 2024-05-08 | US-19.7 |
 | [#653](https://github.com/Koniverse/SubWallet-Extension/issues/653) | Add support staking for Amplitude/Kilt (#653) | 0.7.2 | 2022-11-19 | US-32.27 |
 | [#3043](https://github.com/Koniverse/SubWallet-Extension/issues/3043) | Show nomination pool with block status (#3043) | 1.2.6 | 2024-06-19 | US-32.272 |
 | [#3127](https://github.com/Koniverse/SubWallet-Extension/issues/3127) | Update UI for Earning position details (#3127) | 1.2.2 | 2024-05-30 | US-32.276 |
 | [#3150](https://github.com/Koniverse/SubWallet-Extension/issues/3150) | Update some message related to earning feature (#3150) | 1.2.4 | 2024-06-08 | US-32.278 |
 | [#3197](https://github.com/Koniverse/SubWallet-Extension/issues/3197) | Check error logs in earning feature (#3197) | 1.2.6 | 2024-06-19 | US-32.280 |
-| [#3289](https://github.com/Koniverse/SubWallet-Extension/issues/3289) | Fix bug Cannot read properties of undefined (reading 'filter') related to Mission pool (#3289) | 1.2.14 | 2024-07-09 | US-32.284 |
+| [#3289](https://github.com/Koniverse/SubWallet-Extension/issues/3289) | Fix bug Cannot read properties of undefined (reading 'filter') related to Mission pool (#3289) | 1.2.14 | 2024-07-09 | US-19.7 |
 | [#3326](https://github.com/Koniverse/SubWallet-Extension/issues/3326) | Improve the staking reward information retrieval (#3326) | 1.2.16 | 2024-07-19 | US-32.287 |
 | [#3327](https://github.com/Koniverse/SubWallet-Extension/issues/3327) | Fix bug Show incorrect withdrawal information of the Bifrost liquid staking when all accounts mode (#3327) | 1.2.22 | 2024-07-31 | US-32.288 |
 | [#690](https://github.com/Koniverse/SubWallet-Extension/issues/690) | Support claim reward feature for QR Account (#690) | 0.7.2 | 2022-11-19 | US-32.29 |
@@ -950,11 +950,11 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4531](https://github.com/Koniverse/SubWallet-Extension/issues/4531) | Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531) | 1.3.49 | 2025-07-28 | US-36.73 |
 | [#4592](https://github.com/Koniverse/SubWallet-Extension/issues/4592) | Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592) | 1.3.53 | 2025-08-12 | US-36.74 |
 | [#4645](https://github.com/Koniverse/SubWallet-Extension/issues/4645) | Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645) | 1.3.56 | 2025-09-11 | US-36.75 |
-| [#3468](https://github.com/Koniverse/SubWallet-Extension/issues/3468) | Improve condition for Marketing campaign (#3468) | 1.2.28 | 2024-09-04 | US-39.11 |
-| [#4403](https://github.com/Koniverse/SubWallet-Extension/issues/4403) | Fixed bug Error page when use marketing campaign (#4403) | 1.3.41 | 2025-06-11 | US-39.19 |
-| [#2000](https://github.com/Koniverse/SubWallet-Extension/issues/2000) | Support notification in browser and banner in app (#2000) | 1.1.18 | 2023-10-20 | US-39.3 |
-| [#2806](https://github.com/Koniverse/SubWallet-Extension/issues/2806) | Improve the Marketing Campaign application mechanism (#2806) | 1.2.6 | 2024-06-19 | US-39.8 |
-| [#3414](https://github.com/Koniverse/SubWallet-Extension/issues/3414) | Improve performance upon showing Marketing Campaign (#3414) | 1.2.24 | 2024-08-09 | US-39.9 |
+| [#3468](https://github.com/Koniverse/SubWallet-Extension/issues/3468) | Improve condition for Marketing campaign (#3468) | 1.2.28 | 2024-09-04 | US-19.4 |
+| [#4403](https://github.com/Koniverse/SubWallet-Extension/issues/4403) | Fixed bug Error page when use marketing campaign (#4403) | 1.3.41 | 2025-06-11 | US-19.4 |
+| [#2000](https://github.com/Koniverse/SubWallet-Extension/issues/2000) | Support notification in browser and banner in app (#2000) | 1.1.18 | 2023-10-20 | US-19.8 |
+| [#2806](https://github.com/Koniverse/SubWallet-Extension/issues/2806) | Improve the Marketing Campaign application mechanism (#2806) | 1.2.6 | 2024-06-19 | US-19.4 |
+| [#3414](https://github.com/Koniverse/SubWallet-Extension/issues/3414) | Improve performance upon showing Marketing Campaign (#3414) | 1.2.24 | 2024-08-09 | US-19.4 |
 | [#36](https://github.com/Koniverse/SubWallet-Extension/issues/36) | Custom network, Custom Endpoint (#36) | 0.4.3 | 2022-05-31 | US-4.1 |
 | [#464](https://github.com/Koniverse/SubWallet-Extension/issues/464) | Temporarily remove "Add custom network" (#464) | 0.5.3 | 2022-07-29 | US-4.1 |
 | [#477](https://github.com/Koniverse/SubWallet-Extension/issues/477) | Support token import for PSP-22 and PSP-34 (#477) | 0.6.7 | 2022-10-22 | US-4.11 |
@@ -1104,7 +1104,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4410](https://github.com/Koniverse/SubWallet-Extension/issues/4410) | Update chain-list stable v0.2.106 (#4410) | 1.3.42 | 2025-06-23 | US-41.445 |
 | [#4443](https://github.com/Koniverse/SubWallet-Extension/issues/4443) | Update Gears Library (#4443) | 1.3.47 | 2025-07-11 | US-41.447 |
 | [#4507](https://github.com/Koniverse/SubWallet-Extension/issues/4507) | Re-check for Paseo after migrated (#4507) | 1.3.61 | 2025-10-04 | US-41.452 |
-| [#4515](https://github.com/Koniverse/SubWallet-Extension/issues/4515) | Replace Hardcoded Strings with i18n Keys (#4515) | 1.3.55 | 2025-09-05 | US-41.453 |
+| [#4515](https://github.com/Koniverse/SubWallet-Extension/issues/4515) | Replace Hardcoded Strings with i18n Keys (#4515) | 1.3.55 | 2025-09-05 | US-19.2 |
 | [#4521](https://github.com/Koniverse/SubWallet-Extension/issues/4521) | Update chain-list stable v0.2.110 (#4521) | 1.3.48 | 2025-07-21 | US-41.455 |
 | [#4536](https://github.com/Koniverse/SubWallet-Extension/issues/4536) | Fixed issue can not update patch and online resources (#4536) | 1.3.62 | 2025-10-10 | US-41.456 |
 | [#4546](https://github.com/Koniverse/SubWallet-Extension/issues/4546) | Update chain-list stable v0.2.111 (#4546) | 1.3.52 | 2025-08-07 | US-41.457 |

@@ -106,7 +106,7 @@ here** — the note records this capability's count as **0**
 
 > **That is a checked absence within one ledger, not an empty history.** A title scan of the **18
 > ledgers still separate** finds **27 issues** mentioning NFT, sitting in EPIC-24, EPIC-26,
-> EPIC-28, EPIC-32, EPIC-39 and EPIC-41. Treat that as an **upper bound, not a count**: routing
+> EPIC-28, EPIC-32 and EPIC-41. Treat that as an **upper bound, not a count**: routing
 > there is a title heuristic ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > and most will belong to the NFT capabilities that already carry tables. Which land *here* — the
 > new-standards capability — is decided when those ledgers are folded.
