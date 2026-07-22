@@ -23,6 +23,11 @@ A user holding nested NFTs (e.g. on Unique Network, where one NFT can bundle
 child NFTs) sees the parent–child structure and can navigate into the bundle,
 rather than a flat list that hides the relationships.
 
+## Status
+
+> **✅ done — shipped in 1.3.80.** All 3 acceptance criteria are ticked, and the single row below is settled (shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Some Substrate collections — notably Unique Network — support nesting: an NFT

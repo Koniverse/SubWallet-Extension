@@ -22,6 +22,13 @@ A user holding ERC-1155 multi-token NFTs sees them in the collection grid and
 can send them, closing the one EVM standard the wallet does not yet support
 alongside ERC-721.
 
+## Status
+
+> **📋 backlog — even though the row below has shipped.** ERC-1155 on RARI shipped in 1.3.5
+> (#3726), but this story's 3 acceptance criteria have not had their done-pass, so FR-88 is not
+> signed off. Per the Stream-B convention a capability story stays `backlog` until its ACs are
+> verified against the code. **The table is history; the acceptance criteria decide the status.**
+
 ## Background
 
 ERC-1155 is a multi-token standard where a single contract holds many token

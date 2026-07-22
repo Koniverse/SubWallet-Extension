@@ -20,6 +20,12 @@ Add a **second authentication factor** in front of value leaving the wallet — 
 and Google authentication for any crypto sent out ([#4125](https://github.com/Koniverse/SubWallet-Extension/issues/4125)).
 Open, not started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is a **consolidated maintenance story**: it groups 1 tracker issue into one capability with a

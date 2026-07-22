@@ -24,6 +24,11 @@ screened against Merkle Science's scam / illicit-activity data and a risk verdic
 is surfaced in the send flow — so that a user about to pay a known scam,
 sanctioned, or fraud-associated address is warned *before* they sign the transfer.
 
+## Status
+
+> **📋 backlog — not started.** None of the 5 acceptance criteria is ticked, no release
+> delivers this capability, and no incremental tracker issue is recorded against it yet.
+
 ## Background
 
 Phishing-origin blocking ([US-5.1](US-5.1-phishing-site-and-address-protection.md))

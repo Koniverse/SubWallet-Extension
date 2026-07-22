@@ -22,6 +22,11 @@ A user holding NFTs on newer ecosystems (Ternoa, Joystream, Aventus) or in
 ERC-6551 token-bound accounts sees them in the collectibles surface, widening
 coverage beyond the standards already supported.
 
+## Status
+
+> **📋 backlog — not started.** None of the 3 acceptance criteria is ticked, no release
+> delivers this capability, and no incremental tracker issue is recorded against it yet.
+
 ## Background
 
 NFT coverage is an ongoing expansion. This story onboards **additional

@@ -21,6 +21,12 @@ Send NFT and History
 ([#2858](https://github.com/Koniverse/SubWallet-Extension/issues/2858)). Open since 2024-04-03,
 not started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is an **improvement story on a hardening one**.

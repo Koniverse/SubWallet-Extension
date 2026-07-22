@@ -26,6 +26,11 @@ each user can decide whether to widen their attack/permission surface for
 convenience or keep it minimal. **The two toggles ship with opposite defaults**:
 camera **off**, One-Sign **on**.
 
+## Status
+
+> **✅ done — shipped in 1.3.21.** All 5 acceptance criteria are ticked, and the single row below is settled (shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 These two FRs are merged into one story because they are a single Settings

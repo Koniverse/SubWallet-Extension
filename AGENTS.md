@@ -251,11 +251,22 @@ owner and lands in `docs/CONTEXT.md` as a dated `D` entry** ([D97](docs/CONTEXT.
 That seam is checkable — *an FR or NFR whose status a docs epic changed, with no `D`
 entry to cite, is a violation.*
 
-**4. The done-gate has two branches.** A story that materializes a requirement is `done`
+**4. The done-gate has three branches.** A story that materializes a requirement is `done`
 only with `version_shipped` (RULE-16) + a CHANGELOG entry + every AC ticked. A story in
 an epic that materializes no requirement (`prd_ref: []` at the epic — docs, tooling,
 infra) **ships in no release**: it is `done` when every AC is ticked, `commit` names a
 real SHA, and `validate` exits zero. Its `version_shipped` is empty **on purpose**.
+
+**The third branch is for work that happened in another repository.** [D97](docs/CONTEXT.md)
+wrote the first two, and its second assumed the SHA exists *here* — true for docs and tooling,
+false for a backend deploy, a separate site, or a support system. Such a story delivers a
+**record**, not code, so it is `done` when: `prd_ref: []`; **every row in its incremental-work
+table is closed on the tracker** (COMPLETED *or* NOT_PLANNED — a not-planned issue is settled,
+not outstanding); every AC ticked; and each AC asserts **coverage** ("issue #N is recorded with
+its tracker state"), never behaviour. `version_shipped` **and** `commit` stay empty on purpose —
+demanding a SHA that cannot exist would leave the story permanently un-closable, which is how
+US-1.6 sat at `in-progress` with four settled rows. The check is `gh issue view <N>` per row:
+external evidence, so the story is not verified against the docs that contain it.
 Corollary: **a `done` story may not carry an unticked AC** — forward scope must *leave*
 the story into its own (this is how FR-23 came to be marked shipped though never built).
 **Second corollary, same rule through a different field: it may not carry an open row in its
@@ -335,6 +346,14 @@ in the same pass, because a split is a *rearrangement*, not a done-pass.
 capability ships get their own story in the sprint that picks them up — appending them to the
 shipped story re-creates exactly the state this rule exists to remove. The
 incremental-work table is a **record of what a story delivered**, not a backlog.
+
+**Every story carrying an incremental-work table opens with a `## Status` section** — the status
+and the one reason for it, in two or three lines, right after the Goal. This is not decoration:
+the rollups read frontmatter and the reader arrives at the table, so the two routinely disagree
+**by design** — US-5.10 shows four `✅ done` rows above a story that is `in-progress`, because its
+own six ACs are open. Without the section a reader sees only the contradiction. The sentence that
+resolves it, and that every one of these sections says in some form: **the table is history; the
+acceptance criteria decide the status.**
 
 **Why:** an open row inside a `done` story is invisible in every rollup — the epic table, the
 sprint board and STATUS all read the story's frontmatter, never its rows. Six stories carried

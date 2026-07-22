@@ -19,6 +19,14 @@ updated: 2026-07-22
 
 Stand up the client-side `NftService` and move the EVM and Unique NFT handlers onto it (#4884, shipped **1.3.80**) — Phase 1 of the migration onto the SubWallet Services SDK, and the successor to the earlier service migration ([US-9.19](US-9.19-nft-service-migration.md)).
 
+## Status
+
+> **✅ done — shipped in 1.3.80.** AC-1 is ticked and the single row below is closed: #4884
+> delivered the client-side `NftService` plus the EVM and Unique handlers. **Phase 1 only** — the
+> rest of the migration (#4883) is [US-9.24](US-9.24-client-side-nft-service-full-sdk-migration.md).
+> Until 2026-07-22 this story claimed the opposite, asserting *"not yet started, no release delivers
+> it"* above a row reading `done @ 1.3.80`.
+
 ## Scope
 
 **Phase 1 of the client-side `NftService` + SDK migration**, shipped in **1.3.80** (#4884 — `NFTService` plus the EVM and Unique handlers). It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); a migration changes where logic runs, not what the wallet promises. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). `points: 1` marks it as one backfill record.

@@ -25,6 +25,11 @@ benign) is surfaced in the confirmation UI — so that a user about to approve a
 drainer transaction, a malicious `approve`, or a deceptive signature is warned
 *at the moment of signing*, not after funds are gone.
 
+## Status
+
+> **📋 backlog — not started.** None of the 5 acceptance criteria is ticked, no release
+> delivers this capability, and no incremental tracker issue is recorded against it yet.
+
 ## Background
 
 Phishing-site blocking ([US-5.1](US-5.1-phishing-site-and-address-protection.md))

@@ -24,6 +24,11 @@ without losing wallet state. This is the foundation everything else stands on:
 once it holds, every downstream epic gets to stop worrying about whether the
 background is alive, how it wakes, or whether its state survives an eviction.
 
+## Status
+
+> **✅ done — shipped in 1.2.7.** All 5 acceptance criteria are ticked, and the 2 rows below are settled (1 shipped, 1 closed not-planned).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Chrome's MV3 enforcement timeline removed the persistent background page the

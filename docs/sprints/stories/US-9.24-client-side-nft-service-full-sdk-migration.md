@@ -21,6 +21,12 @@ Migrate the **remaining** NFT logic onto the client-side `NftService` and the Su
 SDK ([#4883](https://github.com/Koniverse/SubWallet-Extension/issues/4883)) — everything Phase 1
 did not move. Open since 2025-12-04.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is the **unfinished half of [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md)**,

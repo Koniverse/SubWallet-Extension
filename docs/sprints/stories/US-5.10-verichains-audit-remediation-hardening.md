@@ -16,7 +16,27 @@ created: 2026-06-12
 updated: 2026-07-22
 ---
 
-## Status refresh — 2026-07-22 (corrects the 2026-07-15 sync)
+## Goal
+
+Close the security and UX-security findings surfaced by audit and by real-world
+false-positive reports, and lock each one behind a regression guard — so the
+defence surface this epic publishes (key/secret hygiene, web-hardening, phishing
+accuracy) is not asserted once but kept from regressing as the codebase grows.
+This story ships no new user-facing feature; its value is that audit-driven and
+report-driven security fixes land *with* a test or lint/grep guard, and that
+phishing protection stops flagging legitimate sites so users keep trusting the
+warning when it is real.
+
+## Status
+
+> **🚧 in-progress — the rows below are settled, this story's own work is not.** The table records
+> 4 audit rounds that opened 2022–2024 and all closed by 2025-10. The remediation this story actually owns lives in its
+> **acceptance criteria**, and **none of the 6 is ticked**: the UX-bounty findings (AC-1, #4471),
+> secret hygiene (AC-2, #4929), WebApp hardening (AC-3, #4959) and re-enabling phishing detection
+> (AC-4, #4889 / #4998) are all open. **The table is history; the acceptance criteria decide the
+> status** — which is why a page of `✅ done` rows sits above a story that is not done.
+
+### How it got here — 2026-07-22 (corrects the 2026-07-15 sync)
 
 > **`review` → `in-progress`.** The 2026-07-15 sync moved this story `backlog` → `review` because
 > **one** of its five anchor issues (#4959) was *In Review* on Projects board #2. That derivation is
@@ -40,17 +60,6 @@ updated: 2026-07-22
 > **`sprint` also moved, `sprint-2026-W28` → `sprint-2026-W30`.** W28 closed on 2026-07-12; a story
 > in flight cannot sit in a window that ended ten days ago. W30 (2026-07-20 → 07-26) is the open
 > window. Only `status` / `sprint` / `updated` changed; Goal, AC and reasoning below are untouched.
-
-## Goal
-
-Close the security and UX-security findings surfaced by audit and by real-world
-false-positive reports, and lock each one behind a regression guard — so the
-defence surface this epic publishes (key/secret hygiene, web-hardening, phishing
-accuracy) is not asserted once but kept from regressing as the codebase grows.
-This story ships no new user-facing feature; its value is that audit-driven and
-report-driven security fixes land *with* a test or lint/grep guard, and that
-phishing protection stops flagging legitimate sites so users keep trusting the
-warning when it is real.
 
 ## Background
 

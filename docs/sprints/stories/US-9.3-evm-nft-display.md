@@ -22,6 +22,11 @@ A user with EVM accounts sees their ERC-721 NFTs across EVM chains
 (Moonbeam/Moonriver, Astar, Ethereum and other registered EVM networks) in the
 same collection grid as their Substrate NFTs.
 
+## Status
+
+> **✅ done — shipped in 0.3.1.** All 3 acceptance criteria are ticked, and the 10 rows below are settled (9 shipped, 1 closed not-planned).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 ERC-721 is the dominant EVM NFT standard. The `EvmNftHandler` detects holdings

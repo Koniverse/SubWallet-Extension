@@ -22,6 +22,11 @@ A user can send an NFT they own to any compatible address from inside the
 wallet, with the resulting transfer signed and tracked in history — turning the
 collectibles surface from read-only into something they can act on.
 
+## Status
+
+> **✅ done — shipped in 0.2.8.** All 3 acceptance criteria are ticked, and the 17 rows below are settled (15 shipped, 2 closed not-planned).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Display (US-9.1 / US-9.3) makes NFTs visible; this story makes them movable.

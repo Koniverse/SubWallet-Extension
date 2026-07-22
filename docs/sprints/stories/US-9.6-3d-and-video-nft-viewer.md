@@ -22,6 +22,11 @@ A user opening an NFT whose media is a 3D model or a video sees it rendered
 natively — an interactive model-viewer or a playable video — instead of a
 broken image, so rich-media collectibles look the way their creators intended.
 
+## Status
+
+> **✅ done — shipped in 0.6.5.** All 3 acceptance criteria are ticked, and the 3 rows below are settled (3 shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Not all NFT media is a flat image. Some collections ship `.glb`/`.gltf` 3D

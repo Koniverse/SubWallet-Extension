@@ -19,6 +19,11 @@ updated: 2026-07-17
 
 Migrate the NFT feature onto the new-UI service architecture (#967) — shipped in **v1.0.2** as the "Migrate NFT feature into new UI" work. The forward-looking client-side NFT Service + SDK migration continues in [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md).
 
+## Status
+
+> **✅ done — shipped in 1.0.2.** Its one acceptance criterion is ticked, and the single row below is settled (shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Scope
 
 The NFT-feature migration into the new UI / service architecture (v1.0.2). Superseded, going forward, by the client-side NFT Service work ([US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md)).

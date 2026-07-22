@@ -23,6 +23,12 @@ development build inside the Koni browser runner**
 ([#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602)). Both open, neither
 started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** Both rows below are **open on the tracker**, and
+> none of the 2 acceptance criteria is ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is an **improvement story on a hardening one**. US-1.5 carries the shipped build/CI work; its

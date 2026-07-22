@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 08:02:02 UTC
+> Last generated: 2026-07-22 10:05:43 UTC
 > Total stories: 2728
 
 ## 📋 Backlog (290)
@@ -299,7 +299,7 @@
 | US-9.23 | WebApp address display & validation, round 2 (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.24 | Client-side NFT Service — full SDK migration (improvement on US-9.20) | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
-## 🟢 Ready (18)
+## 🟢 Ready (16)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -317,8 +317,6 @@
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
-| US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
-| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
@@ -326,7 +324,6 @@
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-1.6 | Platform operations & out-of-repo tooling | EPIC-1 | P3 | 1 | sprint-2026-W30 | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
@@ -356,7 +353,8 @@
 | US-41.426 | Product review Q3-2024 | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
-| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
+| US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 
 ## 👀 Review (11)
@@ -375,13 +373,14 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2179)
+## ✅ Done (2181)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.1 | MV3 service-worker background for Chrome/Firefox compliance | EPIC-1 | P0 | 8 | sprint-2024-M06 | saltict |
 | US-1.2 | Yarn 3 monorepo shared across extension, web app and mobile | EPIC-1 | P0 | 5 | sprint-2024-M02 | saltict |
 | US-1.3 | Online chain-list hot-update (release-free network/token/XCM delivery) | EPIC-1 | P0 | 5 | sprint-2024-M03 | S2kael |
+| US-1.6 | Platform operations & out-of-repo tooling | EPIC-1 | P3 | 1 | sprint-2026-W30 | — |
 | US-10.1 | EVM provider injection (EIP-1193 / EIP-6963) | EPIC-10 | P1 | 5 | sprint-2023-M12 | S2kael |
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | sprint-2022-M01 | jacogr |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | sprint-2023-M07 | S2kael |
@@ -2521,6 +2520,7 @@
 | US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -2771,10 +2771,10 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 290
-- 🟢 **Ready**: 18
+- 🟢 **Ready**: 16
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2179
+- ✅ **Done**: 2181
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 198
 

@@ -19,6 +19,11 @@ updated: 2026-07-17
 
 Keep NFT media rendering reliable as upstream sources change — RMRK endpoints/API, nft.storage, the IPFS resolver and gateway fallbacks, image-error and source-failure handling — so a dead asset or a moved endpoint never blanks the collection grid.
 
+## Status
+
+> **✅ done — shipped in 1.3.56.** Its one acceptance criterion is ticked, and the 15 rows below are settled (15 shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Scope
 
 RMRK/IPFS endpoint & API maintenance, JSON/link parsing, resolver and gateway-fallback fixes, non-extension-environment gateway support, and the Vara/PAH image fix.

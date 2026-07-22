@@ -23,6 +23,15 @@ A user with a Bitcoin account sees the Ordinals inscriptions they hold rendered
 in the collectibles surface, so Bitcoin NFTs sit alongside their Substrate and
 EVM NFTs in one place.
 
+## Status
+
+> **📋 backlog — even though work below has shipped.** The 4 rows record inscription work
+> released on the **WebApp** (1.1.36) and the 2026 Bitcoin-API rounds. FR-91 is not signed off: the
+> story's 3 acceptance criteria have had no done-pass, and the **extension** surface is not
+> delivered at all — that scope moved to
+> [US-9.22](US-9.22-runes-and-ordinals-on-the-extension.md). **The table is history; the acceptance
+> criteria decide the status.**
+
 ## Background
 
 Ordinals/inscriptions are Bitcoin's NFT-equivalent: arbitrary content inscribed

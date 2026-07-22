@@ -22,6 +22,11 @@ A single master password — enforced against a strength policy — wraps every
 account in the wallet, so that the user manages one secret instead of one per
 account and all key material is encrypted at rest under a key only they hold.
 
+## Status
+
+> **✅ done — shipped in 1.0.2.** All 4 acceptance criteria are ticked, and no incremental tracker issue is recorded against this capability.
+> **The status is the acceptance criteria's to give** — nothing else in this file can change it.
+
 ## Background
 
 The master password is the root of the wallet's authorization model and the key

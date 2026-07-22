@@ -23,6 +23,11 @@ password unlocks the whole wallet, and locking (manual or automatic) relocks
 everything at once — so that the user reasons about a single security boundary,
 never a patchwork of per-account or per-feature locks.
 
+## Status
+
+> **✅ done — shipped in 1.0.2.** All 4 acceptance criteria are ticked, and no incremental tracker issue is recorded against this capability.
+> **The status is the acceptance criteria's to give** — nothing else in this file can change it.
+
 ## Background
 
 A unified lock state is what makes "the wallet is locked" a meaningful guarantee.

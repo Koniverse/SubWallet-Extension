@@ -24,6 +24,11 @@ master password is required on every protected action or only once per unlocked
 session (FR-58) — so each user can trade convenience against exposure to fit their
 threat model.
 
+## Status
+
+> **✅ done — shipped in 1.1.10.** All 4 acceptance criteria are ticked, and no incremental tracker issue is recorded against this capability.
+> **The status is the acceptance criteria's to give** — nothing else in this file can change it.
+
 ## Background
 
 These two FRs are the **policy knobs** behind the unified lock state machine in

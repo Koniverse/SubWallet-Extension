@@ -23,6 +23,11 @@ Substrate collection standards — RMRK 1.0/2.0, Unique/Quartz, Asset Hub
 (Statemine/Statemint) and PSP-34/WASM — in one collection grid, without
 knowing or caring which standard each collection uses.
 
+## Status
+
+> **✅ done — shipped in 0.6.7.** All 4 acceptance criteria are ticked, and the 29 rows below are settled (26 shipped, 3 closed not-planned).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Substrate has several incompatible NFT standards. Rather than a screen per

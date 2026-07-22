@@ -25,6 +25,11 @@ unreachable. This is the mechanism that lets the product respond to a new
 parachain launch or a partner-chain incident in hours instead of a store-review
 cycle.
 
+## Status
+
+> **✅ done — shipped in 1.1.50.** All 4 acceptance criteria are ticked, and the 2 rows below are settled (2 shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Chain definitions live in `@subwallet/chain-list` (an external monorepo package);

@@ -18,6 +18,12 @@ updated: 2026-07-17
 
 Add NFT portfolio-management (#250) — organizing and curating the NFTs a user holds. Open, not started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 NFT portfolio management. Open, not started.

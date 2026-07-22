@@ -20,6 +20,12 @@ Recheck **when Firefox stops the background page** and whether the MV3 backgroun
 [US-1.1](US-1.1-mv3-service-worker-background.md) survives it
 ([#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222)). Open, not started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is an **improvement story on a shipped one**. US-1.1 shipped the MV3 service-worker

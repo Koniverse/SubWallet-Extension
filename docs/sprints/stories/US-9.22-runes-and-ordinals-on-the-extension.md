@@ -23,6 +23,12 @@ Bring **Runes and Ordinals/inscriptions to the browser extension**
 [US-9.7](US-9.7-bitcoin-ordinals-display.md) shipped on the **WebApp** and not here. Both open
 since April 2025, neither started.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** Both rows below are **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is an **improvement story on a display one**. US-9.7 owns FR-91 and carries the shipped

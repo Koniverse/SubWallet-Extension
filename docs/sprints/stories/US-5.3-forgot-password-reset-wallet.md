@@ -23,6 +23,11 @@ extension* — but only by resetting the wallet, which clears all accounts and
 requires re-import from seed — so that the non-custodial guarantee is preserved:
 there is no back door, and the user's seed remains the single source of truth.
 
+## Status
+
+> **✅ done — shipped in 1.0.4.** All 4 acceptance criteria are ticked, and no incremental tracker issue is recorded against this capability.
+> **The status is the acceptance criteria's to give** — nothing else in this file can change it.
+
 ## Background
 
 The master password is **non-recoverable by design** (FR-54): there is no

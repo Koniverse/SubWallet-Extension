@@ -23,6 +23,11 @@ Every field that accepts or displays a seed phrase or private key uses an
 autocomplete/autofill cache cannot capture the secret and leak it to local
 storage (the "demonic vulnerability").
 
+## Status
+
+> **✅ done — shipped in 1.1.10.** All 3 acceptance criteria are ticked, and no incremental tracker issue is recorded against this capability.
+> **The status is the acceptance criteria's to give** — nothing else in this file can change it.
+
 ## Background
 
 The "demonic vulnerability" is a concrete, shipped bug class: seed-phrase and

@@ -2,7 +2,7 @@
 id: US-1.6
 title: "Platform operations & out-of-repo tooling"
 epic: EPIC-1
-status: in-progress
+status: done
 priority: P3
 points: 1
 sprint: sprint-2026-W30
@@ -21,6 +21,16 @@ backend middleware, backend deploy pipelines, the ChainList site, an analytics d
 support system. It ships no extension capability. Its purpose is that the tracker stays fully
 claimed without any of these being mistaken for extension work.
 
+## Status
+
+> **✅ done — and no release carries it.** Every row below is closed on the tracker (3 COMPLETED,
+> 1 NOT_PLANNED) and AC-1, a coverage assertion, holds. `version_shipped` and `commit` are empty
+> **on purpose**: the work happened in other repositories, so no release of this extension delivers
+> it and no SHA here implements it. That is the done-gate's **third branch**
+> ([AGENTS.md](../../../AGENTS.md) rule 4). **`done` claims a complete record, not a shipped
+> capability.** The two items nobody started left for
+> [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md).
+
 ## Scope
 
 This is a **consolidated maintenance story**: it groups 4 tracker issues into one boundary,
@@ -36,21 +46,30 @@ other direction — they are not unclassifiable, they are **classified as out-of
 
 **What this story deliberately does not do:** assert a `version_shipped` for any row. A release of
 this extension does not carry a backend deploy or a support system, so the `Shipped` column stays
-`—` for all four even where the work is `done` — the two-branch done-gate
-([AGENTS.md](../../../AGENTS.md) rule 4) is exactly this case, one story lower than usual.
+`—` for all four even where the work is `done` — the done-gate's third branch
+([AGENTS.md](../../../AGENTS.md) rule 4) is exactly this case.
 
 **Every row here is now settled** — three `done`, one closed not-planned. The two that were open,
 the ChainList page (#2131) and the tracking dashboard (#2529), moved to
 [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) on 2026-07-22, so this story records only
 work that finished.
 
-**It nevertheless stays `in-progress`, and that is a known gap, not an oversight.** The two-branch
-done-gate ([AGENTS.md](../../../AGENTS.md) rule 4) closes a story either with a
-`version_shipped` + CHANGELOG entry, or — for a no-requirement story — with `commit` naming a real
-SHA. **This story can satisfy neither**: no release of this extension carries a backend deploy, and
-no SHA in this repository delivers work done in another one. Marking it `done` anyway would be the
-fake-done this program exists to prevent; **how an out-of-repo coverage story closes is an open
-question for the owner.**
+**So the story is `done`.** Its deliverable is the record, and the record is complete: all four
+issues are closed on the tracker — three COMPLETED, one NOT_PLANNED — and AC-1, a coverage
+assertion, holds. `version_shipped` and `commit` stay **empty on purpose**: no release of this
+extension carries a backend deploy, and no SHA in this repository delivers work done in another
+one. Demanding either would leave this story permanently un-closable, which is why the owner
+extended the done-gate with a third branch on 2026-07-22
+([AGENTS.md](../../../AGENTS.md) rule 4) — the case
+[D97](../../CONTEXT.md#d97-what-a-docs-epic-may-change--and-when-a-story-that-ships-in-no-release-is-done)
+did not foresee when it wrote the first two.
+
+**`done` here claims a complete record, not a shipped capability.** No user of this extension
+gained anything from these four issues; the `Shipped` column says `—` on every row, and the two
+that were never started left for [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md). The
+preview tool will warn that a `done` story has no `version_shipped` — that warning is a known
+viewer defect, documented in [AGENTS.md](../../../AGENTS.md), and must not be "fixed" by
+inventing a release.
 
 ## Incremental work, fixes & chores
 
@@ -75,7 +94,7 @@ question for the owner.**
 
 | AC | Command |
 | --- | --- |
-| AC-1 | `gh issue view <N>` for each row · `grep -c "^version_shipped: .\+" ` on this file → 0 |
+| AC-1 | `gh issue view 2455` `2534` `4118` `4189` → all CLOSED (3 COMPLETED, 1 NOT_PLANNED) · `grep -c "^version_shipped: .\+"` on this file → 0 |
 
 ## Cross-references
 

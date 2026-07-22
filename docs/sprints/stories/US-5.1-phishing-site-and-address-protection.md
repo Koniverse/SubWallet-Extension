@@ -32,6 +32,11 @@ wallet to a known phishing site.
 > [FR-62](../../PRD.md#functional-requirements) / [US-5.9](US-5.9-anti-scam-address-screening.md),
 > and it is honestly `📋 planned`.
 
+## Status
+
+> **✅ done — shipped in 0.2.1.** All 3 acceptance criteria are ticked, and the 8 rows below are settled (8 shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Phishing is the highest-frequency attack on wallet users and it lands *outside* the key

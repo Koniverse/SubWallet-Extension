@@ -22,6 +22,11 @@ A user can add an NFT collection that auto-detection missed by entering its
 contract address, so collections from long-tail or just-launched projects still
 show up in the wallet.
 
+## Status
+
+> **✅ done — shipped in 0.4.1.** All 3 acceptance criteria are ticked, and the 12 rows below are settled (9 shipped, 3 closed not-planned).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Backend-driven detection (US-9.1 / US-9.3) covers known collections, but not

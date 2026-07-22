@@ -21,6 +21,12 @@ Hold the two **out-of-repo platform items that were never started** — the Chai
 tracking dashboard ([#2529](https://github.com/Koniverse/SubWallet-Extension/issues/2529)).
 Open since 2023-11 and 2024-01.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** Both rows below are **open on the tracker**, and
+> its one acceptance criterion is not ticked. `assignee`, `commit`, `sprint` and
+> `version_shipped` stay empty until it ships.
+
 ## Scope
 
 This is the **unfinished half of [US-1.6](US-1.6-platform-operations-and-out-of-repo-tooling.md)**,

@@ -27,6 +27,14 @@ display / transfer correctness that the feature stories in this epic assemble,
 so users never see a broken detail page, a missing collection, or a confirmation
 screen that contradicts what they are sending.
 
+## Status
+
+> **📋 backlog — even though 20 of the rows below shipped.** The table records four years of NFT
+> display fixes, 0.3.3 through 1.3.3, plus 4 closed not-planned. The hardening guarantee itself is not
+> signed off: none of the 5 acceptance criteria has had a done-pass. **The table is history; the
+> acceptance criteria decide the status.** The one row still open moved to
+> [US-9.23](US-9.23-webapp-address-display-and-validation-round-2.md).
+
 ## Background
 
 This is a cross-cutting hardening story for EPIC-9 with **no FR** — it

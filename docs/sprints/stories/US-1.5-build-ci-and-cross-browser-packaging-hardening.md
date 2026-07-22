@@ -36,6 +36,14 @@ Yarn 3 lockfile is committed and integrity-checked, core-wallet deps resolve fro
 the public npm registry, and CI fails closed on a drifted lockfile or a flagged
 advisory (NFR-19).
 
+## Status
+
+> **🔎 ready — not `done`, though every row below is settled.** The 3 rows record build and
+> packaging work that shipped (1.0.6, 1.1.36). This story's own 11 acceptance criteria — the
+> NFR-8 / NFR-9 / NFR-19 guarantees it defends — have **not** had their done-pass, so none is ticked.
+> **The table is history; the acceptance criteria decide the status.** The two rows that were still
+> open moved to [US-1.8](US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md).
+
 ## Background
 
 This is the **bug / iteration (hardening) cluster** for EPIC-1's build/packaging

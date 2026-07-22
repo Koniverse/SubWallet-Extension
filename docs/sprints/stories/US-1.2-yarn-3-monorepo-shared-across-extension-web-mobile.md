@@ -24,6 +24,11 @@ mobile web-runner — so a single background implementation powers all three
 surfaces and a new feature is written once, not three times. Downstream feature
 epics get to write against one shared core and trust it runs everywhere.
 
+## Status
+
+> **✅ done — shipped in 1.1.36.** All 4 acceptance criteria are ticked, and the single row below is settled (shipped).
+> **The table is history, not a work list** — a `done` story may not carry an open row ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 SubWallet ships three runtime surfaces (browser extension, web app, mobile
