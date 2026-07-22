@@ -229,27 +229,21 @@ false-positive reports._
 
 ## Incremental work, fixes & chores
 
-The five anchor issues above are the **current** round. This capability has been running since
-the project's first external review; **4 earlier tracker issues** are folded in here from the
-former one-issue-per-story maintenance ledger (2026-07-21). They land here rather than on a
-feature story because none of them belongs to a single capability — that is what makes this the
-epic's hardening cluster.
+**5 tracker issues** make up this capability — the findings its acceptance criteria name, one for one. All are **open**; the `Status` column is the Projects board's ([AGENTS.md](../../../AGENTS.md) rule 12).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
-| — | [#31](https://github.com/Koniverse/SubWallet-Extension/issues/31) | External security audit | ✅ done |
-| — | [#1553](https://github.com/Koniverse/SubWallet-Extension/issues/1553) | Recheck problems in the GitHub security tab | ✅ done |
-| 1.1.9 | [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for `page.js` / `content.js` — remove build variables from the injected scripts | ✅ done |
-| 1.3.28 | [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Auto-lock, advanced phishing detection and camera settings reset on version upgrade | ✅ done |
+| — | [#4471](https://github.com/Koniverse/SubWallet-Extension/issues/4471) | 🛠 UX Improvements from UX Bounty Audit | 📋 requires BA docs / design |
+| — | [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929) | Security check: all API keys are open, not in `.env` config | 📋 backlog |
+| — | [#4959](https://github.com/Koniverse/SubWallet-Extension/issues/4959) | [WebApp] Fix reverse tabnabbing & implement a Content Security Policy | 👀 review |
+| — | [#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889) | Extension — Phishing Detection screen shown on common websites | 🔁 follow up |
+| — | [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) | False positive: chaindrop.app flagged as phishing — a legitimate testnet faucet | 📋 backlog |
 
-Two of them are the **same defect class as the anchors**, which is why the cluster is real rather
-than a bucket: **#1823** strips build-time variables out of the injected scripts — the 2023
-instance of the secret-in-the-bundle problem [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)
-re-opened in 2026; and **#3741** is a *cross-capability* defect, losing the auto-lock timer
-([US-5.6](US-5.6-auto-lock-timer-and-unlock-type.md)), the phishing toggle
-([US-5.1](US-5.1-phishing-site-and-address-protection.md)) and camera access
-([US-5.7](US-5.7-camera-access-and-one-sign-toggles.md)) on upgrade — no single feature story
-owns it, the settings-persistence guarantee does.
+> **The four settled audit rounds that used to sit here moved to
+> [US-5.12](US-5.12-earlier-security-audit-rounds.md) on 2026-07-22.** They are prehistory: no
+> acceptance criterion of this story names them, and a table mixing them with the five open
+> findings above is the mix [AGENTS.md](../../../AGENTS.md) rule 9 forbids. **The table follows the
+> acceptance criteria** — whichever side the ACs name is the side that stays.
 
 ## Cross-references
 

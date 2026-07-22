@@ -149,11 +149,11 @@ chosen latency budget, and provider/coverage caveats on delivery._
 
 ## Incremental work, fixes & chores
 
-**None — and none pending.** No issue in the former security maintenance ledger landed on this
-capability (the per-issue map is in the [consolidation note](../../notes/2026-07-21.md)),
-and a title scan of the **18 ledgers still unfolded** finds no candidate either: nothing matching
-"blockaid". Consistent with the capability being planned rather than built — there is no code yet
-for a bug to be filed against.
+**1 tracker issue** makes up this capability — the issue it exists to deliver. It is **open**; the `Status` column is the Projects board's ([AGENTS.md](../../../AGENTS.md) rule 12).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#4661](https://github.com/Koniverse/SubWallet-Extension/issues/4661) | Support Blockaid for EVM transaction or signature requests | 🔬 researching |
 
 ## Cross-references
 

@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 12:01:42 UTC
-> Total stories: 2644
+> Last generated: 2026-07-22 12:02:09 UTC
+> Total stories: 2649
 
-## 📋 Backlog (281)
+## 📋 Backlog (282)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -35,7 +35,6 @@
 | US-19.11 | Onboarding gate follow-ups (improvement on US-19.1) | EPIC-19 | P3 | 1 | — | — |
 | US-19.12 | i18n coverage & key hygiene (improvement on US-19.2) | EPIC-19 | P3 | 1 | — | — |
 | US-19.13 | Avail Space mission pool improvement (improvement on US-19.7) | EPIC-19 | P3 | 1 | — | — |
-| US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
 | US-23.44 | Integrate with Web3 Auth solution => Users can manage their wallets with social accounts | EPIC-23 | P3 | 1 | — | hieudd |
@@ -289,6 +288,8 @@
 | US-9.22 | Runes & Ordinals on the extension (improvement on US-9.7) | EPIC-9 | P3 | 1 | — | — |
 | US-9.23 | WebApp address display & validation, round 2 (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.24 | Client-side NFT Service — full SDK migration (improvement on US-9.20) | EPIC-9 | P3 | 1 | — | frenkie-ng |
+| US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
+| US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
 ## 🟢 Ready (14)
 
@@ -309,13 +310,14 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (32)
+## 🟡 In Progress (33)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
+| US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
 | US-23.222 | WebApp - Wallet account injection feature (related to unified account feature) | EPIC-23 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
@@ -362,7 +364,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2112)
+## ✅ Done (2115)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -370,6 +372,7 @@
 | US-1.2 | Yarn 3 monorepo shared across extension, web app and mobile | EPIC-1 | P0 | 5 | sprint-2024-M02 | saltict |
 | US-1.3 | Online chain-list hot-update (release-free network/token/XCM delivery) | EPIC-1 | P0 | 5 | sprint-2024-M03 | S2kael |
 | US-1.6 | Platform operations & out-of-repo tooling | EPIC-1 | P3 | 1 | sprint-2026-W30 | — |
+| US-1.10 | Earlier build & packaging work (2023–2025) | EPIC-1 | P3 | 1 | sprint-2023-M06 | — |
 | US-10.1 | EVM provider injection (EIP-1193 / EIP-6963) | EPIC-10 | P1 | 5 | sprint-2023-M12 | S2kael |
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | sprint-2022-M01 | jacogr |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | sprint-2023-M07 | S2kael |
@@ -430,6 +433,7 @@
 | US-20.7 | MV3 wake-depth split (pub → partial, pri → full) | EPIC-20 | P1 | 5 | sprint-2025-M06 | saltict |
 | US-20.8 | API request strategy v2 — response cache, group cancellation, adaptive backoff | EPIC-20 | P1 | 5 | sprint-2025-M07 | S2kael |
 | US-20.9 | Aggregated data routed through the external Services SDK | EPIC-20 | P1 | 5 | sprint-2025-M08 | bluezdot |
+| US-20.10 | Early performance passes (2022–2024) | EPIC-20 | P3 | 1 | sprint-2022-M12 | — |
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
@@ -2448,6 +2452,7 @@
 | US-5.5 | Seed-phrase input safety | EPIC-5 | P0 | 2 | sprint-2023-M08 | S2kael |
 | US-5.6 | Auto-lock timer + unlock type | EPIC-5 | P0 | 3 | sprint-2023-M08 | saltict |
 | US-5.7 | Camera-access + One-Sign toggles | EPIC-5 | P0 | 3 | sprint-2025-M02 | S2kael |
+| US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | — |
 | US-6.1 | Dark-only responsive UI: popup and full-page expand view | EPIC-6 | P2 | 3 | sprint-2023-M03 | lw-cdm |
 | US-6.2 | Web app (standalone browser app) with feature parity to the extension | EPIC-6 | P2 | 5 | sprint-2024-M02 | saltict |
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
@@ -2686,12 +2691,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 281
+- 📋 **Backlog**: 282
 - 🟢 **Ready**: 14
-- 🟡 **In Progress**: 32
+- 🟡 **In Progress**: 33
 - 👀 **Review**: 11
-- ✅ **Done**: 2112
+- ✅ **Done**: 2115
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 194
 
-⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).

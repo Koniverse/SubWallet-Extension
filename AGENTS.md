@@ -347,6 +347,26 @@ capability ships get their own story in the sprint that picks them up — append
 shipped story re-creates exactly the state this rule exists to remove. The
 incremental-work table is a **record of what a story delivered**, not a backlog.
 
+**One story, one table, one completion state.** A story's *scope* — the issues it exists to deliver
+— and its *history* — what already landed on the capability — both belong in the incremental-work
+table, and they must not disagree about completion. When they do, that is the mix this rule
+forbids, and the fix is the split above. It is **not** a second table: EPIC-20 was first "fixed" by
+giving each story a `### Its own tracker issues` block beside its history block, which kept both
+completion states on one page under two headings. That is a way around the rule, not a way to keep
+it. Six settled issues left US-20.1 / US-20.2 / US-20.6 for `US-20.10` instead.
+
+**Which side leaves depends on the acceptance criteria.** The canonical direction above — settled
+stays, open leaves — is right when the ACs are generic hardening statements (`US-9.10`, `US-9.4`).
+It is **backwards** when the ACs name the open issues one for one: `US-5.10` has an AC per open
+finding and `US-1.5` an AC per open build item, so moving those out would leave a story whose every
+acceptance criterion points at another document. There the **settled prehistory** leaves instead
+(`US-5.12`, `US-1.10`, `US-20.10`). **The table follows the acceptance criteria.**
+
+**A story's own scope must reach the table.** Every EPIC-20 story cited its scope issues in prose
+only — References, Tasks, ACs — so a reader saw a table of `✅ done` history above a `backlog`
+story and concluded the status was wrong. The status was right; the table was showing someone
+else's work.
+
 **Every story carrying an incremental-work table opens with a `## Status` section** — the status
 and the one reason for it, in two or three lines, right after the Goal. This is not decoration:
 the rollups read frontmatter and the reader arrives at the table, so the two routinely disagree

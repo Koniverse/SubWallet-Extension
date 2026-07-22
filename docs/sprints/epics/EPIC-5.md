@@ -132,6 +132,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Anti-scam address screening | Screen recipient addresses against Merkle Science scam data | 📋 backlog | — |
 | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Security audit & remediation hardening | Remediate audit + false-positive findings (#4471, #4929, #4959, #4889, #4998), each regression-guarded | 🚧 in-progress | — |
 | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Two-factor authentication for outgoing transfers | A second factor in front of value leaving the wallet (#4125) | 📋 backlog | — |
+| [US-5.12](../stories/US-5.12-earlier-security-audit-rounds.md) | Earlier security audit rounds (2022–2025) | The four audit/hardening rounds that closed before US-5.10's scope was written | ✅ done | 1.3.28 |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is
@@ -164,6 +165,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Merkle Science recipient screen in the send-flow validation step via backend proxy *(planned)* | FR-62 |
 | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Audit / false-positive remediation across phishing match-list, bundle secret-hygiene, WebApp hardening | FR-52 (defends), NFR-16, NFR-25 |
 | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Second authentication factor in front of outgoing value — no subsystem yet | — |
+| [US-5.12](../stories/US-5.12-earlier-security-audit-rounds.md) | Audit rounds closed before the current remediation — prehistory | — |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 

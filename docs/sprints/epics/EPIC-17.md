@@ -32,6 +32,7 @@ same work twice ([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive with
 
 | Issue | Title | Tracker state | Children |
 |---|---|---|---|
+| [#1676](https://github.com/Koniverse/SubWallet-Extension/issues/1676) | Support Proxy Account *(feature root)* | ✅ closed COMPLETED | #4726 ([US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md)) · #4725 |
 | [#4770](https://github.com/Koniverse/SubWallet-Extension/issues/4770) | [Proxy Account][Extension] Background logic Integration | ✅ closed COMPLETED | #4780 ([US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md)), #4781, #4782, #4783 ([US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md)) |
 
 > Moved out of US-17.1's incremental-work table on 2026-07-22, where it sat as a row beside #4780,

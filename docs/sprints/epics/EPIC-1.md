@@ -110,6 +110,7 @@ runtime* translation channel (FR-4).
 | [US-1.7](../stories/US-1.7-firefox-background-lifecycle-recheck.md) | Firefox background-lifecycle recheck | Improvement on US-1.1 — measure when Firefox stops the background on the current MV2 build (#3222) | 📋 backlog | — |
 | [US-1.8](../stories/US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md) | Firefox CORS follow-up & dev-build test tooling | Improvement on US-1.5 — the reopened cross-origin block (#1934) and Koni-runner dev-build testing (#4602) | 📋 backlog | — |
 | [US-1.9](../stories/US-1.9-out-of-repo-tooling-not-yet-started.md) | Out-of-repo tooling not yet started | Improvement on US-1.6 — the ChainList page (#2131) and the tracking dashboard (#2529), neither started | 📋 backlog | — |
+| [US-1.10](../stories/US-1.10-earlier-build-and-packaging-work.md) | Earlier build & packaging work (2023–2025) | The three build/packaging issues that shipped before US-1.5's scope was written | ✅ done | 1.1.36 |
 
 > **There is no separate maintenance layer for build & platform.** Each capability above carries
 > its own requirement *and* its incremental-work history as a table inside the story. The 19

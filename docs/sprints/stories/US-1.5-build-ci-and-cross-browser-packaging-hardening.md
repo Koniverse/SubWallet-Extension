@@ -267,20 +267,28 @@ regression suite rather than fragmenting per browser._
 
 ## Incremental work, fixes & chores
 
-**3 tracker issues** of incremental work landed on this capability — manifest-permission reduction, one Firefox CORS fix, and the WebApp build number. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
-
-> **All three are settled.** Two open rows — the reopened Firefox cross-origin block
-> ([#1934](https://github.com/Koniverse/SubWallet-Extension/issues/1934)) and dev-build test
-> tooling ([#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602)) — moved to
-> [US-1.8](US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md) on 2026-07-22, so this
-> story's done-pass judges only what it delivered. **#1934 is a reopen of the defect class
-> #3992 below closed** — that pairing is why it must not sit in a table of settled work.
+**8 tracker issues** make up this capability — the build, packaging and cross-browser items its acceptance criteria name. All are **open**; the `Status` column is the Projects board's ([AGENTS.md](../../../AGENTS.md) rule 12).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
-| 1.0.6 | [#1406](https://github.com/Koniverse/SubWallet-Extension/issues/1406) | Try to remove `webRequest` from the manifest | ✅ done |
-| 1.1.36 | [#2231](https://github.com/Koniverse/SubWallet-Extension/issues/2231) | WebApp — update build number | ✅ done |
-| — | [#3992](https://github.com/Koniverse/SubWallet-Extension/issues/3992) | WebApp — fix CORS bug on Firefox (extension and WebApp) | ✅ done |
+| — | [#3904](https://github.com/Koniverse/SubWallet-Extension/issues/3904) | Review the webpack config and build process for SubWallet | 🟢 ready to implement |
+| — | [#4115](https://github.com/Koniverse/SubWallet-Extension/issues/4115) | Extension — Research how to build on Firefox after the MV3 update | 🟢 ready to implement |
+| — | [#2461](https://github.com/Koniverse/SubWallet-Extension/issues/2461) | Update the fallback for online resources periodically | 📋 backlog |
+| — | [#4664](https://github.com/Koniverse/SubWallet-Extension/issues/4664) | Cannot update online resources | 📋 backlog |
+| — | [#2942](https://github.com/Koniverse/SubWallet-Extension/issues/2942) | Extension — Check for errors when Brave automatically removes extensions | 📋 backlog |
+| — | [#2577](https://github.com/Koniverse/SubWallet-Extension/issues/2577) | Bug: cannot create a Substrate API in the Jest environment | 📋 backlog |
+| — | [#3360](https://github.com/Koniverse/SubWallet-Extension/issues/3360) | Extension [Firefox] — Follow-up on the error page | 📋 backlog |
+| — | [#1270](https://github.com/Koniverse/SubWallet-Extension/issues/1270) | Update the style error when an imported JSON file is invalid | 📋 backlog |
+
+> **The three settled rows that used to sit here moved to
+> [US-1.10](US-1.10-earlier-build-and-packaging-work.md) on 2026-07-22.** No acceptance criterion of
+> this story names them; they are prehistory, and a table mixing them with the eight open items is
+> the mix [AGENTS.md](../../../AGENTS.md) rule 9 forbids. **The table follows the acceptance
+> criteria.**
+>
+> Two further open items — the reopened Firefox cross-origin block and dev-build test tooling —
+> live in [US-1.8](US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md), split out earlier
+> the same day.
 
 ## Cross-references
 

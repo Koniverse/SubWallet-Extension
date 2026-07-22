@@ -60,7 +60,12 @@ records it and the children are the story rows ([AGENTS.md](../../../AGENTS.md) 
 | Issue | Title | Tracker state | Children |
 |---|---|---|---|
 | [#2182](https://github.com/Koniverse/SubWallet-Extension/issues/2182) | WebApp \| Extension — Review all performance problems | ✅ closed COMPLETED | #2245 ([US-20.5](../stories/US-20.5-list-rendering-performance.md)) · #2248 ([US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md)) · #2207, #2228, #1902 (other ledgers) |
+| [#4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197) | Evaluate and update the performance of the extension | 📋 open | #4021, #4447 ([US-20.2](../stories/US-20.2-api-call-optimization.md)) · #4427 ([US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md)) · #4123, #3960, #4216, #4288, #3132 (other ledgers) |
 
+> **Both are open-ended programmes, not features.** #4197 is the newer one and nests through the
+> sub-issues API; #2182 is the 2023 one and nests through prose. Eight EPIC-20 stories cite #4197
+> in their references — it is the reason this epic exists.
+>
 > **#2182 lists its children as plain bullets under *"Known Problems"*, with no checkboxes and no
 > sub-issue links.** `gh api …/sub_issues` returns 0, and the body-checkbox query added for #1532
 > misses it too. Rule 10's child test now matches **any list item that is an issue reference**;
@@ -196,12 +201,13 @@ boundary is drawn explicitly in Out of scope.
 | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 🚧 in-progress | — |
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
 | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | ⏸️ deprecated | — |
-| [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 📋 backlog | — |
+| [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 👀 review | — |
 | [US-20.7](../stories/US-20.7-mv3-wake-depth-split.md) | MV3 wake-depth split | `pub(` wakes the core only; `pri(`/`mobile(` additionally starts the 11 data services (#4428 + #4478 fix) | ✅ done | 1.3.42 |
 | [US-20.8](../stories/US-20.8-api-request-strategy-v2.md) | API request strategy v2 | md5-keyed 60 s response cache, group cancellation, per-window cap, adaptive backoff (#4448) | ✅ done | 1.3.47 |
 | [US-20.9](../stories/US-20.9-aggregated-data-via-services-sdk.md) | Aggregated data via Services SDK | 18 aggregate call sites routed off-device; in-repo SDK deleted (#4465) | ✅ done | 1.3.52 |
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | List rendering performance | Make heavy lists/screens (NFT / Receive / customization / select token / select network) render fast | 📋 backlog | — |
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp & web-runner performance | WebApp animations + list pagination and a web-runner shared worker across tabs | 📋 backlog | — |
+| [US-20.10](../stories/US-20.10-early-performance-passes.md) | Early performance passes (2022–2024) | The six performance issues that shipped before this programme started | ✅ done | 1.0.7 |
 
 > Every EPIC-20 story owns **no FR** (cf. the
 > [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) /

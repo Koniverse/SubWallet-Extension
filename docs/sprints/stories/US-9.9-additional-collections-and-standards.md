@@ -99,17 +99,11 @@ _Forward-looking — FR-93 is `📋 planned`. Fill `commit` / `version_shipped` 
 
 ## Incremental work, fixes & chores
 
-**None from the NFT ledger — but 27 candidates are waiting.** Of the 116 tracker issues in the
-former NFT maintenance ledger, folded into this epic's capabilities on 2026-07-17, **none landed
-here** — the note records this capability's count as **0**
-([consolidation note](../../notes/2026-07-17.md)).
+**1 tracker issue** makes up the ERC-6551 half of this capability. It is **open** — research, not implementation.
 
-> **That is a checked absence within one ledger, not an empty history.** A title scan of the **13
-> ledgers still separate** finds **27 issues** mentioning NFT, sitting in EPIC-24, EPIC-26,
-> EPIC-28, EPIC-32 and EPIC-41. Treat that as an **upper bound, not a count**: routing
-> there is a title heuristic ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
-> and most will belong to the NFT capabilities that already carry tables. Which land *here* — the
-> new-standards capability — is decided when those ledgers are folded.
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#2485](https://github.com/Koniverse/SubWallet-Extension/issues/2485) | Research ERC-6551 | 📋 backlog |
 
 ## Cross-references
 

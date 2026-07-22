@@ -110,6 +110,11 @@ ERC-1155 support is **partial**, so this story stays `backlog`: a **RARI-chain-s
 |---|---|---|---|
 | 1.3.5 | [#3726](https://github.com/Koniverse/SubWallet-Extension/issues/3726) | Support ERC-1155 (RARI chain) | ✅ done |
 
+> **ERC-1155 on Ethereum is not a row here.** #4881 became
+> [US-9.26](US-9.26-erc-1155-on-ethereum.md) on 2026-07-22; this story's row shipped on RARI in
+> 1.3.5, and a shipped row beside an open one is the mix
+> [AGENTS.md](../../../AGENTS.md) rule 9 forbids.
+
 ## Cross-references
 
 - [PRD FR-88](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.3](US-9.3-evm-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md)
