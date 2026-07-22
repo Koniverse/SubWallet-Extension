@@ -43,12 +43,19 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
   if (remainingTimestampMs <= 0) {
     return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.availableForWithdrawal');
   } else {
-    const remainingTimeHr = remainingTimestampMs / 1000 / 60 / 60;
+    // Test cases:
+    //  - 3599000 ms   → 59 min 59s
+    //  - 3600000 ms   → 60 min
+    //  - 82799000 ms  → 23h
+    //  - 86399900 ms  → 23h 59m
+    //  - 86400000 ms  → 24h
+    //  - 172800000 ms → 48h
+    const MS_PER_HOUR = 60 * 60 * 1000; // 3600000
 
-    // Formatted waitting time without round up
+    // Example of _formattedWaitingTime: 22 hr 59.833333333333336 m
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
     const _formattedWaitingTime = humanizeDuration(remainingTimestampMs, {
-      units: remainingTimeHr >= 24 ? ['d', 'h'] : ['h', 'm'],
+      units: remainingTimestampMs >= MS_PER_HOUR ? ['d', 'h'] : ['h', 'm'],
       round: false,
       delimiter: ' ',
       language: 'shortEn',
@@ -66,14 +73,43 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
       } // TODO: should not be shorten
     }) as string;
 
-    // Formatted waitting time with round up
-    const formattedWaitingTime = _formattedWaitingTime.split(' ').map((segment, index) => {
-      if (index % 2 === 0) {
-        return Math.ceil(parseFloat(segment)).toString();
-      }
+    // Example of timeArray: ['23', 'hr', '59.833333333333336', 'm']
+    const timeArray = _formattedWaitingTime.split(' ');
 
-      return segment;
-    }).join(' ');
+    // Formatted waiting time with round up
+    const formattedWaitingTime = timeArray.reduce<string[]>((result, rawValue, index, array) => {
+      if (index % 2 === 0) { // even index element hold the value, odd index element hold the unit
+        const value = Math.ceil(parseFloat(rawValue));
+        const unit = array[index + 1];
+
+        // Case 1: 60 minutes → convert to +1 hour
+        if (unit === 'm' && value === 60) {
+          const prevHourIndex = result.length - 2;
+
+          if (prevHourIndex >= 0) {
+            result[prevHourIndex] = (parseInt(result[prevHourIndex]) + 1).toString();
+          } else {
+            result.push('1', 'hr');
+          }
+          // Case 2: 24 hours → convert to +1 day
+        } else if (unit === 'hr' && value === 24) {
+          const prevDayIndex = result.length - 2;
+
+          if (prevDayIndex >= 0) {
+            result[prevDayIndex] = (parseInt(result[prevDayIndex]) + 1).toString();
+          } else {
+            result.push('1', 'd');
+          }
+        } else {
+          // Default: push rounded value and its unit normally
+          result.push(value.toString(), unit);
+        }
+
+        return result;
+      } else {
+        return result;
+      }
+    }, []).join(' ');
 
     return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
