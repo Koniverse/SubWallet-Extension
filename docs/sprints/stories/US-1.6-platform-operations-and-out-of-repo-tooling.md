@@ -23,8 +23,8 @@ claimed without any of these being mistaken for extension work.
 
 ## Status
 
-> **✅ done — and no release carries it.** Every row below is closed on the tracker (3 COMPLETED,
-> 1 NOT_PLANNED) and AC-1, a coverage assertion, holds. `version_shipped` and `commit` are empty
+> **✅ done — and no release carries it.** Every row below is settled: **2 delivered, 2 cancelled**.
+> AC-1, a coverage assertion, holds. `version_shipped` and `commit` are empty
 > **on purpose**: the work happened in other repositories, so no release of this extension delivers
 > it and no SHA here implements it. That is the done-gate's **third branch**
 > ([AGENTS.md](../../../AGENTS.md) rule 4). **`done` claims a complete record, not a shipped
@@ -60,7 +60,10 @@ this extension does not carry a backend deploy or a support system, so the `Ship
 > line** — `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues` returns empty for the
 > three that remain, and returned six for #4189.
 
-**Every row here is now settled** — three `done`, one closed not-planned. #1045 joined on
+**Every row here is now settled** — two `done`, two cancelled. **#2534 (a user support system) is
+one of the cancelled ones**, and only the *board* says so: the tracker closed it `COMPLETED` on
+2025-03-30 while `Status` on Projects board #2 reads **Cancel**. Where the two disagree the board
+is the more specific record, and no commit or release contradicts it. #1045 joined on
 2026-07-22 out of the onboarding ledger: making SubWallet selectable in dApps that use
 **web3-onboard** is a dApp-discovery concern ([EPIC-10](../epics/EPIC-10.md)), but the code is a
 pull request against `blocknative/web3-onboard` — `grep -r web3-onboard packages/` returns
@@ -92,7 +95,7 @@ inventing a release.
 |---|---|---|---|
 | — | [#1045](https://github.com/Koniverse/SubWallet-Extension/issues/1045) | Create a PR integrating SubWallet into **web3-onboard** *(separate repo — blocknative/web3-onboard)* | ✅ done |
 | — | [#2455](https://github.com/Koniverse/SubWallet-Extension/issues/2455) | Build middleware services — cross-chain balance, earning-pool statistics | ⏸️ deprecated |
-| — | [#2534](https://github.com/Koniverse/SubWallet-Extension/issues/2534) | Build a user support system | ✅ done |
+| — | [#2534](https://github.com/Koniverse/SubWallet-Extension/issues/2534) | Build a user support system | ⏸ deprecated |
 | — | [#4118](https://github.com/Koniverse/SubWallet-Extension/issues/4118) | Set up a GitHub Action to deploy the SubWallet **backend** | ✅ done |
 
 > **#2455 is the ancestor of the Services SDK.** It proposed exactly what
@@ -109,7 +112,7 @@ inventing a release.
 
 | AC | Command |
 | --- | --- |
-| AC-1 | `gh issue view 1045` `2455` `2534` `4118` → all CLOSED (3 COMPLETED, 1 NOT_PLANNED) · each `.../sub_issues` empty · `grep -c "^version_shipped: .\+"` on this file → 0 |
+| AC-1 | `gh issue view 1045` `2455` `2534` `4118` → all CLOSED · board `Status` for each (#2534 = Cancel) · each `.../sub_issues` empty · `grep -c "^version_shipped: .\+"` on this file → 0 |
 
 ## Cross-references
 

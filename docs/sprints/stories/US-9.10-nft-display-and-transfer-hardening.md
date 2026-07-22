@@ -157,7 +157,10 @@ Beyond the requirement above, **24 tracker issue(s)** of incremental work landed
 > [US-9.23](US-9.23-webapp-address-display-and-validation-round-2.md) on 2026-07-22, so this
 > story's done-pass judges only what it delivered.
 
-> 4 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+> 3 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+>
+> **#1909 was one of them until 2026-07-22**, marked so by the 2026-07-17 fold. The tracker says
+> `CLOSED / COMPLETED` and Projects board #2 says `Status = Done`.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -183,7 +186,7 @@ Beyond the requirement above, **24 tracker issue(s)** of incremental work landed
 | — | [#1154](https://github.com/Koniverse/SubWallet-Extension/issues/1154) | Upgrade UI - Still shows NFT sent | ✅ done |
 | — | [#1258](https://github.com/Koniverse/SubWallet-Extension/issues/1258) | Show duplicate network enable message in the import token, import nft screen | ⏸ deprecated |
 | — | [#1300](https://github.com/Koniverse/SubWallet-Extension/issues/1300) | Bug when URL NFT collection fails | ⏸ deprecated |
-| — | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | WebApp - Re- check NFT of the Statemine network | ⏸ deprecated |
+| — | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | WebApp - Re- check NFT of the Statemine network | ✅ done |
 | — | [#2106](https://github.com/Koniverse/SubWallet-Extension/issues/2106) | Do not delete NFT data when reset wallet | ⏸ deprecated |
 
 ## Cross-references

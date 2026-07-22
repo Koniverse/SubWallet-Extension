@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — eleven standing rules
+### How the docs are allowed to change — twelve standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These eleven live here on purpose.** The koni-docs spec is vendored from
+**These twelve live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.
@@ -362,9 +362,21 @@ delivers it"* directly above a row reading `✅ done @ 1.3.80`.
 
 **10. An umbrella belongs to the epic; only a leaf belongs in a story.** The tracker nests
 issues, and a parent listed beside its own children claims the same work twice. **The test is
-mechanical and has two halves, and both must hold:** the issue has sub-issues
-(`gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`) **and** no CHANGELOG line of
-its own. Both → it delegated all its scope, so the epic records it in an umbrella table and the
+mechanical and has two halves, and both must hold:** the issue has children **and** no CHANGELOG
+line of its own.
+
+**"Has children" is two queries, not one.** `gh api …/issues/<N>/sub_issues` only sees GitHub's
+sub-issues feature, which is recent. Older parents nest through a **markdown task list in the
+body**, and the API returns `0` for them — `#1532` *"Multi-language support"* is the whole i18n
+capability's root, and it reads as a leaf. So also fetch the body and look for checkbox lines that
+reference issues:
+
+```
+gh issue view <N> --json body --jq .body | grep -E '^\s*- \[[ x]\]' -A2 | grep -oE '#[0-9]+'
+```
+
+One row in 252 turned on this. That is not a reason to skip it: it was the root of the largest
+capability in its epic. Both → it delegated all its scope, so the epic records it in an umbrella table and the
 children are the rows. Sub-issues *with* a CHANGELOG line → it is a **delivery that happened to
 have a sub-task**, and it stays a row: `#4884` has one child and its own 1.3.80 line, `#4568` the
 same at 1.3.68.
@@ -389,6 +401,26 @@ and `check-ids` skips it for exactly that reason. So the filename is a promise �
 says *this is everything from that day*. A slug on the end quietly breaks it, because the next pass
 gets its own slug instead of a section. Renaming one later costs a link rewrite across the whole
 surface (49 files, that time).
+
+**12. A closed issue has two statuses, and the board is the specific one.** `stateReason` says
+`COMPLETED` or `NOT_PLANNED`; Projects board #2 carries a `Status` field that also holds **Cancel**.
+They disagree: **four of 252 folded rows are `CLOSED / COMPLETED` on the tracker and `Cancel` on the
+board** — #1975, #2534, #3048, #3078 — and every one had been recorded as `done`. Two more disagreed
+the other way, marked `deprecated` in the docs while tracker *and* board said delivered (#603,
+#1909).
+
+`stateReason` records only *how* an issue was closed, and a developer closing a cancelled ticket
+picks "completed" without thinking. The board field is what someone set on purpose. So read
+**both**, and where they conflict the board wins unless a commit or a CHANGELOG line contradicts it.
+**#3048 is the pattern**: board `Cancel`, 28 commits, and `git merge-base --is-ancestor` fails
+against `origin/dev` — because a cancelled branch never merges.
+
+```
+gh api graphql -f query='{repository(owner:"Koniverse",name:"SubWallet-Extension"){
+  issue(number:N){stateReason projectItems(first:3){nodes{fieldValues(first:20){nodes{
+  ... on ProjectV2ItemFieldSingleSelectValue{
+    field{... on ProjectV2SingleSelectField{name}} name}}}}}}}}'
+```
 
 ### The two change logs
 

@@ -106,7 +106,11 @@ Commits `6e4091bf3f, 824a020641, 88402e9c33` verified contained in the v0.6.7 an
 
 Beyond the requirement above, **28 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17.md).
 
-> 3 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+> 2 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
+>
+> **#603 was one of them until 2026-07-22.** Both the tracker (`CLOSED / COMPLETED`) and Projects
+> board #2 (`Status = Done`) say it was delivered; the `deprecated` marking came from the
+> 2026-07-17 fold and matched neither.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -131,7 +135,7 @@ Beyond the requirement above, **28 tracker issue(s)** of incremental work landed
 | — | [#194](https://github.com/Koniverse/SubWallet-Extension/issues/194) | Collect NFT on Singular.app but it doesnt show on SubWallet | ✅ done |
 | — | [#205](https://github.com/Koniverse/SubWallet-Extension/issues/205) | Add Polka Potions NFT collection | ✅ done |
 | — | [#230](https://github.com/Koniverse/SubWallet-Extension/issues/230) | Integrate NFTs on Altair NFT Playground | ⏸ deprecated |
-| — | [#603](https://github.com/Koniverse/SubWallet-Extension/issues/603) | Integrate Gromlins NFT | ⏸ deprecated |
+| — | [#603](https://github.com/Koniverse/SubWallet-Extension/issues/603) | Integrate Gromlins NFT | ✅ done |
 | — | [#622](https://github.com/Koniverse/SubWallet-Extension/issues/622) | Support Bit.Country'NFT Trading and Land Portfolio | ✅ done |
 | — | [#688](https://github.com/Koniverse/SubWallet-Extension/issues/688) | Support Zeitgeist NFT | ✅ done |
 | — | [#1285](https://github.com/Koniverse/SubWallet-Extension/issues/1285) | Add ArtZero API for Astar's NFT | ✅ done |

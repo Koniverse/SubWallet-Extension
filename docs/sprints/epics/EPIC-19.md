@@ -46,10 +46,19 @@ with `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
 |---|---|---|---|
 | [#4182](https://github.com/Koniverse/SubWallet-Extension/issues/4182) | Improve MKT campaign features | 📋 open | #4180, #4137, #3737 (UI/UX ledger) · #4432 (transactions ledger) · #3454 ([US-19.10](../stories/US-19.10-webapp-marketing-campaign-round-2.md)) |
 | [#4370](https://github.com/Koniverse/SubWallet-Extension/issues/4370) | In-app Notifications | ✅ closed COMPLETED | #3507, #3515, #1599, #2038, #1639 (UI/UX ledger) · #1385 (transactions ledger) · #2230, #4064 ([US-19.8](../stories/US-19.8-in-app-notification-center.md)) |
+| [#1532](https://github.com/Koniverse/SubWallet-Extension/issues/1532) | Multi-language support *(task-list umbrella — the oldest one)* | ✅ closed COMPLETED | #1630, #1640, #1658 ([US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md)) · #2123 ([US-19.3](../stories/US-19.3-additional-ui-languages.md)) |
 | [#4154](https://github.com/Koniverse/SubWallet-Extension/issues/4154) | Support adding some new languages on the wallet | 📋 open | #4126, #2123 ([US-19.3](../stories/US-19.3-additional-ui-languages.md)) · #2004, #2423 ([US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md), [US-19.11](../stories/US-19.11-onboarding-gate-follow-ups.md)) · #2531 |
 | [#2531](https://github.com/Koniverse/SubWallet-Extension/issues/2531) | Clean up i18n data and re-apply i18n | 📋 open | 10 shipped i18n-format issues ([US-19.2](../stories/US-19.2-multi-language-i18n-round-1.md)) · #4564, #4656 ([US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md)) · #4560 ([US-1.4](../stories/US-1.4-online-i18n-hot-update.md)) |
 | [#4527](https://github.com/Koniverse/SubWallet-Extension/issues/4527) | Request for Additional Language Support (Spanish and more) | 📋 open | #4528 ([US-19.3](../stories/US-19.3-additional-ui-languages.md)) |
 
+> **#1532 does not appear in the sub-issues API at all.** Its children are a **markdown task list
+> in the body** — the convention that predates GitHub's sub-issues feature — so
+> `gh api …/sub_issues` returns `0` for it. Rule 10's check has to read the body too; #1532 is the
+> only one of 252 folded rows where that mattered.
+>
+> It is also **closed COMPLETED with an unchecked child**: Portuguese (#2123) is still open, and
+> the box beside it in #1532's body is still empty.
+>
 > **Four of the listed "sub-issues" are pull requests, not issues** — #1940, #1832 and #1716 under
 > #4182, and #913 under #4370. Their titles are PR titles (`[Issue-N] …`) and they appear nowhere
 > in the docs, correctly. This is the same board noise as #138, #145 and #43 found on 2026-07-22;
