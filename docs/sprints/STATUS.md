@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 04:31:41 UTC
-> Total stories: 2771
+> Last generated: 2026-07-22 04:37:40 UTC
+> Total stories: 2758
 
 ## 📋 Backlog (292)
 
@@ -23,6 +23,7 @@
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
 | US-14.3 | Additional on-ramp providers | EPIC-14 | P3 | 5 | — | — |
 | US-15.5 | Web-app governance surface | EPIC-15 | P3 | 8 | — | — |
+| US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
@@ -210,7 +211,6 @@
 | US-36.61 | Optimize swap pair selection | EPIC-36 | P3 | 1 | — | — |
 | US-36.64 | Avail Space - Support Avail Recovery Ledger app | EPIC-36 | P3 | 1 | — | — |
 | US-36.76 | Remove @polkadot/hw-ledger from ledger connector | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-37.15 | Get stake history of proxy account for proxied account | EPIC-37 | P3 | 1 | — | — |
 | US-38.4 | [Multisig] Mobile support | EPIC-38 | P3 | 1 | — | — |
 | US-38.5 | [Multisig] WebApp support | EPIC-38 | P3 | 1 | — | — |
 | US-38.11 | [Multisig] [Extension] [Phase 2] Multisig Account Detection | EPIC-38 | P3 | 1 | — | bluezdot |
@@ -376,7 +376,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2213)
+## ✅ Done (2202)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2107,17 +2107,6 @@
 | US-36.79 | [Extension] Update metadata runtime for Ledger app - Round 4 | EPIC-36 | P3 | 1 | sprint-2025-M11 | PDTnhah |
 | US-36.80 | [Extension] Update metadata runtime for Ledger app - Round 5 | EPIC-36 | P3 | 1 | sprint-2025-M12 | PDTnhah |
 | US-36.81 | Recheck Ledger signing on Bittensor network | EPIC-36 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-37.3 | [Proxy Account][Doc] Write Technical Documentation for Proxy Account Support | EPIC-37 | P3 | 1 | sprint-2026-M05 | PDTnhah |
-| US-37.5 | [Proxy Account][Extension] Background logic Integration | EPIC-37 | P3 | 1 | sprint-2026-M01 | tunghp2002 |
-| US-37.6 | [Proxy Account][Extension] Manage Proxy UI | EPIC-37 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
-| US-37.7 | [Proxy Account][Extension] Add Proxy Form | EPIC-37 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
-| US-37.8 | [Proxy Account][Extension] Add / Remove Confirmation | EPIC-37 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
-| US-37.9 | [Proxy Account][Extension] Select Proxy Account for Signing | EPIC-37 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
-| US-37.10 | Initialize Proxy Service | EPIC-37 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-37.11 | Handle proxy extrinsic | EPIC-37 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-37.12 | Intergrate proxy account with others extrinsic | EPIC-37 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-37.13 | History intergrate Proxy Account | EPIC-37 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-37.14 | [Proxy Account][Extension] Remove Proxy Form | EPIC-37 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
 | US-38.6 | [Multisig][Reseach] Multisig Technical Research | EPIC-38 | P3 | 1 | sprint-2025-M11 | bluezdot |
 | US-38.8 | [Multisig] [Extension] [Phase 1] Multisig Account Management | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
 | US-38.9 | [Multisig] [Extension] [Phase 1] Pending Transaction Detection | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
@@ -2598,7 +2587,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (206)
+## 🗑️ Deprecated (204)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2645,6 +2634,7 @@ _No stories_
 | US-24.322 | [Extension][Manage network/Filter] Display incorrect list of networks when combining enabled/disabled filter and other f | EPIC-24 | P3 | 1 | — | — |
 | US-24.323 | Support Minting DOT and POAP at Token2049 | EPIC-24 | P3 | 1 | — | bluezdot |
 | US-24.326 | [WebApp / Network detail] - Unable to open network detail screen when clicking first time on edit button of network | EPIC-24 | P3 | 1 | — | lw-cdm |
+| US-24.342 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-24 | P3 | 1 | — | anhntk54 |
 | US-26.15 | Some UI bugs & feedback to improve UX-UI (v2) | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.52 | Update background logic for history | EPIC-26 | P3 | 1 | — | saltict |
 | US-26.77 | Upgrade UI - Address book | EPIC-26 | P3 | 1 | — | S2kael |
@@ -2755,9 +2745,6 @@ _No stories_
 | US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
 | US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-37.1 | Support Proxy Account Management | EPIC-37 | P3 | 1 | — | saltict |
-| US-37.2 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-37 | P3 | 1 | — | anhntk54 |
-| US-37.4 | [Proxy Account][Extension] Manage Proxy Accounts | EPIC-37 | P3 | 1 | — | — |
 | US-38.1 | Support multisig features | EPIC-38 | P3 | 1 | sprint-2025-M03 | nulllpc |
 | US-38.2 | [Multisig] Support Multisig account | EPIC-38 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-38.3 | [Multisig] Extension support | EPIC-38 | P3 | 1 | — | bluezdot |
@@ -2817,8 +2804,8 @@ _No stories_
 - 🟢 **Ready**: 17
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2213
+- ✅ **Done**: 2202
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 206
+- 🗑️ **Deprecated**: 204
 
 ⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

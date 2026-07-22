@@ -102,6 +102,16 @@ The proxy-vs-multisig boundary is drawn explicitly in Out of scope below.
 |---|---|---|---|---|
 | [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md) | Proxy types & authority management | Add a proxy to a Substrate account, choose a named pallet proxy type, and manage the delegated-authority relationship | ✅ done | 1.3.72 |
 | [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) | Proxy signing (Sign Selector) + proxied-by display | At signing time a Sign Selector picks which controlling account signs, and the proxied-by provenance is shown end to end | ✅ done | 1.3.72 |
+| [US-17.3](../stories/US-17.3-proxy-stake-allocation-in-earning-history.md) | Proxy stake allocation in earning history | Show how a proxy allocated the proxied account's balance, on the earning surface (#4947) | 📋 backlog | — |
+
+> **There is no separate maintenance layer for proxy accounts.** Each capability above carries its
+> own requirement *and* its full incremental-work history as a table inside the story. The 15
+> tracker issues that formerly sat one-story-each in the maintenance layer were folded in on
+> 2026-07-22: **9** into [US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md),
+> **4** into [US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md),
+> #4947 became [US-17.3](../stories/US-17.3-proxy-stake-allocation-in-earning-history.md), and one
+> was **relocated out of the area** — #4610 proxies the mempool.space HTTP API, not a proxy
+> account. Forwarding map: [consolidation note](../../notes/2026-07-22-epic-17-consolidation.md).
 
 ## Cross-cutting invariants
 
