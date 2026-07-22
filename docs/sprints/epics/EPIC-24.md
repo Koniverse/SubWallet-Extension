@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**342 stories** — 287 done (shipped), 2 in flight (ready / in-progress /
-review, from the Projects board), 34 backlog (open, not yet started), 19 deprecated
+**341 stories** — 287 done (shipped), 2 in flight (ready / in-progress /
+review, from the Projects board), 33 backlog (open, not yet started), 19 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -384,7 +384,6 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-24.332](../stories/US-24.332-some-updates-after-polkadot-asset-hub-migration.md) | ✅ done | Some updates after Polkadot Asset Hub Migration | [#4819](https://github.com/Koniverse/SubWallet-Extension/issues/4819) | bluezdot | 1.3.65 |
 | [US-24.333](../stories/US-24.333-update-chain-list-stable-v0-2-122.md) | ✅ done | Update chain-list stable v0.2.122 | [#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827) | PDTnhah | 1.3.69 |
 | [US-24.334](../stories/US-24.334-update-chain-list-stable-v0-2-123.md) | ✅ done | Update chain-list stable v0.2.123 | [#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861) | PDTnhah | 1.3.72 |
-| [US-24.335](../stories/US-24.335-migrate-remaining-chains-to-sdk-integrate-into-nftservi.md) | 📋 backlog | Migrate Remaining Chains to SDK & Integrate into NFTService (Phase 2) | [#4885](https://github.com/Koniverse/SubWallet-Extension/issues/4885) | — | — |
 | [US-24.336](../stories/US-24.336-display-token-name-and-subnet-id-for-subnet-tokens-bitt.md) | ✅ done | Display token name and subnet ID for subnet tokens \| Bittensor | [#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892) | Thiendekaco | 1.3.76 |
 | [US-24.337](../stories/US-24.337-add-cardano-preview-network.md) | 📋 backlog | Add Cardano Preview Network | [#4906](https://github.com/Koniverse/SubWallet-Extension/issues/4906) | — | — |
 | [US-24.338](../stories/US-24.338-extension-update-chain-list-stable-v0-2-124.md) | 🟢 ready | Extension - Update chain-list stable v0.2.124 | [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | PDTnhah | — |

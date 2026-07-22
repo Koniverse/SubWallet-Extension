@@ -23,6 +23,21 @@ pick its type, manage the relationship) and the signing-time *behaviour* (a Sign
 Selector that picks which controlling account actually signs, with the
 "proxied-by" provenance shown end to end).
 
+### Umbrella issues — owned by this epic, not by a story
+
+An issue that **has sub-issues and no CHANGELOG line of its own** delegated all its scope; the epic
+records it and the children are the story rows. Listing it beside its own children would claim the
+same work twice ([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive with
+`gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
+
+| Issue | Title | Tracker state | Children |
+|---|---|---|---|
+| [#4770](https://github.com/Koniverse/SubWallet-Extension/issues/4770) | [Proxy Account][Extension] Background logic Integration | ✅ closed COMPLETED | #4780 ([US-17.1](../stories/US-17.1-proxy-types-and-authority-management.md)), #4781, #4782, #4783 ([US-17.2](../stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md)) |
+
+> Moved out of US-17.1's incremental-work table on 2026-07-22, where it sat as a row beside #4780,
+> its own child. All four children shipped in **1.3.72**; the umbrella has no release of its own.
+> [Umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md).
+
 ## Overview
 
 ### Business context

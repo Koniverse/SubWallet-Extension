@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**372 stories** — 318 done (shipped), 3 in flight (ready / in-progress /
+**373 stories** — 319 done (shipped), 3 in flight (ready / in-progress /
 review, from the Projects board), 27 backlog (open, not yet started), 24 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -422,6 +422,14 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-32.370](../stories/US-32.370-fix-bug-get-earning-position-parachain.md) | ✅ done | Fix bug get Earning position parachain | [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950) | tunghp2002 | 1.3.73 |
 | [US-32.371](../stories/US-32.371-extension-able-to-scroll-up-own-in-account-info-in-tao.md) | 📋 backlog | [ Extension ]  Able to scroll up /đown in account info in TAO direct nomination earnings | [#4974](https://github.com/Koniverse/SubWallet-Extension/issues/4974) | — | — |
 | [US-32.372](../stories/US-32.372-add-recommend-validator-for-native-and-subnet-staking.md) | 🟡 ready | Add recommend validator for native and subnet staking | [#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024) | tunghp2002 | — |
+| [US-32.373](../stories/US-32.373-deploying-bittensor-ecosystem-features.md) | ✅ done | Deploying Bittensor ecosystem features *(cross-epic umbrella)* | [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | tunghp2002 | 1.3.48 |
+
+> **US-32.373 arrived on 2026-07-22, not from the generator.** #4189 had been mis-filed as
+> out-of-repo platform work by a title heuristic reading *"Deploying …"* as a deploy chore. It is a
+> **cross-epic umbrella** over six shipped sub-issues — three here, two in [EPIC-24](EPIC-24.md),
+> one in [EPIC-34](EPIC-34.md) — so this ledger owns it by plurality and the story says so. The
+> six children were repointed to it in the same pass; the correction is recorded in the
+> [EPIC-1 consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
 
 ## Acceptance criteria
 

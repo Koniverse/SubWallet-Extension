@@ -61,6 +61,14 @@ Chronological by shipped release (—); `—` = closed with no CHANGELOG line. T
 
 **Evidence:** CHANGELOG `## 1.3.80` (Build date: Jun 02, 2026) — *"Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)"*. The four commits above create and populate the service — `673c2719e6` renames the folder into `nft-service`, `e0edb482ab` removes the EVM on-chain fetch handler after migrating to the SDK, `104eb5c6d8` adds the service event listeners, `6d0a362943` maps NFT data through the new endpoint — and each has `v1.3.80` as its first containing release tag (`git tag --contains <sha> | sort -V | head -1`). Last substantive commit 2026-02-23, so `sprint` is reconstructed as `sprint-2026-M02`.
 
+> **#4884 has one sub-issue, and another story owns it.**
+> [#4768](https://github.com/Koniverse/SubWallet-Extension/issues/4768) *"Implement UI to support
+> the Nested NFT standard"* is its child and is a row in
+> [US-9.2](US-9.2-nested-bundled-nft-display.md). #4884 stays a row here rather than moving to the
+> epic's umbrella table because it carries **its own CHANGELOG line** in 1.3.80 — it delivered
+> something ([AGENTS.md](../../../AGENTS.md) rule 10). The parent of *both* is #4883, which is the
+> umbrella and is recorded on [EPIC-9](../epics/EPIC-9.md).
+
 > **Not every `[Issue-4884]` commit is this work.** `5fcc109aee` *"add account details for multisig"* carries the same tag and is v1.3.74 multisig UI — a branch-tag collision, the case [D106](../../CONTEXT.md#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true) covers. The four cited above were selected by content, not by tag.
 
 ## Cross-references

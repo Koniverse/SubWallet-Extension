@@ -23,17 +23,18 @@ claimed without any of these being mistaken for extension work.
 
 ## Status
 
-> **✅ done — and no release carries it.** Every row below is closed on the tracker (3 COMPLETED,
+> **✅ done — and no release carries it.** Every row below is closed on the tracker (2 COMPLETED,
 > 1 NOT_PLANNED) and AC-1, a coverage assertion, holds. `version_shipped` and `commit` are empty
 > **on purpose**: the work happened in other repositories, so no release of this extension delivers
 > it and no SHA here implements it. That is the done-gate's **third branch**
 > ([AGENTS.md](../../../AGENTS.md) rule 4). **`done` claims a complete record, not a shipped
 > capability.** The two items nobody started left for
-> [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md).
+> [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md), and a fourth row left because it did
+> **not** belong here at all — see below.
 
 ## Scope
 
-This is a **consolidated maintenance story**: it groups 4 tracker issues into one boundary,
+This is a **consolidated maintenance story**: it groups 3 tracker issues into one boundary,
 replacing the former one-issue-per-story ledger. It materializes **no FR**, and it never will —
 an FR describes what the *wallet* does, and none of these is in the wallet. Full traceability is
 the table below and the [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
@@ -46,10 +47,20 @@ other direction — they are not unclassifiable, they are **classified as out-of
 
 **What this story deliberately does not do:** assert a `version_shipped` for any row. A release of
 this extension does not carry a backend deploy or a support system, so the `Shipped` column stays
-`—` for all four even where the work is `done` — the done-gate's third branch
+`—` for all three even where the work is `done` — the done-gate's third branch
 ([AGENTS.md](../../../AGENTS.md) rule 4) is exactly this case.
 
-**Every row here is now settled** — three `done`, one closed not-planned. The two that were open,
+> **One row was here by mistake and is gone.** [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189)
+> *"Deploying Bittensor ecosystem features"* is **not** out-of-repo work: it is a cross-epic
+> umbrella over **six sub-issues that all shipped**, in releases 1.3.28 through 1.3.48. A title
+> heuristic read *"Deploying …"* as a deploy chore. It moved to
+> [US-32.373](US-32.373-deploying-bittensor-ecosystem-features.md) on 2026-07-22, and the six
+> child stories that named this story as their parent were repointed with it. **The test that
+> catches this class:** an out-of-repo issue has **no sub-issues in this tracker and no CHANGELOG
+> line** — `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues` returns empty for the
+> three that remain, and returned six for #4189.
+
+**Every row here is now settled** — two `done`, one closed not-planned. The two that were open,
 the ChainList page (#2131) and the tracking dashboard (#2529), moved to
 [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) on 2026-07-22, so this story records only
 work that finished.
@@ -78,7 +89,6 @@ inventing a release.
 | — | [#2455](https://github.com/Koniverse/SubWallet-Extension/issues/2455) | Build middleware services — cross-chain balance, earning-pool statistics | ⏸️ deprecated |
 | — | [#2534](https://github.com/Koniverse/SubWallet-Extension/issues/2534) | Build a user support system | ✅ done |
 | — | [#4118](https://github.com/Koniverse/SubWallet-Extension/issues/4118) | Set up a GitHub Action to deploy the SubWallet **backend** | ✅ done |
-| — | [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | Deploy the Bittensor ecosystem features | ✅ done |
 
 > **#2455 is the ancestor of the Services SDK.** It proposed exactly what
 > [D66](../../CONTEXT.md#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device)
@@ -94,7 +104,7 @@ inventing a release.
 
 | AC | Command |
 | --- | --- |
-| AC-1 | `gh issue view 2455` `2534` `4118` `4189` → all CLOSED (3 COMPLETED, 1 NOT_PLANNED) · `grep -c "^version_shipped: .\+"` on this file → 0 |
+| AC-1 | `gh issue view 2455` `2534` `4118` → all CLOSED (2 COMPLETED, 1 NOT_PLANNED) · each `.../sub_issues` empty · `grep -c "^version_shipped: .\+"` on this file → 0 |
 
 ## Cross-references
 

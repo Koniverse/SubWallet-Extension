@@ -17,9 +17,9 @@ updated: 2026-07-22
 
 ## Goal
 
-Migrate the **remaining** NFT logic onto the client-side `NftService` and the SubWallet Services
-SDK ([#4883](https://github.com/Koniverse/SubWallet-Extension/issues/4883)) — everything Phase 1
-did not move. Open since 2025-12-04.
+Migrate the **remaining chains** onto the client-side `NftService` and the SubWallet Services SDK
+([#4885](https://github.com/Koniverse/SubWallet-Extension/issues/4885), *Phase 2*) — everything
+Phase 1 did not move. Open, In Backlog on the board.
 
 ## Status
 
@@ -44,11 +44,19 @@ its own table showed #4884 `✅ done @ 1.3.80`. One story cannot both be undeliv
 Phase 1 is shipped and this is the part that is not
 ([D107](../../CONTEXT.md#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim)).
 
+> **This story was itself anchored on the wrong issue for a few hours.** It first claimed
+> [#4883](https://github.com/Koniverse/SubWallet-Extension/issues/4883) — which is the **parent**
+> of the already-shipped #4884, so a reader following it landed on an issue containing completed
+> work. #4883 is an umbrella and belongs to [EPIC-9](../epics/EPIC-9.md)
+> ([AGENTS.md](../../../AGENTS.md) rule 10); the open leaf is **#4885**. That issue was also in the
+> wrong ledger — filed under Network & Token, whose ledger story is retired. Both corrections, and
+> the retired id, are in the [umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md).
+
 ## Incremental work, fixes & chores
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
-| — | [#4883](https://github.com/Koniverse/SubWallet-Extension/issues/4883) | Implement Client-side NFT Service & Migrate Existing Logic to SDK | 📋 backlog |
+| — | [#4885](https://github.com/Koniverse/SubWallet-Extension/issues/4885) | Migrate Remaining Chains to SDK & Integrate into NFTService (Phase 2) | 📋 backlog |
 
 ## Acceptance criteria
 
@@ -58,8 +66,8 @@ Phase 1 is shipped and this is the part that is not
 
 | AC | Command |
 | --- | --- |
-| AC-1 | `gh issue view 4883` → state · `ls packages/extension-base/src/services/nft-service/nft-handlers/` → every handler on the SDK path |
+| AC-1 | `gh issue view 4885` → state · `ls packages/extension-base/src/services/nft-service/nft-handlers/` → every handler on the SDK path |
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.19](US-9.19-nft-service-migration.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.20](US-9.20-client-side-nft-service-and-sdk-migration.md) · [US-9.19](US-9.19-nft-service-migration.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md) · [umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md)

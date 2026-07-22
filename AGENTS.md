@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — nine standing rules
+### How the docs are allowed to change — ten standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These nine live here on purpose.** The koni-docs spec is vendored from
+**These ten live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.
@@ -359,6 +359,24 @@ acceptance criteria decide the status.**
 sprint board and STATUS all read the story's frontmatter, never its rows. Six stories carried
 nine such rows on 2026-07-22, and one of them (US-9.20) asserted *"not yet started, no release
 delivers it"* directly above a row reading `✅ done @ 1.3.80`.
+
+**10. An umbrella belongs to the epic; only a leaf belongs in a story.** The tracker nests
+issues, and a parent listed beside its own children claims the same work twice. **The test is
+mechanical and has two halves, and both must hold:** the issue has sub-issues
+(`gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`) **and** no CHANGELOG line of
+its own. Both → it delegated all its scope, so the epic records it in an umbrella table and the
+children are the rows. Sub-issues *with* a CHANGELOG line → it is a **delivery that happened to
+have a sub-task**, and it stays a row: `#4884` has one child and its own 1.3.80 line, `#4568` the
+same at 1.3.68.
+
+**Read the tree, not the title.** `#4189` *"Deploying Bittensor ecosystem features"* was filed as
+out-of-repo deploy work by a title heuristic; it is an umbrella over **six shipped sub-issues**
+across three epics. **An out-of-repo issue has no sub-issues here and no CHANGELOG line** — that
+pair is the check, and it is now in US-1.6's verification command.
+
+**The board's own tree is evidence, not truth.** `#43` (2022, hardware wallet) is listed under a
+2025 multisig issue and `#145` (a balance bug) under a nested-NFT UI task. Record the error where
+someone will find it; do not model it.
 
 ### The two change logs
 

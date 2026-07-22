@@ -81,3 +81,43 @@ browser *is* the subject.
 - `node scripts/koni-docs-check-ids.mjs` — exit 0; every ID, link and anchor resolves.
 - `npx koni-docs validate --docs-path docs/` — exit 0.
 - No `US-22.` token remains on the live doc surface; this dated note is the only place they appear.
+
+## Correction — 2026-07-22: #4189 was not out-of-repo work
+
+[#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) *"Deploying Bittensor
+ecosystem features"* was folded into US-1.6 with `Shipped: —`. That was wrong. It is a **cross-epic
+umbrella over six sub-issues, every one of them closed COMPLETED with a CHANGELOG line and a
+release**:
+
+| Shipped | Issue | Title | Area |
+|---|---|---|---|
+| 1.3.28 | [#4140](https://github.com/Koniverse/SubWallet-Extension/issues/4140) | Extension — Bug related to subnet staking features | EPIC-12 |
+| 1.3.28 | [#4150](https://github.com/Koniverse/SubWallet-Extension/issues/4150) | Display dTAO balance like another token | EPIC-4 |
+| 1.3.28 | [#4151](https://github.com/Koniverse/SubWallet-Extension/issues/4151) | Add dTAO tokens | EPIC-4 |
+| 1.3.30 | [#4145](https://github.com/Koniverse/SubWallet-Extension/issues/4145) | Extension — Support custom slippage for TAO subnet staking | EPIC-12 |
+| 1.3.43 | [#4358](https://github.com/Koniverse/SubWallet-Extension/issues/4358) | TAO On-ramp Integration in SubWallet | EPIC-14 |
+| 1.3.48 | [#4359](https://github.com/Koniverse/SubWallet-Extension/issues/4359) | Stake TAO with Seamless Validator Switching | EPIC-12 |
+
+**How it got there.** The title starts with *"Deploying"*, and the maintenance generator's area
+heuristic reads that as a deploy chore — the same class of error
+[D108](../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)
+predicted and that already sent #4610 to the wrong area. It then survived the EPIC-22 fold, because
+that fold read the ledger's own area labels rather than the tracker.
+
+**How to catch the class.** An out-of-repo issue has **no sub-issues in this tracker and no
+CHANGELOG line**. `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues` returns empty
+for #2131, #2455, #2529, #2534 and #4118 — and returned six for #4189. That check now runs in
+US-1.6's own verification command.
+
+**Where it went.** [US-32.373](../sprints/stories/US-32.373-deploying-bittensor-ecosystem-features.md),
+the Earning ledger, which owns three of the six children — the plurality. The story states that
+EPIC-4 and EPIC-14 own the other three, so no area is over-claimed. Its `version_shipped` is
+**1.3.48**, the release by which every child had shipped; the board closed #4189 on 2025-04-14,
+when two children were still ahead of it.
+
+**Six child stories were repointed.** US-32.324, US-32.325, US-32.335, US-24.294, US-24.295 and
+US-34.35 each said *"Sub-issue of #4189 (now US-1.6)"* — telling a reader that Bittensor feature
+work's parent was a platform-operations story. They now name US-32.373.
+
+**US-1.6 is down to three rows** — #2455 (closed not-planned), #2534 and #4118 — and stays `done`
+under the done-gate's third branch.

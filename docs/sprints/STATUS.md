@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 10:05:43 UTC
+> Last generated: 2026-07-22 10:05:57 UTC
 > Total stories: 2728
 
-## 📋 Backlog (290)
+## 📋 Backlog (289)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -88,7 +88,6 @@
 | US-24.292 | Extension - Improve Customize asset display screen | EPIC-24 | P3 | 1 | — | — |
 | US-24.317 | Extension - Improve Filter To token Based on Selected From token ( Round 2) | EPIC-24 | P3 | 1 | — | Quangdm-cdm |
 | US-24.318 | Extension – Bundling Extension Code for Mobile Wallet App Integration | EPIC-24 | P3 | 1 | — | — |
-| US-24.335 | Migrate Remaining Chains to SDK & Integrate into NFTService (Phase 2) | EPIC-24 | P3 | 1 | — | — |
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
 | US-26.91 | [QRScanner] Update style | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.116 | Improve UI for reset wallet feature | EPIC-26 | P3 | 1 | — | — |
@@ -373,7 +372,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2181)
+## ✅ Done (2182)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -1884,6 +1883,7 @@
 | US-32.367 | [Bittensor] UI: Support new Root staking reward options | EPIC-32 | P3 | 1 | sprint-2026-M04 | tunghp2002 |
 | US-32.369 | Remove the Crowdloans tab | EPIC-32 | P3 | 1 | sprint-2026-M01 | frenkie-ng |
 | US-32.370 | Fix bug get Earning position parachain | EPIC-32 | P3 | 1 | sprint-2026-M01 | tunghp2002 |
+| US-32.373 | Deploying Bittensor ecosystem features | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
 | US-33.1 | Integration Native and Cross-chain assets for Acala | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-33.2 | Integration cross-chain assets for Bifrost | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-33.3 | Integration Cross-chain assets for Moonbeam, Moonriver | EPIC-33 | P3 | 1 | sprint-2022-M03 | saltict |
@@ -2770,11 +2770,11 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 290
+- 📋 **Backlog**: 289
 - 🟢 **Ready**: 16
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2181
+- ✅ **Done**: 2182
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 198
 

@@ -27,6 +27,23 @@ inscription), and send it — without caring which standard or chain the
 collection lives on. A new collection standard is a new handler behind one
 NFT UI, never a new screen.
 
+### Umbrella issues — owned by this epic, not by a story
+
+An issue that **has sub-issues and no CHANGELOG line of its own** delegated all its scope; the epic
+records it and the children are the story rows. Listing it beside its own children would claim the
+same work twice ([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive with
+`gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
+
+| Issue | Title | Tracker state | Children |
+|---|---|---|---|
+| [#4883](https://github.com/Koniverse/SubWallet-Extension/issues/4883) | Implement Client-side NFT Service & Migrate Existing Logic to SDK | 📋 open | #4884 ([US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md), shipped 1.3.80), #4885 ([US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md), open) |
+
+> **#4884 and #4568 are *not* umbrellas** even though each has a sub-issue: both carry their own
+> CHANGELOG line (1.3.80 and 1.3.68), so each delivered something and stays a row. Only #4883
+> delegated its whole scope. US-9.24 was briefly anchored on #4883 itself — the parent of shipped
+> work — and now names the open leaf #4885, which was also relocated out of the Network & Token
+> ledger. [Umbrella sweep](../../notes/2026-07-22-umbrella-sweep.md).
+
 ## Overview
 
 ### Business context

@@ -103,7 +103,7 @@ Beyond the requirement above, **11 tracker issue(s)** of incremental work landed
 | 1.3.49 | [#3818](https://github.com/Koniverse/SubWallet-Extension/issues/3818) | Fixed bug import NFT (#3837) | ✅ done |
 | 1.3.49 | [#3837](https://github.com/Koniverse/SubWallet-Extension/issues/3837) | Extension - Can't import NFT | ✅ done |
 | 1.3.68 | [#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568) | Support show NFT haven't method tokenOfOwnerByIndex | ✅ done |
-| 1.3.68 | [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) | Unable to import NFT ERC-721 on Rari chain | ✅ done |
+| 1.3.68 | [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) | Unable to import NFT ERC-721 on Rari chain *(sub-issue of #4568)* | ✅ done |
 | — | [#620](https://github.com/Koniverse/SubWallet-Extension/issues/620) | Import NFT button not showing after viewing NFT details | ✅ done |
 | — | [#1430](https://github.com/Koniverse/SubWallet-Extension/issues/1430) | Crash app in case import NFT by ERC20, PSP22 contract | ⏸ deprecated |
 | — | [#3841](https://github.com/Koniverse/SubWallet-Extension/issues/3841) | Extension - Don't show NFT although imported successfully | ⏸ deprecated |
