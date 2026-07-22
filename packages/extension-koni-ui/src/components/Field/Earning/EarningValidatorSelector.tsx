@@ -20,7 +20,7 @@ import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/
 import { Badge, Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import BigN from 'bignumber.js';
-import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
+import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -105,7 +105,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
-  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, ChainRecommendValidator>>({});
+  const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
 
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) { // todo: should also check chain group for pool
@@ -230,6 +230,24 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     });
   }, [items, sortSelection, sortValidator]);
 
+  const validatorResultList = useMemo(() => {
+    const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
+    const recommendedItems = resultList.filter((item) => recommendedAddresses.includes(item.address));
+    const otherItems = resultList.filter((item) => !recommendedAddresses.includes(item.address));
+
+    if (!recommendedItems.length) {
+      return otherItems;
+    }
+
+    const recommendedHeader = { isSectionHeader: true, identity: 'Recommended' };
+
+    if (!otherItems.length) {
+      return [recommendedHeader, ...recommendedItems];
+    }
+
+    return [recommendedHeader, ...recommendedItems, { isSectionHeader: true, identity: 'Others' }, ...otherItems];
+  }, [chain, defaultValidatorMap, resultList]);
+
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
       if (!selectedFilters.length) {
@@ -278,6 +296,28 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.isSectionHeader) {
+      const isRecommended = item.identity === 'Recommended';
+
+      return (
+        <div
+          className={'__section-header'}
+          key={item.identity}
+        >
+          {item.identity?.toUpperCase()}
+          {isRecommended && (
+            <Icon
+              className={'__selected-icon'}
+              iconColor={'#4cd9ac'}
+              phosphorIcon={ThumbsUp}
+              size='xs'
+              weight='fill'
+            />
+          )}
+        </div>
+      );
+    }
+
     if (item.address === originValidator) {
       return null;
     }
@@ -308,6 +348,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal]);
 
   const searchFunction = useCallback((item: ValidatorDataType, searchText: string) => {
+    if (item.isSectionHeader) {
+      return false;
+    }
+
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
@@ -349,12 +393,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
-      setDefaultPoolMap(earningPoolRecommendation);
+      setDefaultValidatorMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);
 
   useEffect(() => {
-    const recommendValidator = defaultPoolMap[chain];
+    const recommendValidator = defaultValidatorMap[chain];
 
     if (recommendValidator) {
       setAutoValidator((old) => {
@@ -374,7 +418,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     } else {
       setAutoValidator('');
     }
-  }, [items, chain, defaultPoolMap]);
+  }, [items, chain, defaultValidatorMap]);
 
   useEffect(() => {
     const _default = nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join(',') || autoValidator || '';
@@ -456,7 +500,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
           enableSearchInput={true}
           filterBy={filterFunction}
-          list={resultList}
+          list={validatorResultList}
           onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
@@ -526,6 +570,18 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
 
     '.pool-item:not(:last-child)': {
       marginBottom: token.marginXS
+    },
+
+    '.__section-header': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextSecondary,
+      fontWeight: token.fontWeightStrong,
+      marginBottom: token.marginXXS,
+      lineHeight: token.lineHeightSM
+    },
+
+    '.__selected-icon': {
+      paddingLeft: token.paddingXXS
     }
   };
 });
