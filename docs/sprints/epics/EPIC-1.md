@@ -106,6 +106,16 @@ runtime* translation channel (FR-4).
 | [US-1.3](../stories/US-1.3-online-chain-list-hot-update.md) | Online chain-list hot-update | Add networks/tokens/logos and toggle XCM routes without a release | ✅ done | 1.1.50 |
 | [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) | Online i18n hot-update | Fetch updated UI translations at runtime without a release | 📋 backlog | — |
 | [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) | Build, CI, packaging & supply-chain hardening | Keep the build/webpack/packaging pipeline shippable across browsers (Firefox MV3, Brave uninstall, Jest env, online-resource fallback) and the dependency tree auditable (lockfile / npm-registry / audit gate, NFR-19) | 📋 backlog | — |
+| [US-1.6](../stories/US-1.6-platform-operations-and-out-of-repo-tooling.md) | Platform operations & out-of-repo tooling | Hold the tracked platform work whose code lives outside this repository | 🚧 in-progress | — |
+
+> **There is no separate maintenance layer for build & platform.** Each capability above carries
+> its own requirement *and* its incremental-work history as a table inside the story. The 19
+> tracker issues that formerly sat one-story-each in the maintenance layer were folded in on
+> 2026-07-22: 3 → US-1.1, 1 → US-1.2, 2 → US-1.3, 5 → US-1.5, 6 into the new
+> [US-1.6](../stories/US-1.6-platform-operations-and-out-of-repo-tooling.md), and **2 relocated to
+> other epics** — #1938 (camera on Firefox) and #1995 (IPFS on Firefox) were filed under the
+> browser they broke on rather than the capability that broke. Forwarding map:
+> [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
 
 > US-1.1–1.4 each materialize one FR; US-1.5 is the epic's bug/iteration
 > (hardening) cluster and owns no FR — it enforces the build/compliance NFRs.

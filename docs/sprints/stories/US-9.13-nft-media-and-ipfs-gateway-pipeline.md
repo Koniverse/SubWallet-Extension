@@ -45,6 +45,7 @@ Chronological by shipped release (0.4.3 → 1.3.56); `—` = closed with no CHAN
 | 1.3.56 | [#4132](https://github.com/Koniverse/SubWallet-Extension/issues/4132) | Fixed bug Do not display NFT images on Vara network, PAH | ✅ done |
 | — | [#614](https://github.com/Koniverse/SubWallet-Extension/issues/614) | Bug happens when get NFT from ipfs-gateway.cloud | ✅ done |
 | — | [#619](https://github.com/Koniverse/SubWallet-Extension/issues/619) | Improved handling for case the NFT's source failure | ✅ done |
+| 1.1.18 | [#1995](https://github.com/Koniverse/SubWallet-Extension/issues/1995) | Bug IPFS in Firefox — some NFT collections do not render | ✅ done |
 
 ## Acceptance criteria
 
@@ -53,3 +54,9 @@ Chronological by shipped release (0.4.3 → 1.3.56); `—` = closed with no CHAN
 ## Cross-references
 
 - [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.6](US-9.6-3d-and-video-nft-viewer.md), [US-9.10](US-9.10-nft-display-and-transfer-hardening.md) · [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)
+
+> **#1995 relocated here 2026-07-22** from the Build & Platform ledger. Reported as *"Bug IPFS in
+> Firefox browser"*, its actual symptom is *"do not show NFT of some NFT collection"* — this
+> story's media pipeline failing on one browser. The browser was the condition; the gateway
+> pipeline was the capability. Forwarding map:
+> [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).

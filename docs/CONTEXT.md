@@ -2508,7 +2508,7 @@ UI polish, small increments. Minting 2735 of them as US-4.x / US-6.x would bury 
 EPIC-4 FR stories under 345 maintenance stubs, and a reader could no longer see the requirement
 set. The unit of a story would stop meaning one thing.
 
-**Decision — a parallel layer.** Twenty **maintenance epics** (`EPIC-22`…`EPIC-41`) *(2026-07-17: **19** — the NFT maintenance epic was folded back into [EPIC-9](sprints/epics/EPIC-9.md) and its number retired ([rule 7](../AGENTS.md) forbids naming it here, since no such document exists now). A later epic took a number inside the stated range but is a QA epic, not a maintenance one, so the range no longer describes the layer)*, one per
+**Decision — a parallel layer.** Twenty **maintenance epics** *(as of 2026-07-22: **16**, and the original contiguous number range no longer describes the layer. Four have been folded back into the product epic they belonged to — NFT into [EPIC-9](sprints/epics/EPIC-9.md) (2026-07-17), security into [EPIC-5](sprints/epics/EPIC-5.md), proxy into [EPIC-17](sprints/epics/EPIC-17.md), build & platform into [EPIC-1](sprints/epics/EPIC-1.md) — and their numbers are retired; [rule 7](../AGENTS.md) forbids naming them here, since no such documents exist now. A later epic also took a number inside the stated range but is a QA epic, not a maintenance one.)*, one per
 product area plus one *Uncategorized*, each holding one story per unowned issue in its area. The
 21 product epics are untouched — they remain the FR map. Every shipped issue now has exactly one
 owning story; the ERP reads across both layers, the FR reader reads only the first.

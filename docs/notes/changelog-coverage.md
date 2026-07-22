@@ -74,8 +74,8 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#3020](https://github.com/Koniverse/SubWallet-Extension/issues/3020) | Update chain-list (#3020) | 1.1.64 | 2024-05-10 | US-20.3 |
 | [#160](https://github.com/Koniverse/SubWallet-Extension/issues/160) | Support import ERC20 and ERC721 for EVM Networks (#160) | 0.4.1 | 2022-05-11 | US-21.2 |
 | [#911](https://github.com/Koniverse/SubWallet-Extension/issues/911) | Add support for Astar, Shiden Light Client (#911) | 0.7.7 | 2022-12-28 | US-21.2 |
-| [#4163](https://github.com/Koniverse/SubWallet-Extension/issues/4163) | Update chain-list stable v0.2.103 (#4163) | 1.3.31 | 2025-04-18 | US-22.18 |
-| [#1995](https://github.com/Koniverse/SubWallet-Extension/issues/1995) | Fixed bug IPFS in Firefox browser (#1995) | 1.1.18 | 2023-10-20 | US-22.5 |
+| [#4163](https://github.com/Koniverse/SubWallet-Extension/issues/4163) | Update chain-list stable v0.2.103 (#4163) | 1.3.31 | 2025-04-18 | US-1.3 |
+| [#1995](https://github.com/Koniverse/SubWallet-Extension/issues/1995) | Fixed bug IPFS in Firefox browser (#1995) | 1.1.18 | 2023-10-20 | US-9.13 |
 | [#1910](https://github.com/Koniverse/SubWallet-Extension/issues/1910) | Fixed bug Do not auto-lock after imported multiple account (#1910) | 1.1.13 | 2023-09-21 | US-23.109 |
 | [#1919](https://github.com/Koniverse/SubWallet-Extension/issues/1919) | Fixed bug Do not show selected account (#1919) | 1.1.13 | 2023-09-21 | US-23.111 |
 | [#1946](https://github.com/Koniverse/SubWallet-Extension/issues/1946) | Add “Token Name” to the token screens (#1946) | 1.1.20 | 2023-11-04 | US-23.114 |

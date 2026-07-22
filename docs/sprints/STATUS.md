@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 04:37:40 UTC
-> Total stories: 2758
+> Last generated: 2026-07-22 05:27:58 UTC
+> Total stories: 2741
 
-## 📋 Backlog (292)
+## 📋 Backlog (287)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -30,11 +30,6 @@
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-22.3 | Handling the Cross-Origin Request Blocked on Firefox browser | EPIC-22 | P3 | 1 | — | lw-cdm |
-| US-22.6 | Build Chainlist page | EPIC-22 | P3 | 1 | — | tunghp2002 |
-| US-22.11 | Build tracking dashboard across platforms | EPIC-22 | P3 | 1 | — | saltict |
-| US-22.13 | Extension - Recheck time of stop background on Firefox browser | EPIC-22 | P3 | 1 | — | Thiendekaco |
-| US-22.19 | Add logic for testing development build with Koni Brower Runner | EPIC-22 | P3 | 1 | — | saltict |
 | US-23.44 | Integrate with Web3 Auth solution => Users can manage their wallets with social accounts | EPIC-23 | P3 | 1 | — | hieudd |
 | US-23.54 | Integrate the phishing website/account list flagged by Polkadot Alliance | EPIC-23 | P3 | 1 | — | S2kael |
 | US-23.77 | Do not select image on the Scan QR screen when user standing on popup view on the Firefox browser | EPIC-23 | P3 | 1 | — | frenkie-ng |
@@ -301,7 +296,7 @@
 | US-9.10 | NFT display & UI hardening | EPIC-9 | P2 | 5 | — | — |
 | US-9.21 | NFT portfolio management | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (17)
+## 🟢 Ready (18)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -321,12 +316,14 @@
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
+| US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (32)
+## 🟡 In Progress (33)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
+| US-1.6 | Platform operations & out-of-repo tooling | EPIC-1 | P3 | 1 | sprint-2026-W30 | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
@@ -376,7 +373,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2202)
+## ✅ Done (2190)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -446,18 +443,6 @@
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-22.1 | Make the wallet extension in chrome persist it's state when changing focus | EPIC-22 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-22.2 | Try to remove 'webRequest' from manifest.xml | EPIC-22 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-22.4 | WebApp - Re-check camera detection on the Firefox browser | EPIC-22 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-22.5 | Fixed bug IPFS in Firefox browser | EPIC-22 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-22.7 | WebApp \| Update build number for WebApp | EPIC-22 | P3 | 1 | sprint-2023-M11 | anhntk54 |
-| US-22.8 | Web Runner \| Backup and restore indexed DB | EPIC-22 | P3 | 1 | sprint-2024-M04 | saltict |
-| US-22.12 | Build a user support system | EPIC-22 | P3 | 1 | sprint-2025-M03 | saltict |
-| US-22.14 | Build Ton chainlist | EPIC-22 | P3 | 1 | sprint-2024-M08 | bluezdot |
-| US-22.15 | WebApp - Fix bug CORS on Firefox's extension and WebApp | EPIC-22 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-22.16 | Setup github action để deploy cho SubWallet backend | EPIC-22 | P3 | 1 | sprint-2025-M08 | jonathanhoang12 |
-| US-22.17 | Deploying Bittensor ecosystem features | EPIC-22 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-22.18 | Build chainlist stable v0.2.103 | EPIC-22 | P3 | 1 | sprint-2025-M04 | S2kael |
 | US-23.1 | Show balance for all account in Wallet | EPIC-23 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-23.2 | [v0.2.8] Still showing Back to home button when switching tabs, Switch account | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
 | US-23.3 | Don't navigate to Get Started screen when Forget account is out | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
@@ -2587,13 +2572,11 @@
 
 _No stories_
 
-## 🗑️ Deprecated (204)
+## 🗑️ Deprecated (202)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
-| US-22.9 | Build some middleware services | EPIC-22 | P3 | 1 | — | saltict |
-| US-22.10 | Do not navigate the Chrome store in case disable Extension SubWallet yet | EPIC-22 | P3 | 1 | — | — |
 | US-23.13 | Auto Import account from Polkadot js wallet to SubWallet | EPIC-23 | P3 | 1 | — | vantrong291 |
 | US-23.42 | Recovery account | EPIC-23 | P3 | 1 | — | saltict |
 | US-23.46 | Recovery account | EPIC-23 | P3 | 1 | — | saltict |
@@ -2800,12 +2783,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 292
-- 🟢 **Ready**: 17
-- 🟡 **In Progress**: 32
+- 📋 **Backlog**: 287
+- 🟢 **Ready**: 18
+- 🟡 **In Progress**: 33
 - 👀 **Review**: 11
-- ✅ **Done**: 2202
+- ✅ **Done**: 2190
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 204
+- 🗑️ **Deprecated**: 202
 
-⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).

@@ -139,6 +139,16 @@ _Retroactive story — capability already shipped. Fill `commit`, `version_shipp
 and any implementation caveats (e.g. specific Chrome/Firefox quirks) during
 version reconciliation._
 
+## Incremental work, fixes & chores
+
+**3 tracker issues** of incremental work landed on this capability — background-state persistence, the Firefox background-stop timing recheck, and one lifecycle behaviour closed not-planned. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#334](https://github.com/Koniverse/SubWallet-Extension/issues/334) | Make the wallet extension in Chrome persist its state | ✅ done |
+| — | [#2471](https://github.com/Koniverse/SubWallet-Extension/issues/2471) | Do not navigate to the Chrome store while the extension is disabled | ⏸️ deprecated |
+| — | [#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222) | Extension — recheck the background-stop timing on Firefox | 📋 backlog |
+
 ## Cross-references
 
 - [PRD FR-1](../../PRD.md#functional-requirements)

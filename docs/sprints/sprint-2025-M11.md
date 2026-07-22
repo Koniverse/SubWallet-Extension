@@ -13,7 +13,7 @@ derived after the fact; **velocity here is meaningless — do not chart it** ([C
 
 ## Sprint scope
 
-See the maintenance epics (EPIC-22+) — the stories dated 2025-11.
+See the maintenance epics — the stories dated 2025-11.
 
 ## Per-Epic Retrospective
 

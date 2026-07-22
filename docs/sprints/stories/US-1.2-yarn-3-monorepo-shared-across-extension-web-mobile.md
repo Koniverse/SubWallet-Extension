@@ -131,6 +131,14 @@ that keeps it under the Firefox limit is hardened in
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any package-boundary caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**1 tracker issue** landed on this capability — the web-runner's storage backup/restore API, one of the shared-core surfaces this monorepo exists to keep identical across builds. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.26 | [#2276](https://github.com/Koniverse/SubWallet-Extension/issues/2276) | Web Runner — backup and restore IndexedDB | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-2](../../PRD.md#functional-requirements)

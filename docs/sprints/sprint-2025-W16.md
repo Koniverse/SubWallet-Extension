@@ -13,7 +13,7 @@ this team's estimate** — it counts issues the board tags to the week, not plan
 
 ## Sprint scope
 
-See the maintenance epics (EPIC-22+) — the stories in sprint-2025-W16.
+See the maintenance epics — the stories in sprint-2025-W16.
 
 ## Per-Epic Retrospective
 

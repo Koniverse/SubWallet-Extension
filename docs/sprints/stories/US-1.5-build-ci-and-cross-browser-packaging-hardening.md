@@ -257,6 +257,18 @@ build/packaging bug is resolved. One story by design: the supported browsers sha
 one webpack/MV3/packaging pipeline, so these fixes stay coordinated under a shared
 regression suite rather than fragmenting per browser._
 
+## Incremental work, fixes & chores
+
+**5 tracker issues** of incremental work landed on this capability — manifest-permission reduction, two Firefox CORS defects, the WebApp build number, and dev-build test tooling. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.0.6 | [#1406](https://github.com/Koniverse/SubWallet-Extension/issues/1406) | Try to remove `webRequest` from the manifest | ✅ done |
+| — | [#1934](https://github.com/Koniverse/SubWallet-Extension/issues/1934) | Handle the Cross-Origin Request blocked on Firefox | 📋 backlog |
+| 1.1.36 | [#2231](https://github.com/Koniverse/SubWallet-Extension/issues/2231) | WebApp — update build number | ✅ done |
+| — | [#3992](https://github.com/Koniverse/SubWallet-Extension/issues/3992) | WebApp — fix CORS bug on Firefox (extension and WebApp) | ✅ done |
+| — | [#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602) | Add logic for testing a development build with the Koni browser | 📋 backlog |
+
 ## Cross-references
 
 - [Epic EPIC-1](../epics/EPIC-1.md)

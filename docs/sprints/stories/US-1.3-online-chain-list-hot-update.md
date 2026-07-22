@@ -121,6 +121,15 @@ are backfilled during version reconciliation. Builds on the monorepo and shared
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any refresh-cadence / validation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**2 tracker issues** landed on this capability — both chain-list builds delivered through the online channel rather than an extension release, which is the point of the capability. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.2.26 | [#3455](https://github.com/Koniverse/SubWallet-Extension/issues/3455) | Build TON chainlist | ✅ done |
+| — | [#4239](https://github.com/Koniverse/SubWallet-Extension/issues/4239) | Build chainlist stable v0.2.103 | ✅ done |
+
 ## Cross-references
 
 - [PRD FR-3](../../PRD.md#functional-requirements)
