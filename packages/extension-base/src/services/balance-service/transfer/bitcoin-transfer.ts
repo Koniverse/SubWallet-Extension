@@ -21,15 +21,20 @@ export interface TransferBitcoinProps extends TransactionFee {
   transferAll: boolean;
   value: string;
   network: Network
+  forceRefreshProtectedUtxos?: boolean;
+  skipProtectedUtxos?: boolean;
 }
 
 export async function createBitcoinTransaction (params: TransferBitcoinProps): Promise<[Psbt, string, string|undefined]> {
-  const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, from, network, to, transferAll, value } = params;
+  const { bitcoinApi, chain, feeCustom: _feeCustom, feeInfo: _feeInfo, feeOption, forceRefreshProtectedUtxos, from, network, skipProtectedUtxos, to, transferAll, value } = params;
   const feeCustom = _feeCustom as BitcoinFeeRate;
 
   const feeInfo = _feeInfo as BitcoinFeeInfo;
   const bitcoinFee = combineBitcoinFee(feeInfo, feeOption, feeCustom);
-  const utxos = await getTransferableBitcoinUtxos(bitcoinApi, from);
+  const utxos = await getTransferableBitcoinUtxos(bitcoinApi, from, {
+    forceRefreshProtectedUtxos,
+    skipProtectedUtxos
+  });
 
   try {
     const amountValue = parseFloat(value);
