@@ -40,6 +40,8 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.4](../stories/US-42.4-qc-tusdt-on-bittensor.md) | TUSDT token on Bittensor shows correctly (#699) | done |
 | [US-42.5](../stories/US-42.5-qc-myth-xcm-pah-hydration.md) | MYTH XCM between PAH and Hydration retest (#301) | done |
 | [US-42.6](../stories/US-42.6-qc-release-extension-v1-3-84.md) | Release extension v1.3.84 — dev, master, draft, production gate | ready |
+| [US-42.7](../stories/US-42.7-qc-recommend-validator-native-subnet-staking.md) | Recommend validator for native/subnet staking — Extension (#5024) | in-progress |
+| [US-42.9](../stories/US-42.9-qc-release-webapp-v1-3-56-0.md) | Release Web App v1.3.56-0 (1356-0014) — recommend validator (#5024), dev/production gate | ready |
 
 More rows get added here as testing starts.
 
