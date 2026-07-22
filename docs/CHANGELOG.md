@@ -1,23 +1,56 @@
 # CHANGELOG
 
+Release history for **SubWallet Extension**, in the koni-docs changelog format.
+
+> **Two changelogs exist while the CI migration is pending.**
+>
+> This file is the canonical one. The root [`CHANGELOG.md`](../CHANGELOG.md) is the
+> untouched legacy copy, kept only because
+> [`scripts/koni-ci-ghact-build.mjs`](../scripts/koni-ci-ghact-build.mjs) still reads it
+> to gate GitHub releases: it greps for a bare `## <version>` heading, which the
+> koni-docs `## [<version>] — …` format below deliberately does not match.
+>
+> **To retire the root file**: delete it, point that `readFileSync` at
+> `docs/CHANGELOG.md`, and change the grep to `## [${version}]`. Until then a release
+> must be written to **both** files.
+>
+> Versions are the product versions from `VERSION` / root `package.json`.
+
+> **Dates come from git, not from the source file.** Where the root file's
+> `Build date:` disagreed with the release commit, the commit won — per the
+> reconciliation rule in [notes/2026-07-07.md](notes/2026-07-07.md) ("code wins").
+> 24 dates were corrected this way, including three whose year was
+> off by one (0.7.8, 0.7.9, 0.8.1 are dated 2022 in the source but shipped 2023).
+>
+> 6 of the earliest Koni releases carry no `**Commit**` line: they predate this
+> repository's recorded history and no commit identifies them. A wrong SHA would be
+> worse than none (RULE-2).
+>
+> **6 version numbers appear twice** — 0.8.1, 0.7.1, 0.6.1, 0.4.1, 0.3.1, 0.2.1 — because the Koni
+> fork restarted its numbering over versions the upstream polkadot-js extension had
+> already used. The two entries are distinguished by date and by the `(Koni)` title;
+> any tool that keys on the version string alone will find the first one.
+
 ## [Unreleased]
 
-(empty — track unreleased changes here; new version sections are inserted above the previous version, anchored on this block, per koni-docs changelog template)
+(empty — track unreleased changes here; new version sections are inserted above the
+previous version, anchored on this block, per the koni-docs changelog template)
+
+<!-- Version drift: the newest entry below is 1.3.82, but VERSION and PRD.md
+     still read 1.3.79. Bumping them is Wave 2 of docs/notes/2026-07-09.md. -->
 
 ---
 
-## 1.3.83
+## [1.3.83] — 2026-07-09 — Release 1.3.83 (Koni) — v1.3.83
 
-Build date: Jul 08, 2026.
-
-Features & Updates:
+### Added
 - Add earning term and condition display mechanism (#5007)
 
+**Commit**: c5aff28d5f
+
 ---
 
-## 1.3.82
-
-Build date: Jul 06, 2026.
+## [1.3.82] — 2026-07-06 — Release 1.3.82 (Koni) — v1.3.82
 
 Features & Updates:
 
@@ -27,13 +60,19 @@ Bug fixes:
 
 - Signing popup crashes with "Unable to create Enum via index 9" when SignerPayload.assetId is a V5 cross-consensus Location (#4989)
 
-## 1.3.81
+**Commit**: 459b9d18e3
 
-Build date: Jul 03, 2026 => This version was skipped due to a release issue.
+---
 
-## 1.3.80
+## [1.3.81] — 2026-07-03 — Release 1.3.81 (Koni) — v1.3.81
 
-Build date: Jun 02, 2026.
+=> This version was skipped due to a release issue.
+
+**Commit**: 8527b46727
+
+---
+
+## [1.3.80] — 2026-06-02 — Release 1.3.80 (Koni) — v1.3.80
 
 Features & Updates:
 
@@ -42,9 +81,11 @@ Features & Updates:
 - Re-check logic approve token when perform XCM (#4830)
 - Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)
 
-## 1.3.79
+**Commit**: bcbdaeeec0
 
-Build date: May 21, 2026.
+---
+
+## [1.3.79] — 2026-05-21 — Release 1.3.79 (Koni) — v1.3.79
 
 Features & Updates:
 
@@ -53,9 +94,11 @@ Features & Updates:
 - Extension – Some issues when merging in version 1.3.78 (#4988)
 - Refactor Swap Service interface and redundant code (#4826)
 
-## 1.3.78
+**Commit**: 95a43f918f
 
-Build date: May 14, 2026.
+---
+
+## [1.3.78] — 2026-05-14 — Release 1.3.78 (Koni) — v1.3.78
 
 Features & Updates:
 
@@ -68,9 +111,11 @@ Features & Updates:
   - Support bittensor on-chain swap (#4899)
   - [Subtensor EVM] Add support for some alpha tokens
 
-## 1.3.77
+**Commit**: c1c25d8ac6
 
-Build date: Apr 09, 2026.
+---
+
+## [1.3.77] — 2026-04-09 — Release 1.3.77 (Koni) — v1.3.77
 
 Features & Updates:
 
@@ -80,9 +125,11 @@ Features & Updates:
 - Support stDOT LSD sunset (#4968)
 - Update for chainlist stable v0.2.126
 
-## 1.3.76
+**Commit**: b237bb8627
 
-Build date: Mar 20, 2026.
+---
+
+## [1.3.76] — 2026-03-20 — Release 1.3.76 (Koni) — v1.3.76
 
 Features & Updates:
 
@@ -90,25 +137,31 @@ Features & Updates:
 - Display token name and subnet ID for subnet tokens | Bittensor (#4892)
 - Support the newly updated Root staking feature | Bittensor (#4829)
 
-## 1.3.75
+**Commit**: 0acb0c93a6
 
-Build date: Mar 17, 2026.
+---
+
+## [1.3.75] — 2026-03-17 — Release 1.3.75 (Koni) — v1.3.75
 
 Features & Updates:
 
 - Add user-configurable Subscan API Key in settings (#4965)
 
-## 1.3.74
+**Commit**: 3da9ca0dcb
 
-Build date: Feb 11, 2026.
+---
+
+## [1.3.74] — 2026-02-11 — Release 1.3.74 (Koni) — v1.3.74
 
 Features & Updates:
 
 - Support Multisig Account Phase 1 (#4855)
 
-## 1.3.73
+**Commit**: fa101d21f3
 
-Build date: Jan 22, 2026.
+---
+
+## [1.3.73] — 2026-01-22 — Release 1.3.73 (Koni) — v1.3.73
 
 Features & Updates:
 
@@ -119,9 +172,11 @@ Bug fixes:
 
 - Fix bug get Earning position parachain (#4950)
 
-## 1.3.72
+**Commit**: 7551180ab3
 
-Build date: Jan 14, 2026.
+---
+
+## [1.3.72] — 2026-01-14 — Release 1.3.72 (Koni) — v1.3.72
 
 Features & Updates:
 
@@ -130,9 +185,11 @@ Features & Updates:
 - Add support for USDC & stEWT (#639)
 - Migrate to ParaSpell V5 (#4908)
 
-## 1.3.71
+**Commit**: 143a9f8e55
 
-Build date: Dec 29, 2025.
+---
+
+## [1.3.71] — 2025-12-29 — Release 1.3.71 (Koni) — v1.3.71
 
 Features & Updates:
 
@@ -140,26 +197,32 @@ Features & Updates:
 - Update libs for SubWallet Extensions (#4808)
 - Support Import from Trust Wallet to SubWallet (#4762)
 
-## 1.3.70
+**Commit**: 1c54706967
 
-Build date: Dec 11, 2025.
+---
+
+## [1.3.70] — 2025-12-11 — Release 1.3.70 (Koni) — v1.3.70
 
 Features & Updates:
 
 - Support OpenGov (Phase 1) (#4678)
 
-## 1.3.69
+**Commit**: 14e64fc98e
 
-Build date: Dec 08, 2025.
+---
+
+## [1.3.69] — 2025-12-08 — Release 1.3.69 (Koni) — v1.3.69
 
 Features & Updates:
 
 - Update chain-list stable v0.2.122 (#4827)
 - Turn off "Advanced phishing detection" feature (#4891)
 
-## 1.3.68
+**Commit**: 0a5cfcf145
 
-Build date: Dec 03, 2025.
+---
+
+## [1.3.68] — 2025-12-03 — Release 1.3.68 (Koni) — v1.3.68
 
 Features & Updates:
 
@@ -172,18 +235,22 @@ Bug fixes:
 - Unable to import NFT ERC-721 on Rari chain (#4625)
 - Support show NFT haven't method tokenOfOwnerByIndex (#4568)
 
-## 1.3.67
+**Commit**: 94d9b869ca
 
-Build date: Nov 13, 2025.
+---
+
+## [1.3.67] — 2025-11-13 — Release 1.3.67 (Koni) — v1.3.67
 
 Features & Updates:
 
 - Improve Swap validation by Dry-run-preview API from ParaSpell (#4671)
 - Configure gas limit & max gas fee for Energy Web Chain (#4716)
 
-## 1.3.66
+**Commit**: 4d510d3a85
 
-Build date: Nov 07, 2025.
+---
+
+## [1.3.66] — 2025-11-07 — Release 1.3.66 (Koni) — v1.3.66
 
 Features & Updates:
 
@@ -193,9 +260,11 @@ Features & Updates:
 - Re-enable Cross-chain transfer related to Relay-chain (#4822)
 - Rounded value parameter send in EVM transaction request (#3632)
 
-## 1.3.65
+**Commit**: e69aef4e13
 
-Build date: Nov 06, 2025.
+---
+
+## [1.3.65] — 2025-11-06 — Release 1.3.65 (Koni) — v1.3.65
 
 Features & Updates:
 
@@ -206,9 +275,11 @@ Features & Updates:
 - Some updates after Polkadot Asset Hub Migration (#4819)
 - Update altinputasset for some liquid staking (#4813)
 
-## 1.3.64
+**Commit**: 3a888f3d8f
 
-Build date: Oct 30, 2025.
+---
+
+## [1.3.64] — 2025-10-31 — Release 1.3.64 (Koni) — v1.3.64
 
 Features & Updates:
 
@@ -221,9 +292,11 @@ Features & Updates:
   - [Hydration] Add support for ENA
   - [Hydration] Add swap support for ENA
 
-## 1.3.63
+**Commit**: 0ad17018c9
 
-Build date: Oct 23, 2025.
+---
+
+## [1.3.63] — 2025-10-23 — Release 1.3.63 (Koni) — v1.3.63
 
 Features & Updates:
 
@@ -238,9 +311,11 @@ Features & Updates:
   - \[Hydration\] Add support for PAXG
   - Update outdated data
 
-## 1.3.62
+**Commit**: b1527c5615
 
-Build date: Oct 10, 2025.
+---
+
+## [1.3.62] — 2025-10-10 — Release 1.3.62 (Koni) — v1.3.62
 
 Features & Updates:
 
@@ -255,9 +330,11 @@ Bug fixes:
 - Fixed bug show Earning options for Kusama although AHM migrated (#4763)
 - Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706)
 
-## 1.3.61
+**Commit**: eb99bab70a
 
-Build date: Oct 04, 2025.
+---
+
+## [1.3.61] — 2025-10-04 — Release 1.3.61 (Koni) — v1.3.61
 
 Features & Updates:
 
@@ -268,9 +345,11 @@ Bug fixes:
 
 - Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731)
 
-## 1.3.60
+**Commit**: b176302b37
 
-Build date: Oct 02, 2025.
+---
+
+## [1.3.60] — 2025-10-02 — Release 1.3.60 (Koni) — v1.3.60
 
 Features & Updates:
 
@@ -283,18 +362,22 @@ Bug fixes:
 
 - Fixed error when performing EWC staking (#4694)
 
-## 1.3.59
+**Commit**: 8edf28c95f
 
-Build date: Sep 23, 2025.
+---
+
+## [1.3.59] — 2025-09-23 — Release 1.3.59 (Koni) — v1.3.59
 
 Features & Updates:
 
 - Update chain-list stable v0.2.116 (#4704):
 - Support HOLLAR mainnet (#4692)
 
-## 1.3.58
+**Commit**: 2e764d70b3
 
-Build date: Sep 19, 2025.
+---
+
+## [1.3.58] — 2025-09-19 — Release 1.3.58 (Koni) — v1.3.58
 
 Features & Updates:
 
@@ -309,17 +392,21 @@ Bug fixes:
 
 - Fixed bug Show incorrect amount when transfer max (#4462)
 
-## 1.3.57
+**Commit**: e8a5edd5e9
 
-Build date: Sep 17, 2025.
+---
+
+## [1.3.57] — 2025-09-17 — Release 1.3.57 (Koni) — v1.3.57
 
 Features & Updates:
 
 - Add support for in-app EWT staking (#4638)
 
-## 1.3.56
+**Commit**: 17cc72e920
 
-Build date: Sep 11, 2025.
+---
+
+## [1.3.56] — 2025-09-11 — Release 1.3.56 (Koni) — v1.3.56
 
 Features & Updates:
 
@@ -338,9 +425,11 @@ Bug fixes:
 - Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645)
 - Fixed TAO's position in Earning options (#4654)
 
-## 1.3.55
+**Commit**: c1301536b2
 
-Build date: Sep 05, 2025.
+---
+
+## [1.3.55] — 2025-09-05 — Release 1.3.55 (Koni) — v1.3.55
 
 Features & Updates:
 
@@ -369,9 +458,11 @@ Bug fixes:
 - Fixed bug Incorrect price history chart display when changing currency in popup mode (#4586)
 - Fixed min amount on popup Pay attention in case there is not enough balance to stake (#3930)
 
-## 1.3.54
+**Commit**: b1ef21fe42
 
-Build date: Aug 21, 2025.
+---
+
+## [1.3.54] — 2025-08-21 — Release 1.3.54 (Koni) — v1.3.54
 
 Features & Updates:
 
@@ -402,9 +493,11 @@ Bug fixes:
 - Handle case connecting with network systems that do not support WalletConnect connection (#4598)
 - Fixed bug getting too many requests from Earning feature of Bittensor (#4623)
 
-## 1.3.53
+**Commit**: d0158087d4
 
-Build date: Aug 12, 2025.
+---
+
+## [1.3.53] — 2025-08-12 — Release 1.3.53 (Koni) — v1.3.53
 
 Features & Update:
 
@@ -423,9 +516,11 @@ Bug fixed:
 - Fixed bug Unable to detect domains name when transfer (#4072)
 - Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592)
 
-## 1.3.52
+**Commit**: 15568ef03e
 
-Build date: Aug 07, 2025.
+---
+
+## [1.3.52] — 2025-08-07 — Release 1.3.52 (Koni) — v1.3.52
 
 Features & Update:
 
@@ -443,25 +538,31 @@ Bug fixed:
 - Fixed bug when withdraw (#4575)
 - Fixed bug no network support when connecting to the WalletConnect (#3025)
 
-## 1.3.51
+**Commit**: 591be2f21e
 
-Build date: Jul 31, 2025.
+---
+
+## [1.3.51] — 2025-07-31 — Release 1.3.51 (Koni) — v1.3.51
 
 Features & Update:
 
 - Support for Bitcoin swap on ChainFlip (#4573)
 
-## 1.3.50
+**Commit**: 6c5c0bec7b
 
-Build date: Jul 30, 2025.
+---
+
+## [1.3.50] — 2025-07-30 — Release 1.3.50 (Koni) — v1.3.50
 
 Features & Update:
 
 - Support for New Swap Pairs on Chainflip (#4495)
 
-## 1.3.49
+**Commit**: c68273583f
 
-Build date: Jul 28, 2025.
+---
+
+## [1.3.49] — 2025-07-28 — Release 1.3.49 (Koni) — v1.3.49
 
 Features & Update:
 
@@ -474,9 +575,11 @@ Bug fixed:
 
 - Fixed bug import NFT (#3837) (#3818)
 
-## 1.3.48
+**Commit**: 10867f43ca
 
-Build date: Jul 21, 2025.
+---
+
+## [1.3.48] — 2025-07-21 — Release 1.3.48 (Koni) — v1.3.48
 
 Features & Update:
 
@@ -493,13 +596,15 @@ Bug fixed:
 - Fixed bug auto-enable chain for popular tokens (#4525)
 - Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375)
 
-## 1.3.47
+**Commit**: ed31bd22d6
 
-Build date: Jul 11, 2025.
+---
+
+## [1.3.47] — 2025-07-11 — Release 1.3.47 (Koni) — v1.3.47
 
 Features & Update:
 
-- Optimize Subscan API request (#4458)
+- Optimize Subscan API request (#4448 — the published release note said `#4458` in error; #4458 is the chain-list bump below. The work is PR #4470 / branch `koni/dev/issue-4448`: `strategy/api-request-strategy-v2`, an md5-keyed 60s response cache and group request cancellation)
 - Update Gears Library (#4443)
 - Support buy token BTC (Bitcoin) (#4490)
 - Update chainlist stable v0.2.108 (#4458)
@@ -513,9 +618,11 @@ Bug fixed:
 
 - Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481)
 
-## 1.3.46
+**Commit**: 895002c5b8
 
-Build date: Jul 04, 2025.
+---
+
+## [1.3.46] — 2025-07-04 — Release 1.3.46 (Koni) — v1.3.46
 
 Features & Update:
 
@@ -523,25 +630,31 @@ Features & Update:
 - Upgrading certain technical issues of the EVM provider (#2871)
 - Support Asset Hub migration (#3710)
 
-## 1.3.45
+**Commit**: 81de40416e
 
-Build date: Jul 01, 2025.
+---
+
+## [1.3.45] — 2025-07-01 — Release 1.3.45 (Koni) — v1.3.45
 
 Bug fixed:
 
 - Fixed error validate receive address when transferring MYTH (Mythos) (#4486)
 
-## 1.3.44
+**Commit**: e690ac5221
 
-Build date: Jun 27, 2025.
+---
+
+## [1.3.44] — 2025-06-27 — Release 1.3.44 (Koni) — v1.3.44
 
 Bug fixed:
 
 - Hot fix error validate receive address when transferring MYTH (Mythos) (#4486)
 
-## 1.3.43
+**Commit**: 6aff3baf2b
 
-Build date: Jun 26, 2025.
+---
+
+## [1.3.43] — 2025-06-26 — Release 1.3.43 (Koni) — v1.3.43
 
 Features & Update:
 
@@ -555,9 +668,11 @@ Bug fixed:
 - Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver (#4224)
 - Fixed bug Fails to Load on the Hone and earning screen (#4478)
 
-## 1.3.42
+**Commit**: 00b49c6d64
 
-Build date: Jun 23, 2025.
+---
+
+## [1.3.42] — 2025-06-23 — Release 1.3.42 (Koni) — v1.3.42
 
 Features & Update:
 
@@ -580,9 +695,11 @@ Bug fixed:
 
 - Fixed some UI bugs after Bitcoin integration (#4412, #4425)
 
-## 1.3.41
+**Commit**: 35b31587e7
 
-Build date: Jun 11, 2025.
+---
+
+## [1.3.41] — 2025-06-11 — Release 1.3.41 (Koni) — v1.3.41
 
 Features & Update:
 
@@ -598,9 +715,11 @@ Bug fixed:
 - Fixed bug Error page when use marketing campaign (#4403)
 - Fixed bug navigating actions in Earning feature (#4441)
 
-## 1.3.40
+**Commit**: 057386979f
 
-Build date: May 30, 2025.
+---
+
+## [1.3.40] — 2025-05-30 — Release 1.3.40 (Koni) — v1.3.40
 
 Features & Update:
 
@@ -612,17 +731,21 @@ Bug fixed:
 
 - Fixed bug Wrong Price Impact When Swapping on PAH (#4241)
 
-## 1.3.39
+**Commit**: ac934140ed
 
-Build date: May 26, 2025.
+---
+
+## [1.3.39] — 2025-05-26 — Release 1.3.39 (Koni) — v1.3.39
 
 Bug fixed:
 
 - Fix bug error page when connect with dApp (#4401)
 
-## 1.3.38
+**Commit**: a85af27f86
 
-Build date: May 23, 2025.
+---
+
+## [1.3.38] — 2025-05-23 — Release 1.3.38 (Koni) — v1.3.38
 
 Features & Update:
 
@@ -633,9 +756,11 @@ Bug fixed:
 
 - Fixed bug related to feedback from Cardano Foundation (#4352)
 
-## 1.3.37
+**Commit**: c0aa94e6c7
 
-Build date: May 23, 2025.
+---
+
+## [1.3.37] — 2025-05-23 — Release 1.3.37 (Koni) — v1.3.37
 
 Features & Update:
 
@@ -647,9 +772,11 @@ Bug fixed:
 
 - Fixed bug when connects to Remix (#4330)
 
-## 1.3.36
+**Commit**: 49789de9b3
 
-Build date: May 16, 2025.
+---
+
+## [1.3.36] — 2025-05-16 — Release 1.3.36 (Koni) — v1.3.36
 
 Features & Update:
 
@@ -657,9 +784,11 @@ Features & Update:
 - Support UniswapX Dutch Swap (#4293)
 - Review Uniswap fee (#4088)
 
-## 1.3.35
+**Commit**: 07cea86dd5
 
-Build date: May 09, 2025.
+---
+
+## [1.3.35] — 2025-05-09 — Release 1.3.35 (Koni) — v1.3.35
 
 Features & Update:
 
@@ -673,27 +802,33 @@ Bug fixed:
 - Fixed bug connecting to Aleph Zero EVM dapp (#4320)
 - Fixed bug related to price chart for derivation token (#4332, #4344)
 
-## 1.3.34
+**Commit**: f67dfecc43
 
-Build date: May 05, 2025.
+---
+
+## [1.3.34] — 2025-05-05 — Release 1.3.34 (Koni) — v1.3.34
 
 Features & Update:
 
 - Support extension side panel (#4091)
 - Update padding for the time frame selector for price chart
 
-## 1.3.33
+**Commit**: 6fff6b28ff
 
-Build date: Apr 30, 2025.
+---
+
+## [1.3.33] — 2025-04-30 — Release 1.3.33 (Koni) — v1.3.33
 
 Features & Update:
 
 - Support price chart (#4122, #4266)
 - Update link for "Contact support" (#4324)
 
-## 1.3.32
+**Commit**: 300d28880c
 
-Build date: Apr 26, 2025.
+---
+
+## [1.3.32] — 2025-04-26 — Release 1.3.32 (Koni) — v1.3.32
 
 Features & Update:
 
@@ -708,9 +843,11 @@ Bug fixed:
 
 - Fixed bug when stake for subnet (#4287)
 
-## 1.3.31
+**Commit**: 0d95cc2b71
 
-Build date: Apr 18, 2025.
+---
+
+## [1.3.31] — 2025-04-18 — Release 1.3.31 (Koni) — v1.3.31
 
 Features & Update:
 
@@ -730,9 +867,11 @@ Bug fixed:
   - Fixed bug XCM for Acala (#3725)
   - Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903)
 
-## 1.3.30
+**Commit**: f290efb637
 
-Build date: Apr 14, 2025.
+---
+
+## [1.3.30] — 2025-04-14 — Release 1.3.30 (Koni) — v1.3.30
 
 Features & Update:
 
@@ -753,9 +892,11 @@ Bug fixed:
   - Fixed bug Cannot read properties of undefined (reading 'destinationTokenInfo') when open the old Notification details (#4195)
   - Fixed bug Error page when perform sign permit from Uniswap (#4248)
 
-## 1.3.29
+**Commit**: 577bae0a04
 
-Build date: Apr 08, 2025.
+---
+
+## [1.3.29] — 2025-04-08 — Release 1.3.29 (Koni) — v1.3.29
 
 Features & Update:
 
@@ -768,9 +909,11 @@ Bug fixed:
 
 - Fixed bug getting EVM addresses when connecting to Autonomy (#4172)
 
-## 1.3.28
+**Commit**: b172e9bfc3
 
-Build date: Apr 02, 2025.
+---
+
+## [1.3.28] — 2025-04-02 — Release 1.3.28 (Koni) — v1.3.28
 
 Features & Update:
 
@@ -783,9 +926,11 @@ Bug fixed:
 - Fixed bug related to subnet staking feature (#4140)
 - Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741)
 
-## 1.3.27
+**Commit**: 6e39edfb4d
 
-Build date: Mar 29, 2025.
+---
+
+## [1.3.27] — 2025-03-29 — Release 1.3.27 (Koni) — v1.3.27
 
 Features & Update:
 
@@ -797,18 +942,22 @@ Bug fixed:
 
 - Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141)
 
-## 1.3.26
+**Commit**: 734c548591
 
-Build date: Mar 27, 2025.
+---
+
+## [1.3.26] — 2025-03-27 — Release 1.3.26 (Koni) — v1.3.26
 
 Bug fixed:
 
 - Fixed bug show balance for Polimec (#4058)
 - Fixed bug View explorer for Bittensor (#4058)
 
-## 1.3.25
+**Commit**: 329c84077a
 
-Build date: Mar 24, 2025.
+---
+
+## [1.3.25] — 2025-03-24 — Release 1.3.25 (Koni) — v1.3.25
 
 Features & Update:
 
@@ -819,9 +968,11 @@ Bug fixed:
 
 - Fixed bug integrating Wagmi into SubWallet (#4086)
 
-## 1.3.24
+**Commit**: 51be24cca1
 
-Build date: Mar 18, 2025.
+---
+
+## [1.3.24] — 2025-03-18 — Release 1.3.24 (Koni) — v1.3.24
 
 Features & Update:
 
@@ -833,9 +984,11 @@ Bug fixed:
 
 - Fixed bug Can't reset data when search on select token popup (#3786)
 
-## 1.3.23
+**Commit**: 638f989896
 
-Build date: Mar 05, 2025.
+---
+
+## [1.3.23] — 2025-03-05 — Release 1.3.23 (Koni) — v1.3.23
 
 Features & Update:
 
@@ -848,26 +1001,32 @@ Bug fixed:
 
 - Fix Bug when unstaking vDOT, vMANTA (#4054)
 
-## 1.3.22
+**Commit**: 256f98fe0b
 
-Build date: Mar 04, 2025.
+---
+
+## [1.3.22] — 2025-03-04 — Release 1.3.22 (Koni) — v1.3.22
 
 Features & Update:
 
 - Support staking for Mythos (#3984)
 
-## 1.3.21
+**Commit**: 5687ad1071
 
-Build date: Feb 28, 2025.
+---
+
+## [1.3.21] — 2025-02-28 — Release 1.3.21 (Koni) — v1.3.21
 
 Features & Update:
 
 - Allow signing once for multiple transactions (#3901)
 - Update chain-list stable v0.2.99 (#4007)
 
-## 1.3.20
+**Commit**: 3f05a9b8d0
 
-Build date: Feb 24, 2025.
+---
+
+## [1.3.20] — 2025-02-24 — Release 1.3.20 (Koni) — v1.3.20
 
 Features & Update:
 
@@ -877,25 +1036,31 @@ Bug fixed:
 
 - Fixed bug Unable to estimate fee when signing for dApp (#4050)
 
-## 1.3.19
+**Commit**: c6418f3b79
 
-Build date: Feb 21, 2025.
+---
+
+## [1.3.19] — 2025-02-21 — Release 1.3.19 (Koni) — v1.3.19
 
 Bug fixed:
 
 - Fixed bug related to custom token to paid fee
 
-## 1.3.18
+**Commit**: d8fa53c223
 
-Build date: Feb 20, 2025.
+---
+
+## [1.3.18] — 2025-02-20 — Release 1.3.18 (Koni) — v1.3.18
 
 Features & Update:
 
 - Support paying fee with non-native tokens on Asset Hub (#3590)
 
-## 1.3.17
+**Commit**: 01dfb01730
 
-Build date: Feb 18, 2025.
+---
+
+## [1.3.17] — 2025-02-18 — Release 1.3.17 (Koni) — v1.3.17
 
 Features & Update:
 
@@ -907,35 +1072,43 @@ Bug fixed:
 - Fixed bug Show incorrect APY for some chains (#4026)
 - Fixed rate limit api key for Bittensor(TAO) (#4029)
 
-## 1.3.16
+**Commit**: d9b1e35dc1
 
-Build date: Feb 10, 2025.
+---
+
+## [1.3.16] — 2025-02-10 — Release 1.3.16 (Koni) — v1.3.16
 
 Features & Update:
 
 - Add in-app staking for Analog
 
-## 1.3.15
+**Commit**: afbc58a3e3
 
-Build date: Feb 06, 2025.
+---
+
+## [1.3.15] — 2025-02-06 — Release 1.3.15 (Koni) — v1.3.15
 
 Bug fixed:
 
 - Fix issue Don't open the extension related to Patch feature (#4002)
 - Fix bug Do not show earning position for Bittensor (#4006)
 
-## 1.3.14
+**Commit**: 406874dfac
 
-Build date: Jan 24, 2025.
+---
+
+## [1.3.14] — 2025-01-24 — Release 1.3.14 (Koni) — v1.3.14
 
 Features & Update:
 
 - Update chain-list stable (#3974)
 - Add staking support for CERE (#360)
 
-## 1.3.13
+**Commit**: d1e054b367
 
-Build date: Jan 21, 2025.
+---
+
+## [1.3.13] — 2025-01-21 — Release 1.3.13 (Koni) — v1.3.13
 
 Features & Update:
 
@@ -946,9 +1119,11 @@ Bug fixed:
 
 - Fix bug setup validator related maxCount (#3971)
 
-## 1.3.12
+**Commit**: 8358f527ed
 
-Build date: Jan 06, 2025.
+---
+
+## [1.3.12] — 2025-01-06 — Release 1.3.12 (Koni) — v1.3.12
 
 Features & Update:
 
@@ -962,9 +1137,11 @@ Bug fixed:
 
 - Fix max transferable for Avail Bridge (#3911)
 
-## 1.3.11
+**Commit**: 1f327e40a6
 
-Build date: Dec 23, 2024.
+---
+
+## [1.3.11] — 2024-12-23 — Release 1.3.11 (Koni) — v1.3.11
 
 Features & Update:
 
@@ -975,18 +1152,22 @@ Bug fixed:
 
 - Fix errors when making transactions on Tangle mainnet (#3861)
 
-## 1.3.10
+**Commit**: 84d752c0c3
 
-Build date: Dec 12, 2024.
+---
+
+## [1.3.10] — 2024-12-12 — Release 1.3.10 (Koni) — v1.3.10
 
 Features & Update:
 
 - Update version polkadot api (#3888)
 - Unable to transfer local token on Bifrost (#3896)
 
-## 1.3.9
+**Commit**: aecd1c0a04
 
-Build date: Dec 09, 2024.
+---
+
+## [1.3.9] — 2024-12-09 — Release 1.3.9 (Koni) — v1.3.9
 
 Features & Update:
 
@@ -998,9 +1179,11 @@ Bug fixed:
 - Fixed bug validating recipient balance when sending Substrate token (#3713)
 - Fixed bug send NFT on Ethereum network (#3762)
 
-## 1.3.8
+**Commit**: d8c772a653
 
-Build date: Dec 03, 2024.
+---
+
+## [1.3.8] — 2024-12-03 — Release 1.3.8 (Koni) — v1.3.8
 
 Features & Update:
 
@@ -1017,9 +1200,11 @@ Features & Update:
   - Update Aventus Block Explorer
   - Delete Story Public Tesnet (Iliad testnet)
 
-## 1.3.7
+**Commit**: 6d05bd42e2
 
-Build date: Nov 23, 2024.
+---
+
+## [1.3.7] — 2024-11-23 — Release 1.3.7 (Koni) — v1.3.7
 
 Features & Update:
 
@@ -1036,9 +1221,11 @@ Bug fixed:
 
 - Re-check transaction on Polkadot Asset Hub (#3852)
 
-## 1.3.6
+**Commit**: 90a7fc15e8
 
-Build date: Nov 07, 2024.
+---
+
+## [1.3.6] — 2024-11-07 — Release 1.3.6 (Koni) — v1.3.6
 
 Features & Update:
 
@@ -1053,9 +1240,11 @@ Bug fixed:
 
 - Fixed error auto reset data on Pool field (#3001)
 
-## 1.3.5
+**Commit**: 4b5d2b2827
 
-Build date: Oct 31, 2024.
+---
+
+## [1.3.5] — 2024-10-31 — Release 1.3.5 (Koni) — v1.3.5
 
 Features & Update:
 
@@ -1074,9 +1263,11 @@ Bug fixed:
 
 - Fixed bug Do not show token (#3721)
 
-## 1.3.4
+**Commit**: 6b2b19f7dd
 
-Build date: Oct 28, 2024.
+---
+
+## [1.3.4] — 2024-10-28 — Release 1.3.4 (Koni) — v1.3.4
 
 Features & Update:
 
@@ -1088,9 +1279,11 @@ Features & Update:
   - Add support for Unichain testnet
   - Update address prefix for Bifrost
 
-## 1.3.3
+**Commit**: 4b898b40b9
 
-Build date: Oct 16, 2024.
+---
+
+## [1.3.3] — 2024-10-16 — Release 1.3.3 (Koni) — v1.3.3
 
 Features & Update:
 
@@ -1105,9 +1298,11 @@ Bugs fixed:
 - Fix min stake for TAO(Bittensor) (#3788)
 - Fix bug show OG WUD BURN NFT Collection (#3791)
 
-## 1.3.2
+**Commit**: 947cf51896
 
-Build date: Oct 12, 2024.
+---
+
+## [1.3.2] — 2024-10-12 — Release 1.3.2 (Koni) — v1.3.2
 
 Features & Update:
 
@@ -1131,17 +1326,21 @@ Features & Update:
     - Re-check enable TON (TON network) token
 - Add validate tokenOfOwnerByIndex when import NFT (#3609)
 
-## 1.3.1
+**Commit**: 68fcf5149e
 
-Build date: Oct 08, 2024.
+---
+
+## [1.3.1] — 2024-10-08 — Release 1.3.1 (Koni) — v1.3.1
 
 Features & Update:
 
 - Support Unified account
 
-## 1.2.32
+**Commit**: ed98953615
 
-Build date: Oct 01, 2024.
+---
+
+## [1.2.32] — 2024-10-01 — Release 1.2.32 (Koni) — v1.2.32
 
 Features & Update:
 
@@ -1151,9 +1350,11 @@ Bugs fixed:
 
 - Hot fix handle API status (#3711)
 
-## 1.2.31
+**Commit**: 2c00906ebd
 
-Build date: Sep 28, 2024.
+---
+
+## [1.2.31] — 2024-09-28 — Release 1.2.31 (Koni) — v1.2.31
 
 Features & Update:
 
@@ -1168,9 +1369,11 @@ Bugs fixed:
 - Fix bug Do not show earning position for StellaSwap (#3647)
 - Fix bug Can't import JSON file containing Unified account (#3643)
 
-## 1.2.30
+**Commit**: 39db6f9866
 
-Build date: Sep 20, 2024.
+---
+
+## [1.2.30] — 2024-09-20 — Release 1.2.30 (Koni) — v1.2.30
 
 Features & Update:
 
@@ -1194,9 +1397,11 @@ Bugs fixed:
 - Fix bug not showing balance of VFT tokens (#3612)
 - Fix bug do not show balance (#3653)
 
-## 1.2.29
+**Commit**: 65a2517276
 
-Build date: Sep 13, 2024.
+---
+
+## [1.2.29] — 2024-09-13 — Release 1.2.29 (Koni) — v1.2.29
 
 Features & Update:
 
@@ -1219,9 +1424,11 @@ Bugs fixed:
 - Fix bug XCM for channel: DOT: KAH -> PAH (#3561)
 - Fix bug display wrong APY for Polkadot staking option (#3601)
 
-## 1.2.28
+**Commit**: 6071bfea40
 
-Build date: Sep 04, 2024.
+---
+
+## [1.2.28] — 2024-09-04 — Release 1.2.28 (Koni) — v1.2.28
 
 Features & Update:
 
@@ -1245,9 +1452,11 @@ Bugs fixed:
 - Fix UI bug on the Transfer screen (#3452)
 - Fix bug XCM (#3519)
 
-## 1.2.27
+**Commit**: cd1438c541
 
-Build date: Aug 22, 2024.
+---
+
+## [1.2.27] — 2024-08-22 — Release 1.2.27 (Koni) — v1.2.27
 
 Features & Update:
 
@@ -1257,17 +1466,21 @@ Features & Update:
   - Update decimals for Litmus, Litentry
   - Update ED for some token: USDT, USDC (PAH), LIT (Litmus), LIT (Litentry), WUD (Hydration)
 
-## 1.2.26
+**Commit**: 6140ab5a25
 
-Build date: Aug 19, 2024.
+---
+
+## [1.2.26] — 2024-08-19 — Release 1.2.26 (Koni) — v1.2.26
 
 Bugs fixed:
 
 - Update earning feature with cache from middleware service
 
-## 1.2.25
+**Commit**: e75c937e10
 
-Build date: Aug 17, 2024.
+---
+
+## [1.2.25] — 2024-08-17 — Release 1.2.25 (Koni) — v1.2.25
 
 Features & Update:
 
@@ -1283,9 +1496,11 @@ Bugs fixed:
 - Fix Input overflow width issue (#3441)
 - Fix bug Do not show Signature popup in case not enough balance to cover gas fee (#2501)
 
-## 1.2.24
+**Commit**: 7db9b55525
 
-Build date: Aug 09, 2024.
+---
+
+## [1.2.24] — 2024-08-09 — Release 1.2.24 (Koni) — v1.2.24
 
 Features & Update:
 
@@ -1296,9 +1511,11 @@ Features & Update:
   - Add support for Pendulum assets (ASTR, vDOT, BNC)
   - Add support for Exosama network
 
-## 1.2.23
+**Commit**: 16194ce49e
 
-Build date: Aug 03, 2024.
+---
+
+## [1.2.23] — 2024-08-03 — Release 1.2.23 (Koni) — v1.2.23
 
 Features & Update:
 
@@ -1307,9 +1524,11 @@ Features & Update:
   - Add support for Aleph Zero EVM (mainnet)
   - Update price-id for AZERO EVM
 
-## 1.2.22
+**Commit**: 4a5f2ed1ac
 
-Build date: Jul 31, 2024.
+---
+
+## [1.2.22] — 2024-07-31 — Release 1.2.22 (Koni) — v1.2.22
 
 Features & Update:
 
@@ -1322,9 +1541,11 @@ Bugs fixed:
 - Fix bug do not show root screen after remove account (#3148)
 - Fix bug Show blank screen when attach account (#3054)
 
-## 1.2.21
+**Commit**: a3c0a9cf92
 
-Build date: Jul 24, 2024.
+---
+
+## [1.2.21] — 2024-07-24 — Release 1.2.21 (Koni) — v1.2.21
 
 Bugs fixed:
 Fix a few bugs for Avail (#3378)
@@ -1335,41 +1556,51 @@ Fix a few bugs for Avail (#3378)
 - Update Avail staking APY
 - Fix bug when click "View details" on the Sign transaction from dApp
 
-## 1.2.20
+**Commit**: c08618703b
 
-Build date: Jul 24, 2024.
+---
 
-Features & Update:
-
-- Update chain-list for Avail
-
-## 1.2.19
-
-Build date: Jul 23, 2024.
+## [1.2.20] — 2024-07-23 — Release 1.2.20 (Koni) — v1.2.20
 
 Features & Update:
 
 - Update chain-list for Avail
 
-## 1.2.18
+**Commit**: b0f31d15ad
 
-Build date: Jul 23, 2024.
+---
+
+## [1.2.19] — 2024-07-23 — Release 1.2.19 (Koni) — v1.2.19
+
+Features & Update:
+
+- Update chain-list for Avail
+
+**Commit**: 3460b74b70
+
+---
+
+## [1.2.18] — 2024-07-23 — Release 1.2.18 (Koni) — v1.2.18
 
 Features & Update:
 
 - Update chain-list for Avail (#3369)
 
-## 1.2.17
+**Commit**: 460dd083b9
 
-Build date: Jul 22, 2024.
+---
+
+## [1.2.17] — 2024-07-22 — Release 1.2.17 (Koni) — v1.2.17
 
 Features & Update:
 
 - Set default pool and default validator for Avail (#3365)
 
-## 1.2.16
+**Commit**: 3f2dc7041a
 
-Build date: Jul 19, 2024.
+---
+
+## [1.2.16] — 2024-07-19 — Release 1.2.16 (Koni) — v1.2.16
 
 Features & Update:
 
@@ -1387,9 +1618,11 @@ Bugs fixed:
 
 - Fix bug connecting to uquid dapp with Wallet Connect (#3275)
 
-## 1.2.15
+**Commit**: 1894de4192
 
-Build date: Jul 12, 2024.
+---
+
+## [1.2.15] — 2024-07-12 — Release 1.2.15 (Koni) — v1.2.15
 
 Features & Update:
 
@@ -1407,9 +1640,11 @@ Bugs fixed:
 - Fix bug calculating balance for relaychain (#3312)
 - Fix bug show withdraw information for the Acala liquid staking (#2965)
 
-## 1.2.14
+**Commit**: 044c8735ef
 
-Build date: Jul 09, 2024.
+---
+
+## [1.2.14] — 2024-07-09 — Release 1.2.14 (Koni) — v1.2.14
 
 Features & Update:
 
@@ -1421,9 +1656,11 @@ Bugs fixed:
 - Hotfix update chain-list stable version
 - Fix bug transaction has a bad signature when transfer AVL token (#3300)
 
-## 1.2.13
+**Commit**: 881cb3fb2c
 
-Build date: Jul 05, 2024.
+---
+
+## [1.2.13] — 2024-07-05 — Release 1.2.13 (Koni) — v1.2.13
 
 Features & Update:
 
@@ -1438,9 +1675,11 @@ Bugs fixed:
 
 - Fix bug Do not show account to get address when stand on All accounts mode (#3283)
 
-## 1.2.12
+**Commit**: fc254ff37e
 
-Build date: Jul 03, 2024.
+---
+
+## [1.2.12] — 2024-07-02 — Release 1.2.12 (Koni) — v1.2.12
 
 Features & Update:
 
@@ -1455,9 +1694,11 @@ Bugs fixed:
 - Fix bug Do not show Interlay's earning position (#3234)
 - Fix bug not showing popup Swap confirmation when swap with Injected account (#3230)
 
-## 1.2.11
+**Commit**: 67f2e645db
 
-Build date: Jun 29, 2024.
+---
+
+## [1.2.11] — 2024-06-29 — Release 1.2.11 (Koni) — v1.2.11
 
 Features & Update:
 
@@ -1467,9 +1708,11 @@ Bugs fixed:
 
 - Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account (#3254)
 
-## 1.2.10
+**Commit**: d5dcac1341
 
-Build date: Jun 25, 2024.
+---
+
+## [1.2.10] — 2024-06-25 — Release 1.2.10 (Koni) — v1.2.10
 
 Features & Update:
 
@@ -1477,9 +1720,11 @@ Features & Update:
 - Fix bug Screen flickering error when interacting with extensions (#3131)
 - Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT (#3133)
 
-## 1.2.9
+**Commit**: b9762d19c3
 
-Build date: Jun 24, 2024.
+---
+
+## [1.2.9] — 2024-06-24 — Release 1.2.9 (Koni) — v1.2.9
 
 Features & Update:
 
@@ -1496,25 +1741,31 @@ Bugs fixed:
 
 - Fix bug Error can't read properties of undefined (reading 'filter')
 
-## 1.2.8
+**Commit**: f2f04e416e
 
-Build date: Jun 21, 2024.
+---
+
+## [1.2.8] — 2024-06-21 — Release 1.2.8 (Koni) — v1.2.8
 
 Bugs fixed:
 
 - Fix bug Error can't read properties of undefined (reading 'filter') (#3218)
 
-## 1.2.7
+**Commit**: 50691f0dfc
 
-Build date: Jun 20, 2024.
+---
+
+## [1.2.7] — 2024-06-20 — Release 1.2.7 (Koni) — v1.2.7
 
 Features & Update:
 
 - Support MV3 on Firefox (#3108)
 
-## 1.2.6
+**Commit**: cbbd162d15
 
-Build date: Jun 19, 2024.
+---
+
+## [1.2.6] — 2024-06-19 — Release 1.2.6 (Koni) — v1.2.6
 
 Features & Update:
 
@@ -1532,9 +1783,11 @@ Bugs fixed:
 - Check error logs in earning feature (#3197)
 - Fixed bug related to earning feature ( Round 5) (#2995)
 
-## 1.2.5
+**Commit**: 9fcbb1fa5f
 
-Build date: Jun 11, 2024.
+---
+
+## [1.2.5] — 2024-06-11 — Release 1.2.5 (Koni) — v1.2.5
 
 Features & Update:
 
@@ -1546,9 +1799,11 @@ Bugs fixed:
 
 - Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account (#3145)
 
-## 1.2.4
+**Commit**: edf836dc4d
 
-Build date: Jun 08, 2024.
+---
+
+## [1.2.4] — 2024-06-08 — Release 1.2.4 (Koni) — v1.2.4
 
 Features & Update:
 
@@ -1567,9 +1822,11 @@ Features & Update:
 - Update some message related to earning feature (#3150)
 - Update transferable formula for system pallet v1 (#3166)
 
-## 1.2.3
+**Commit**: 6e54674edc
 
-Build date: Jun 03, 2024.
+---
+
+## [1.2.3] — 2024-06-03 — Release 1.2.3 (Koni) — v1.2.3
 
 Features & Update:
 
@@ -1583,9 +1840,11 @@ Features & Update:
 - Improve swap quote fetching speed (#3104)
 - Update transferable balance calculation formula (2118)
 
-## 1.2.2
+**Commit**: cc7dbf43b7
 
-Build date: May 30, 2024.
+---
+
+## [1.2.2] — 2024-05-30 — Release 1.2.2 (Koni) — v1.2.2
 
 Features & Update:
 
@@ -1600,18 +1859,22 @@ Bugs fixed:
   - Timing logic to display seed phrase backup prompt popup
   - Bug disconnect port
 
-## 1.2.1
+**Commit**: a9448c5213
 
-Build date: May 28, 2024.
+---
+
+## [1.2.1] — 2024-05-28 — Release 1.2.1 (Koni) — v1.2.1
 
 Features & Update:
 
 - Update Extension Manifest V3 (#2205)
 - Handle case displayed account with specific network (#2709)
 
-## 1.1.68
+**Commit**: 78f25028a0
 
-Build date: May 25, 2024.
+---
+
+## [1.1.68] — 2024-05-25 — Release 1.1.68 (Koni) — v1.1.68
 
 Features & Update:
 
@@ -1632,9 +1895,11 @@ Bugs fixed:
 - Fix bug missing custom tokens on applying online patch (#3101)
 - Fix error when fetching with Avail network (#3115)
 
-## 1.1.67
+**Commit**: 70e26e92a0
 
-Build date: May 22, 2024.
+---
+
+## [1.1.67] — 2024-05-22 — Release 1.1.67 (Koni) — v1.1.67
 
 Features & Update:
 
@@ -1646,9 +1911,11 @@ Bugs fixed:
 
 - Fix bug integrating chain online (#3084)
 
-## 1.1.66
+**Commit**: ef638e5698
 
-Build date: May 21, 2024.
+---
+
+## [1.1.66] — 2024-05-21 — Release 1.1.66 (Koni) — v1.1.66
 
 Features & Update:
 
@@ -1663,9 +1930,11 @@ Bugs fixed:
 
 - Handle the case of not resetting the wallet to the default state when click Erase all (#3035)
 
-## 1.1.65
+**Commit**: 95fe257913
 
-Build date: May 17, 2024.
+---
+
+## [1.1.65] — 2024-05-16 — Release 1.1.65 (Koni) — v1.1.65
 
 Features & Update:
 
@@ -1681,9 +1950,11 @@ Bugs fixed:
 - Fixed bug Unable to back screen in case open General settings to Marketing campaign (#3062)
 - Fixed bug when transferring PSP22 token (#3041)
 
-## 1.1.64
+**Commit**: b2ccf85040
 
-Build date: May 11, 2024.
+---
+
+## [1.1.64] — 2024-05-10 — Release 1.1.64 (Koni) — v1.1.64
 
 Features & Update:
 
@@ -1699,18 +1970,22 @@ Bugs fixed:
 - Fixed bug enable chains when detect balance (#2882)
 - Fixed bug  Invalid recipient address when Dapp deploy smart contract (#2859)
 
-## 1.1.63
+**Commit**: 0945fdb859
 
-Build date: May 09, 2024.
+---
+
+## [1.1.63] — 2024-05-09 — Release 1.1.63 (Koni) — v1.1.63
 
 Bugs fixed:
 
 - Fixed cannot signing with dApp in case network is not publish (#3027)
 - Fixed bug Network's status show incorrect (#3037)
 
-## 1.1.62
+**Commit**: a4f441a653
 
-Build date: May 08, 2024.
+---
+
+## [1.1.62] — 2024-05-08 — Release 1.1.62 (Koni) — v1.1.62
 
 Features & Update:
 
@@ -1725,9 +2000,11 @@ Bugs fixed:
 - Fixed bug Error getting wrong validator address (#2821)
 - Update Validator name/ Collator name (#2998)
 
-## 1.1.61
+**Commit**: 74c59d9abe
 
-Build date: May 02, 2024.
+---
+
+## [1.1.61] — 2024-05-02 — Release 1.1.61 (Koni) — v1.1.61
 
 Features & Update:
 
@@ -1738,26 +2015,32 @@ Bugs fixed:
 - Fixed bug Cannot read properties of undefined (reading 'length') (#2986)
 - Fixed bug related to earning feature (#2680)
 
-## 1.1.60
+**Commit**: 3d021adad8
 
-Build date: Apl 30, 2024.
+---
+
+## [1.1.60] — 2024-04-29 — Release 1.1.60 (Koni) — v1.1.60
 
 Features & Update:
 
 - Add support Mythos chain (#2966)
 - Set default pool for Avail Turing (#2971)
 
-## 1.1.59
+**Commit**: 5dd2e22797
 
-Build date: Apl 25, 2024.
+---
+
+## [1.1.59] — 2024-04-25 — Release 1.1.59 (Koni) — v1.1.59
 
 Features & Update:
 
 - Support staking for Avail Turing (#2963)
 
-## 1.1.58
+**Commit**: ff4b206eb7
 
-Build date: Apl 24, 2024.
+---
+
+## [1.1.58] — 2024-04-24 — Release 1.1.58 (Koni) — v1.1.58
 
 Features & Update:
 
@@ -1773,18 +2056,22 @@ Bugs fixed:
 
 - Fixed bug Do not show transaction history in case sender account is null (#2955)
 
-## 1.1.57
+**Commit**: 38f031e806
 
-Build date: Apl 23, 2024.
+---
+
+## [1.1.57] — 2024-04-23 — Release 1.1.57 (Koni) — v1.1.57
 
 Bugs fixed:
 
 - Fix bug related to Aleph Zero transfer and staking (#2655)
 - Fix issue related to earning status (#2941)
 
-## 1.1.56
+**Commit**: e98f053a79
 
-Build date: Apl 19, 2024.
+---
+
+## [1.1.56] — 2024-04-19 — Release 1.1.56 (Koni) — v1.1.56
 
 Features & Update:
 
@@ -1801,9 +2088,11 @@ Bugs fixed:
 
 - Fixed bug parsing Earning status for Nomination pool (#2937)
 
-## 1.1.55
+**Commit**: ad2b6afa58
 
-Build date: Apl 14, 2024.
+---
+
+## [1.1.55] — 2024-04-14 — Release 1.1.55 (Koni) — v1.1.55
 
 Features & Update:
 
@@ -1825,18 +2114,22 @@ Bugs fixed:
 - Fixed bug Error page when sign message with WalletConnect (#2915)
 - Fixed bug displaying 'connection existed' when connecting WalletConnect (#2903)
 
-## 1.1.54
+**Commit**: b65d4ed8e0
 
-Build date: Apl 09, 2024.
+---
+
+## [1.1.54] — 2024-04-09 — Release 1.1.54 (Koni) — v1.1.54
 
 Bugs fixed:
 
 - Fix issue in transaction screen (#2891)
 - Fix error in setting screen
 
-## 1.1.53
+**Commit**: 7191299927
 
-Build date: Apl 08, 2024.
+---
+
+## [1.1.53] — 2024-04-08 — Release 1.1.53 (Koni) — v1.1.53
 
 Bugs fixed:
 
@@ -1844,9 +2137,11 @@ Bugs fixed:
 - Fixed bug Wallet Connect not show connection popup (#2407)
 - Fixed bug Some required methods are missing when connecting Dapp to Subwallet via WalletConnect (#2860)
 
-## 1.1.52
+**Commit**: 6dca1331e1
 
-Build date: Apl 05, 2024.
+---
+
+## [1.1.52] — 2024-04-05 — Release 1.1.52 (Koni) — v1.1.52
 
 Features & Update:
 
@@ -1863,17 +2158,21 @@ Bugs fixed:
 
 - Fixed bug show earnings screen although back to home (#2742)
 
-## 1.1.51
+**Commit**: e460c992de
 
-Build date: Apl 02, 2024.
+---
+
+## [1.1.51] — 2024-04-02 — Release 1.1.51 (Koni) — v1.1.51
 
 Features & Update:
 
 - Update withdraw time for parachain staking (#2829)
 
-## 1.1.50
+**Commit**: de5b1d9667
 
-Build date: Mar 28, 2024.
+---
+
+## [1.1.50] — 2024-03-28 — Release 1.1.50 (Koni) — v1.1.50
 
 Features & Update:
 
@@ -1887,9 +2186,11 @@ Bugs fixed:
 
 - Fixed bug Do not show balance in case standing on History list to search token (#2791)
 
-## 1.1.49
+**Commit**: 6c27de71b0
 
-Build date: Mar 25, 2024.
+---
+
+## [1.1.49] — 2024-03-26 — Release 1.1.49 (Koni) — v1.1.49
 
 Features & Update:
 
@@ -1902,26 +2203,32 @@ Bugs fixed:
 - Fixed bug when performing XCM transfer on Kusama (#2814)
 - Fixed bug Error parsing token balance for frozen asset on Asset Hub (#2799)
 
-## 1.1.48
+**Commit**: a05736d9c4
 
-Build date: Mar 25, 2024.
+---
+
+## [1.1.48] — 2024-03-25 — Release 1.1.48 (Koni) — v1.1.48
 
 Bugs fixed:
 
 - Fix send fund error (#2795)
 
-## 1.1.47
+**Commit**: 853940622c
 
-Build date: Mar 23, 2024.
+---
+
+## [1.1.47] — 2024-03-23 — Release 1.1.47 (Koni) — v1.1.47
 
 Features & Update:
 
 - Add support XCM for PINK token (#2786)
   - Default enable DOT, DED, PINK on Asset Hub and xcPINK on Moonbeam
 
-## 1.1.46
+**Commit**: 61a9d2d388
 
-Build date: Mar 22, 2024.
+---
+
+## [1.1.46] — 2024-03-22 — Release 1.1.46 (Koni) — v1.1.46
 
 Features & Update:
 
@@ -1929,9 +2236,11 @@ Features & Update:
 - Support connect Ledger device for Asset Hub (#2785)
 - Support Mission Pool for Extension (#2781)
 
-## 1.1.45
+**Commit**: c22f0ed9f8
 
-Build date: Mar 20, 2024.
+---
+
+## [1.1.45] — 2024-03-20 — Release 1.1.45 (Koni) — v1.1.45
 
 Features & Update:
 
@@ -1949,9 +2258,11 @@ Bugs fixed:
 
 - Fixed bug connect a Ledger device (#2608)
 
-## 1.1.44
+**Commit**: 2a6b334dd1
 
-Build date: Mar 16, 2024.
+---
+
+## [1.1.44] — 2024-03-16 — Release 1.1.44 (Koni) — v1.1.44
 
 Features & Update:
 
@@ -1970,17 +2281,21 @@ Bugs fixed:
 
 - Fixed bug error page on NFT details screen (#2748)
 
-## 1.1.43
+**Commit**: 1f75c04107
 
-Build date: Mar 11, 2024.
+---
+
+## [1.1.43] — 2024-03-11 — Release 1.1.43 (Koni) — v1.1.43
 
 Bugs fixed:
 
 - Fixed bug not updating blocked XCM channels
 
-## 1.1.42
+**Commit**: 18ed580464
 
-Build date: Mar 08, 2024.
+---
+
+## [1.1.42] — 2024-03-08 — Release 1.1.42 (Koni) — v1.1.42
 
 Features & Update:
 
@@ -1998,9 +2313,11 @@ Bugs fixed:
 
 - Disable auto enable wallet while request "eth_account"
 
-## 1.1.41
+**Commit**: 61fb078aa5
 
-Build date: Mar 02, 2024.
+---
+
+## [1.1.41] — 2024-03-02 — Release 1.1.41 (Koni) — v1.1.41
 
 Features & Update:
 
@@ -2024,17 +2341,21 @@ Bugs fixed:
 - Fixed bug sending AVL on Avail Goldberg testnet (#2538)
 - Re-check case update data after performing actions (unstake, cancel unstake, withdraw) (#2682)
 
-## 1.1.40
+**Commit**: 7f9f48e07a
 
-Build date: Feb 29, 2024.
+---
+
+## [1.1.40] — 2024-02-29 — Release 1.1.40 (Koni) — v1.1.40
 
 Features & Update:
 
 - Update pool default for VARA (#2678)
 
-## 1.1.39
+**Commit**: d463948b03
 
-Build date: Feb 24, 2024.
+---
+
+## [1.1.39] — 2024-02-24 — Release 1.1.39 (Koni) — v1.1.39
 
 Features & Update:
 
@@ -2052,9 +2373,11 @@ Bugs fixed:
 - Fixed bug showing positions (#2612)
 - Fixed bug show incorrect token in case the wallet has only 1 account type (#2616)
 
-## 1.1.38
+**Commit**: 9dfb57fd39
 
-Build date: Feb 17, 2024.
+---
+
+## [1.1.38] — 2024-02-17 — Release 1.1.38 (Koni) — v1.1.38
 
 Features & Update:
 
@@ -2069,9 +2392,11 @@ Bugs fixed:
 
 - Fixed some UI bug (#2509)
 
-## 1.1.37
+**Commit**: 6e7e244bf5
 
-Build date: Feb 07, 2024.
+---
+
+## [1.1.37] — 2024-02-07 — Release 1.1.37 (Koni) — v1.1.37
 
 Features & Update:
 
@@ -2081,9 +2406,11 @@ Bugs fixed:
 
 - Fixed bug Unable to connect with eip6763 dApp (#2590)
 
-## 1.1.36
+**Commit**: 8320b1e3f4
 
-Build date: Feb 07, 2024.
+---
+
+## [1.1.36] — 2024-02-06 — Release 1.1.36 (Koni) — v1.1.36
 
 Features & Update:
 
@@ -2097,18 +2424,22 @@ Features & Update:
 - Update chain subspace gemini 3h
 - Check fee estimation on EVM networks (#2336)
 
-## 1.1.35
+**Commit**: c2c5bfbf29
 
-Build date: Feb 02, 2024.
+---
+
+## [1.1.35] — 2024-02-02 — Release 1.1.35 (Koni) — v1.1.35
 
 Features & Update:
 
 - Set pool default for Aleph Zero (#2578)
 - Update disabled XCM channels online (#2463)
 
-## 1.1.34
+**Commit**: c83a852297
 
-Build date: Feb 01, 2024.
+---
+
+## [1.1.34] — 2024-02-01 — Release 1.1.34 (Koni) — v1.1.34
 
 Features & Update:
 
@@ -2122,9 +2453,11 @@ Bugs fixed:
 - Fixed bug Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported (#2518)
 - Fixed bug not showing GENS token from Genshiro (#2540)
 
-## 1.1.33
+**Commit**: 084530f0fa
 
-Build date: Jan 23, 2024.
+---
+
+## [1.1.33] — 2024-01-23 — Release 1.1.33 (Koni) — v1.1.33
 
 Features & Update:
 
@@ -2143,9 +2476,11 @@ Bugs fixed:
 
 - Improve banner campaign in app (#2038)
 
-## 1.1.32
+**Commit**: 40e3f21499
 
-Build date: Jan 15, 2024.
+---
+
+## [1.1.32] — 2024-01-15 — Release 1.1.32 (Koni) — v1.1.32
 
 Features & Update:
 
@@ -2160,9 +2495,11 @@ Bugs fixed:
 
 - Fixed bug Do not show banner on Crowdloans tab (#2487)
 
-## 1.1.31
+**Commit**: b9e9a9a598
 
-Build date: Jan 11, 2024.
+---
+
+## [1.1.31] — 2024-01-11 — Release 1.1.31 (Koni) — v1.1.31
 
 Features & Update:
 
@@ -2177,9 +2514,11 @@ Bugs fixed:
 - Fixed bug Do not detect phishing page in case have no account in wallet (#2390)
 - Fixed bug Show custom network on the token list when nominate (#2452)
 
-## 1.1.30
+**Commit**: ce492a043c
 
-Build date: Jan 05, 2024.
+---
+
+## [1.1.30] — 2024-01-05 — Release 1.1.30 (Koni) — v1.1.30
 
 Features & Update:
 
@@ -2194,9 +2533,11 @@ Bugs fixed:
 - Hot fix bug estimating EVM transaction fee (#2412)
 - Fixed bug Do not display the account in the account details tab in case the entire account balance is locked (#2429)
 
-## 1.1.29
+**Commit**: d9bba51995
 
-Build date: Dec 29, 2023.
+---
+
+## [1.1.29] — 2023-12-29 — Release 1.1.29 (Koni) — v1.1.29
 
 Features & Update:
 
@@ -2210,18 +2551,22 @@ Bugs fixed:
 - Fixed some UI bug (#2203)
 - Fixed bug can not connect to WalletConnect (#2413)
 
-## 1.1.28
+**Commit**: c1e4dc2df8
 
-Build date: Dec 25, 2023.
+---
+
+## [1.1.28] — 2023-12-25 — Release 1.1.28 (Koni) — v1.1.28
 
 Features & Update:
 
 - Add support Polimec (#2404)
 - Allow access extension from iframe (#2406)
 
-## 1.1.27
+**Commit**: 674af5e64e
 
-Build date: Dec 20, 2023.
+---
+
+## [1.1.27] — 2023-12-20 — Release 1.1.27 (Koni) — v1.1.27
 
 Features & Update:
 
@@ -2240,9 +2585,11 @@ Bugs fixed:
 - Fixed bug show transfer NFT history details (#2373)
 - Fixed bug phishing detection (#2372)
 
-## 1.1.26
+**Commit**: 2253b39837
 
-Build date: Dec 16, 2023.
+---
+
+## [1.1.26] — 2023-12-16 — Release 1.1.26 (Koni) — v1.1.26
 
 Features & Update:
 
@@ -2261,9 +2608,11 @@ Bugs fixed:
 - Fixed bug show incorrect balance on All account mode when switch account (#2323)
 - Fixed bug do not navigate when click on hyperlink in attach account (#2316)
 
-## 1.1.25
+**Commit**: 2002b00578
 
-Build date: Dec 7, 2023.
+---
+
+## [1.1.25] — 2023-12-07 — Release 1.1.25 (Koni) — v1.1.25
 
 Features & Update:
 
@@ -2279,9 +2628,11 @@ Bugs fixed:
 
 - Fixed bug display dApp/pool/validator/collator name (#2130)
 
-## 1.1.24
+**Commit**: 733d3e1777
 
-Build date: Dec 1, 2023.
+---
+
+## [1.1.24] — 2023-12-01 — Release 1.1.24 (Koni) — v1.1.24
 
 Features & Update:
 
@@ -2300,9 +2651,11 @@ Bugs fixed:
 - Fixed bug show staking earning status on Creditcoin (#2277)
 - Fixed bug showing staking rewards on Moonbeam (#2213)
 
-## 1.1.23
+**Commit**: bdd98e044f
 
-Build date: Nov 24, 2023.
+---
+
+## [1.1.23] — 2023-11-24 — Release 1.1.23 (Koni) — v1.1.23
 
 Features & Update:
 
@@ -2319,9 +2672,11 @@ Bugs fixed:
 - Fixed bug missing crowdloan (#2199)
 - Fixed bug browser waste time when load extension (#2207) and add the loading effect when open app (#2228)
 
-## 1.1.22
+**Commit**: f6bbdda50b
 
-Build date: Nov 15, 2023.
+---
+
+## [1.1.22] — 2023-11-15 — Release 1.1.22 (Koni) — v1.1.22
 
 Features & Update:
 
@@ -2336,9 +2691,11 @@ Bugs fixed:
 - Fixed bug chainStaking Metadata on Kusama (#2162)
 - Fixed bug Can’t get balance of the ENJ token (#2154)
 
-## 1.1.21
+**Commit**: 616165cf98
 
-Build date: Nov 08, 2023.
+---
+
+## [1.1.21] — 2023-11-08 — Release 1.1.21 (Koni) — v1.1.21
 
 Features & Update:
 
@@ -2353,9 +2710,11 @@ Bugs fixed:
 - Fixed bug show error page when opening the app with an invalid URL (#2072)
 - Fixed bug still show token of the inactive network (#2158)
 
-## 1.1.20
+**Commit**: e1c6af305e
 
-Build date: Oct 26, 2023.
+---
+
+## [1.1.20] — 2023-11-04 — Release 1.1.20 (Koni) — v1.1.20
 
 Features & Update:
 
@@ -2378,9 +2737,11 @@ Bugs fixed:
 - Fixed bug decoding dApp staking when unstake (#2129)
 - Fixed bug in case save file when create new account, export account (#2100)
 
-## 1.1.19
+**Commit**: 4795493466
 
-Build date: Oct 26, 2023.
+---
+
+## [1.1.19] — 2023-10-26 — Release 1.1.19 (Koni) — v1.1.19
 
 Features & Update:
 
@@ -2396,9 +2757,11 @@ Bugs fixed:
 - Fixed bug Get Ledger account addresses on incompatible networks (#2075)
 - Fixed bug transfer on Rococo (#2042)
 
-## 1.1.18
+**Commit**: d349e979e5
 
-Build date: Oct 20, 2023.
+---
+
+## [1.1.18] — 2023-10-20 — Release 1.1.18 (Koni) — v1.1.18
 
 Features & Update:
 
@@ -2412,9 +2775,11 @@ Bugs fixed:
 - Fixed bug Do not show Acala, Karura NFT (#2029)
 - Fixed bug Show apply master password when access via URL (2040)
 
-## 1.1.17
+**Commit**: f266c489c9
 
-Build date: Oct 17, 2023.
+---
+
+## [1.1.17] — 2023-10-17 — Release 1.1.17 (Koni) — v1.1.17
 
 Features & Update:
 The default Vara network is enabled (#2019)
@@ -2426,9 +2791,11 @@ The default Vara network is enabled (#2019)
   - Add support for Vara NFTs
 - Updated list of tokens supported by Transak (#2026)
 
-## 1.1.16
+**Commit**: 12c2e48459
 
-Build date: Oct 07, 2023.
+---
+
+## [1.1.16] — 2023-10-07 — Release 1.1.16 (Koni) — v1.1.16
 
 Features & Update:
 
@@ -2438,9 +2805,11 @@ Bugs fixed:
 
 - Fixed bug when connect to dApp via WallectConnect (#1981)
 
-## 1.1.15
+**Commit**: aaa0800955
 
-Build date: Sep 30, 2023.
+---
+
+## [1.1.15] — 2023-09-30 — Release 1.1.15 (Koni) — v1.1.15
 
 Features & Update:
 
@@ -2465,18 +2834,22 @@ Bugs fixed:
 - Fixed bug Do not scroll the network list in case of connecting dApp via WalletConnect (#1926)
 - Fixed bug Navigate incorrect in case Create one when connect dApp (#1930)
 
-## 1.1.14
+**Commit**: 73e4fb5707
 
-Build date: Sep 26, 2023.
+---
+
+## [1.1.14] — 2023-09-26 — Release 1.1.14 (Koni) — v1.1.14
 
 Features & Update:
 
 - Improve network and asset subscription (#1939)
 - Update transfer function for Pendulum (#1950)
 
-## 1.1.13
+**Commit**: 329b77a4bd
 
-Build date: Sep 21, 2023.
+---
+
+## [1.1.13] — 2023-09-21 — Release 1.1.13 (Koni) — v1.1.13
 
 Features & Update:
 
@@ -2490,9 +2863,11 @@ Bugs fixed:
 - Fixed bug Do not auto-lock after imported multiple account (#1910)
 - Fixed bug Do not show selected account (#1919)
 
-## 1.1.12
+**Commit**: 32f50317a0
 
-Build date: Sep 15, 2023.
+---
+
+## [1.1.12] — 2023-09-15 — Release 1.1.12 (Koni) — v1.1.12
 
 Features & Update:
 
@@ -2508,9 +2883,11 @@ Bugs fixed:
 - Fixed bug Show incorrect message when the minimum active stake is a real number (#1901)
 - Fixed bug Create incorrect account when connect dApp (#1912)
 
-## 1.1.11
+**Commit**: 8b76b54d56
 
-Build date: Sep 09, 2023.
+---
+
+## [1.1.11] — 2023-09-09 — Release 1.1.11 (Koni) — v1.1.11
 
 Features & Update:
 
@@ -2538,9 +2915,11 @@ Bugs fixed:
 - Fixed bug The network address displayed is incorrect (#1866)
 - Fixed bug bug related to web runner v1.1.10 when used for mobile applications (#1882)
 
-## 1.1.10
+**Commit**: c194a56a81
 
-Build date: Aug 26, 2023.
+---
+
+## [1.1.10] — 2023-08-26 — Release 1.1.10 (Koni) — v1.1.10
 
 Features & Update:
 
@@ -2551,9 +2930,11 @@ Features & Update:
 - Improve import security (#1798)
 - Update chain list: Add support Gemini 3f, Update RPC for Creditcoin (#1839)
 
-## 1.1.9
+**Commit**: 004063b45b
 
-Build date: Aug 22, 2023.
+---
+
+## [1.1.9] — 2023-08-22 — Release 1.1.9 (Koni) — v1.1.9
 
 Features & Update:
 
@@ -2568,9 +2949,11 @@ Bugs fixed:
 - Fix a few minor bugs with NFT (#1817)
 - Update webpack config environment for page.js and content.js to improve security (#1823)
 
-## 1.1.8
+**Commit**: 1ec099a40b
 
-Build date: Aug 12, 2023.
+---
+
+## [1.1.8] — 2023-08-12 — Release 1.1.8 (Koni) — v1.1.8
 
 Features & Update:
 
@@ -2588,9 +2971,11 @@ Bugs fixed:
 - Fixed bug Validator avatars are auto-generated continuously (#1757)
 - Fixed bug do not delete connection when reset wallet (#1762)
 
-## 1.1.7
+**Commit**: 08d7704b59
 
-Build date: Aug 06, 2023.
+---
+
+## [1.1.7] — 2023-08-06 — Release 1.1.7 (Koni) — v1.1.7
 
 Bugs fixed:
 
@@ -2598,9 +2983,11 @@ Bugs fixed:
 - Fix error can not export account
 - Fix error can not buy with Banxa
 
-## 1.1.6
+**Commit**: 3998e2ccdc
 
-Build date: Aug 04, 2023.
+---
+
+## [1.1.6] — 2023-08-04 — Release 1.1.6 (Koni) — v1.1.6
 
 Features & Update:
 
@@ -2624,9 +3011,11 @@ Bugs fixed:
 - Fixed bug Do not reset selected validator when change token to stake (#1721)
 - Fixed bug Do not display the history of addresses other than the original address (#1748)
 
-## 1.1.5
+**Commit**: 4fcb4e32fd
 
-Build date: Jul 29, 2023.
+---
+
+## [1.1.5] — 2023-07-29 — Release 1.1.5 (Koni) — v1.1.5
 
 Features & Update:
 
@@ -2639,17 +3028,21 @@ Bugs fixed:
 - Fixed bug does not synchronize the configuration of the network and the token (#1633)
 - Fixed bug still send local token in case the native token balance = 0 (#1667)
 
-## 1.1.4
+**Commit**: 93152684bd
 
-Build date: Jul 24, 2023.
+---
+
+## [1.1.4] — 2023-07-24 — Release 1.1.4 (Koni) — v1.1.4
 
 Bugs fixed:
 
 - Can not load another NFTs when collection contain any NFT with wrong information (#1672)
 
-## 1.1.3
+**Commit**: f7bf82fe8a
 
-Build date: Jul 21, 2023.
+---
+
+## [1.1.3] — 2023-07-21 — Release 1.1.3 (Koni) — v1.1.3
 
 Features & Update:
 
@@ -2668,9 +3061,11 @@ Bugs fixed:
 - Fixed bug Do not validate amount of the recipient address in case send token (#1657)
 - Fix bug signing transaction on Avail (#1670)
 
-## 1.1.2
+**Commit**: e901052f5e
 
-Build date: Jul 14, 2023.
+---
+
+## [1.1.2] — 2023-07-14 — Release 1.1.2 (Koni) — v1.1.2
 
 Features & Update:
 
@@ -2701,9 +3096,11 @@ Update chainlist (#1620)
 - Add support for USDT, DOT on Pendulum
 - Update XCM for Acala
 
-## 1.1.1
+**Commit**: 1e9b1e2de3
 
-Build date: Jul 06, 2023.
+---
+
+## [1.1.1] — 2023-07-06 — Release 1.1.1 (Koni) — v1.1.1
 
 Features & Update:
 
@@ -2724,9 +3121,11 @@ Update `@subwallet/chain-list@0.2.4` (#1590):
 
 - Supported LP Tokens on Kintsugi (LP kBTC-USDT, LP KSM-kBTC, LP KSM-KINT)
 
-## 1.0.12
+**Commit**: c35b93b8d7
 
-Build date: Jun 29, 2023.
+---
+
+## [1.0.12] — 2023-06-29 — Release 1.0.12 (Koni) — v1.0.12
 
 Features & Update:
 
@@ -2740,9 +3139,11 @@ Update `@subwallet/chain-list@0.2.3` (#1576):
 
 - Add support for vFIL (Bifrost Polkadot), vETH (Ethereum)
 
-## 1.0.11
+**Commit**: 8f46e6bfc4
 
-Build date: Jun 24, 2023.
+---
+
+## [1.0.11] — 2023-06-24 — Release 1.0.11 (Koni) — v1.0.11
 
 Features & Update:
 
@@ -2759,9 +3160,11 @@ Update `@subwallet/chain-list@0.2.2` (#1556):
 - Integrate Polkadot Bridge Hub, Kusama Bridge Hub, Polkadot Collectives Parachain
 - Add logo for $CP token on Moonbeam
 
-## 1.0.10
+**Commit**: c329fc64be
 
-Build date: Jun 17, 2023.
+---
+
+## [1.0.10] — 2023-06-17 — Release 1.0.10 (Koni) — v1.0.10
 
 Features & Update:
 
@@ -2781,9 +3184,11 @@ Update `@subwallet/chain-list@0.2.1` (#1541):
 - Add support for Avail testnet (Kate)
 - Re-name Statemint & Statemint Parachain to Polkadot Asset Hub & Kusama Asset Hub
 
-## 1.0.9
+**Commit**: ed0b82d3bd
 
-Build date: Jun 13, 2023.
+---
+
+## [1.0.9] — 2023-06-13 — Release 1.0.9 (Koni) — v1.0.9
 
 Features & Update:
 
@@ -2811,9 +3216,11 @@ Update `@subwallet/chain-list@0.1.11`:
 - Hide the channel xcm USDT: Equilibrium —> Statemint
 - Update provider for Calamari
 
-## 1.0.8
+**Commit**: d6998a8708
 
-Build date: Jun 8, 2023.
+---
+
+## [1.0.8] — 2023-06-08 — Release 1.0.8 (Koni) — v1.0.8
 
 Features & Update:
 
@@ -2829,9 +3236,11 @@ Fixed bugs:
 - Fixed bug Do not Apply master password in case import multi account but file json have information "IsMasterPassword" (#1490)
 - Fixed bug send fund ERC20 token on Polygon (#1492)
 
-## 1.0.7
+**Commit**: 0f1d139c6d
 
-Build date: Jun 1, 2023.
+---
+
+## [1.0.7] — 2023-06-01 — Release 1.0.7 (Koni) — v1.0.7
 
 Features & Update:
 
@@ -2855,9 +3264,11 @@ Fixed bugs:
 - Fixed the bug causing failure to stake more for a pool in cases where an unstake request was present (#1470)
 - Updated web runner to fix ABI block explorer on mobile (#1472)
 
-## 1.0.6
+**Commit**: 8412da0394
 
-Build date: May 26, 2023.
+---
+
+## [1.0.6] — 2023-05-26 — Release 1.0.6 (Koni) — v1.0.6
 
 Features & Update:
 
@@ -2880,9 +3291,11 @@ Fixed bugs:
 - Update RMRK API (#1414)
 - Fix bug get balance when send token (#1428)
 
-## 1.0.5
+**Commit**: 8b0d53f9ce
 
-Build date: May 20, 2023.
+---
+
+## [1.0.5] — 2023-05-21 — Release 1.0.5 (Koni) — v1.0.5
 
 Features & Update:
 
@@ -2922,9 +3335,11 @@ Bug fixed:
 - Fixed bug import private key (#1395)
 - Fixed bug showing min pooled amount (#1396)
 
-## 1.0.4
+**Commit**: 80afa2a09f
 
-Build date: May 12, 2023.
+---
+
+## [1.0.4] — 2023-05-12 — Release 1.0.4 (Koni) — v1.0.4
 
 Fixed bugs:
 
@@ -2941,9 +3356,11 @@ Update, Features:
 - Enable native token automatically when enabling local token from the transfer screen (#1289)
 - Reset Wallet Feature (#1224)
 
-## 1.0.3
+**Commit**: fd2036af92
 
-Build date: May 06, 2023.
+---
+
+## [1.0.3] — 2023-05-06 — Release 1.0.3 (Koni) — v1.0.3
 
 Update:
 
@@ -2956,9 +3373,11 @@ Bugs:
 
 - Update out date libs (#1306)
 
-## 1.0.2
+**Commit**: 27049bb5bb
 
-Build date: Apr 28, 2023.
+---
+
+## [1.0.2] — 2023-04-29 — Release 1.0.2 (Koni) — v1.0.2
 
 Update:
 
@@ -2968,9 +3387,11 @@ Bug fixes:
 
 - Fix many bugs from version 1.0.1
 
-## 1.0.1
+**Commit**: 47ae912b5a
 
-Build date: Apr 10, 2023.
+---
+
+## [1.0.1] — 2023-03-31 — Release 1.0.1 (Koni) — v1.0.1
 
 Upgrade:
 
@@ -2978,9 +3399,11 @@ Upgrade:
 - New Transaction Handler
 - ...
 
-## 0.8.4 (Koni)
+**Commit**: ad2567d9ae
 
-Build date: Mar 31, 2023.
+---
+
+## [0.8.4] — 2023-03-31 — Release 0.8.4 (Koni) — v0.8.4
 
 Update:
 
@@ -2992,9 +3415,11 @@ Bug fixes:
 
 - Fix bug importing PSP22 tokens (#1118)
 
-## 0.8.3 (Koni)
+**Commit**: b90024a0cd
 
-Build date: Mar 29, 2023.
+---
+
+## [0.8.3] — 2023-03-29 — Release 0.8.3 (Koni) — v0.8.3
 
 Update:
 
@@ -3003,9 +3428,11 @@ Update:
 - Add XCM for Kusama --> Statemint (#1094)
 - Update logic for ink 4.0 and delete old PSP token (#1095)
 
-## 0.8.2 (Koni)
+**Commit**: 7195cf765a
 
-Build date: Mar 15, 2023.
+---
+
+## [0.8.2] — 2023-03-15 — Release 0.8.2 (Koni) — v0.8.2
 
 Update:
 
@@ -3017,9 +3444,11 @@ Bug fixes:
 
 - Fix bug XCM for Moonbeam, Bifrost Kusama (#1000)
 
-## 0.8.1 (Koni)
+**Commit**: 487aab593d
 
-Build date: Feb 03, 2022.
+---
+
+## [0.8.1] — 2023-02-03 — Release 0.8.1 (Koni) — v0.8.1
 
 Update:
 
@@ -3032,9 +3461,11 @@ Bug fixes:
 - Fix the staking validator's expected return for relaychain (#997)
 - Fix bug can not connect to AstarEVM (#1001)
 
-## 0.7.9 (Koni)
+**Commit**: b3c903307a
 
-Build date: Jan 30, 2022.
+---
+
+## [0.7.9] — 2023-01-30 — Release 0.7.9 (Koni) — v0.7.9
 
 Update:
 
@@ -3045,9 +3476,11 @@ Bug fixes:
 
 - Fix bug getting multiple balances for Equilibrium (#981)
 
-## 0.7.8 (Koni)
+**Commit**: 66dd7ca51e
 
-Build date: Jan 19, 2022.
+---
+
+## [0.7.8] — 2023-01-19 — Release 0.7.8 (Koni) — v0.7.8
 
 Update:
 
@@ -3058,9 +3491,11 @@ Bug fixes:
 
 - Fix bug getting multiple balances for Equilibrium (#981)
 
-## 0.7.7 (Koni)
+**Commit**: 58f7e822d7
 
-Build date: Dec 28, 2022.
+---
+
+## [0.7.7] — 2022-12-28 — Release 0.7.7 (Koni) — v0.7.7
 
 Update:
 
@@ -3076,9 +3511,11 @@ Bug fixes:
 - Do not show sub0 Lisbon 2022 NFT (#950)
 - Fix the error when adding a token from dApp (#959)
 
-## 0.7.6 (Koni)
+**Commit**: 3996e82cda
 
-Build date: Dec 17, 2022.
+---
+
+## [0.7.6] — 2022-12-17 — Release 0.7.6 (Koni) — v0.7.6
 
 Update:
 
@@ -3091,9 +3528,11 @@ Update:
 - Add the missing networks in Live Networks group (#910)
 - Update new way to get transaction history (#820)
 
-## 0.7.5 (Koni)
+**Commit**: 6f35f5f002
 
-Build date: Dec 15, 2022.
+---
+
+## [0.7.5] — 2022-12-15 — Release 0.7.5 (Koni) — v0.7.5
 
 Update:
 
@@ -3112,9 +3551,11 @@ Bug fixes:
 - Update message when scan QR code with QR signer account in case the account does not exist (#889)
 - Update get balance function for Kusama (#916)
 
-## 0.7.4 (Koni)
+**Commit**: 5a913d9096
 
-Build date: Dec 4, 2022.
+---
+
+## [0.7.4] — 2022-12-04 — Release 0.7.4 (Koni) — v0.7.4
 
 Update:
 
@@ -3130,9 +3571,11 @@ Bug fixes:
 - Fix bug don't show validator on the Amplitude network and update expected return (#884)
 - Fix bug don't show the Export account screen when visit it from the get wallet address screen (#885)
 
-## 0.7.3 (Koni)
+**Commit**: e05ece8e2f
 
-Build date: Nov 19, 2022.
+---
+
+## [0.7.3] — 2022-11-25 — Release 0.7.3 (Koni) — v0.7.3
 
 Update:
 
@@ -3146,9 +3589,11 @@ Bug fixes:
 - Show incorrect screen when re-open the extension after staking successfully (#845)
 - Do not show message when staking record does not exist yet (#849)
 
-## 0.7.2 (Koni)
+**Commit**: b82dec432a
 
-Build date: Nov 19, 2022.
+---
+
+## [0.7.2] — 2022-11-19 — Release 0.7.2 (Koni) — v0.7.2
 
 Update:
 
@@ -3171,9 +3616,11 @@ Bug fixes:
 - Incorrect navigation when cancel transaction with QR signer account (#825)
 - Can not sign the Claim reward transaction with QR-signer account (#838)
 
-## 0.7.1 (Koni)
+**Commit**: a1f98048fd
 
-Build date: Nov 10, 2022.
+---
+
+## [0.7.1] — 2022-11-10 — Release 0.7.1 (Koni) — v0.7.1
 
 Update:
 
@@ -3183,9 +3630,11 @@ Bug fixes:
 
 - Bug parsing IPFS link (#794)
 
-## 0.6.9 (Koni)
+**Commit**: 58dd43728a
 
-Build date: Nov 3, 2022.
+---
+
+## [0.6.9] — 2022-11-04 — Release 0.6.9 (Koni) — v0.6.9
 
 Update:
 
@@ -3200,9 +3649,11 @@ Bug fixes:
 
 - Error while try to subscribe event data with ETH, BNB or another https provider (#783)
 
-## 0.6.8 (Koni)
+**Commit**: 60221e8c5b
 
-Build date: Oct 31, 2022.
+---
+
+## [0.6.8] — 2022-10-31 — Release 0.6.8 (Koni) — v0.6.8
 
 Update:
 
@@ -3217,9 +3668,11 @@ Bug fixes:
 - Issue sending Bit.Country NFT and displaying BIT token (#747)
 - Unable to send NFT with QR Account in case of network not selected (#759)
 
-## 0.6.7 (Koni)
+**Commit**: a416445ff1
 
-Build date: Oct 22, 2022.
+---
+
+## [0.6.7] — 2022-10-22 — Release 0.6.7 (Koni) — v0.6.7
 
 Update:
 
@@ -3240,9 +3693,11 @@ Bug fixes:
 - An error occurs when a user deletes tokens in case the tokens to be deleted have the same address contract (#714)
 - Can't unstake, withdraw on parachain when using a QR signer account (#717)
 
-## 0.6.6 (Koni)
+**Commit**: d4fcda246e
 
-Build date: Sep 30, 2022.
+---
+
+## [0.6.6] — 2022-09-30 — Release 0.6.6 (Koni) — v0.6.6
 
 Update:
 
@@ -3259,9 +3714,11 @@ Bug fixes:
 - Some errors occurred when updating the caching mechanism (#583)
 - Some bugs related to custom tokens when the chain is disconnected (#687)
 
-## 0.6.5 (Koni)
+**Commit**: 2ac68edeeb
 
-Build date: Sep 24, 2022.
+---
+
+## [0.6.5] — 2022-09-24 — Release 0.6.5 (Koni) — v0.6.5
 
 Update:
 
@@ -3275,9 +3732,11 @@ Bug fixes:
 
 - Handle estimated fee error on NFT sending + staking (#648)
 
-## 0.6.4 (Koni)
+**Commit**: 986d087b92
 
-Build date: Sep 21, 2022.
+---
+
+## [0.6.4] — 2022-09-22 — Release 0.6.4 (Koni) — v0.6.4
 
 Update:
 
@@ -3289,17 +3748,21 @@ Bug fixes:
 
 - Can't see the NFT in case NFT Collection is on multi-page (#639)
 
-## 0.6.2 (Koni)
+**Commit**: 5c42fa4aa7
 
-Build date: Sep 16, 2022.
+---
+
+## [0.6.2] — 2022-09-16 — Release 0.6.2 (Koni) — v0.6.2
 
 Update:
 
 - Support Single-chain mode feature customize for Parachain & Solo chains (#331)
 
-## 0.6.1 (Koni)
+**Commit**: 9dd5c85eab
 
-Build date: Sep 13, 2022.
+---
+
+## [0.6.1] — 2022-09-13 — Release 0.6.1 (Koni) — v0.6.1
 
 Update:
 
@@ -3309,26 +3772,32 @@ Update:
 - Update default provider for Subspace Gemini 1 (#628)
 - Update endpoint list for GM Chain (#632)
 
-## 0.5.9 (Koni)
+**Commit**: a075ba1120
 
-Build date: Sep 7, 2022.
+---
+
+## [0.5.9] — 2022-09-07 — Release 0.5.9 (Koni) — v0.5.9
 
 Bug fixes:
 
 - Fix error of ipfs-gateway.cloud (#612)
 - Fix Transak logo (#616)
 
-## 0.5.8 (Koni)
+**Commit**: c5c55c70b4
 
-Build date: Sep 7, 2022.
+---
+
+## [0.5.8] — 2022-09-06 — Release 0.5.8 (Koni) — v0.5.8
 
 Update:
 
 - Add support Subspace Gemini 2a
 
-## 0.5.7 (Koni)
+**Commit**: 91053804df
 
-Build date: Sep 6, 2022.
+---
+
+## [0.5.7] — 2022-09-06 — Release 0.5.7 (Koni) — v0.5.7
 
 Update:
 
@@ -3348,9 +3817,11 @@ Bug fixes:
 - Fix bug happens when user disconnect network or remove account that selected to buy cryptos (#609)
 - Fix support Xcm transfer on Kusama, Polkadot, Astar, Shiden chain for QR Account (#552)
 
-## 0.5.6 (Koni)
+**Commit**: cc7bfffca5
 
-Build date: Aug 24, 2022.
+---
+
+## [0.5.6] — 2022-08-24 — Release 0.5.6 (Koni) — v0.5.6
 
 Update:
 
@@ -3377,9 +3848,11 @@ Bug fixes:
 - Fix bug parsing Acala crowdloan data (#568)
 - Fix staking data UI error (#567)
 
-## 0.5.5 (Koni)
+**Commit**: 652138b050
 
-Build date: Aug 12, 2022.
+---
+
+## [0.5.5] — 2022-08-11 — Release 0.5.5 (Koni) — v0.5.5
 
 Update:
 
@@ -3392,9 +3865,11 @@ Bug fixes:
 - Fix bug display wrong connection information with DApps (#498)
 - Fix bug some dApp can't connect to wallet when user close extension (#530)
 
-## 0.5.4 (Koni)
+**Commit**: b9452e40f8
 
-Build date: Aug 05, 2022.
+---
+
+## [0.5.4] — 2022-08-05 — Release 0.5.4 (Koni) — v0.5.4
 
 Update:
 
@@ -3408,9 +3883,11 @@ Bug fixes:
 
 - Fix balance showing incorrect in Send Fund screen in case create/forget acc successfully (#271)
 
-## 0.5.3 (Koni)
+**Commit**: ccb27bd41a
 
-Build date: Jul 29, 2022.
+---
+
+## [0.5.3] — 2022-07-29 — Release 0.5.3 (Koni) — v0.5.3
 
 Update:
 
@@ -3432,9 +3909,11 @@ Bug fixes:
 - Fix bug adding default EVM token after deleting it (#490)
 - Update logo & modal style (#499)
 
-## 0.5.2 (Koni)
+**Commit**: 76905348af
 
-Build date: Jul 22, 2022.
+---
+
+## [0.5.2] — 2022-07-22 — Release 0.5.2 (Koni) — v0.5.2
 
 Update:
 
@@ -3451,9 +3930,11 @@ Bug fixes:
 - Fix error logs from koni-content (#438)
 - Fix the issues with EVM Provider by late initialized (#444)
 
-## 0.4.9 (Koni)
+**Commit**: 88924a5315
 
-Build date: Jul 02, 2022.
+---
+
+## [0.4.9] — 2022-07-02 — Release 0.4.9 (Koni) — v0.4.9
 
 Update:
 
@@ -3465,9 +3946,11 @@ Bug fixes:
 - Fix bug can not scan QR (#394)
 - Fix some errors related to Network Settings (#408)
 
-## 0.4.8 (Koni)
+**Commit**: dcae42ccad
 
-Build date: Jun 25, 2022.
+---
+
+## [0.4.8] — 2022-06-25 — Release 0.4.8 (Koni) — v0.4.8
 
 Update:
 
@@ -3478,9 +3961,11 @@ Bug fixes:
 - Fix miscalculation of unstaking time (#382)
 - Fix bug not show transaction after transfer from astar app via EVM Provider
 
-## 0.4.7 (Koni)
+**Commit**: 628c0ef594
 
-Build date: Jun 24, 2022.
+---
+
+## [0.4.7] — 2022-06-24 — Release 0.4.7 (Koni) — v0.4.7
 
 Update:
 
@@ -3494,25 +3979,31 @@ Bug fixes:
 - Some problems with connect with EVM DApp Interface (#359)
 - Not showing crowdloan data properly (#375)
 
-## 0.4.6 (Koni)
+**Commit**: 776350f11d
 
-Build date: Jun 18, 2022.
+---
+
+## [0.4.6] — 2022-06-18 — Release 0.4.6 (Koni) — v0.4.6
 
 Update:
 
 - Support EVM DApp, demo can be found at <https://connect.subwallet.app/>
 
-## 0.4.5 (Koni)
+**Commit**: f22ee3d159
 
-Build date: Jun 09, 2022.
+---
+
+## [0.4.5] — 2022-06-09 — Release 0.4.5 (Koni) — v0.4.5
 
 Update:
 
 - Support Send / Receive cross-chain assets (update some label and variablea and xc logo) (#35)
 
-## 0.4.4 (Koni)
+**Commit**: 57095ab698
 
-Build date: Jun 08, 2022.
+---
+
+## [0.4.4] — 2022-06-08 — Release 0.4.4 (Koni) — v0.4.4
 
 Update:
 
@@ -3525,9 +4016,11 @@ Bug Fixed:
 - Fix bug "Encountered an error, please try again" when Send NFT (#321)
 - Fix bug can not send fund/XCM transfer of the Kintsugi Chain (#332)
 
-## 0.4.3 (Koni)
+**Commit**: 7e016f2052
 
-Build date: May 31, 2022.
+---
+
+## [0.4.3] — 2022-05-31 — Release 0.4.3 (Koni) — v0.4.3
 
 Update:
 
@@ -3541,9 +4034,11 @@ Bug Fixed:
 - Other defects related to Import EVM Tokens (#266)
 - Bug Send NFT when balance is too low (#265)
 
-## 0.4.2 (Koni)
+**Commit**: 19b50e4cf6
 
-Build date: May 20, 2022.
+---
+
+## [0.4.2] — 2022-05-20 — Release 0.4.2 (Koni) — v0.4.2
 
 Update:
 
@@ -3562,9 +4057,11 @@ Bug Fixed:
 - Fix display multi popup connect wallet (#227)
 - Fix tooltip not showing on the popup view on firefox browser (#224)
 
-## 0.4.1 (Koni)
+**Commit**: e99a340365
 
-Build date: May 11, 2022.
+---
+
+## [0.4.1] — 2022-05-11 — Release 0.4.1 (Koni) — v0.4.1
 
 Update:
 
@@ -3583,25 +4080,33 @@ Bug Fixed:
 - Fix bug and improve some experience (#168)
 - Fix bug not update them when change them from popup view (#228)
 
-## 0.3.6 (Koni)
+**Commit**: c850efb8ae
 
-Build date: Apr 22, 2022.
+---
+
+## [0.3.6] — 2022-04-22 — Release 0.3.6 (Koni) — v0.3.6
+
 Update:
 
 - Split background.js and extension.js into multi file for loading faster and can be submit to Firefox store (#80)
 - Update Centrifuge Parachain info (#203)
 - Support ERC20 tokens of Moonfit on Moonbase (#201)
 
-## 0.3.5 (Koni)
+**Commit**: c349ced235
 
-Build date: Apr 18, 2022.
+---
+
+## [0.3.5] — 2022-04-18 — Release 0.3.5 (Koni) — v0.3.5
+
 Bug Fixed:
 
 - Fix Astar issues on display NFT because wrong IPFS
 
-## 0.3.4 (Koni)
+**Commit**: 9b36dd3baf
 
-Build date: Apr 16, 2022.
+---
+
+## [0.3.4] — 2022-04-16 — Release 0.3.4 (Koni) — v0.3.4
 
 Update:
 
@@ -3619,9 +4124,11 @@ Bug Fixed:
 - Fix grammar error and type issue of button (issue #156,#166)
 - Fix some network in wrong group (issue #180)
 
-## 0.3.3 (Koni)
+**Commit**: d04111d1db
 
-Build date: Apr 08, 2022.
+---
+
+## [0.3.3] — 2022-04-08 — Release 0.3.3 (Koni) — v0.3.3
 
 Update:
 
@@ -3633,9 +4140,11 @@ Bug Fixed:
 - Some problems related to NFT function (issue #105)
 - Not have website list in website access screen
 
-## 0.3.2 (Koni)
+**Commit**: 1a34f5362a
 
-Build date: Apr 07, 2022.
+---
+
+## [0.3.2] — 2022-04-07 — Release 0.3.2 (Koni) — v0.3.2
 
 Update:
 
@@ -3653,9 +4162,13 @@ Update:
   - Astar MetaLion Kingdom
   - Astar Karafuru
 
-## 0.3.1 (Koni)
+**Commit**: 80a323d9fb
 
-Build date: Apr 05, 2022. Complete External security audit
+---
+
+## [0.3.1] — 2022-04-05 — Release 0.3.1 (Koni) — v0.3.1
+
+Complete External security audit
 
 Update:
 
@@ -3672,9 +4185,13 @@ Bug Fixed:
 - Fix some bugs with AlephZero balance (issue #50)
 - Fix some small bugs
 
-## 0.2.9 (Koni)
+**Commit**: 209909844e
 
-Build date: Mar 22, 2022. Complete external security audit
+---
+
+## [0.2.9] — 2022-03-22 — Release 0.2.9 (Koni) — v0.2.9
+
+Complete external security audit
 Update:
 
 - Show Moonbase and Moonriver tokens balance
@@ -3686,9 +4203,13 @@ Bug Fixed:
 - Display RMRK 2.0
 - Staking balance
 
-## 0.2.8 (Koni)
+**Commit**: d810a400a7
 
-Build date: Mar 18, 2022. Complete External Security Audit
+---
+
+## [0.2.8] — 2022-03-18 — Release 0.2.8 (Koni) — v0.2.8
+
+Complete External Security Audit
 **Update:**
 
 - Send and Receive NFT: Acala, RMRK, Quartz, Statemine
@@ -3704,7 +4225,11 @@ Build date: Mar 18, 2022. Complete External Security Audit
 - Bug when search account
 - Temporary remove Export all account feature
 
-## 0.2.7 (Koni)
+**Commit**: f30463904d
+
+---
+
+## [0.2.7] — 2022-03-08 — Release 0.2.7 (Koni) — v0.2.7
 
 **Update:**
 
@@ -3723,7 +4248,11 @@ Build date: Mar 18, 2022. Complete External Security Audit
 
 ---
 
-## 0.2.6 (Koni)
+**Commit**: 5e353479c3
+
+---
+
+## [0.2.6] — 2022-03-03 — Release 0.2.6 (Koni) — v0.2.6
 
 **Update:**
 
@@ -3742,7 +4271,11 @@ Build date: Mar 18, 2022. Complete External Security Audit
 
 ---
 
-## 0.2.5 (Koni)
+**Commit**: 1466becd1c
+
+---
+
+## [0.2.5] — 2022-02-25 — Release 0.2.5 (Koni) — v0.2.5
 
 Changes:
 
@@ -3751,9 +4284,13 @@ Changes:
 - Update style Authorize, Metadata, Signing, Export All, Export, Forget screen
 - ...
 
-## 0.2.3 (Koni)
+**Commit**: e72795334c
 
-Build date: Feb 21, 2022. Complete internal security audit
+---
+
+## [0.2.3] — 2022-02-21 — Release 0.2.3 (Koni) — v0.2.3
+
+Complete internal security audit
 
 Update:
 
@@ -3762,9 +4299,13 @@ Update:
 
 ---
 
-## 0.2.2 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Feb 19, 2022. Complete internal security audit
+---
+
+## [0.2.2] — 2022-02-19 — Release 0.2.2 (Koni) — v0.2.2
+
+Complete internal security audit
 
 Update:
 
@@ -3780,9 +4321,13 @@ Bugs Fixed:
 
 ---
 
-## 0.2.1 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Feb 10, 2022. Complete internal security audit
+---
+
+## [0.2.1] — 2022-02-10 — Release 0.2.1 (Koni) — v0.2.1
+
+Complete internal security audit
 
 Update:
 
@@ -3795,9 +4340,13 @@ Update:
 
 ---
 
-## 0.1.0 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Jan 25, 2022. Complete internal security audit
+---
+
+## [0.1.0] — 2022-01-25 — Release 0.1.0 (Koni) — v0.1.0
+
+Complete internal security audit
 
 Update:
 
@@ -3811,9 +4360,13 @@ Bugs Fixed:
 
 ---
 
-## 0.0.3 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Jan 16, 2022. Complete internal security audi
+---
+
+## [0.0.3] — 2022-01-16 — Release 0.0.3 (Koni) — v0.0.3
+
+Complete internal security audi
 
 Update
 
@@ -3824,9 +4377,13 @@ Update
 
 ---
 
-## 0.0.2 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Jan 10, 2022. Complete internal security audit
+---
+
+## [0.0.2] — 2022-01-10 — Release 0.0.2 (Koni) — v0.0.2
+
+Complete internal security audit
 
 Update
 
@@ -3853,9 +4410,13 @@ Bugs Fixed
 
 ---
 
-## 0.0.1 (Koni)
+> Commit unresolved: this release predates the repository's recorded history — no release commit or `package.json` bump identifies it.
 
-Build date: Jan 05, 2022 with basic features
+---
+
+## [0.0.1] — 2022-01-17 — Release 0.0.1 (Koni) — v0.0.1
+
+with basic features
 
 Update:
 
@@ -3867,7 +4428,11 @@ Update:
 
 ---
 
-## 0.42.5 Jan 10, 2022
+**Commit**: 0d78ecaf7e
+
+---
+
+## [0.42.5] — 2022-01-10 — Release 0.42.5 — v0.42.5
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -3880,7 +4445,11 @@ Changes:
 - Bump `@polkadot/util` to 8.3.1
 - Bump `@polkadot/api` to 7.3.1
 
-## 0.42.4 Dec 27, 2021
+**Commit**: d9b3c5a069
+
+---
+
+## [0.42.4] — 2021-12-27 — Release 0.42.4 — v0.42.4
 
 **Important** As 0.42.3, not published to the stores, fixes dependency issue in 0.42.4.
 
@@ -3888,7 +4457,11 @@ Changes:
 
 - Ensure `@subwallet/extension-mocks` is correctly listed as devDependency
 
-## 0.42.3 Dec 27, 2021
+**Commit**: c3003c11a3
+
+---
+
+## [0.42.3] — 2021-12-27 — Release 0.42.3 — v0.42.3
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -3901,13 +4474,21 @@ Changes:
 - Bump `@polkadot/util` to 8.2.2
 - Bump `@polkadot/api` to 7.1.1
 
-## 0.42.2 Dec 10, 2021
+**Commit**: 78726a852d
+
+---
+
+## [0.42.2] — 2021-12-10 — Release 0.42.2 — v0.42.2
 
 Changes:
 
 - Fix bug introduced in 0.42.1 where account storage is not portable after the base port update
 
-## 0.42.1 Dec 10, 2021
+**Commit**: 8f8460e25c
+
+---
+
+## [0.42.1] — 2021-12-10 — Release 0.42.1 — v0.42.1
 
 Contributed:
 
@@ -3923,7 +4504,11 @@ Changes:
 - Bump `@polkadot/util` to 8.1.2
 - Bump `@polkadot/api` to 6.11.1
 
-## 0.41.2 Nov 30, 2021
+**Commit**: 1ca53bc1dc
+
+---
+
+## [0.41.2] — 2021-11-30 — Release 0.41.2 — v0.41.2
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -3933,7 +4518,11 @@ Changes:
 - Bump `@polkadot/util` to 8.0.4
 - Bump `@polkadot/api` to 6.10.2
 
-## 0.41.1 Nov 8, 2021
+**Commit**: e9ce780824
+
+---
+
+## [0.41.1] — 2021-11-08 — Release 0.41.1 — v0.41.1
 
 Contributed:
 
@@ -3949,7 +4538,11 @@ Changes:
 - Bump `@polkadot/util` to 7.8.2
 - Bump `@polkadot/api` to 6.7.1
 
-## 0.40.4 Oct 25, 2021
+**Commit**: 63d29819bc
+
+---
+
+## [0.40.4] — 2021-10-25 — Release 0.40.4 — v0.40.4
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -3960,7 +4553,11 @@ Changes:
 - Bump `@polkadot/util` to 7.6.1
 - Bump `@polkadot/api` to 6.5.1
 
-## 0.40.3 Sep 18, 2021
+**Commit**: 0b49ff4a8d
+
+---
+
+## [0.40.3] — 2021-09-18 — Release 0.40.3 — v0.40.3
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -3970,13 +4567,21 @@ Changes:
 - Bump `@polkadot/util` to 7.4.1
 - Bump `@polkadot/api` to 6.0.1
 
-## 0.40.2 Sep 16, 2021
+**Commit**: 0992b6c763
+
+---
+
+## [0.40.2] — 2021-09-16 — Release 0.40.2 — v0.40.2
 
 Changes:
 
 - Fix polish translation (valid JSON)
 
-## 0.40.1 Sep 16, 2021
+**Commit**: d52ae696ee
+
+---
+
+## [0.40.1] — 2021-09-16 — Release 0.40.1 — v0.40.1
 
 - **Important** The signatures generated now via the extension will be a wrapped data set, i.e. `signRaw` cannot be used directly to sign transactions, rather it is only meant to be used for actual messages
 
@@ -3998,7 +4603,11 @@ Changes:
 - Cater for `#` in phishing Urls as part of the checks
 - Bump `@polkadot/api` & `@polkadot/util` to latest versions
 
-## 0.39.3 Aug 16, 2021
+**Commit**: e0b299324a
+
+---
+
+## [0.39.3] — 2021-08-16 — Release 0.39.3 — v0.39.3
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4007,7 +4616,11 @@ Changes:
 - Bump `@polkadot/api` to `5.5.1`
 - Bump `@polkadot/util` to `7.2.1`
 
-## 0.39.2 Aug 2, 2021
+**Commit**: f440ddb3ef
+
+---
+
+## [0.39.2] — 2021-08-02 — Release 0.39.2 — v0.39.2
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4016,7 +4629,11 @@ Changes:
 - Bump `@polkadot/api` to `5.3.1`
 - Bump `@polkadot/util` to `7.1.1`
 
-## 0.39.1 Jul 11, 2021
+**Commit**: 9664180538
+
+---
+
+## [0.39.1] — 2021-07-11 — Release 0.39.1 — v0.39.1
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4026,7 +4643,11 @@ Changes:
 - Bump `@polkadot/api` to `5.0.1`
 - Bump `@polkadot/util` to `7.0.1`
 
-## 0.38.8 Jun 26, 2021
+**Commit**: c50fb0ff1d
+
+---
+
+## [0.38.8] — 2021-07-05 — Release 0.38.8 — v0.38.8
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4039,7 +4660,11 @@ Changes:
 - Bump `@polkadot/api` to `4.17.1`
 - Bump `@polkadot/util` to `6.11.1`
 
-## 0.38.7 Jun 26, 2021
+**Commit**: 70c72ced6f
+
+---
+
+## [0.38.7] — 2021-06-26 — Release 0.38.7 — v0.38.7
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4048,7 +4673,11 @@ Changes:
 - Bump `@polkadot/api` to `4.16.1`
 - Bump `@polkadot/util` to `6.10.1`
 
-## 0.38.6 Jun 20, 2021
+**Commit**: 6f1fdc226e
+
+---
+
+## [0.38.6] — 2021-06-20 — Release 0.38.6 — v0.38.6
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4057,7 +4686,11 @@ Changes:
 - Bump `@polkadot/api` to `4.15.1`
 - Bump `@polkadot/util` to `6.9.1`
 
-## 0.38.5 Jun 14, 2021
+**Commit**: 18b772f186
+
+---
+
+## [0.38.5] — 2021-06-14 — Release 0.38.5 — v0.38.5
 
 **Important** Not published to the stores, aligns with latest released packages.
 
@@ -4067,7 +4700,11 @@ Changes:
 - Bump `@polkadot/api` to `4.14.1`
 - Bump `@polkadot/util` to `6.8.1`
 
-## 0.38.4 Jun 11, 2021
+**Commit**: a26c8fa38e
+
+---
+
+## [0.38.4] — 2021-06-11 — Release 0.38.4 — v0.38.4
 
 **Important** Not published to the stores, just made available to expose `{unwrap, wrap}Bytes`
 
@@ -4079,13 +4716,21 @@ Changes:
 
 - Raw signing interfaces will now always place a `<Bytes>...</Bytes>` wrapper around signed data
 
-## 0.38.3 May 31, 2021
+**Commit**: 33331a0138
+
+---
+
+## [0.38.3] — 2021-05-31 — Release 0.38.3 — v0.38.3
 
 Contributed:
 
 - Fix Chromium not displaying accounts due to height mismatch (Thanks to <https://github.com/wirednkod>)
 
-## 0.38.2 May 30, 2021
+**Commit**: 89c6852448
+
+---
+
+## [0.38.2] — 2021-05-30 — Release 0.38.2 — v0.38.2
 
 **Important** Not published to the stores, just made available to ensure users can have access to a version that uses the latest `@polkadot/{api, util}`
 
@@ -4094,7 +4739,11 @@ Changes:
 - Bump `@polkadot/api` to `4.12.1`
 - Bump `@polkadot/util` to `6.6.1`
 
-## 0.38.1 May 25, 2021
+**Commit**: f98c98d818
+
+---
+
+## [0.38.1] — 2021-05-25 — Release 0.38.1 — v0.38.1
 
 Contributed:
 
@@ -4113,7 +4762,11 @@ Changes:
 - Bump `@polkadot/api` & `@polkadot/util` to latest released versions
 - Swap to use of ESM modules all in published packages
 
-## 0.37.2 Feb 28, 2021
+**Commit**: 80dd1d9f53
+
+---
+
+## [0.37.2] — 2021-02-28 — Release 0.37.2 — v0.37.2
 
 **Important** Not published to the stores, just made available to ensure users can have access to a version that uses the latest `@polkadot/{api, util}`
 
@@ -4125,7 +4778,11 @@ Changes:
 
 - Bump `@polkadot/api` & `@polkadot/util` to latest released versions
 
-## 0.37.1 Feb 10, 2021
+**Commit**: 69245841e9
+
+---
+
+## [0.37.1] — 2021-02-10 — Release 0.37.1 — v0.37.1
 
 Contributed:
 
@@ -4144,7 +4801,11 @@ Changes:
 - Support for latest JS APIs
 - Adjust phishing detection to check newly opened tabs
 
-## 0.36.1 Jan 5, 2021
+**Commit**: cf6622d52a
+
+---
+
+## [0.36.1] — 2021-01-05 — Release 0.36.1 — v0.36.1
 
 Contributed:
 
@@ -4168,7 +4829,11 @@ Changes:
 - Swap to using TypeScript type imports
 - Hide parent/derivation-path when account is not derived
 
-## 0.35.1 Nov 29, 2020
+**Commit**: addbc1cf11
+
+---
+
+## [0.35.1] — 2020-11-30 — Release 0.35.1 — v0.35.1
 
 Contributed:
 
@@ -4197,7 +4862,11 @@ Changes:
 - Adjust web3Enable for better on-load detection
 - Support for all latest Substrate/Polkadot types
 
-## 0.34.1 Sep 15, 2020
+**Commit**: 7846fb75ad
+
+---
+
+## [0.34.1] — 2020-09-15 — Release 0.34.1 — v0.34.1
 
 Contributed:
 
@@ -4208,7 +4877,11 @@ Changes:
 
 - Support for latest Metadata v12 formats
 
-## 0.33.4 Sep 9, 2020
+**Commit**: 8ec5771fe5
+
+---
+
+## [0.33.4] — 2020-09-09 — Release 0.33.4 — v0.33.4
 
 Contributed:
 
@@ -4218,13 +4891,21 @@ Changes:
 
 - Reproducible builds with Webpack optimization flags
 
-## 0.33.2 Sep 7, 2020
+**Commit**: 5d17a85616
+
+---
+
+## [0.33.2] — 2020-09-07 — Release 0.33.2 — v0.33.2
 
 Changes:
 
 - Fix zip output to correctly include all source files
 
-## 0.33.1 Sep 7, 2020
+**Commit**: 0a6958548f
+
+---
+
+## [0.33.1] — 2020-09-07 — Release 0.33.1 — v0.33.1
 
 Contributed:
 
@@ -4246,7 +4927,11 @@ Changes:
 - Prepare for i18n translations with initial i18next setup
 - Rendering optimizations for Extrinsic displays
 
-## 0.32.1 Jul 27, 2020
+**Commit**: e5d4386294
+
+---
+
+## [0.32.1] — 2020-07-28 — Release 0.32.1 — v0.32.1
 
 Contributed:
 
@@ -4261,14 +4946,22 @@ Changes:
 - Add base known chain info to icon/ss58 display lookups
 - Adjust IdentityIcon backgrounds between dark/light themes
 
-## 0.31.1 Jun 24, 2020
+**Commit**: b7bc0da237
+
+---
+
+## [0.31.1] — 2020-06-24 — Release 0.31.1 — v0.31.1
 
 Changes:
 
 - Indicate password error when account cannot be unlocked on signing
 - Support for new Polkadot/Kusama/Substrate signing payloads
 
-## 0.30.1 Jun 8, 2020
+**Commit**: 104ced876a
+
+---
+
+## [0.30.1] — 2020-06-08 — Release 0.30.1 — v0.30.1
 
 Contributed:
 
@@ -4288,7 +4981,11 @@ Changes:
 - Remove all bundled metadata, update is available for dapps to keep current
 - Sorting of injected accounts based on created timestamp
 
-## 0.25.1 May 14, 2020
+**Commit**: b7176010a5
+
+---
+
+## [0.25.1] — 2020-05-14 — Release 0.25.1 — v0.25.1
 
 Contributed:
 
@@ -4300,7 +4997,11 @@ Changes:
 - Update `signedExtensions` to cater for new chains
 - Update metadata for latest Kusama
 
-## 0.24.1 Apr 19, 2020
+**Commit**: 4e3ba14eeb
+
+---
+
+## [0.24.1] — 2020-04-19 — Release 0.24.1 — v0.24.1
 
 Contributed:
 
@@ -4314,7 +5015,11 @@ Changes:
 - Rework base storage access & cross-browser interfaces for consistency
 - UI consistency adjustments & code maintainability cleanups
 
-## 0.23.1 Mar 26, 2020
+**Commit**: f349c24761
+
+---
+
+## [0.23.1] — 2020-03-26 — Release 0.23.1 — v0.23.1
 
 Contributed:
 
@@ -4326,7 +5031,11 @@ Changes:
 - Allow prompts for metadata from dapps before decoding
 - Add latest metadata for the Kusama network
 
-## 0.22.1 Mar 03, 20202
+**Commit**: d92a02dff4
+
+---
+
+## [0.22.1] — 2020-03-03 — Release 0.22.1 — v0.22.1
 
 Contributed:
 
@@ -4337,14 +5046,22 @@ Changes:
 
 - Dependencies updated to latest versions
 
-## 0.21.1 Feb 07, 20202
+**Commit**: 0fca577343
+
+---
+
+## [0.21.1] — 2020-02-07 — Release 0.21.1 — v0.21.1
 
 Changes:
 
 - Rebuild for re-publish
 - Dependencies updated to latest versions
 
-## 0.20.1 Jan 27, 2020
+**Commit**: 5f294e95ed
+
+---
+
+## [0.20.1] — 2020-01-27 — Release 0.20.1 — v0.20.1
 
 Contributed:
 
@@ -4355,7 +5072,11 @@ Changes:
 - Account copy now respects the address formatting
 - Updated to latest polkadot-js/api
 
-## 0.14.1 Dec 10, 2019
+**Commit**: fb0ea0522b
+
+---
+
+## [0.14.1] — 2019-12-10 — Release 0.14.1 — v0.14.1
 
 Contributed:
 
@@ -4366,7 +5087,11 @@ Changes:
 - Support for Kusama CC3
 - Allow the use of hex seeds as part of account creation
 
-## 0.13.1 Oct 25, 2019
+**Commit**: cb13202da9
+
+---
+
+## [0.13.1] — 2019-10-25 — Release 0.13.1 — v0.13.1
 
 Contributed:
 
@@ -4378,14 +5103,22 @@ Changes:
 - Support for latest Polkadot/Substrate clients with v8 metadata & v4 transactions
 - Remove support for non-operational Kusama CC1 network
 
-## 0.12.1 Oct 02, 2019
+**Commit**: 91184ab5cc
+
+---
+
+## [0.12.1] — 2019-10-02 — Release 0.12.1 — v0.12.1
 
 Changes:
 
 - Support for Kusama CC2
 - Update to to latest stable dependencies
 
-## 0.11.1 Sep 20, 2019
+**Commit**: 5c5e7912a8
+
+---
+
+## [0.11.1] — 2019-09-20 — Release 0.11.1 — v0.11.1
 
 Changes:
 
@@ -4396,7 +5129,11 @@ Changes:
 - Integrate latest @polkadot/util, @polkadot-js/ui & @polkadot/api dependencies
 - Updated to Babel 7.6 (build and runtime improvements)
 
-## 0.10.1 Sep 10, 2019
+**Commit**: 69e4d0639c
+
+---
+
+## [0.10.1] — 2019-09-10 — Release 0.10.1 — v0.10.1
 
 Changes:
 
@@ -4405,39 +5142,63 @@ Changes:
 - Adjust embedded chain metadata to only contain actual calls (for decoding)
 - Minor code maintainability enhancements
 
-## 0.9.1 Aug 31, 2019
+**Commit**: 9d766277e6
+
+---
+
+## [0.9.1] — 2019-08-31 — Release 0.9.1 — v0.9.1
 
 Changes:
 
 - Fix an initialization error in extension-dapp
 
-## 0.8.1 Aug 25, 2019
+**Commit**: af4d38013e
+
+---
+
+## [0.8.1] — 2019-08-25 — Release 0.8.1 — v0.8.1
 
 Changes:
 
 - Add basic support for seed derivation as part of the account import. Seeds can be followed by the derivation path, and derivation is applied on creation.
 - Update the polkadot-js/api version to 0.90.1, the first non-beta version with full support for Kusama
 
-## 0.7.1 Aug 19, 2019
+**Commit**: 6e5609d410
+
+---
+
+## [0.7.1] — 2019-08-19 — Release 0.7.1 — v0.7.1
 
 Changes:
 
 - Updated the underlying polkadot-js/api version to support the most-recent signing payload extensions, as will be available on Kusama
 
-## 0.6.1 Aug 03, 2019
+**Commit**: 7722dc7a85
+
+---
+
+## [0.6.1] — 2019-08-03 — Release 0.6.1 — v0.6.1
 
 Changes:
 
 - Support Extrinsics v3 from substrate 2.x, this signs an extrinsic with the genesisHash
 
-## 0.5.1 Jul 25, 2019
+**Commit**: 540370c64f
+
+---
+
+## [0.5.1] — 2019-07-25 — Release 0.5.1 — v0.5.1
 
 Changes:
 
 - Always check for site permissions on messages, don't assume that messages originate from the libraries provided
 - Change the injected Signer interface to support the upcoming Kusama transaction format
 
-## 0.4.1 Jul 18, 2019
+**Commit**: 5f22f67d55
+
+---
+
+## [0.4.1] — 2019-07-18 — Release 0.4.1 — v0.4.1
 
 Changes:
 
@@ -4446,7 +5207,11 @@ Changes:
 - Cater for the setting of multiple network prefixes, e.g. Kusama
 - Project icon has been updated
 
-## 0.3.1 Jul 14, 2019
+**Commit**: 30fc7f7c13
+
+---
+
+## [0.3.1] — 2019-07-14 — Release 0.3.1 — v0.3.1
 
 Changes:
 
@@ -4454,8 +5219,14 @@ Changes:
 - Don't request focus for popup window (this is not available on FF)
 - `yarn build:zip` now builds a source zip as well (for store purposes)
 
-## 0.2.1 Jul 12, 2019
+**Commit**: 008401864d
+
+---
+
+## [0.2.1] — 2019-07-12 — Release 0.2.1 — v0.2.1
 
 Changes:
 
 - First release to Chrome and FireFox stores, basic functionality only
+
+**Commit**: 1e96fdce1d
