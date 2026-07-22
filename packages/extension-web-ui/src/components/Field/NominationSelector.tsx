@@ -137,7 +137,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )
             : undefined
         }
-        title={t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel') + ' ' + t(handleValidatorLabel) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
+        title={t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel', { replace: { handleValidatorLabel: t(handleValidatorLabel) } }) || placeholder || t('ui.EARNING.components.Field.NominationSelector.selectValidator')}
       />
     </>
   );
