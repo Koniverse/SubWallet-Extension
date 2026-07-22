@@ -11,7 +11,7 @@ arch_ref:
   - AD-04
   - AD-24
 created: 2026-06-12
-updated: 2026-07-16
+updated: 2026-07-22
 ---
 
 ## Goal
@@ -23,22 +23,37 @@ on-chain. The epic delivers shared-authority custody where no single key — and
 server — can move the funds alone.
 
 > **Implementation ledger →** the individual tracker tickets that built this feature — Phase-1
-> build tasks, screens, fixes — live in [EPIC-38](EPIC-38.md), one story per issue. This epic is
-> the **FR contract** (FR-149/150/151); EPIC-38 is the **issue ledger** of the same area. They
-> overlap by design — the FR is the contract, the tickets are its issues — and their `points` are
-> never summed.
+> build tasks, screens, fixes — live **inside the stories below**, each as a row in that story's
+> own incremental-work table. The former one-issue-per-story maintenance ledger was dissolved on
+> 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22-epic-18-consolidation.md).
+
+### Umbrella issues — owned by this epic, not by a story
+
+The multisig tracker is a five-level sub-issue tree. The rule applied across the area is
+mechanical: **an issue that has sub-issues is an umbrella and is owned here; a leaf issue is a row
+in the story that owns its capability.** Listing an umbrella beside its own children would claim
+the same work twice ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)).
+Re-derive the tree with `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
+
+| Issue | Title | Tracker state | Shipped | Children |
+|---|---|---|---|---|
+| [#1426](https://github.com/Koniverse/SubWallet-Extension/issues/1426) | Support multisig features *(2023 scoping, superseded by #1677)* | ✅ closed COMPLETED | — | — |
+| [#1677](https://github.com/Koniverse/SubWallet-Extension/issues/1677) | [Multisig] Support Multisig account *(parent feature umbrella)* | 📋 open | — | #4696, #4697, #4698, #4744 |
+| [#4696](https://github.com/Koniverse/SubWallet-Extension/issues/4696) | [Multisig] Extension support | 📋 open | — | #4838, #4839 |
+| [#4838](https://github.com/Koniverse/SubWallet-Extension/issues/4838) | [Extension] Phase 1: Core Multisig Management | ✅ closed COMPLETED | — | #4855, #4856 |
+| [#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855) | [Extension] [Phase 1] UI — **the issue the 1.3.74 CHANGELOG names** | ✅ closed COMPLETED | 1.3.74 | #4869, #4871, #4872, #4874, #4875 |
+| [#4856](https://github.com/Koniverse/SubWallet-Extension/issues/4856) | [Extension] [Phase 1] Background | ✅ closed COMPLETED | 1.3.74 | #4841, #4842, #4843, #4870, #4913, #4921, #4938 |
+| [#4839](https://github.com/Koniverse/SubWallet-Extension/issues/4839) | [Extension] Phase 2: Multisig Account Detection and Optimization | 📋 open | — | #4844, #4845, #4927 |
+
+> **#4838 and #4855/#4856 both being "Phase 1" is not a duplicate.** #4838 is the phase; #4855 is
+> its UI half and #4856 its background half. `Shipped: 1.3.74` sits on the two halves because the
+> CHANGELOG line — *"Support Multisig Account Phase 1 (#4855)"* — names #4855, and #4856's commits
+> are ancestors of `v1.3.74`; the phase issue itself carries no release of its own.
 >
-> **Feature-umbrella issues are owned here, not double-tracked.** The tracker's umbrella tickets —
-> **#1426** (2023 *"Support multisig features"* scoping, closed/superseded), **#1677** (*"Support
-> Multisig account"*, the parent umbrella, open for Phase 2), **#4696** (*"Extension support"*,
-> Phase-1 shipped in v1.3.74), and **#4838** (the *"Phase 1: Core Multisig Management"* umbrella,
-> closed COMPLETED on the tracker 2026-07-16) — are feature/phase-level, so this FR epic owns them.
-> Their EPIC-38 ledger stories ([US-38.1](../stories/US-38.1-support-multisig-features.md) /
-> [US-38.2](../stories/US-38.2-multisig-support-multisig-account.md) /
-> [US-38.3](../stories/US-38.3-multisig-extension-support.md) /
-> [US-38.7](../stories/US-38.7-multisig-extension-phase-1-core-multisig-management.md)) were
-> **retired 2026-07-16** to avoid double-claiming what an FR already contracts
-> ([CONTEXT D108](../../CONTEXT.md)).
+> The tracker also lists **#43** (*"Support Hardware Wallet"*, closed 2022) as a sub-issue of
+> #4856. That is a board error, not multisig work — #43 is owned by US-16.1 and is deliberately
+> **not** modelled here.
 
 ## Overview
 
@@ -75,6 +90,7 @@ two are explicitly *not* the same thing (see Out of scope).
 | 1 | **Multisig account model** | [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | Deterministic off-chain creation + management of an M-of-N signatory set |
 | 2 | **Pending-tx approval** | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | On-chain (indexer-free) pending-tx detection with role-differentiated initiator/co-signer flows |
 | 3 | **Phase-2 enrichment** | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | Auto-detect activated accounts + indexer-enriched history/detail (planned) |
+| 4 | **Platform ports** | [US-18.4](../stories/US-18.4-multisig-on-mobile-and-web.md) | Carry the shipped extension capability to mobile and the WebApp (planned, no FR) |
 
 ### Out of scope
 
@@ -118,10 +134,21 @@ two are explicitly *not* the same thing (see Out of scope).
 | [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md) | Multisig account creation (deterministic off-chain) & management | Create/manage an M-of-N multisig whose address derives off-chain from signatories + threshold, no on-chain tx | ✅ done | 1.3.74 |
 | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | Pending-tx detection + role-differentiated approval | Detect pending multisig txs on-chain (no indexer) and approve/reject with initiator-vs-co-signer flows | ✅ done | 1.3.74 |
 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | Auto-detection + indexer history + Phase-2 optimization | Auto-detect activated multisig accounts and enrich history/detail via indexer (planned) | 📋 backlog | — |
+| [US-18.4](../stories/US-18.4-multisig-on-mobile-and-web.md) | Multisig on mobile & web (platform ports) | Port the shipped extension capability to SubWallet Mobile (#4697, out-of-repo) and the WebApp (#4698) | 📋 backlog | — |
 
 > US-18.1/US-18.2 are retroactive (shipped); US-18.3 is forward (Phase 2) and absorbs
-> the multisig auto-detection / indexer-history / optimization cluster
-> (issues #4839, #4845).
+> the three leaves of the #4839 umbrella (#4844, #4845, #4927). US-18.4 carries **no FR** —
+> a platform port ships no new requirement, and an FR is earned when a capability is
+> specified, not when someone files a request
+> ([D104](../../CONTEXT.md#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)).
+
+### Issue coverage
+
+All **26** multisig issues on the tracker are claimed: 7 umbrellas above, and 19 leaves as rows in
+the four stories — 7 in US-18.1, 7 in US-18.2, 3 in US-18.3, 2 in US-18.4. Six of them
+(#4839, #4845, #4855, #4872, #4875, #4963) had no story before the 2026-07-22 consolidation; two
+(#4872, #4875) are still `OPEN` on the board although their code is in `v1.3.74`. Both facts are
+evidenced in the [consolidation note](../../notes/2026-07-22-epic-18-consolidation.md).
 
 ## Cross-cutting invariants
 
@@ -136,3 +163,4 @@ two are explicitly *not* the same thing (see Out of scope).
 - [ ] A user can create and manage an M-of-N multisig whose address is derived off-chain (deterministically) from the signatory set + threshold, with no on-chain creation transaction — [US-18.1](../stories/US-18.1-multisig-account-creation-and-management.md)
 - [ ] Pending multisig transactions are detected on-chain without an indexer, and the initiator and co-signers get role-differentiated approval/rejection flows that execute only once the threshold is reached — [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md)
 - [ ] Activated multisig accounts are auto-detected and history/pending-tx detail is enriched via an indexer (call data, confirmations) — [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) (planned, Phase 2)
+- [ ] The shipped extension capability is available on SubWallet Mobile and the WebApp — [US-18.4](../stories/US-18.4-multisig-on-mobile-and-web.md) (planned, no FR)

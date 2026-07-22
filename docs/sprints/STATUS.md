@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 05:27:58 UTC
-> Total stories: 2741
+> Last generated: 2026-07-22 07:47:19 UTC
+> Total stories: 2722
 
-## 📋 Backlog (287)
+## 📋 Backlog (284)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -25,6 +25,7 @@
 | US-15.5 | Web-app governance surface | EPIC-15 | P3 | 8 | — | — |
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
+| US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
@@ -206,10 +207,6 @@
 | US-36.61 | Optimize swap pair selection | EPIC-36 | P3 | 1 | — | — |
 | US-36.64 | Avail Space - Support Avail Recovery Ledger app | EPIC-36 | P3 | 1 | — | — |
 | US-36.76 | Remove @polkadot/hw-ledger from ledger connector | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-38.4 | [Multisig] Mobile support | EPIC-38 | P3 | 1 | — | — |
-| US-38.5 | [Multisig] WebApp support | EPIC-38 | P3 | 1 | — | — |
-| US-38.11 | [Multisig] [Extension] [Phase 2] Multisig Account Detection | EPIC-38 | P3 | 1 | — | bluezdot |
-| US-38.19 | [Multisig] [Extension] [Phase 2] Improve display Multisig detail by type | EPIC-38 | P3 | 1 | — | bluezdot |
 | US-39.10 | WebApp - Support marketing campaign feature for webapp ( Round 2 ) | EPIC-39 | P3 | 1 | — | — |
 | US-39.12 | Extension - Improve Notification | EPIC-39 | P3 | 1 | — | — |
 | US-39.17 | Improve MKT campaign features | EPIC-39 | P3 | 1 | — | nulllpc |
@@ -373,7 +370,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2190)
+## ✅ Done (2178)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2092,18 +2089,6 @@
 | US-36.79 | [Extension] Update metadata runtime for Ledger app - Round 4 | EPIC-36 | P3 | 1 | sprint-2025-M11 | PDTnhah |
 | US-36.80 | [Extension] Update metadata runtime for Ledger app - Round 5 | EPIC-36 | P3 | 1 | sprint-2025-M12 | PDTnhah |
 | US-36.81 | Recheck Ledger signing on Bittensor network | EPIC-36 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-38.6 | [Multisig][Reseach] Multisig Technical Research | EPIC-38 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-38.8 | [Multisig] [Extension] [Phase 1] Multisig Account Management | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
-| US-38.9 | [Multisig] [Extension] [Phase 1] Pending Transaction Detection | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
-| US-38.10 | [Multisig] [Extension] [Phase 1] Implement Multisig Actions | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
-| US-38.12 | [Multisig] [Extension] [Phase 1] Background | EPIC-38 | P3 | 1 | sprint-2026-M03 | bluezdot |
-| US-38.13 | [Multisig] [Extension] [Phase 1] Create Multisig account | EPIC-38 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-38.14 | [Multisig] [Extension] [Phase 1] Experiments and Init Core Service | EPIC-38 | P3 | 1 | sprint-2025-M12 | bluezdot |
-| US-38.15 | [Multisig] [Extension] [Phase 1] Implement History screen | EPIC-38 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-38.16 | [Multisig] [Extension] [Phase 1] Implement Notification screen | EPIC-38 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
-| US-38.17 | [Multisig] [Extension] [Phase 1] Handle mechanism to trigger multisig notifications | EPIC-38 | P3 | 1 | sprint-2026-M01 | bluezdot |
-| US-38.18 | [Multisig] [Extension] [Phase 1] Classify and handle data for all multisig types | EPIC-38 | P3 | 1 | sprint-2026-M01 | bluezdot |
-| US-38.20 | [Multisig] [Extension] [Phase 1] Handle Init Multisig Transaction | EPIC-38 | P3 | 1 | sprint-2026-M01 | bluezdot |
 | US-39.1 | Create PR to intergrate SubWallet into web3-onboard | EPIC-39 | P3 | 1 | sprint-2023-M08 | S2kael |
 | US-39.2 | Update manage message and notification in extension | EPIC-39 | P3 | 1 | sprint-2023-M07 | S2kael |
 | US-39.3 | Support notification in browser and banner in app | EPIC-39 | P3 | 1 | sprint-2023-M10 | S2kael |
@@ -2572,7 +2557,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (202)
+## 🗑️ Deprecated (198)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2728,10 +2713,6 @@ _No stories_
 | US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
 | US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
 | US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-38.1 | Support multisig features | EPIC-38 | P3 | 1 | sprint-2025-M03 | nulllpc |
-| US-38.2 | [Multisig] Support Multisig account | EPIC-38 | P3 | 1 | sprint-2026-W28 | bluezdot |
-| US-38.3 | [Multisig] Extension support | EPIC-38 | P3 | 1 | — | bluezdot |
-| US-38.7 | [Multisig] [Extension] Phase 1: Core Multisig Management | EPIC-38 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-39.14 | WebApp - Support Notification in app | EPIC-39 | P3 | 1 | — | — |
 | US-41.3 | Intergrate Collab.Land for private channel in Discord | EPIC-41 | P3 | 1 | — | — |
 | US-41.21 | Get Data subtoken from Subquery: | EPIC-41 | P3 | 1 | — | — |
@@ -2783,12 +2764,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 287
+- 📋 **Backlog**: 284
 - 🟢 **Ready**: 18
 - 🟡 **In Progress**: 33
 - 👀 **Review**: 11
-- ✅ **Done**: 2190
+- ✅ **Done**: 2178
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 202
+- 🗑️ **Deprecated**: 198
 
 ⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).
