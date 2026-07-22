@@ -68,7 +68,7 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 | 2 | **Rich media rendering** | [US-9.6](../stories/US-9.6-3d-and-video-nft-viewer.md), [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md), [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | 3D / video viewer + IPFS media pipeline + NFT display/UI correctness hardening (detail render, cross-browser display) |
 | 3 | **Collection extensibility** | [US-9.8](../stories/US-9.8-custom-nft-import.md), [US-9.9](../stories/US-9.9-additional-collections-and-standards.md) | Custom import by contract + additional collections / ERC-6551 token-bound accounts |
 | 4 | **Transfer** | [US-9.5](../stories/US-9.5-nft-transfer-send.md) | Build and send an NFT to any compatible address |
-| 5 | **NFT service & portfolio** | [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md), [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT-service migration, client-side SDK migration, and portfolio management |
+| 5 | **NFT service & portfolio** | [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md), [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md), [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT-service migration, client-side SDK migration (Phase 1 shipped, rest planned), and portfolio management |
 
 ### Out of scope
 
@@ -107,7 +107,7 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 | AD | Title | Story |
 |----|-------|-------|
-| AD-24 | Backend Services SDK for multi-chain data aggregation (NFT) | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) |
+| AD-24 | Backend Services SDK for multi-chain data aggregation (NFT) | [US-9.1](../stories/US-9.1-substrate-nft-display.md), [US-9.3](../stories/US-9.3-evm-nft-display.md), [US-9.19](../stories/US-9.19-nft-service-migration.md), [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md), [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md) |
 | AD-25 | Cache / CDN proxy layer — `ipfs-files` NFT media gateway | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) |
 
 > AD-22 (handler-per-type class hierarchy) is *referenced* — the NFT handler
@@ -117,7 +117,7 @@ EPIC-9 builds the NFT-shaped transfer request and hands it to that pipeline.
 
 ## Stories
 
-Each NFT capability is **one story** — it carries its requirement (where it materializes an FR) *and* its full incremental-work history (fixes, chores, chain/collection integrations) as an "Incremental work, fixes & chores" timeline inside the story. There is no separate maintenance layer. **14 capability stories** below — the whole NFT area.
+Each NFT capability is **one story** — it carries its requirement (where it materializes an FR) *and* its full incremental-work history (fixes, chores, chain/collection integrations) as an "Incremental work, fixes & chores" timeline inside the story. There is no separate maintenance layer. **17 capability stories** below — the whole NFT area.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
@@ -133,10 +133,15 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 | [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md) | NFT display & UI hardening | Detail render, cross-browser display, webapp UI correctness | 📋 backlog | — |
 | [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md) | NFT media & IPFS gateway pipeline | RMRK/IPFS endpoints, resolver, image-error & media reliability | ✅ done | 1.3.56 |
 | [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT service migration | Migrate the NFT feature into the new UI/service architecture | ✅ done | 1.0.2 |
-| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration | Client-side NftService + migrate existing logic to the SDK (Phase 1 shipped) | 🚧 in-progress | — |
+| [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side NFT Service & SDK migration (Phase 1) | Client-side `NftService` + EVM/Unique handlers on the SDK | ✅ done | 1.3.80 |
 | [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management | Organize and curate the NFTs a user holds | 📋 backlog | — |
+| [US-9.22](../stories/US-9.22-runes-and-ordinals-on-the-extension.md) | Runes & Ordinals on the extension | Improvement on US-9.7 — the extension surface (#4246, #4295); US-9.7 shipped the WebApp one | 📋 backlog | — |
+| [US-9.23](../stories/US-9.23-webapp-address-display-and-validation-round-2.md) | WebApp address display & validation, round 2 | Improvement on US-9.10 — its one open row (#2858) | 📋 backlog | — |
+| [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md) | Client-side NFT Service — full SDK migration | Improvement on US-9.20 — everything Phase 1 did not move (#4883) | 📋 backlog | — |
 
 > **US-9.9** (FR-93) is 📋 planned in the PRD; authored here as `backlog` per Stream-B convention. **US-9.7** / **US-9.10** are `backlog` at the requirement level (the FR/hardening capability is not signed off) even though shipped incremental work appears in their timelines.
+>
+> **US-9.22 / US-9.23 / US-9.24 are improvement stories**, split out on 2026-07-22 from US-9.7, US-9.10 and US-9.20. Each parent carried an open row beside its shipped ones; US-9.20's went further and asserted *"not yet started, no release delivers it"* over a table showing #4884 `done @ 1.3.80`. Completed work stays in the story that shipped it, open work becomes an improvement story on it ([AGENTS.md](../../../AGENTS.md) rule 9).
 >
 > Two mis-area issues a title heuristic had routed here — **#639** (USDC & stEWT, token support) and **#1967** (Mint-NFT campaign) — were **relocated 2026-07-17** to [EPIC-24](EPIC-24.md) and [EPIC-39](EPIC-39.md). Full issue→story map: [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
 
@@ -160,6 +165,9 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 | [US-9.19](../stories/US-9.19-nft-service-migration.md) | NFT feature migration onto the new-UI service architecture | — (AD-24) |
 | [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md) | Client-side `NftService` + Services SDK migration | — (AD-24) |
 | [US-9.21](../stories/US-9.21-nft-portfolio-management.md) | NFT portfolio management (curation / organization) | — |
+| [US-9.22](../stories/US-9.22-runes-and-ordinals-on-the-extension.md) | Runes/Ordinals on the extension surface | — |
+| [US-9.23](../stories/US-9.23-webapp-address-display-and-validation-round-2.md) | WebApp address display + validation (Send token / Send NFT / History) | — |
+| [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md) | Remaining NFT handlers onto the client-side `NftService` / SDK | — (AD-24) |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
@@ -231,5 +239,8 @@ sequenceDiagram
 - [ ] NFT detail renders without an error page and collections display correctly cross-browser — [US-9.10](../stories/US-9.10-nft-display-and-transfer-hardening.md)
 - [x] NFT media resolves reliably through the IPFS gateway pipeline with multi-gateway fallback — [US-9.13](../stories/US-9.13-nft-media-and-ipfs-gateway-pipeline.md)
 - [x] The NFT feature runs on the new-UI service architecture — [US-9.19](../stories/US-9.19-nft-service-migration.md)
-- [ ] Client-side NFT Service + SDK migration (in progress — Phase 1 #4884 shipped v1.3.80) — [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md)
+- [x] Client-side NFT Service + SDK migration, Phase 1 (#4884, v1.3.80) — [US-9.20](../stories/US-9.20-client-side-nft-service-and-sdk-migration.md)
+- [ ] The remaining NFT handlers move onto the client-side `NftService` / SDK (#4883) — [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md)
+- [ ] Runes and Ordinals render in the **extension** (#4246, #4295) — [US-9.22](../stories/US-9.22-runes-and-ordinals-on-the-extension.md)
+- [ ] WebApp address display + validation round 2 (#2858) — [US-9.23](../stories/US-9.23-webapp-address-display-and-validation-round-2.md)
 - [ ] NFT portfolio management (planned) — [US-9.21](../stories/US-9.21-nft-portfolio-management.md)

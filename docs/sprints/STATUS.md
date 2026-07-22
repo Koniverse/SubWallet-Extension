@@ -1,13 +1,16 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 07:47:19 UTC
-> Total stories: 2722
+> Last generated: 2026-07-22 08:02:02 UTC
+> Total stories: 2728
 
-## 📋 Backlog (284)
+## 📋 Backlog (290)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
+| US-1.7 | Firefox background-lifecycle recheck (improvement on US-1.1) | EPIC-1 | P3 | 1 | — | Thiendekaco |
+| US-1.8 | Firefox CORS follow-up & dev-build test tooling (improvement on US-1.5) | EPIC-1 | P3 | 1 | — | saltict |
+| US-1.9 | Out-of-repo tooling not yet started (improvement on US-1.6) | EPIC-1 | P3 | 1 | — | — |
 | US-10.5 | Bitcoin dApp connection (PSBT) | EPIC-10 | P1 | 5 | — | — |
 | US-10.6 | TON dApp connection | EPIC-10 | P1 | 5 | — | — |
 | US-10.10 | Multi-wallet coexistence hardening | EPIC-10 | P1 | 3 | — | — |
@@ -292,6 +295,9 @@
 | US-9.9 | Additional NFT collections & standards (ERC-6551) | EPIC-9 | P2 | 5 | — | — |
 | US-9.10 | NFT display & UI hardening | EPIC-9 | P2 | 5 | — | — |
 | US-9.21 | NFT portfolio management | EPIC-9 | P3 | 1 | — | — |
+| US-9.22 | Runes & Ordinals on the extension (improvement on US-9.7) | EPIC-9 | P3 | 1 | — | — |
+| US-9.23 | WebApp address display & validation, round 2 (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
+| US-9.24 | Client-side NFT Service — full SDK migration (improvement on US-9.20) | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
 ## 🟢 Ready (18)
 
@@ -316,7 +322,7 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (33)
+## 🟡 In Progress (32)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -352,7 +358,6 @@
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
-| US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
 ## 👀 Review (11)
 
@@ -370,7 +375,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2178)
+## ✅ Done (2179)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2552,6 +2557,7 @@
 | US-9.8 | Custom NFT import | EPIC-9 | P2 | 3 | sprint-2022-M05 | nulllpc |
 | US-9.13 | NFT media & IPFS gateway pipeline | EPIC-9 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
 | US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
+| US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | sprint-2026-M02 | frenkie-ng |
 
 ## 🚫 Blocked (0)
 
@@ -2764,12 +2770,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 284
+- 📋 **Backlog**: 290
 - 🟢 **Ready**: 18
-- 🟡 **In Progress**: 33
+- 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2178
+- ✅ **Done**: 2179
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 198
 
-⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

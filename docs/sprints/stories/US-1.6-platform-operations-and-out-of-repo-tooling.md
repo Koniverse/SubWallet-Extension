@@ -23,7 +23,7 @@ claimed without any of these being mistaken for extension work.
 
 ## Scope
 
-This is a **consolidated maintenance story**: it groups 6 tracker issues into one boundary,
+This is a **consolidated maintenance story**: it groups 4 tracker issues into one boundary,
 replacing the former one-issue-per-story ledger. It materializes **no FR**, and it never will —
 an FR describes what the *wallet* does, and none of these is in the wallet. Full traceability is
 the table below and the [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
@@ -36,21 +36,27 @@ other direction — they are not unclassifiable, they are **classified as out-of
 
 **What this story deliberately does not do:** assert a `version_shipped` for any row. A release of
 this extension does not carry a backend deploy or a support system, so the `Shipped` column stays
-`—` for all six even where the work is `done` — the two-branch done-gate
+`—` for all four even where the work is `done` — the two-branch done-gate
 ([AGENTS.md](../../../AGENTS.md) rule 4) is exactly this case, one story lower than usual.
 
-**Status is the aggregate, not the maximum**: `in-progress` because two rows are open and four are
-settled. It is not `done` — that would claim work nobody has started
-([D107](../../CONTEXT.md#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim)
-one field over).
+**Every row here is now settled** — three `done`, one closed not-planned. The two that were open,
+the ChainList page (#2131) and the tracking dashboard (#2529), moved to
+[US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) on 2026-07-22, so this story records only
+work that finished.
+
+**It nevertheless stays `in-progress`, and that is a known gap, not an oversight.** The two-branch
+done-gate ([AGENTS.md](../../../AGENTS.md) rule 4) closes a story either with a
+`version_shipped` + CHANGELOG entry, or — for a no-requirement story — with `commit` naming a real
+SHA. **This story can satisfy neither**: no release of this extension carries a backend deploy, and
+no SHA in this repository delivers work done in another one. Marking it `done` anyway would be the
+fake-done this program exists to prevent; **how an out-of-repo coverage story closes is an open
+question for the owner.**
 
 ## Incremental work, fixes & chores
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
-| — | [#2131](https://github.com/Koniverse/SubWallet-Extension/issues/2131) | Build the ChainList page *(separate repo — SubWallet-ChainList)* | 📋 backlog |
 | — | [#2455](https://github.com/Koniverse/SubWallet-Extension/issues/2455) | Build middleware services — cross-chain balance, earning-pool statistics | ⏸️ deprecated |
-| — | [#2529](https://github.com/Koniverse/SubWallet-Extension/issues/2529) | Build a tracking dashboard across platforms | 📋 backlog |
 | — | [#2534](https://github.com/Koniverse/SubWallet-Extension/issues/2534) | Build a user support system | ✅ done |
 | — | [#4118](https://github.com/Koniverse/SubWallet-Extension/issues/4118) | Set up a GitHub Action to deploy the SubWallet **backend** | ✅ done |
 | — | [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | Deploy the Bittensor ecosystem features | ✅ done |
@@ -63,7 +69,7 @@ one field over).
 
 ## Acceptance criteria
 
-- [ ] **AC-1** — Every issue above is recorded with the tracker's own state, and **none** carries a `version_shipped` — no release of this extension delivers backend or tooling work.
+- [x] **AC-1** — Every issue above is recorded with the tracker's own state, and **none** carries a `version_shipped` — no release of this extension delivers backend or tooling work.
 
 ## Verification commands
 
@@ -73,4 +79,4 @@ one field over).
 
 ## Cross-references
 
-- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [D66](../../CONTEXT.md#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)
+- [Epic EPIC-1](../epics/EPIC-1.md) · [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md) · [US-1.9](US-1.9-out-of-repo-tooling-not-yet-started.md) · [D66](../../CONTEXT.md#d66-aggregate-multi-chain-data-through-the-subwallet-services-sdk-backend-rather-than-computing-it-on-device) · [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md)

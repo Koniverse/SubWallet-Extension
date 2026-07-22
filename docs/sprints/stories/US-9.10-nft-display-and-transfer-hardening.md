@@ -13,7 +13,7 @@ depends_on: [US-9.1, US-9.5]
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-22
 ---
 
 
@@ -142,7 +142,12 @@ _Hardening story — no FR; consolidates NFT display/transfer-correctness issues
 
 ## Incremental work, fixes & chores
 
-Beyond the requirement above, **25 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Beyond the requirement above, **24 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> **All 24 are settled.** The one open row — WebApp address display/validation round 2
+> ([#2858](https://github.com/Koniverse/SubWallet-Extension/issues/2858)) — moved to
+> [US-9.23](US-9.23-webapp-address-display-and-validation-round-2.md) on 2026-07-22, so this
+> story's done-pass judges only what it delivered.
 
 > 4 issue(s) below are ⏸ **deprecated** — closed not-planned / superseded, never shipped.
 
@@ -172,8 +177,7 @@ Beyond the requirement above, **25 tracker issue(s)** of incremental work landed
 | — | [#1300](https://github.com/Koniverse/SubWallet-Extension/issues/1300) | Bug when URL NFT collection fails | ⏸ deprecated |
 | — | [#1909](https://github.com/Koniverse/SubWallet-Extension/issues/1909) | WebApp - Re- check NFT of the Statemine network | ⏸ deprecated |
 | — | [#2106](https://github.com/Koniverse/SubWallet-Extension/issues/2106) | Do not delete NFT data when reset wallet | ⏸ deprecated |
-| — | [#2858](https://github.com/Koniverse/SubWallet-Extension/issues/2858) | WebApp - Adjust showing/validating address on Send token, Send NFT, History (Round 2) | 📋 backlog |
 
 ## Cross-references
 
-- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md) · [US-9.8](US-9.8-custom-nft-import.md) · [#2124](https://github.com/Koniverse/SubWallet-Extension/issues/2124) · [#2946](https://github.com/Koniverse/SubWallet-Extension/issues/2946) · [#3030](https://github.com/Koniverse/SubWallet-Extension/issues/3030) · [#3241](https://github.com/Koniverse/SubWallet-Extension/issues/3241) · [#4859](https://github.com/Koniverse/SubWallet-Extension/issues/4859)
+- [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.5](US-9.5-nft-transfer-send.md) · [US-9.8](US-9.8-custom-nft-import.md) · [US-9.23](US-9.23-webapp-address-display-and-validation-round-2.md) · [#2124](https://github.com/Koniverse/SubWallet-Extension/issues/2124) · [#2946](https://github.com/Koniverse/SubWallet-Extension/issues/2946) · [#3030](https://github.com/Koniverse/SubWallet-Extension/issues/3030) · [#3241](https://github.com/Koniverse/SubWallet-Extension/issues/3241) · [#4859](https://github.com/Koniverse/SubWallet-Extension/issues/4859)

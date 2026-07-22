@@ -13,7 +13,7 @@ depends_on: [US-1.1]
 assignee: saltict
 commit:
 created: 2026-06-12
-updated: 2026-07-15
+updated: 2026-07-22
 ---
 
 ## Status refresh — 2026-07-15
@@ -259,19 +259,25 @@ regression suite rather than fragmenting per browser._
 
 ## Incremental work, fixes & chores
 
-**5 tracker issues** of incremental work landed on this capability — manifest-permission reduction, two Firefox CORS defects, the WebApp build number, and dev-build test tooling. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+**3 tracker issues** of incremental work landed on this capability — manifest-permission reduction, one Firefox CORS fix, and the WebApp build number. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+> **All three are settled.** Two open rows — the reopened Firefox cross-origin block
+> ([#1934](https://github.com/Koniverse/SubWallet-Extension/issues/1934)) and dev-build test
+> tooling ([#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602)) — moved to
+> [US-1.8](US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md) on 2026-07-22, so this
+> story's done-pass judges only what it delivered. **#1934 is a reopen of the defect class
+> #3992 below closed** — that pairing is why it must not sit in a table of settled work.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
 | 1.0.6 | [#1406](https://github.com/Koniverse/SubWallet-Extension/issues/1406) | Try to remove `webRequest` from the manifest | ✅ done |
-| — | [#1934](https://github.com/Koniverse/SubWallet-Extension/issues/1934) | Handle the Cross-Origin Request blocked on Firefox | 📋 backlog |
 | 1.1.36 | [#2231](https://github.com/Koniverse/SubWallet-Extension/issues/2231) | WebApp — update build number | ✅ done |
 | — | [#3992](https://github.com/Koniverse/SubWallet-Extension/issues/3992) | WebApp — fix CORS bug on Firefox (extension and WebApp) | ✅ done |
-| — | [#4602](https://github.com/Koniverse/SubWallet-Extension/issues/4602) | Add logic for testing a development build with the Koni browser | 📋 backlog |
 
 ## Cross-references
 
 - [Epic EPIC-1](../epics/EPIC-1.md)
+- [US-1.8](US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md) — the two open rows this story no longer carries
 - [ARCHITECTURE AD-06 / AD-08 / AD-25](../../ARCHITECTURE.md#architecture-decisions)
 - [US-1.1](US-1.1-mv3-service-worker-background.md) · [US-1.2](US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md)
 - Issues: [#3904](https://github.com/Koniverse/SubWallet-Extension/issues/3904) · [#4115](https://github.com/Koniverse/SubWallet-Extension/issues/4115) · [#3360](https://github.com/Koniverse/SubWallet-Extension/issues/3360) · [#2942](https://github.com/Koniverse/SubWallet-Extension/issues/2942) · [#2577](https://github.com/Koniverse/SubWallet-Extension/issues/2577) · [#2461](https://github.com/Koniverse/SubWallet-Extension/issues/2461) · [#4664](https://github.com/Koniverse/SubWallet-Extension/issues/4664) · [#1270](https://github.com/Koniverse/SubWallet-Extension/issues/1270)

@@ -13,7 +13,7 @@ depends_on:
 assignee:
 commit:
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-22
 ---
 
 
@@ -95,17 +95,22 @@ Flip this story to `done` only when a release actually ships it.
 
 ## Incremental work, fixes & chores
 
-Beyond the requirement above, **6 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+Beyond the requirement above, **4 tracker issue(s)** of incremental work landed on this capability — fixes, chores and small increments, folded in from the former consolidated ledger (2026-07-17). They materialize no FR of their own; the full issue→story map is in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
+
+> **All four are settled.** Two open rows — Runes/Ordinals on the **extension**
+> ([#4246](https://github.com/Koniverse/SubWallet-Extension/issues/4246),
+> [#4295](https://github.com/Koniverse/SubWallet-Extension/issues/4295)) — moved to
+> [US-9.22](US-9.22-runes-and-ordinals-on-the-extension.md) on 2026-07-22. What shipped here is
+> the **WebApp** surface; the extension surface is not delivered, and a table mixing the two
+> reads as if it were.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
 | 1.1.36 | [#2380](https://github.com/Koniverse/SubWallet-Extension/issues/2380) | Showing ordinals on webapp | ✅ done |
 | 1.1.36 | [#2399](https://github.com/Koniverse/SubWallet-Extension/issues/2399) | Add more inscriptions on SubWallet Web app | ✅ done |
-| — | [#4246](https://github.com/Koniverse/SubWallet-Extension/issues/4246) | Extension - Support RUNE & Ordinal for Bitcoin | 📋 backlog |
-| — | [#4295](https://github.com/Koniverse/SubWallet-Extension/issues/4295) | Support showing Rune and Inscription | 📋 backlog |
 | — | [#4991](https://github.com/Koniverse/SubWallet-Extension/issues/4991) | Replace hosted BTC APIs with Blockstream API and evaluate Runes/Ordinals alternatives | ✅ done |
 | — | [#4997](https://github.com/Koniverse/SubWallet-Extension/issues/4997) | Bitcoin on-chain data mismatch on host API (Fees, Inscriptions, Runes) | ✅ done |
 
 ## Cross-references
 
-- [PRD FR-91](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [EPIC-4](../epics/EPIC-4.md)
+- [PRD FR-91](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [EPIC-4](../epics/EPIC-4.md) · [US-9.22](US-9.22-runes-and-ordinals-on-the-extension.md)

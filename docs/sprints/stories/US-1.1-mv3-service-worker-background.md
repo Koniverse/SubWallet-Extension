@@ -13,7 +13,7 @@ depends_on:
 assignee: saltict
 commit: f268562cdac6c1b65afed42924452cbfa3ceb360, ec35731e50ce11b9ecedd1d75ee6a399b9cfcb91, 49a361953cde851226b1f86cf54db6b559eb7917
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-07-22
 ---
 
 ## Goal
@@ -141,18 +141,24 @@ version reconciliation._
 
 ## Incremental work, fixes & chores
 
-**3 tracker issues** of incremental work landed on this capability — background-state persistence, the Firefox background-stop timing recheck, and one lifecycle behaviour closed not-planned. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+**2 tracker issues** of incremental work landed on this capability — background-state persistence, and one lifecycle behaviour closed not-planned. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+
+> **Both rows are settled.** A third — the Firefox background-stop recheck
+> ([#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222)) — sat here until
+> 2026-07-22 and moved to [US-1.7](US-1.7-firefox-background-lifecycle-recheck.md). A `done`
+> story may not carry unfinished work: [AGENTS.md](../../../AGENTS.md) rule 4 forbids it an
+> unticked AC, and an open row in this table is the same claim through a different field.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
 | — | [#334](https://github.com/Koniverse/SubWallet-Extension/issues/334) | Make the wallet extension in Chrome persist its state | ✅ done |
 | — | [#2471](https://github.com/Koniverse/SubWallet-Extension/issues/2471) | Do not navigate to the Chrome store while the extension is disabled | ⏸️ deprecated |
-| — | [#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222) | Extension — recheck the background-stop timing on Firefox | 📋 backlog |
 
 ## Cross-references
 
 - [PRD FR-1](../../PRD.md#functional-requirements)
 - [Epic EPIC-1](../epics/EPIC-1.md)
+- [US-1.7](US-1.7-firefox-background-lifecycle-recheck.md) — the open Firefox recheck this story no longer carries
 - [ARCHITECTURE AD-08 / AD-20](../../ARCHITECTURE.md#architecture-decisions)
 - [US-1.2](US-1.2-yarn-3-monorepo-shared-across-extension-web-mobile.md)
 - [US-1.5](US-1.5-build-ci-and-cross-browser-packaging-hardening.md)

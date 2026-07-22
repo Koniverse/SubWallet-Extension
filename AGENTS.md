@@ -163,12 +163,12 @@ Current docs at the repo root:
 Canonical `docs/` content per koni-docs spec (BRIEF, PRD, ARCHITECTURE,
 CONTEXT, LESSONS, SETUP, sprints/, CHANGELOG) is **authored**.
 
-### How the docs are allowed to change — eight standing rules
+### How the docs are allowed to change — nine standing rules
 
 These are not EPIC-21's rules; they are the project's. Each was paid for by a defect
 that reached the owner before it reached a check. Full reasoning in `docs/CONTEXT.md`.
 
-**These eight live here on purpose.** The koni-docs spec is vendored from
+**These nine live here on purpose.** The koni-docs spec is vendored from
 `Koniverse/Koni-Skills` and the CLI ships from npm — the next skill install or
 `npm i -g` overwrites both. `AGENTS.md` is the only copy nothing overwrites, and
 **it is the authority** where it and the tool disagree.
@@ -258,6 +258,9 @@ infra) **ships in no release**: it is `done` when every AC is ticked, `commit` n
 real SHA, and `validate` exits zero. Its `version_shipped` is empty **on purpose**.
 Corollary: **a `done` story may not carry an unticked AC** — forward scope must *leave*
 the story into its own (this is how FR-23 came to be marked shipped though never built).
+**Second corollary, same rule through a different field: it may not carry an open row in its
+incremental-work table either.** Consolidation gave unfinished scope a second place to hide —
+US-1.1 read `✅ done @ 1.2.7` while listing an issue open since 2024 (rule 9).
 
 **5. Every story past `backlog` sits in a sprint window — `W` planned, `M` reconstructed.**
 `sprint` is **required** once a story leaves `backlog`: work in flight must be locatable in
@@ -319,6 +322,24 @@ The last two are the point. `— (AD-N)` and `—` look alike and say opposite t
 *"nothing to see"* when it is in fact a claim about coverage, which is rule 4's corollary
 one column over. An epic's matrix carries **one line** pointing here; it does not restate
 this table ([D109](docs/CONTEXT.md)).
+
+**9. Completed work and unfinished work do not share a story.** When a story mixes shipped
+rows with open ones, **split it**: everything settled stays in the story that shipped it, and
+the open rows become an **improvement story on it** — `prd_ref: []` (the parent owns the FR;
+extending or fixing a capability earns its own FR only when someone specifies it, [D104](docs/CONTEXT.md)),
+`status: backlog`, no `version_shipped`, and a Scope paragraph naming its parent and why the
+work left. The parent gains a note saying which rows moved and where; neither side is promoted
+in the same pass, because a split is a *rearrangement*, not a done-pass.
+
+**And new work is a new story, not a new row.** Fixes and improvements that arrive after a
+capability ships get their own story in the sprint that picks them up — appending them to the
+shipped story re-creates exactly the state this rule exists to remove. The
+incremental-work table is a **record of what a story delivered**, not a backlog.
+
+**Why:** an open row inside a `done` story is invisible in every rollup — the epic table, the
+sprint board and STATUS all read the story's frontmatter, never its rows. Six stories carried
+nine such rows on 2026-07-22, and one of them (US-9.20) asserted *"not yet started, no release
+delivers it"* directly above a row reading `✅ done @ 1.3.80`.
 
 ### The two change logs
 

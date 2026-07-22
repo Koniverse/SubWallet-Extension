@@ -107,6 +107,9 @@ runtime* translation channel (FR-4).
 | [US-1.4](../stories/US-1.4-online-i18n-hot-update.md) | Online i18n hot-update | Fetch updated UI translations at runtime without a release | 📋 backlog | — |
 | [US-1.5](../stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) | Build, CI, packaging & supply-chain hardening | Keep the build/webpack/packaging pipeline shippable across browsers (Firefox MV3, Brave uninstall, Jest env, online-resource fallback) and the dependency tree auditable (lockfile / npm-registry / audit gate, NFR-19) | 📋 backlog | — |
 | [US-1.6](../stories/US-1.6-platform-operations-and-out-of-repo-tooling.md) | Platform operations & out-of-repo tooling | Hold the tracked platform work whose code lives outside this repository | 🚧 in-progress | — |
+| [US-1.7](../stories/US-1.7-firefox-background-lifecycle-recheck.md) | Firefox background-lifecycle recheck | Improvement on US-1.1 — measure when Firefox stops the background on the current MV2 build (#3222) | 📋 backlog | — |
+| [US-1.8](../stories/US-1.8-firefox-cors-follow-up-and-dev-build-test-tooling.md) | Firefox CORS follow-up & dev-build test tooling | Improvement on US-1.5 — the reopened cross-origin block (#1934) and Koni-runner dev-build testing (#4602) | 📋 backlog | — |
+| [US-1.9](../stories/US-1.9-out-of-repo-tooling-not-yet-started.md) | Out-of-repo tooling not yet started | Improvement on US-1.6 — the ChainList page (#2131) and the tracking dashboard (#2529), neither started | 📋 backlog | — |
 
 > **There is no separate maintenance layer for build & platform.** Each capability above carries
 > its own requirement *and* its incremental-work history as a table inside the story. The 19
@@ -116,6 +119,11 @@ runtime* translation channel (FR-4).
 > other epics** — #1938 (camera on Firefox) and #1995 (IPFS on Firefox) were filed under the
 > browser they broke on rather than the capability that broke. Forwarding map:
 > [consolidation note](../../notes/2026-07-22-epic-1-consolidation.md).
+>
+> **US-1.7 / US-1.8 / US-1.9 are the unfinished halves of that fold.** Five of the folded issues
+> were still open, and leaving them beside shipped rows let US-1.1 read `✅ done @ 1.2.7` while
+> holding work nobody had started. Completed work stays in the story that shipped it; open work
+> becomes an improvement story on it ([AGENTS.md](../../../AGENTS.md) rule 9).
 
 > US-1.1–1.4 each materialize one FR; US-1.5 is the epic's bug/iteration
 > (hardening) cluster and owns no FR — it enforces the build/compliance NFRs.
