@@ -113,6 +113,19 @@ reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**None from the security ledger — but 7 candidates are waiting.** No issue in the former
+security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md)).
+That ledger held only 13 issues and they were almost all phishing.
+
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **18
+> ledgers still separate** finds **7 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-26, EPIC-27, EPIC-30, EPIC-34, EPIC-41.
+> Treat that as an **upper bound, not a count**: routing there is a title heuristic
+> ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
+> so some will belong elsewhere once read. Which of them land here is decided when those ledgers
+> are folded, not now.
+
 ## Cross-references
 
 - [PRD FR-54](../../PRD.md#functional-requirements)

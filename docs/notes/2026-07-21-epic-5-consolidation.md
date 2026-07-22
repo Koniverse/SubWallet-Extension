@@ -1,0 +1,81 @@
+# EPIC-25 (Maintenance — Security) merged into EPIC-5 — 2026-07-21
+
+`EPIC-25` is gone. Its 13 tracker issues now live inside the EPIC-5 capability stories they
+belong to, each as a row in that story's own incremental-work table. This is the same treatment
+[EPIC-29 → EPIC-9](2026-07-17-epic-9-consolidation.md) received on 2026-07-17, and it is the
+second of nineteen maintenance epics to be dissolved.
+
+**Why.** One issue per story made the security area unreadable: 13 stubs, each asserting only
+"this issue exists", sitting beside the 10 stories that actually describe what the wallet
+defends. A reader could not tell which was the requirement and which was the ledger entry. A
+capability is now **one story** carrying its requirement *and* its full history — the phishing
+story says what phishing protection is, and lists every fix that shaped it.
+
+**What did not change.** No issue lost its record. Status, shipped release, assignee and commit
+came across unchanged; nothing was upgraded to `done` or given a version it did not have.
+Retired `US-25.x` ids are never reused ([AGENTS.md](../../AGENTS.md) rule 1) and are recorded
+below — this file is the forwarding table.
+
+## Where each issue went
+
+| Issue | Title | Status | Shipped | Retired id | Now lives in |
+|---|---|---|---|---|---|
+| [#31](https://github.com/Koniverse/SubWallet-Extension/issues/31) | External Security Audit | ✅ done | — | `US-25.1` | US-5.10 |
+| [#157](https://github.com/Koniverse/SubWallet-Extension/issues/157) | Leverage phishing website & addresses database to protect users | ✅ done | 0.3.4 | `US-25.2` | US-5.1 |
+| [#561](https://github.com/Koniverse/SubWallet-Extension/issues/561) | Update @polkadot/phishing | ✅ done | 0.5.6 | `US-25.3` | US-5.1 |
+| [#1189](https://github.com/Koniverse/SubWallet-Extension/issues/1189) | Review & Add phishing detection using ChainPatrol api | ✅ done | — | `US-25.4` | US-5.1 |
+| [#1226](https://github.com/Koniverse/SubWallet-Extension/issues/1226) | Detect phishing page with ChainPatrol | ✅ done | 1.0.5 | `US-25.5` | US-5.1 |
+| [#1274](https://github.com/Koniverse/SubWallet-Extension/issues/1274) | Auto-update from phishing list | ✅ done | — | `US-25.6` | US-5.1 |
+| [#1422](https://github.com/Koniverse/SubWallet-Extension/issues/1422) | Do not detect Phishing Page with ChainPatrol on the Firefox browser | ✅ done | — | `US-25.7` | US-5.1 |
+| [#1553](https://github.com/Koniverse/SubWallet-Extension/issues/1553) | Recheck problems in security tabs of github | ✅ done | — | `US-25.8` | US-5.10 |
+| [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for page.js and content.js to improve security | ✅ done | 1.1.9 | `US-25.9` | US-5.10 |
+| [#2372](https://github.com/Koniverse/SubWallet-Extension/issues/2372) | Fixed bug phishing detection | ✅ done | 1.1.27 | `US-25.10` | US-5.1 |
+| [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version | ✅ done | 1.3.28 | `US-25.11` | US-5.10 |
+| [#4125](https://github.com/Koniverse/SubWallet-Extension/issues/4125) | Add another security layer | 📋 backlog | — | `US-25.12` | US-5.11 |
+| [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off 'Advanced phishing detection' feature | ✅ done | 1.3.69 | `US-25.13` | US-5.1 |
+
+**8 → US-5.1** (phishing) · **4 → US-5.10** (audit & hardening) · **1 → US-5.11** (new).
+
+## The three destinations, and why
+
+**[US-5.1] Phishing site blocking — 8 issues.** This story's own requirement is *inherited*
+polkadot-js code (0.2.1, `sprint-2022-M01` — [D105](../CONTEXT.md)). Everything SubWallet built
+on top of it is now visible in one place: the phishing database (#157), the `@polkadot/phishing`
+bump (#561), the whole ChainPatrol arm (#1189 → #1226 → #1274 → #1422 → #2372), and its removal
+in 1.3.69 (#4891). Read top to bottom, the story now tells the actual arc — *inherit a denylist,
+add a commercial detector, spend three years fixing it, turn it off*.
+
+**[US-5.10] Security audit & remediation hardening — 4 issues.** These land on the hardening
+story because none belongs to a single capability. Two are the same defect class as the current
+anchors, years apart: **#1823** (2023) strips build variables out of the injected scripts;
+**#4929** (2026) is the same secret-in-the-bundle problem re-opened. **#3741** loses three
+different settings on upgrade — auto-lock (US-5.6), phishing (US-5.1) and camera (US-5.7) — so
+no feature story owns it; the settings-persistence guarantee does.
+
+**[US-5.11] Two-factor authentication — 1 issue, new story.** #4125 asks for 2FA and Google
+authentication on outgoing transfers. It is not a fix to anything above and the PRD has never
+scoped it, so it becomes its own `backlog` story with **no FR** — an FR is earned when the
+capability is specified, not when someone files a request
+([D104](../CONTEXT.md#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)).
+It is deliberately *not* folded into US-5.8/US-5.9: those ask *is this transaction safe*, this
+asks *is this the owner*.
+
+## Three stale claims in EPIC-5 corrected in the same pass
+
+Found while reconciling the epic's tables against story frontmatter — none caused by this merge:
+
+- **US-5.1's row named the wrong story.** The table said *"Phishing site & address protection"*
+  at *0.35.1*; the story has been *"Phishing site blocking (@polkadot/phishing denylist)"* at
+  **0.2.1** since [D107](../CONTEXT.md) removed the address-screening claim (no code screens an
+  address) and [D101](../CONTEXT.md)/[D105](../CONTEXT.md) fixed the inherited version.
+- **The propagated AC repeated both errors**, asserting addresses are blocked and ChainPatrol is
+  live. Neither is true: the address arm never existed, and ChainPatrol was turned off in 1.3.69.
+- **US-5.10 showed `📋 backlog`**; its frontmatter has said `review` since the 2026-07-15 board
+  sync.
+
+## Verification
+
+- `node scripts/koni-docs-check-ids.mjs` — exit 0; every ID and link resolves.
+- `npx koni-docs validate --docs-path docs/` — exit 0.
+- No `US-25.` token remains on the live doc surface; this dated note is the only place they
+  appear, which is what `check-ids` exempts a dated archive for.

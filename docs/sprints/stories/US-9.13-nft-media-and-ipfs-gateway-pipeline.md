@@ -25,7 +25,7 @@ RMRK/IPFS endpoint & API maintenance, JSON/link parsing, resolver and gateway-fa
 
 This is a **consolidated maintenance story**: it groups 14 related tracker issue(s) into one capability with a clear boundary, replacing the former one-issue-per-story ledger. It materializes **no FR** (the NFT requirement set is [US-9.1](US-9.1-substrate-nft-display.md)…[US-9.10](US-9.10-nft-display-and-transfer-hardening.md)); it records incremental work on this capability. Full issue→story traceability is the table below and [notes/2026-07-17-epic-9-consolidation](../../notes/2026-07-17-epic-9-consolidation.md). **`assignee` / `commit` / `sprint` / `version_shipped` / `points` are a representative backfill anchor** — the most recent shipped constituent (the last row of the timeline), not the full set. The capability actually spans releases 0.4.3 → 1.3.56, so the timeline below is the full record — `version_shipped` names only the last.
 
-## Development timeline & consolidated issues
+## Incremental work, fixes & chores
 
 Chronological by shipped release (0.4.3 → 1.3.56); `—` = closed with no CHANGELOG line. The former one-issue-per-story ids (retired, never reused — [AGENTS.md](../../../AGENTS.md) rule 1) are listed in the [consolidation note](../../notes/2026-07-17-epic-9-consolidation.md).
 

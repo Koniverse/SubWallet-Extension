@@ -92,6 +92,20 @@ yet shipped. Tracked by
 
 _Forward-looking — FR-93 is `📋 planned`. Fill `commit` / `version_shipped` as each addition ships._
 
+## Incremental work, fixes & chores
+
+**None from the NFT ledger — but 27 candidates are waiting.** Of the 116 tracker issues in the
+former NFT maintenance ledger, folded into this epic's capabilities on 2026-07-17, **none landed
+here** — the note records this capability's count as **0**
+([consolidation note](../../notes/2026-07-17-epic-9-consolidation.md)).
+
+> **That is a checked absence within one ledger, not an empty history.** A title scan of the **18
+> ledgers still separate** finds **27 issues** mentioning NFT, sitting in EPIC-24, EPIC-26,
+> EPIC-28, EPIC-32, EPIC-39 and EPIC-41. Treat that as an **upper bound, not a count**: routing
+> there is a title heuristic ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
+> and most will belong to the NFT capabilities that already carry tables. Which land *here* — the
+> new-standards capability — is decided when those ledgers are folded.
+
 ## Cross-references
 
 - [PRD FR-93](../../PRD.md#functional-requirements) · [Epic EPIC-9](../epics/EPIC-9.md) · [US-9.1](US-9.1-substrate-nft-display.md) · [US-9.3](US-9.3-evm-nft-display.md)

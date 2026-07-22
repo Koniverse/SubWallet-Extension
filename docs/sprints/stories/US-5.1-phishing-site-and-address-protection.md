@@ -34,44 +34,31 @@ wallet to a known phishing site.
 
 ## Background
 
-Phishing is the highest-frequency attack against wallet users, and it lands
-*outside* the key boundary: the user willingly approves a connection or transfer
-to an attacker-controlled site/address. Defence is therefore a screen, not a
-cryptographic control.
+Phishing is the highest-frequency attack on wallet users and it lands *outside* the key
+boundary — the user willingly approves a connection or transfer to an attacker-controlled site.
+Defence is a screen, not a cryptographic control.
 
-The **`@polkadot/phishing`** community list is the **shipped/active** detection
-path: `Tabs.checkPhishing` calls `checkIfDenied` from `@polkadot/phishing`
-(bundled + online auto-update) against the visited origin, and a match redirects
-to the full-screen block page
-(`packages/extension-base/src/koni/background/handlers/Tabs.ts`).
+**What is live: the `@polkadot/phishing` denylist.** `Tabs.checkPhishing` calls `checkIfDenied`
+against the visited **origin**; a match redirects to the full-screen block page
+(`koni/background/handlers/Tabs.ts`). The list auto-updates online
+([NFR-4](../../PRD.md#non-functional-requirements)), so a newly flagged site is covered without a
+release. The check is stateless with respect to account presence, and must be tested against
+high-traffic legitimate sites — a false positive trains users to click through warnings
+([§24](../../LESSONS.md)).
 
-**ChainPatrol advanced detection is PARTIAL / currently disabled.** The pieces
-exist — an `enableChainPatrol` setting, a `MigrateChainPatrol` migration, and a
-`chainPatrolCheckUrl` helper that hits `app.chainpatrol.io/api/v2/asset/check` —
-but the actual lookup inside `checkPhishing` is **commented out behind a TODO**
-("Temporarily disable the Advanced phishing detection feature because it produces
-incorrect results … incorrectly flags YouTube, Facebook, and other social media
-platforms as phishing"). So even when the user toggles ChainPatrol on, the live
-phishing path does not consult it today. There is also an **API-key-in-bundle
-concern**: `chainPatrolCheckUrl` currently calls the ChainPatrol API directly
-from the client rather than through a backend proxy (relates to issue
-[#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)); AD-19's
-proxy is the target end-state, not the as-shipped behavior.
-
-The check must be **stateless with respect to account presence** and tested
-against high-traffic legitimate sites to avoid false positives that train users
-to click through warnings ([LESSONS §24](../../LESSONS.md)) — the disabled-by-TODO
-ChainPatrol path is itself a concrete instance of that false-positive risk. The
-blocking warning auto-updates online ([NFR-4](../../PRD.md#non-functional-requirements)) so a newly flagged
-site is covered without an extension release.
+**What is not live: ChainPatrol advanced detection.** The parts exist — an `enableChainPatrol`
+setting, a `MigrateChainPatrol` job, and `chainPatrolCheckUrl` — but since **1.3.69** the lookup
+inside `checkPhishing` is commented out *and the Settings toggle is hidden*
+(`showChainPatrol = false`), because it flagged YouTube, Facebook and other legitimate sites.
+The commit calls it **temporary**; re-enabling it is forward work owned by
+[US-5.10](US-5.10-verichains-audit-remediation-hardening.md) AC-2, gated on a false-positive
+regression suite *and* on routing the call through the AD-19 backend proxy — today
+`chainPatrolCheckUrl` would hit `app.chainpatrol.io` straight from the client, with the key in
+the bundle ([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)).
 
 Materializes [FR-52](../../PRD.md#functional-requirements) — **origin screening only**; FR-52's
-text was narrowed to match on 2026-07-14 ([CONTEXT D107](../../CONTEXT.md)). **Retroactive** —
-already shipped, and inherited (see Implementation notes). The **ChainPatrol arm is forward
-work** owned by [US-5.10](US-5.10-verichains-audit-remediation-hardening.md) AC-2: wire the
-TODO-gated lookup back in *behind a false-positive regression suite*, and route it through the
-AD-19 backend proxy so no key ships in the bundle
-([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)).
+text was narrowed to match on 2026-07-14 ([D107](../../CONTEXT.md)). **Retroactive** and
+**inherited** (see Implementation notes).
 
 ## Acceptance criteria
 
@@ -171,64 +158,74 @@ AD-19 backend proxy so no key ships in the bundle
 
 ## Implementation notes
 
-> ## ⚠️ Every version number below this line is **polkadot-js's**, not SubWallet's
->
-> This story is **inherited** — the code was written upstream, years before SubWallet existed
-> ([CONTEXT D105](../../CONTEXT.md)). So this section quotes **two different products' version
-> lines**, and they are not comparable:
->
-> | | |
-> | --- | --- |
-> | **SubWallet** (this product) | `0.2.1` (2022-02-10, the first release) → `1.3.83`. **This is the only line `version_shipped` may name.** |
-> | **polkadot-js** (upstream, inherited) | `0.5.1` … `0.35.1` … `0.42.1`. Appears **only** in the provenance table and the evidence paragraph below, always beside a **pre-2022 date**. |
->
+**Inherited from polkadot-js — not built by SubWallet** ([D105](../../CONTEXT.md)). The fork
+brought upstream's git history, tags and CHANGELOG with it, so this section quotes **two
+products' version lines**:
+
+| | Release | Date | Author | Commit |
+| --- | --- | --- | --- | --- |
+| Written upstream | polkadot-js **0.35.1** | 2020-11-30 | `Tbaut` | `ae9227ef6d` |
+| Reached a SubWallet user | **0.2.1** — SubWallet's first release | 2022-02-10 | — | — |
+
 > **Read the date, not the number.** Six version numbers exist in *both* lines
-> ([LESSONS §66](../../LESSONS.md)) — the date never collides. And do not "fix" a number
-> below to look like SubWallet's: they are quotations of upstream's CHANGELOG and git tags,
-> and rewriting them makes the citation unverifiable ([CONTEXT D106](../../CONTEXT.md)).
+> ([§66](../../LESSONS.md)); the date never collides. `version_shipped` may name **only**
+> SubWallet's line — it once carried `0.35.1`, which reads as *after* `0.8.1` and implied the
+> capability arrived in 2023 when the wallet had it on day one ([D101](../../CONTEXT.md)).
+> `check-ids` now rejects a `version_shipped` that is not a `(Koni)` CHANGELOG row. Do **not**
+> rewrite the upstream numbers to match ours: they quote upstream's CHANGELOG and tags, and
+> editing them makes the citation unverifiable ([D106](../../CONTEXT.md)).
+>
+> **Anchor on `v0.2.5`, never `v0.2.1`** — SubWallet's 0.2.1 is untagged, and colliding tags
+> point upstream (`v0.7.1` is polkadot-js's, 2019). `assignee` stays `Tbaut`: they wrote it.
 
-**Inherited from polkadot-js — `version_shipped` corrected 2026-07-14 ([CONTEXT D101](../../CONTEXT.md)).**
-This capability was **not built by SubWallet**. It came with the fork: SubWallet-Extension is a
-fork of the **polkadot-js extension**, and inherited its git history, tags and CHANGELOG.
+**Evidence.** CHANGELOG `## [0.35.1] — 2020-11-30`: *"Add phishing site detection and redirection
+(Thanks to Tbaut)"* — the earliest bullet delivering the full-screen block. Commit `ae9227ef6d`
+(2020-10-13, PR #488) is an ancestor of `v0.35.1` and absent from `v0.34.1`; verified contained in
+SubWallet's earliest tag `v0.2.5` by `git merge-base --is-ancestor`. Traced by
+[US-21.2](US-21.2-history-backfill.md) (run `wf_6b56f4cd-d08`, confidence **medium**: the upstream
+title enumerates *"site & address"* but only the site arm ever shipped here).
 
-| | |
-| --- | --- |
-| Upstream release | **polkadot-js 0.35.1**, **2020-11-30** — *not on SubWallet's version line* |
-| Upstream author | `Tbaut` — a polkadot-js maintainer |
-| Upstream commit | `ae9227ef6dbded627b2cc9d40d2e4609d0f9ad67` — the @polkadot/phishing site-denylist check |
-| **Reached a SubWallet user in** | **0.2.1** (2022-02-10) — SubWallet's **first** release |
+**Two guards, both load-bearing:**
 
-This story used to carry that upstream number **in `version_shipped`**, which was **actively
-misleading**: read on SubWallet's version line, `0.35.1` sits *after* `0.8.1` — so the docs
-implied the capability arrived mid-2023, when in fact **SubWallet had it from day one**.
-`version_shipped` answers *"which release of **this product** first gave a user this
-capability"*; the answer is **0.2.1**. That mistake can no longer be made silently:
-`scripts/koni-docs-check-ids.mjs` rejects any `version_shipped` that is not a `(Koni)` row in
-the CHANGELOG ([CONTEXT D106](../../CONTEXT.md)).
+- **Do not backfill the ChainPatrol arm as done.** Its lookup on the live path is TODO-disabled.
+  Re-enable only after the false-positive suite passes *and* the call moves behind the AD-19
+  proxy — forward scope owned by [US-5.10](US-5.10-verichains-audit-remediation-hardening.md)
+  AC-2 ([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)), so this story
+  carries no forward AC.
+- **AC-6 was removed (2026-07-13).** The batch backfill ticked every open AC when it flipped this
+  story to `done`, including a *forward* AC the author had deliberately left unticked. Its scope
+  lives in US-5.10.
 
-Verified: the upstream commit is an ancestor of **`v0.2.5`**, SubWallet's earliest tag
-(`git merge-base --is-ancestor`; SubWallet's 0.2.1 is untagged, so `v0.2.5` is its anchor per
-the [US-21.2](US-21.2-history-backfill.md) rule). **Do not anchor on `v0.2.1`** — no such tag
-exists here, and the tags that *do* collide point upstream (`v0.7.1` is polkadot-js's, 2019).
+## Incremental work, fixes & chores
 
-`assignee` stays `Tbaut` — they wrote the code, and that is true. See [LESSONS §66](../../LESSONS.md).
+The requirement above is the **inherited** polkadot-js denylist check (0.2.1, `sprint-2022-M01`
+— [D105](../../CONTEXT.md#d105-the-fork-boundary-is-its-own-window--inherited-work-does-not-go-on-this-teams-board)).
+Everything SubWallet itself built on top of it is below: **8 tracker issues** — the phishing
+database, the ChainPatrol integration and its fixes, and the eventual decision to turn the
+advanced detector off. Folded in from the former one-issue-per-story maintenance ledger
+(2026-07-21); chronological by shipped release, `—` where no CHANGELOG line proves one.
 
-Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-d08`; trace confidence: medium, rule: first-delivery).
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.4 | [#157](https://github.com/Koniverse/SubWallet-Extension/issues/157) | Leverage phishing website & addresses database to protect users | ✅ done |
+| 0.5.6 | [#561](https://github.com/Koniverse/SubWallet-Extension/issues/561) | Update `@polkadot/phishing` | ✅ done |
+| — | [#1189](https://github.com/Koniverse/SubWallet-Extension/issues/1189) | Review & add phishing detection using the ChainPatrol API | ✅ done |
+| 1.0.5 | [#1226](https://github.com/Koniverse/SubWallet-Extension/issues/1226) | Detect phishing page with ChainPatrol | ✅ done |
+| — | [#1274](https://github.com/Koniverse/SubWallet-Extension/issues/1274) | Auto-update from phishing list | ✅ done |
+| — | [#1422](https://github.com/Koniverse/SubWallet-Extension/issues/1422) | Do not detect phishing page with ChainPatrol on Firefox | ✅ done |
+| 1.1.27 | [#2372](https://github.com/Koniverse/SubWallet-Extension/issues/2372) | Fixed bug phishing detection | ✅ done |
+| 1.3.69 | [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off "Advanced phishing detection" feature | ✅ done |
 
-**Evidence:** CHANGELOG "## [0.35.1] — 2020-11-30": "Add phishing site detection and redirection (Thanks to Tbaut)" — earliest bullet delivering the full-screen phishing block; commit ae9227ef6d (2020-10-13, PR #488) is an ancestor of v0.35.1 (merge-base check exit 0) and absent from v0.34.1. Medium, not high: the title enumerates "site & address" but the address arm never shipped in this repo (no bullet, no @polkadot/phishing address check on the live transfer path — scope sits in sibling US-5.9) and the ChainPatrol arm is TODO-disabled forward work, so only the site arm is traced; delivery is also upstream-inherited (polkadot-js/extension release pre-fork).
+> **7 more phishing issues sit in ledgers not yet folded** — titles matching "phishing" in the
+> Account and UI/UX ledgers (e.g. *"Do not detect phishing page in case have no account"*,
+> *"Improve UI to warn users about phishing websites"*). The 8 above are only what the **security**
+> ledger held; this capability's history is longer than this table until the rest are folded.
 
-Commits `ae9227ef6dbded627b2cc9d40d2e4609d0f9ad67` verified contained in the v0.35.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
-
-**Do not backfill the ChainPatrol arm as done.** The live path's ChainPatrol lookup is
-TODO-disabled. Re-enable it only after the false-positive regression suite passes *and*
-the call is moved behind the AD-19 backend proxy — that forward scope is already owned
-by [US-5.10](US-5.10-verichains-audit-remediation-hardening.md) AC-2
-([#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)), so this story
-carries no forward AC of its own.
-
-**Scope correction (2026-07-13, US-21.2):** the batch backfill ticked every open AC
-when it flipped this story to `done`, including a *forward* AC-6 that the author had
-deliberately left unticked. AC-6 is removed here — its scope lives in US-5.10.
+> **#4891 paused the ChainPatrol arm — it did not close it.** Commit `5b377952ca` (1.3.69)
+> comments out the lookup and hides the Settings toggle, and its own subject says
+> *"**temporarily** disable"*. Re-enabling is [US-5.10](US-5.10-verichains-audit-remediation-hardening.md)
+> AC-2. Note the commit is tagged **`[Issue-4889]`**, a sibling issue — the delivering commit
+> names a different issue than the one it satisfies ([D106](../../CONTEXT.md), content over tag).
 
 ## Cross-references
 

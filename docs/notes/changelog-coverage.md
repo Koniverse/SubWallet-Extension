@@ -326,11 +326,11 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#854](https://github.com/Koniverse/SubWallet-Extension/issues/854) | Integrate Watr Protocol and Token (#854) | 0.7.4 | 2022-12-04 | US-24.93 |
 | [#873](https://github.com/Koniverse/SubWallet-Extension/issues/873) | Integrate xx.network - a L1 Substrate-based network (#873) | 0.7.4 | 2022-12-04 | US-24.96 |
 | [#908](https://github.com/Koniverse/SubWallet-Extension/issues/908) | Add the missing networks in Polkadot & Parachain group (#908) | 0.7.6 | 2022-12-17 | US-24.99 |
-| [#2372](https://github.com/Koniverse/SubWallet-Extension/issues/2372) | Fixed bug phishing detection (#2372) | 1.1.27 | 2023-12-20 | US-25.10 |
-| [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741) | 1.3.28 | 2025-04-02 | US-25.11 |
-| [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off "Advanced phishing detection" feature (#4891) | 1.3.69 | 2025-12-08 | US-25.13 |
-| [#1226](https://github.com/Koniverse/SubWallet-Extension/issues/1226) | Detect phishing page with ChainPatrol (#1226) | 1.0.5 | 2023-05-21 | US-25.5 |
-| [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for page.js and content.js to improve security (#1823) | 1.1.9 | 2023-08-22 | US-25.9 |
+| [#2372](https://github.com/Koniverse/SubWallet-Extension/issues/2372) | Fixed bug phishing detection (#2372) | 1.1.27 | 2023-12-20 | US-5.1 |
+| [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741) | 1.3.28 | 2025-04-02 | US-5.10 |
+| [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off "Advanced phishing detection" feature (#4891) | 1.3.69 | 2025-12-08 | US-5.1 |
+| [#1226](https://github.com/Koniverse/SubWallet-Extension/issues/1226) | Detect phishing page with ChainPatrol (#1226) | 1.0.5 | 2023-05-21 | US-5.1 |
+| [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for page.js and content.js to improve security (#1823) | 1.1.9 | 2023-08-22 | US-5.10 |
 | [#255](https://github.com/Koniverse/SubWallet-Extension/issues/255) | Improve data fetching for better performance and UX (#255) | 0.5.3 | 2022-07-29 | US-26.10 |
 | [#258](https://github.com/Koniverse/SubWallet-Extension/issues/258) | Fix some style bug in (#258) | 0.4.2 | 2022-05-20 | US-26.11 |
 | [#1748](https://github.com/Koniverse/SubWallet-Extension/issues/1748) | Fixed bug Do not display the history of addresses other than the original address (#1748) | 1.1.6 | 2023-08-04 | US-26.111 |

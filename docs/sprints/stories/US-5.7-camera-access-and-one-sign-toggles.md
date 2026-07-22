@@ -140,6 +140,19 @@ toggle is **not SubWallet's work** — it is **Inherited from polkadot-js**, fla
 pure-inherited stories are ([CONTEXT D101](../../CONTEXT.md), [LESSONS §66](../../LESSONS.md)): a
 pre-fork commit sitting under a SubWallet-assigned story would otherwise read as ours.
 
+## Incremental work, fixes & chores
+
+**None from the security ledger — but 6 candidates are waiting.** No issue in the former
+security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md)).
+That ledger held only 13 issues and they were almost all phishing.
+
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **18
+> ledgers still separate** finds **6 issues** mentioning "camera" / "one sign", sitting in EPIC-22, EPIC-23, EPIC-28, EPIC-30.
+> Treat that as an **upper bound, not a count**: routing there is a title heuristic
+> ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
+> so some will belong elsewhere once read. Which of them land here is decided when those ledgers
+> are folded, not now.
+
 ## Cross-references
 
 - [PRD FR-59](../../PRD.md#functional-requirements), [PRD FR-60](../../PRD.md#functional-requirements)

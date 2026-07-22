@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-21 05:21:01 UTC
-> Total stories: 2782
+> Last generated: 2026-07-22 04:31:41 UTC
+> Total stories: 2771
 
 ## 📋 Backlog (292)
 
@@ -90,7 +90,6 @@
 | US-24.318 | Extension – Bundling Extension Code for Mobile Wallet App Integration | EPIC-24 | P3 | 1 | — | — |
 | US-24.335 | Migrate Remaining Chains to SDK & Integrate into NFTService (Phase 2) | EPIC-24 | P3 | 1 | — | — |
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
-| US-25.12 | Add another security layer | EPIC-25 | P3 | 1 | — | — |
 | US-26.91 | [QRScanner] Update style | EPIC-26 | P3 | 1 | — | S2kael |
 | US-26.116 | Improve UI for reset wallet feature | EPIC-26 | P3 | 1 | — | — |
 | US-26.129 | Add language selection on the Welcome screen | EPIC-26 | P3 | 1 | — | — |
@@ -291,6 +290,7 @@
 | US-41.491 | Replace console usage with centralized logger across all packages (excluding extension-base) | EPIC-41 | P3 | 1 | — | — |
 | US-5.8 | Blockaid tx/signature risk scanning | EPIC-5 | P0 | 5 | — | — |
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
+| US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
 | US-6.6 | Design-system & UX hardening: cross-platform consistency and responsive regressions | EPIC-6 | P2 | 5 | — | — |
 | US-7.6 | Balance history (portfolio value over time) | EPIC-7 | P1 | 5 | — | — |
 | US-7.7 | Balance-cache invalidation hardening | EPIC-7 | P2 | 3 | — | — |
@@ -320,10 +320,10 @@
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.429 | Other improvements | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
-| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
+| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (30)
+## 🟡 In Progress (32)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -356,9 +356,11 @@
 | US-41.426 | Product review Q3-2024 | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
+| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
+| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 | US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | — | frenkie-ng |
 
-## 👀 Review (12)
+## 👀 Review (11)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -373,9 +375,8 @@
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
-| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W28 | frenkie-ng |
 
-## ✅ Done (2225)
+## ✅ Done (2213)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -950,18 +951,6 @@
 | US-24.339 | Unable to turn network when no add correct API key | EPIC-24 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
 | US-24.340 | Update ParaSpell API integration to v1 | EPIC-24 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-24.341 | Add support for USDC & stEWT | EPIC-24 | P3 | 1 | sprint-2026-M01 | nulllpc |
-| US-25.1 | External Security Audit | EPIC-25 | P3 | 1 | sprint-2022-M03 | hieudd |
-| US-25.2 | Leverage phishing website & addresses database to protect users | EPIC-25 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-25.3 | Update @polkadot/phishing | EPIC-25 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-25.4 | Review & Add phishing detection using ChainPatrol api | EPIC-25 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-25.5 | Detect phishing page with ChainPatrol | EPIC-25 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-25.6 | Auto-update from phishing list | EPIC-25 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-25.7 | Do not detect Phishing Page with ChainPatrol on the Firefox browser | EPIC-25 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-25.8 | Recheck problems in security tabs of github | EPIC-25 | P3 | 1 | sprint-2025-M10 | S2kael |
-| US-25.9 | Update webpack config environment for page.js and content.js to improve security | EPIC-25 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-25.10 | Fixed bug phishing detection | EPIC-25 | P3 | 1 | sprint-2023-M12 | saltict |
-| US-25.11 | Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version | EPIC-25 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-25.13 | Turn off 'Advanced phishing detection' feature | EPIC-25 | P3 | 1 | sprint-2025-M12 | frenkie-ng |
 | US-26.1 | Improve Polkadot JS Extension UX/UI for more friendly | EPIC-26 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
 | US-26.2 | Some tasks about UX improvement after building the first MVP version | EPIC-26 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
 | US-26.3 | Integrate Darwinia 2 | EPIC-26 | P3 | 1 | sprint-2023-M05 | Quangdm-cdm |
@@ -2826,10 +2815,10 @@ _No stories_
 
 - 📋 **Backlog**: 292
 - 🟢 **Ready**: 17
-- 🟡 **In Progress**: 30
-- 👀 **Review**: 12
-- ✅ **Done**: 2225
+- 🟡 **In Progress**: 32
+- 👀 **Review**: 11
+- ✅ **Done**: 2213
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 206
 
-⚠️  **WIP limit exceeded**: 30 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

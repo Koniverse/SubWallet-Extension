@@ -75,6 +75,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | 3 | **Per-feature safety toggles** | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | User-controlled camera-access and One-Sign opt-ins |
 | 4 | **Inbound threat defence** | [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md), [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md), [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Block phishing sites/addresses, scan transactions/signatures for risk, screen recipient addresses for scam association |
 | 5 | **Audit hardening** | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Remediate security audit and false-positive findings (UX-bounty audit, secret hygiene, web hardening, phishing accuracy) |
+| 6 | **Second factor** *(unscoped)* | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Authenticate the *person* approving an outgoing transfer, not just the transaction (#4125) |
 
 ### Out of scope
 
@@ -120,7 +121,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | Phishing site & address protection | Block known phishing sites/addresses via @polkadot/phishing + ChainPatrol | ✅ done | 0.35.1 |
+| [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) | Phishing site blocking (@polkadot/phishing denylist) | Block known phishing **origins** via the inherited `checkIfDenied` check | ✅ done | 0.2.1 |
 | [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md) | Master password & strength policy | One master password (strength-enforced) wraps all accounts | ✅ done | 1.0.2 |
 | [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md) | Forgot password → reset wallet | Non-recoverable password ⇒ reset-and-re-import path | ✅ done | 1.0.4 |
 | [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md) | Unified unlock / auto-lock flow | One unlock surface; auto-lock relocks the whole wallet | ✅ done | 1.0.2 |
@@ -129,11 +130,22 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.7](../stories/US-5.7-camera-access-and-one-sign-toggles.md) | Camera-access + One-Sign toggles | User opt-in for camera (QR scan) and single-approval batching | ✅ done | 1.3.21 |
 | [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md) | Blockaid tx/signature risk scanning | Flag risky EVM transactions/signatures before signing | 📋 backlog | — |
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Anti-scam address screening | Screen recipient addresses against Merkle Science scam data | 📋 backlog | — |
-| [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Security audit & remediation hardening | Remediate audit + false-positive findings (#4471, #4929, #4959, #4889, #4998), each regression-guarded | 📋 backlog | — |
+| [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Security audit & remediation hardening | Remediate audit + false-positive findings (#4471, #4929, #4959, #4889, #4998), each regression-guarded | 🚧 in-progress | — |
+| [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Two-factor authentication for outgoing transfers | A second factor in front of value leaving the wallet (#4125) | 📋 backlog | — |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is
-> the epic's hardening story (audit remediation), carrying no new FR.
+> the epic's hardening story (audit remediation) and US-5.11 is unscoped forward
+> work — both carry no FR.
+>
+> **There is no separate maintenance layer for security.** Each capability above
+> carries its own requirement *and* its full incremental-work history — fixes,
+> chores and small increments — as a table inside the story. The 13 tracker issues
+> that formerly sat one-story-each in the maintenance layer were folded in on 2026-07-21: 8
+> phishing issues into [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md),
+> 4 audit / secret-hygiene issues into [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md),
+> and #4125 became [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md).
+> The forwarding map is the [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md).
 
 ## Object map & user-story interactions
 
@@ -151,6 +163,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md) | Blockaid scan on the `RequestService` EVM confirmation surface (`addConfirmation` / `confirmationsQueueSubject`) via backend proxy *(planned)* | FR-61 |
 | [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Merkle Science recipient screen in the send-flow validation step via backend proxy *(planned)* | FR-62 |
 | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Audit / false-positive remediation across phishing match-list, bundle secret-hygiene, WebApp hardening | FR-52 (defends), NFR-16, NFR-25 |
+| [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Second authentication factor in front of outgoing value — no subsystem yet | — |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
@@ -213,7 +226,7 @@ sequenceDiagram
 
 ## Acceptance criteria (propagated from stories)
 
-- [ ] Known phishing sites and addresses are blocked via @polkadot/phishing + ChainPatrol, with a blocking warning screen — [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md)
+- [ ] Known phishing **origins** are blocked via the `@polkadot/phishing` denylist, with a blocking warning screen — [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md) *(no address screening exists — [D107](../../CONTEXT.md); the ChainPatrol arm was turned off in 1.3.69, #4891)*
 - [ ] A single strength-enforced master password wraps all accounts and encrypts keys at rest (AES-256-GCM) — [US-5.2](../stories/US-5.2-master-password-and-strength-policy.md)
 - [ ] A forgotten password resolves only via a full wallet reset (no recovery), clearing every data service — [US-5.3](../stories/US-5.3-forgot-password-reset-wallet.md)
 - [ ] One unlock surface gates the wallet; auto-lock relocks the whole wallet on inactivity — [US-5.4](../stories/US-5.4-unified-unlock-and-auto-lock-flow.md)
@@ -223,3 +236,4 @@ sequenceDiagram
 - [ ] _(planned)_ EVM transactions/signatures are risk-scanned via Blockaid before signing — [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md)
 - [ ] _(planned)_ Recipient addresses are screened against Merkle Science scam data — [US-5.9](../stories/US-5.9-anti-scam-address-screening.md)
 - [ ] Security audit and false-positive findings are remediated and regression-guarded (#4471, #4929, #4959, #4889, #4998) — [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md)
+- [ ] _(unscoped)_ A second authentication factor gates value leaving the wallet (#4125) — [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md)

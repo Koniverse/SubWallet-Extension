@@ -2,10 +2,10 @@
 id: US-5.10
 title: "Security audit & remediation hardening"
 epic: EPIC-5
-status: review
+status: in-progress
 priority: P1
 points: 5
-sprint: sprint-2026-W28
+sprint: sprint-2026-W30
 version_shipped:
 prd_ref: [NFR-16, NFR-25, FR-52]
 arch_ref: [AD-04, AD-03, AD-19]
@@ -13,12 +13,33 @@ depends_on: [US-5.1, US-5.2]
 assignee: frenkie-ng
 commit:
 created: 2026-06-12
-updated: 2026-07-15
+updated: 2026-07-22
 ---
 
-## Status refresh — 2026-07-15
+## Status refresh — 2026-07-22 (corrects the 2026-07-15 sync)
 
-> Synced from GitHub Projects board #2 ("SubWallet.App – Development"): issue #4959 is **In Review** there, so this story moves `backlog` → `review` (sprint `sprint-2026-W28`). Only status/sprint changed; Goal, AC and reasoning below are untouched. The board is the live source for workflow state.
+> **`review` → `in-progress`.** The 2026-07-15 sync moved this story `backlog` → `review` because
+> **one** of its five anchor issues (#4959) was *In Review* on Projects board #2. That derivation is
+> wrong for an aggregating story: `review` claims *the story is finished, go check it*, and four of
+> the five anchors had not been started. Re-read on 2026-07-22 — all five are still **open**:
+>
+> | Issue | Board status |
+> |---|---|
+> | [#4471](https://github.com/Koniverse/SubWallet-Extension/issues/4471) | Require BA Docs / Design |
+> | [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929) | In Backlog |
+> | [#4959](https://github.com/Koniverse/SubWallet-Extension/issues/4959) | **In Review** |
+> | [#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889) | Follow Up |
+> | [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) | In Backlog |
+>
+> `in-progress` is the honest aggregate: work is in flight (#4959 in review, #4889 in follow-up)
+> and three items have not started. **The rule this fixes: a story's status is the state of the
+> *story*, not of its furthest-along issue** — the max of its parts overstates every time the parts
+> disagree, which is [D107](../../CONTEXT.md#d107-a-ticked-ac-is-a-claim-about-the-code--four-of-us-51s-were-false-and-one-was-a-p0-security-claim)
+> one field over: a status is a claim.
+>
+> **`sprint` also moved, `sprint-2026-W28` → `sprint-2026-W30`.** W28 closed on 2026-07-12; a story
+> in flight cannot sit in a window that ended ten days ago. W30 (2026-07-20 → 07-26) is the open
+> window. Only `status` / `sprint` / `updated` changed; Goal, AC and reasoning below are untouched.
 
 ## Goal
 
@@ -196,6 +217,30 @@ finding is remediated. Anchored on five tracked issues (#4471, #4929, #4959,
 #4889, #4998); the Verichains audit named in Background seeded part of the
 remediation. The story stays open to absorb subsequent audit rounds and
 false-positive reports._
+
+## Incremental work, fixes & chores
+
+The five anchor issues above are the **current** round. This capability has been running since
+the project's first external review; **4 earlier tracker issues** are folded in here from the
+former one-issue-per-story maintenance ledger (2026-07-21). They land here rather than on a
+feature story because none of them belongs to a single capability — that is what makes this the
+epic's hardening cluster.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#31](https://github.com/Koniverse/SubWallet-Extension/issues/31) | External security audit | ✅ done |
+| — | [#1553](https://github.com/Koniverse/SubWallet-Extension/issues/1553) | Recheck problems in the GitHub security tab | ✅ done |
+| 1.1.9 | [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for `page.js` / `content.js` — remove build variables from the injected scripts | ✅ done |
+| 1.3.28 | [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Auto-lock, advanced phishing detection and camera settings reset on version upgrade | ✅ done |
+
+Two of them are the **same defect class as the anchors**, which is why the cluster is real rather
+than a bucket: **#1823** strips build-time variables out of the injected scripts — the 2023
+instance of the secret-in-the-bundle problem [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929)
+re-opened in 2026; and **#3741** is a *cross-capability* defect, losing the auto-lock timer
+([US-5.6](US-5.6-auto-lock-timer-and-unlock-type.md)), the phishing toggle
+([US-5.1](US-5.1-phishing-site-and-address-protection.md)) and camera access
+([US-5.7](US-5.7-camera-access-and-one-sign-toggles.md)) on upgrade — no single feature story
+owns it, the settings-persistence guarantee does.
 
 ## Cross-references
 

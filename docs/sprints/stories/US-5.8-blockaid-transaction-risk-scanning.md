@@ -142,6 +142,14 @@ Support blockaid for EVM transaction or signature request.
 _Planned integration — not yet shipped. Fill `commit`, `version_shipped`, the
 chosen latency budget, and provider/coverage caveats on delivery._
 
+## Incremental work, fixes & chores
+
+**None — and none pending.** No issue in the former security maintenance ledger landed on this
+capability (the per-issue map is in the [consolidation note](../../notes/2026-07-21-epic-5-consolidation.md)),
+and a title scan of the **18 ledgers still unfolded** finds no candidate either: nothing matching
+"blockaid". Consistent with the capability being planned rather than built — there is no code yet
+for a bug to be filed against.
+
 ## Cross-references
 
 - [PRD FR-61](../../PRD.md#functional-requirements)
