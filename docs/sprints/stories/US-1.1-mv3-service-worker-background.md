@@ -146,18 +146,40 @@ version reconciliation._
 
 ## Incremental work, fixes & chores
 
-**2 tracker issues** of incremental work landed on this capability — background-state persistence, and one lifecycle behaviour closed not-planned. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
+**15 tracker issues** of incremental work landed on this capability — background-state persistence, one lifecycle behaviour closed not-planned, and the whole MV3 migration arc: the switch itself, its follow-up defect rounds, and the Firefox attempt that ended in a rollback. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22); `—` where no CHANGELOG line proves a release.
 
-> **Both rows are settled.** A third — the Firefox background-stop recheck
+> **All 15 rows are settled.** One more — the Firefox background-stop recheck
 > ([#3222](https://github.com/Koniverse/SubWallet-Extension/issues/3222)) — sat here until
 > 2026-07-22 and moved to [US-1.7](US-1.7-firefox-background-lifecycle-recheck.md). A `done`
 > story may not carry unfinished work: [AGENTS.md](../../../AGENTS.md) rule 4 forbids it an
 > unticked AC, and an open row in this table is the same claim through a different field.
+>
+> **13 of these arrived on 2026-07-22** out of the performance ledger, which had held the MV3
+> migration because MV3 was pursued *for* performance. The migration materializes FR-1, and this
+> story owns it.
+>
+> **The Firefox arc ends in a rollback, and the last row is the rollback.** #3109 → #3330 → #3364,
+> and #3364's own commit is `5c46c04e2e` *"Update build packaging and rollback Firefox to MV2"*
+> (2024-08-21, first tag **v1.2.28**). Firefox has run MV2 ever since — which is why
+> [FR-1](../../PRD.md#functional-requirements) no longer names it.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
 | — | [#334](https://github.com/Koniverse/SubWallet-Extension/issues/334) | Make the wallet extension in Chrome persist its state | ✅ done |
 | — | [#2471](https://github.com/Koniverse/SubWallet-Extension/issues/2471) | Do not navigate to the Chrome store while the extension is disabled | ⏸️ deprecated |
+| 1.2.1 | [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205) | Update extension to MV3 | ✅ done |
+| — | [#2681](https://github.com/Koniverse/SubWallet-Extension/issues/2681) | Extension — Improve MV3 | ✅ done |
+| — | [#2949](https://github.com/Koniverse/SubWallet-Extension/issues/2949) | Can't fetch online resources on MV3 | ✅ done |
+| — | [#2951](https://github.com/Koniverse/SubWallet-Extension/issues/2951) | Update newest code into MV3 version | ✅ done |
+| — | [#2980](https://github.com/Koniverse/SubWallet-Extension/issues/2980) | Extension — Some errors appear on MV3 | ✅ done |
+| — | [#3045](https://github.com/Koniverse/SubWallet-Extension/issues/3045) | Extension — Follow-up MV3 version | ✅ done |
+| — | [#3060](https://github.com/Koniverse/SubWallet-Extension/issues/3060) | Extension — MV3 — Auto reset currency in case upgrade version | ✅ done |
+| — | [#3066](https://github.com/Koniverse/SubWallet-Extension/issues/3066) | Extension — MV3 — Handle some errors on MV3 | ✅ done |
+| — | [#3109](https://github.com/Koniverse/SubWallet-Extension/issues/3109) | MV3 on Firefox | ✅ done |
+| 1.2.2 | [#3146](https://github.com/Koniverse/SubWallet-Extension/issues/3146) | Extension — Fix some bugs related MV3 extension | ✅ done |
+| 1.2.4 | [#3144](https://github.com/Koniverse/SubWallet-Extension/issues/3144) | Extension — Update lock time of MV3 extension | ✅ done |
+| — | [#3330](https://github.com/Koniverse/SubWallet-Extension/issues/3330) | Re-test MV3 on Firefox | ✅ done |
+| 1.2.28 | [#3364](https://github.com/Koniverse/SubWallet-Extension/issues/3364) | Extension — Check validate on Firefox when submitting the MV3 version | ✅ done |
 
 ## Cross-references
 

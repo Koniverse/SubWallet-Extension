@@ -965,10 +965,10 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#2790](https://github.com/Koniverse/SubWallet-Extension/issues/2790) | Integrate asset online (#2790) | 1.1.50 | 2024-03-28 | US-4.3 |
 | [#3132](https://github.com/Koniverse/SubWallet-Extension/issues/3132) | Improve chain-list online patch (#3132) | 1.3.8 | 2024-12-03 | US-4.3 |
 | [#92](https://github.com/Koniverse/SubWallet-Extension/issues/92) | Display Astar(EVM) tokens balances and ERC20 tokens (issue #92) | 0.3.2 | 2022-04-07 | US-4.5 |
-| [#10](https://github.com/Koniverse/SubWallet-Extension/issues/10) | Add URL and update logo for Subspace network (#10) | 1.0.5 | 2023-05-21 | US-40.1 |
-| [#3144](https://github.com/Koniverse/SubWallet-Extension/issues/3144) | Update lock time of MV3 extension (#3144) | 1.2.4 | 2024-06-08 | US-40.17 |
-| [#3146](https://github.com/Koniverse/SubWallet-Extension/issues/3146) | Fixed some bug related to MV3 (#3146) | 1.2.2 | 2024-05-30 | US-40.18 |
-| [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205) | Update Extension Manifest V3 (#2205) | 1.2.1 | 2024-05-28 | US-40.7 |
+| [#10](https://github.com/Koniverse/SubWallet-Extension/issues/10) | Add URL and update logo for Subspace network (#10) | 1.0.5 | 2023-05-21 | US-20.1 |
+| [#3144](https://github.com/Koniverse/SubWallet-Extension/issues/3144) | Update lock time of MV3 extension (#3144) | 1.2.4 | 2024-06-08 | US-1.1 |
+| [#3146](https://github.com/Koniverse/SubWallet-Extension/issues/3146) | Fixed some bug related to MV3 (#3146) | 1.2.2 | 2024-05-30 | US-1.1 |
+| [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205) | Update Extension Manifest V3 (#2205) | 1.2.1 | 2024-05-28 | US-1.1 |
 | [#1239](https://github.com/Koniverse/SubWallet-Extension/issues/1239) | Update wake up / sleep with history and price service (#1239) | 1.0.3 | 2023-05-06 | US-41.101 |
 | [#1279](https://github.com/Koniverse/SubWallet-Extension/issues/1279) | Bug related to address book (#1279) | 1.0.4 | 2023-05-12 | US-41.107 |
 | [#1306](https://github.com/Koniverse/SubWallet-Extension/issues/1306) | Update out date libs (#1306) | 1.0.3 | 2023-05-06 | US-41.112 |

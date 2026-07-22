@@ -104,7 +104,7 @@ former NFT maintenance ledger, folded into this epic's capabilities on 2026-07-1
 here** — the note records this capability's count as **0**
 ([consolidation note](../../notes/2026-07-17.md)).
 
-> **That is a checked absence within one ledger, not an empty history.** A title scan of the **18
+> **That is a checked absence within one ledger, not an empty history.** A title scan of the **13
 > ledgers still separate** finds **27 issues** mentioning NFT, sitting in EPIC-24, EPIC-26,
 > EPIC-28, EPIC-32 and EPIC-41. Treat that as an **upper bound, not a count**: routing
 > there is a title heuristic ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),

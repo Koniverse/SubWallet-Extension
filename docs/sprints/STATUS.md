@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 11:07:23 UTC
-> Total stories: 2664
+> Last generated: 2026-07-22 12:01:42 UTC
+> Total stories: 2644
 
 ## 📋 Backlog (281)
 
@@ -309,7 +309,7 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (33)
+## 🟡 In Progress (32)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -344,7 +344,6 @@
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
-| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 
 ## 👀 Review (11)
@@ -363,7 +362,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2131)
+## ✅ Done (2112)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2066,26 +2065,6 @@
 | US-4.11 | Custom token import (ERC-20 / PSP-22) | EPIC-4 | P1 | 3 | sprint-2022-M10 | nulllpc |
 | US-4.12 | Token registry enable/disable | EPIC-4 | P1 | 2 | sprint-2023-M03 | nulllpc |
 | US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
-| US-40.1 | Add URL and update logo for Subspace network | EPIC-40 | P3 | 1 | sprint-2023-M05 | minhle2994 |
-| US-40.2 | Review data subscriptions and app performance | EPIC-40 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-40.3 | Optimize extension - web runner flow | EPIC-40 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-40.4 | Optimize ZK - Not implement in some evironement like WebApp and Mobile | EPIC-40 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-40.5 | WebApp- Improve performance | EPIC-40 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-40.6 | WebApp \| Extension - Review all performance problems | EPIC-40 | P3 | 1 | sprint-2025-M01 | saltict |
-| US-40.7 | Update Extension Manifest V3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | saltict |
-| US-40.8 | Extension - Improve MV3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.9 | WebApp - CORS error when call API 'cache EVM gas' | EPIC-40 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-40.10 | Can't not fetch online resources on MV3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.11 | Update newest code into MV3 version | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.12 | Extension - Some errors appear on MV3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.13 | Extension - Follow-up MV3 version | EPIC-40 | P3 | 1 | sprint-2024-M12 | haiyenvu23 |
-| US-40.14 | Extension - MV3 - Auto reset currency in case upgrade version | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.15 | Extension - MV3 - Handle some errors on MV3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-40.16 | MV3 on Firefox | EPIC-40 | P3 | 1 | sprint-2024-M08 | Thiendekaco |
-| US-40.17 | Update lock time of MV3 extension | EPIC-40 | P3 | 1 | sprint-2024-M06 | saltict |
-| US-40.18 | Fixed some bug related to MV3 | EPIC-40 | P3 | 1 | sprint-2024-M05 | saltict |
-| US-40.19 | Re-test MV3 on Firefox | EPIC-40 | P3 | 1 | sprint-2024-M07 | haiyenvu23 |
-| US-40.20 | Extension - Check validate on Firefox when submit MV3 version for Firefox browser | EPIC-40 | P3 | 1 | sprint-2024-M08 | saltict |
 | US-41.1 | Update new architecture aim to adding more features while being able to rebase the polkadot-js origin at any time. | EPIC-41 | P3 | 1 | sprint-2022-M03 | saltict |
 | US-41.2 | Support Mobile Devices | EPIC-41 | P3 | 1 | sprint-2022-M08 | saltict |
 | US-41.5 | Fix some bugs with AlephZero balance | EPIC-41 | P3 | 1 | sprint-2022-M04 | lw-cdm |
@@ -2461,6 +2440,7 @@
 | US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
+| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -2708,10 +2688,10 @@ _No stories_
 
 - 📋 **Backlog**: 281
 - 🟢 **Ready**: 14
-- 🟡 **In Progress**: 33
+- 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2131
+- ✅ **Done**: 2112
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 194
 
-⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

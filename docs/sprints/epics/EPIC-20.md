@@ -42,6 +42,30 @@ NFR-17, NFR-20, NFR-21 — **NFR-11 was retired 2026-07-13, see [CONTEXT D96](..
 performance-program tracked by umbrella issue
 [#4197](https://github.com/Koniverse/SubWallet-Extension/issues/4197).
 
+> **Implementation ledger →** the tracker issues that shaped these capabilities live **inside the
+> stories below**, each a row in that story's own incremental-work table. The former
+> one-issue-per-story performance ledger was dissolved on 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22.md#g-epic-40-maintenance--performance-merged-into-epic-20).
+>
+> **Thirteen of its twenty issues were the MV3 migration**, and they went to
+> [US-1.1](../stories/US-1.1-mv3-service-worker-background.md) in EPIC-1, not here. The ledger held
+> them because MV3 was pursued *for* performance; the migration materializes FR-1, and that story
+> owns it.
+
+### Umbrella issues — owned by this epic, not by a story
+
+An issue that **has children and no CHANGELOG line of its own** delegated all its scope; the epic
+records it and the children are the story rows ([AGENTS.md](../../../AGENTS.md) rule 10).
+
+| Issue | Title | Tracker state | Children |
+|---|---|---|---|
+| [#2182](https://github.com/Koniverse/SubWallet-Extension/issues/2182) | WebApp \| Extension — Review all performance problems | ✅ closed COMPLETED | #2245 ([US-20.5](../stories/US-20.5-list-rendering-performance.md)) · #2248 ([US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md)) · #2207, #2228, #1902 (other ledgers) |
+
+> **#2182 lists its children as plain bullets under *"Known Problems"*, with no checkboxes and no
+> sub-issue links.** `gh api …/sub_issues` returns 0, and the body-checkbox query added for #1532
+> misses it too. Rule 10's child test now matches **any list item that is an issue reference**;
+> across 272 folded rows only #1532 and #2182 turn on it, and both were capability roots.
+
 ## Overview
 
 ### Business context
