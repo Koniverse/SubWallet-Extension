@@ -12,10 +12,10 @@ import { getCardanoAssetId } from '@subwallet/extension-base/services/balance-se
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
 import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getTokenMinAmount, _isCIP26Token, _isNativeToken, _isNativeTokenBySlug, _isTokenEvmSmartContract, _isTokenTonSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateToAmountByReservePool, FEE_COVERAGE_PERCENTAGE_SPECIAL_CASE } from '@subwallet/extension-base/services/fee-service/utils';
 import { isBitcoinTransaction, isCardanoTransaction, isSubstrateTransaction, isTonTransaction } from '@subwallet/extension-base/services/transaction-service/helpers';
-import { OptionalSWTransaction, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
+import { OptionalSWTransaction, SubstrateTransactionWrappingStatus, SWTransactionInput, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountSignMode, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeInfo, BitcoinFeeRate, EvmEIP1559FeeOption, EvmFeeInfo, FeeInfo, TransferTxErrorType } from '@subwallet/extension-base/types';
 import { balanceFormatter, combineBitcoinFee, combineEthFee, formatNumber, getSizeInfo, pairToAccount } from '@subwallet/extension-base/utils';
 import { isCardanoAddress, isTonAddress } from '@subwallet/keyring';
@@ -357,7 +357,6 @@ export function checkSupportForTransaction (validationResponse: SWTransactionRes
 
 export async function estimateFeeForTransaction (validationResponse: SWTransactionResponse, transaction: OptionalSWTransaction, chainInfo: _ChainInfo, evmApi: _EvmApi, substrateApi: _SubstrateApi, priceMap: Record<string, number>, feeInfo: FeeInfo, nativeTokenInfo: _ChainAsset, nonNativeTokenPayFeeInfo: _ChainAsset | undefined, isTransferLocalTokenAndPayThatTokenAsFee: boolean | undefined): Promise<FeeData> {
   const estimateFee: FeeData = {
-    feeTokenSlug: '',
     symbol: '',
     decimals: 0,
     value: '0',
@@ -367,7 +366,6 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
 
   estimateFee.decimals = decimals;
   estimateFee.symbol = symbol;
-  estimateFee.feeTokenSlug = _getChainNativeTokenSlug(chainInfo);
   const { address, feeCustom, feeOption } = validationResponse;
 
   if (transaction) {
@@ -456,9 +454,9 @@ export async function estimateFeeForTransaction (validationResponse: SWTransacti
   return estimateFee;
 }
 
-export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>) {
-  const { address, chain, chainType, extrinsicType } = validationResponse;
-  const pair = keyring.getPair(address);
+export function checkSigningAccountForTransaction (validationResponse: SWTransactionResponse, chainInfoMap: Record<string, _ChainInfo>, signer: string) {
+  const { chain, chainType, extrinsicType } = validationResponse;
+  const pair = keyring.getPair(signer);
 
   if (!pair) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.INTERNAL_ERROR, t('bg.TRANSACTION.core.validation.transfer.unableToFindAccount')));
@@ -485,6 +483,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   }
 
   const { edAsWarning, extrinsicType, isTransferAll, skipFeeValidation, tokenPayFeeSlug } = transactionInput;
+  const isWrappable = validationResponse.wrappingStatus === SubstrateTransactionWrappingStatus.WRAPPABLE;
 
   if (skipFeeValidation || (tokenPayFeeSlug && !_isNativeTokenBySlug(tokenPayFeeSlug))) { // todo: need improve: input should be balance of fee token and check this again
     return;
@@ -494,7 +493,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
   const bnNativeTokenAvailable = new BigN(nativeTokenAvailable.value);
   const bnNativeTokenTransferAmount = new BigN(validationResponse.transferNativeAmount || '0');
 
-  if (!bnNativeTokenAvailable.gt(0)) {
+  if (!bnNativeTokenAvailable.gt(0) && !isWrappable) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
   }
 
@@ -505,7 +504,7 @@ export function checkBalanceWithTransactionFee (validationResponse: SWTransactio
     ..._TRANSFER_CHAIN_GROUP.statemine
   ].includes(nativeTokenInfo.originChain);
 
-  if (bnNativeTokenTransferAmount.plus(bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
+  if (bnNativeTokenTransferAmount.plus(isWrappable ? '0' : bnFee).gt(bnNativeTokenAvailable) && (!isTransferAll || isChainNotSupportTransferAll)) {
     validationResponse.errors.push(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE)); // todo: should be generalized and reused in all features
   }
 

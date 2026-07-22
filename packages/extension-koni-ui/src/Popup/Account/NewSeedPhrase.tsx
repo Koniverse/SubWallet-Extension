@@ -4,12 +4,13 @@
 import { AccountProxyType } from '@subwallet/extension-base/types';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, WordPhrase } from '@subwallet/extension-koni-ui/components';
 import { SeedPhraseTermModal } from '@subwallet/extension-koni-ui/components/Modal/TermsAndConditions/SeedPhraseTermModal';
-import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_NAME_MODAL, CONFIRM_TERM_SEED_PHRASE, CREATE_ACCOUNT_MODAL, DEFAULT_MNEMONIC_TYPE, DEFAULT_ROUTER_PATH, SEED_PREVENT_MODAL, SELECTED_MNEMONIC_TYPE, TERM_AND_CONDITION_SEED_PHRASE_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useExtensionDisplayModes, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { isFirefox, isNoAccount } from '@subwallet/extension-koni-ui/utils';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -80,11 +81,21 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [activeModal, checkUnlock, seedPhrase]);
 
   const onSubmit = useCallback((accountName: string) => {
+    let types: KeypairType[];
+
+    if (selectedMnemonicType === 'ton') {
+      types = ['ton-native'];
+    } else if (selectedMnemonicType === TRUST_WALLET_MNEMONIC_TYPE) {
+      types = ['ed25519-tw'];
+    } else {
+      types = ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+    }
+
     setLoading(true);
     createAccountSuriV2({
       name: accountName,
       suri: seedPhrase,
-      type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
+      types,
       isAllowed: true
     })
       .then(() => {
@@ -156,7 +167,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       <Layout.WithSubHeaderOnly
         onBack={preventModal ? goHome : onBack}
         rightFooterButton={{
-          children: t('I have kept it somewhere safe'),
+          children: t('ui.ACCOUNT.screen.Account.NewSeedPhrase.keptItSomewhereSafe'),
           icon: FooterIcon,
           onClick: onConfirmSeedPhrase,
           disabled: !seedPhrase
@@ -170,11 +181,11 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             }
           ]}
         subHeaderLeft={preventModal ? <CloseIcon /> : undefined }
-        title={t('Your seed phrase')}
+        title={t('ui.ACCOUNT.screen.Account.NewSeedPhrase.yourSeedPhrase')}
       >
         <div className={'container'}>
           <div className='description'>
-            {t('Keep your seed phrase in a safe place and never disclose it. Anyone with this phrase can take control of your assets.')}
+            {t('ui.ACCOUNT.screen.Account.NewSeedPhrase.seedPhraseSecurityWarning')}
           </div>
           <WordPhrase
             enableDownload={true}

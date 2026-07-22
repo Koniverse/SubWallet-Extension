@@ -130,6 +130,10 @@ export function isActionFromValidator (stakingType: YieldPoolType, chain: string
     return true;
   } else if (_STAKING_CHAIN_GROUP.mythos.includes(chain)) {
     return true;
+  } else if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
+    return true;
+  } else if (_STAKING_CHAIN_GROUP.tanssi.includes(chain)) {
+    return true;
   }
 
   return false;

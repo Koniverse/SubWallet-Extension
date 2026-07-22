@@ -13,7 +13,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
 import { BuyTokensParam } from '@subwallet/extension-koni-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getAssetDisplayName, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import reformatAddress from '@subwallet/extension-koni-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwModal, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -180,6 +180,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
 
       return {
         name: assetRegistry[info.slug]?.name || info.symbol,
+        displayName: getAssetDisplayName(assetRegistry[info.slug], info.symbol),
         slug: info.slug,
         symbol: info.symbol,
         originChain: info.network,
@@ -337,7 +338,8 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             console.error(e);
 
             notify({
-              message: t('Create buy order fail')
+              message: t('ui.BUY.screen.BuyTokens.unableToRedirectToSupplier'),
+              type: 'error'
             });
           }
         })
@@ -419,7 +421,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
           onBack={goBack}
           paddingVertical
           showBackButton
-          title={t('Buy token')}
+          title={t('ui.BUY.screen.BuyTokens.buyToken')}
         />
         <div className={'__scroll-container'}>
           <div className='__buy-icon-wrapper'>
@@ -448,8 +450,8 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 <ServiceSelector
                   disabled={!selectedTokenSlug}
                   items={serviceItems}
-                  placeholder={t('Select supplier')}
-                  title={t('Select supplier')}
+                  placeholder={t('ui.BUY.screen.BuyTokens.selectSupplier')}
+                  title={t('ui.BUY.screen.BuyTokens.selectSupplier')}
                 />
               </Form.Item>
             </div>
@@ -462,14 +464,14 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             >
               <AccountAddressSelector
                 items={accountAddressItems}
-                label={`${t('To')}:`}
+                label={`${t('ui.BUY.screen.BuyTokens.to')}:`}
                 labelStyle={'horizontal'}
               />
             </Form.Item>
           </Form>
 
           <div className={'common-text __note'}>
-            {t('You will be directed to the chosen supplier to complete this transaction')}
+            {t('ui.BUY.screen.BuyTokens.directedToSupplierToComplete')}
           </div>
         </div>
 
@@ -485,7 +487,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
             loading={loading}
             onClick={onClickNext}
           >
-            {t('Buy now')}
+            {t('ui.BUY.screen.BuyTokens.buyNow')}
           </Button>
         </div>
         <SwModal
@@ -503,7 +505,7 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 onClick={onReject}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('ui.BUY.screen.BuyTokens.cancel')}
               </Button>
               <Button
                 block={true}
@@ -515,13 +517,13 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
                 )}
                 onClick={onApprove}
               >
-                {t('Agree')}
+                {t('ui.BUY.screen.BuyTokens.agree')}
               </Button>
             </>
           )}
           id={modalId}
           onCancel={onReject}
-          title={t('Disclaimer')}
+          title={t('ui.BUY.screen.BuyTokens.disclaimer')}
         >
           <Trans
             components={{
@@ -533,34 +535,33 @@ function Component ({ className, currentAccountProxy }: ComponentProps) {
               ),
               termUrl: (
                 <LinkUrl
-                  content={t('Terms of Service')}
+                  content={t('ui.BUY.screen.BuyTokens.termsOfService')}
                   url={termUrl}
                 />
               ),
               policyUrl: (
                 <LinkUrl
-                  content={t('Privacy Policy')}
+                  content={t('ui.BUY.screen.BuyTokens.privacyPolicy')}
                   url={policyUrl}
                 />
               ),
               contactUrl: (
                 <LinkUrl
-                  content={t('support site')}
+                  content={t('ui.BUY.screen.BuyTokens.supportSite')}
                   url={contactUrl}
                 />
               )
             }}
-            i18nKey={detectTranslate('You are now leaving SubWallet for <mainUrl/>. Services related to card payments are provided by {{service}}, a separate third-party platform. By proceeding and procuring services from {{service}}, you acknowledge that you have read and agreed to {{service}}\'s <termUrl/> and <policyUrl/>. For any question related to {{service}}\'s services, please visit {{service}}\'s <contactUrl/>.')}
+            i18nKey={detectTranslate('ui.BUY.screen.BuyTokens.leavingSubwalletDisclaimer')}
             values={{
               service: serviceName
             }}
           />
           <br />
           <Trans
-            i18nKey={detectTranslate('Note that some tokens may not be available for {{action}} depending on your region. Review your chosen token & region before proceeding with the transaction via {{service}}')}
+            i18nKey={detectTranslate('ui.BUY.screen.BuyTokens.regionalTokenWarning')}
             values={{
-              service: serviceName,
-              action: t('buying')
+              service: serviceName
             }}
           />
         </SwModal>

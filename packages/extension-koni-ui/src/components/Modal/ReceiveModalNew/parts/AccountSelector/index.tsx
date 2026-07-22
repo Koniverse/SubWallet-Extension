@@ -90,6 +90,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     const result: ListItem[] = [];
     const masterAccounts: AccountAddressItemType[] = [];
     const qrSignerAccounts: ListItem[] = [];
+    const multisigAccounts: ListItem[] = [];
     const watchOnlyAccounts: ListItem[] = [];
     const ledgerAccounts: ListItem[] = [];
     const injectedAccounts: ListItem[] = [];
@@ -104,6 +105,8 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
         masterAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.QR) {
         qrSignerAccounts.push(item);
+      } else if (item.accountProxyType === AccountProxyType.MULTISIG) {
+        multisigAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.READ_ONLY) {
         watchOnlyAccounts.push(item);
       } else if (item.accountProxyType === AccountProxyType.LEDGER) {
@@ -122,16 +125,25 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('QR signer account')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
     }
 
+    if (multisigAccounts.length) {
+      multisigAccounts.unshift({
+        id: 'multisig',
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.multisigAccount')
+      });
+
+      result.push(...multisigAccounts);
+    }
+
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('Watch-only account')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -140,7 +152,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('Ledger account')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -149,7 +161,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.injectedAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -158,7 +170,7 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('Unknown account')
+        groupLabel: t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -201,13 +213,13 @@ function Component ({ className = '', items, modalId, onBack, onCancel, onSelect
           onClick: onCancel
         }
         : undefined}
-      title={t('Select account')}
+      title={t('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.selectAccount')}
     >
       <Search
         autoFocus={true}
         className={'__search-box'}
         onSearch={handleSearch}
-        placeholder={t<string>('Enter your account name or address')}
+        placeholder={t<string>('ui.ACCOUNT.components.Modal.ReceiveNew.AccountSelector.enterYourAccountNameOrAddress')}
         searchValue={searchValue}
       />
       <SwList

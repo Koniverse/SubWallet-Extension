@@ -2,52 +2,6 @@
   {
     "serviceInfo": {
       "transak": {
-        "network": "mainnet",
-        "symbol": "DOT",
-        "isSuspended": false
-      },
-      "banxa": {
-        "network": "DOT",
-        "symbol": "DOT",
-        "isSuspended": false
-      },
-      "coinbase": {
-        "network": "polkadot",
-        "symbol": "DOT",
-        "isSuspended": false
-      }
-    },
-    "network": "polkadot",
-    "slug": "polkadot-NATIVE-DOT",
-    "symbol": "DOT",
-    "support": "SUBSTRATE"
-  },
-  {
-    "serviceInfo": {
-      "transak": {
-        "network": "mainnet",
-        "symbol": "KSM",
-        "isSuspended": false
-      },
-      "banxa": {
-        "network": "KSM",
-        "symbol": "KSM",
-        "isSuspended": false
-      },
-      "coinbase": {
-        "network": "kusama",
-        "symbol": "KSM",
-        "isSuspended": false
-      }
-    },
-    "network": "kusama",
-    "slug": "kusama-NATIVE-KSM",
-    "symbol": "KSM",
-    "support": "SUBSTRATE"
-  },
-  {
-    "serviceInfo": {
-      "transak": {
         "network": "ethereum",
         "symbol": "ETH",
         "isSuspended": false

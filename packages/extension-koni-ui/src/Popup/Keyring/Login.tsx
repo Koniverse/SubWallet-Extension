@@ -88,10 +88,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             />
           </div>
           <div className='title'>
-            {t('Welcome back!')}
+            {t('ui.ACCOUNT.screen.Keyring.Login.welcomeBack')}
           </div>
           <div className='sub-title'>
-            {t('Enter your password to unlock wallet')}
+            {t('ui.ACCOUNT.screen.Keyring.Login.enterPasswordToUnlock')}
           </div>
           <Form
             form={form}
@@ -103,7 +103,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               name={FormFieldName.PASSWORD}
               rules={[
                 {
-                  message: t('Password is required'),
+                  message: t('ui.ACCOUNT.screen.Keyring.Login.passwordIsRequired'),
                   required: true
                 }
               ]}
@@ -112,7 +112,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
               <Input.Password
                 containerClassName='password-input'
                 id={passwordInputId}
-                placeholder={t('Password')}
+                placeholder={t('ui.ACCOUNT.screen.Keyring.Login.password')}
               />
             </Form.Item>
             <Form.Item>
@@ -122,7 +122,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 htmlType='submit'
                 loading={loading}
               >
-                {t('Unlock')}
+                {t('ui.ACCOUNT.screen.Keyring.Login.unlock')}
               </Button>
             </Form.Item>
             <Form.Item>
@@ -130,7 +130,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 className='forgot-password'
                 onClick={onReset}
               >
-                {t('Don’t remember your password?')}
+                {t('ui.ACCOUNT.screen.Keyring.Login.dontRememberPassword')}
               </div>
             </Form.Item>
           </Form>

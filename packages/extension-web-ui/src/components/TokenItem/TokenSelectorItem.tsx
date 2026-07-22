@@ -17,11 +17,12 @@ interface Props extends ThemeProps {
   chainSlug: string;
   isSelected?: boolean;
   chainName: string;
+  tokenDisplayName?: string;
   balanceInfo?: TokenSelectorItemType['balanceInfo'];
   showBalance?: boolean;
 }
 
-const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, onClick, showBalance, tokenSlug, tokenSymbol }: Props) => {
+const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, onClick, showBalance, tokenDisplayName, tokenSlug, tokenSymbol }: Props) => {
   const isShowBalance = useSelector((state: RootState) => state.settings.isShowBalance);
 
   return (
@@ -43,7 +44,7 @@ const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, o
       </div>
       <div className='__item-center-part'>
         <div className='__token-symbol'>
-          {tokenSymbol}
+          {tokenDisplayName || tokenSymbol}
         </div>
         <div className='__chain-name'>
           {chainName}

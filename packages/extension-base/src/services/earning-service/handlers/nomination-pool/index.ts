@@ -510,7 +510,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'Amount must be greater than 0')];
     }
 
     if (!_poolInfo || !_poolInfo.statistic) {
@@ -624,7 +624,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const bnAmount = new BN(amount);
 
     if (bnAmount.lte(BN_ZERO)) {
-      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero')));
+      errors.push(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nominationPool.amountMustBeGreaterThanZero')));
     }
 
     const bnActiveStake = new BN(poolPosition.activeStake);
@@ -637,7 +637,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     }
 
     if (poolPosition.unstakings.length > maxUnstake) {
-      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.koni.api.staking.bonding.relayChain.maxUnstakeTimes', { replace: { number: maxUnstake } })));
+      errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.nominationPool.maxUnstakeTimes', { replace: { number: maxUnstake } })));
     }
 
     return Promise.resolve(errors);

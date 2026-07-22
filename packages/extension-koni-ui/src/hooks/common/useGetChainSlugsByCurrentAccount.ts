@@ -48,7 +48,7 @@ function getChainsAccountType (accountType: AccountType, chainInfoMap: Record<st
 function getAccountType (type: KeypairType) {
   if (type === 'ethereum') {
     return 'ETHEREUM';
-  } else if (['ed25519', 'sr25519', 'ecdsa'].includes(type)) {
+  } else if (['ed25519', 'ed25519-tw', 'sr25519', 'ecdsa'].includes(type)) {
     return 'SUBSTRATE';
   }
 

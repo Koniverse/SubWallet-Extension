@@ -101,7 +101,7 @@ const Component: React.FC<Props> = (props: Props) => {
         {
           !!recommendedQuote?.provider.id && (recommendedQuote?.provider.id === currentQuote?.provider.id) && (
             <div className='__best-tag'>
-              {t('Best')}
+              {t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.best')}
             </div>
           )
         }
@@ -127,9 +127,9 @@ const Component: React.FC<Props> = (props: Props) => {
     let message = '';
 
     if (isFormInvalid) {
-      message = t('Invalid input. Re-enter information in the red field and try again');
+      message = t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.invalidInputReEnter');
     } else if (handleRequestLoading) {
-      message = t('Loading...');
+      message = t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.loadingEllipsis');
     }
 
     return (
@@ -264,7 +264,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 className={'__quote-rate-info'}
                 label={(
                   <>
-                    {t('Quote rate')}
+                    {t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.quoteRate')}
 
                     <QuoteResetTime
                       className={'__reset-time'}
@@ -280,7 +280,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               <MetaInfo.Default
                 className={'__swap-process-info'}
-                label={t('Process')}
+                label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.process')}
               >
                 <div
                   className={'__swap-process-modal-trigger'}
@@ -300,7 +300,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               <MetaInfo.Default
                 className={'__meta-info-number-row'}
-                label={t('Estimated fee')}
+                label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.estimatedFee')}
               >
                 <div
                   className={'__swap-fees-modal-trigger'}
@@ -323,7 +323,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               <MetaInfo.Default
                 className={'__meta-info-number-row'}
-                label={t('Min receivable')}
+                label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.minReceivable')}
               >
                 <NumberDisplay
                   decimal={_getAssetDecimals(toAssetInfo)}
@@ -334,7 +334,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
               <MetaInfo.Default
                 className={'__slippage-info'}
-                label={t('Slippage')}
+                label={t('ui.TRANSACTION.screen.Transaction.Swap.QuoteInfo.slippage')}
               >
                 {renderSlippageInfoContent()}
               </MetaInfo.Default>

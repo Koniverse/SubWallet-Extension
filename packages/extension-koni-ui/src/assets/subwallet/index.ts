@@ -22,6 +22,8 @@ const SwLogosMap: Record<string, string> = {
   simple_swap: DefaultLogosMap.simple_swap,
   uniswap: DefaultLogosMap.uniswap,
   kyber: DefaultLogosMap.kyber,
+  optimex: DefaultLogosMap.optimex,
+  optimex_testnet: DefaultLogosMap.optimex,
   hydradx_mainnet: DefaultLogosMap.hydradx,
   hydradx_testnet: DefaultLogosMap.hydradx,
   ordinal_rune: DefaultLogosMap.ordinal_rune,
@@ -31,7 +33,8 @@ const SwLogosMap: Record<string, string> = {
   [SwapProviderId.KUSAMA_ASSET_HUB.toLowerCase()]: DefaultLogosMap.kusama_assethub,
   [SwapProviderId.ROCOCO_ASSET_HUB.toLowerCase()]: DefaultLogosMap.rococo_assethub,
   ton: DefaultLogosMap.ton,
-  meld: DefaultLogosMap.meld
+  meld: DefaultLogosMap.meld,
+  trust: DefaultLogosMap.trust
 };
 
 export default SwLogosMap;

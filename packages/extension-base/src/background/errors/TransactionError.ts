@@ -10,19 +10,19 @@ import { SWError } from './SWError';
 // Todo: finish this map in the future
 const defaultErrorMap = {
   NOT_ENOUGH_BALANCE: {
-    message: detectTranslate('bg.koni.handler.Extension.insufficientBalance'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.insufficientBalance'),
     code: undefined
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.networkIsDisconnected'),
     code: undefined
   },
   INVALID_PARAMS: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.undefinedErrorContactSupport'),
     code: undefined
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.undefinedErrorContactSupport'),
     code: undefined
   },
   DUPLICATE_TRANSACTION: {
@@ -30,11 +30,11 @@ const defaultErrorMap = {
     code: undefined
   },
   UNABLE_TO_SIGN: {
-    message: detectTranslate('bg.TRANSACTION.core.validation.request.unableToSign'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.unableToSign'),
     code: undefined
   },
   USER_REJECT_REQUEST: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.rejectedByUser'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.rejectedByUser'),
     code: undefined
   },
   UNABLE_TO_SEND: {
@@ -94,7 +94,7 @@ const defaultErrorMap = {
     code: undefined
   },
   [YieldValidationStatus.NOT_ENOUGH_FEE]: {
-    message: detectTranslate('bg.koni.handler.Extension.insufficientBalance'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.insufficientBalance'),
     code: undefined
   },
   [YieldValidationStatus.NOT_ENOUGH_MIN_JOIN_POOL]: {
@@ -102,11 +102,11 @@ const defaultErrorMap = {
     code: undefined
   },
   [SwapErrorType.QUOTE_TIMEOUT]: {
-    message: detectTranslate('bg.SWAP.background.error.Swap.quoteTimeout'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.quoteTimeout'),
     code: undefined
   },
   [SwapErrorType.INVALID_RECIPIENT]: {
-    message: detectTranslate('bg.SWAP.background.error.Swap.invalidRecipient'),
+    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.invalidRecipient'),
     code: undefined
   }
 } as Record<TransactionErrorType, { message: string, code?: number }>;

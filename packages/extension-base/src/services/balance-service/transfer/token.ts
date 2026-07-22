@@ -3,13 +3,15 @@
 
 import { GearApi } from '@gear-js/api';
 import { _AssetType, _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getWasmContractGasLimit } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { estimateTonTxFee } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
-import { _TRANSFER_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
+import { _TRANSFER_CHAIN_GROUP, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi, _TonApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible, _isChainTonCompatible, _isGigaToken, _isNativeToken, _isTokenGearSmartContract, _isTokenTransferredByEvm, _isTokenTransferredByTon, _isTokenWasmSmartContract } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateGasFeeParams } from '@subwallet/extension-base/services/fee-service/utils';
+import { AlphaTokenTransferMetadata } from '@subwallet/extension-base/types/balance/transfer';
 import { combineEthFee, getGRC20ContractPromise, getVFTContractPromise } from '@subwallet/extension-base/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { internal } from '@ton/core';
@@ -29,9 +31,10 @@ interface CreateTransferExtrinsicProps {
   value: string,
   transferAll: boolean,
   tokenInfo: _ChainAsset
+  metadata?: Record<string, any>;
 }
 
-export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
+export const createSubstrateExtrinsic = async ({ from, metadata, networkKey, substrateApi, to, tokenInfo, transferAll, value }: CreateTransferExtrinsicProps): Promise<[SubmittableExtrinsic | null, string]> => {
   const api = substrateApi.api;
 
   const isDisableTransfer = tokenInfo.metadata?.isDisableTransfer as boolean;
@@ -75,6 +78,8 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
 
     transfer = transaction.extrinsic;
     transferAmount = value;
+  } else if (_isGigaToken(tokenInfo) && api.tx.currencies) {
+    transfer = api.tx.currencies.transfer(to, _getTokenOnChainAssetId(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.acala.includes(networkKey)) {
     if (!_isNativeToken(tokenInfo)) {
       if (isTxCurrenciesSupported) {
@@ -102,7 +107,15 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
   } else if (_TRANSFER_CHAIN_GROUP.bitcountry.includes(networkKey) && !_isNativeToken(tokenInfo)) {
     transfer = api.tx.currencies.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
   } else if (_TRANSFER_CHAIN_GROUP.statemine.includes(networkKey) && !_isNativeToken(tokenInfo)) {
-    transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+    if (USE_MULTILOCATION_INDEX.includes(networkKey)) {
+      const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(networkKey) ? 4 : 3;
+      const multilocationIndex = _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version);
+
+      // @ts-ignore
+      transfer = api.tx.assets.transfer(multilocationIndex, to, value);
+    } else {
+      transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
+    }
   } else if (_TRANSFER_CHAIN_GROUP.sora_substrate.includes(networkKey) && isTxAssetsSupported) {
     transfer = api.tx.assets.transfer(_getTokenOnChainAssetId(tokenInfo), to, value);
   } else if (isTxBalancesSupported && _isNativeToken(tokenInfo)) {
@@ -121,6 +134,39 @@ export const createSubstrateExtrinsic = async ({ from, networkKey, substrateApi,
     }
   } else if (_TRANSFER_CHAIN_GROUP.truth.includes(networkKey)) {
     transfer = api.tx.assetManager.transfer(to, _getTokenOnChainInfo(tokenInfo), value);
+  } else if (_TRANSFER_CHAIN_GROUP.bittensor.includes(networkKey) && !!metadata) {
+    const { fromValidator, netuid, toValidator } = metadata as AlphaTokenTransferMetadata;
+    const formatToValidator = toValidator?.split('___')[0];
+
+    if (fromValidator === formatToValidator) {
+      transfer = substrateApi.api.tx.subtensorModule.transferStake(
+        to,
+        fromValidator,
+        netuid,
+        netuid,
+        value
+      );
+    } else {
+      const moveStakeTx = substrateApi.api.tx.subtensorModule.moveStake(
+        fromValidator,
+        formatToValidator,
+        netuid,
+        netuid,
+        value
+      );
+      const transferStakeTx = substrateApi.api.tx.subtensorModule.transferStake(
+        to,
+        formatToValidator,
+        netuid,
+        netuid,
+        value
+      );
+
+      transfer = substrateApi.api.tx.utility.batchAll([
+        moveStakeTx,
+        transferStakeTx
+      ]);
+    }
   }
 
   return [transfer, transferAmount || value];

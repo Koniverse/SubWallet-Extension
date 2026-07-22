@@ -1,15 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { SwapError } from '@subwallet/extension-base/background/errors/SwapError';
-import { AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseStepDetail, BaseStepType, CommonOptimalSwapPath, CommonStepFeeInfo } from '@subwallet/extension-base/types/service-base';
 import BigN from 'bignumber.js';
 
 import { BaseProcessRequestSign, TransactionData } from '../transaction';
 
-// core
 export type SwapRate = number;
 
 export interface SwapPair {
@@ -68,6 +67,7 @@ export enum SwapStepType {
   PERMIT = 'PERMIT'
 }
 
+// todo: export this to use from sdk
 export enum SwapProviderId {
   CHAIN_FLIP_TESTNET = 'CHAIN_FLIP_TESTNET',
   CHAIN_FLIP_MAINNET = 'CHAIN_FLIP_MAINNET',
@@ -79,31 +79,34 @@ export enum SwapProviderId {
   WESTEND_ASSET_HUB = 'WESTEND_ASSET_HUB',
   SIMPLE_SWAP = 'SIMPLE_SWAP',
   UNISWAP = 'UNISWAP',
-  KYBER = 'KYBER'
+  KYBER = 'KYBER',
+  OPTIMEX = 'OPTIMEX',
+  OPTIMEX_TESTNET = 'OPTIMEX_TESTNET',
+  BITTENSOR = 'BITTENSOR',
+  BITTENSOR_TESTNET = 'BITTENSOR_TESTNET'
 }
 
+// todo: export this to use from sdk
 export const _SUPPORTED_SWAP_PROVIDERS: SwapProviderId[] = [
   SwapProviderId.CHAIN_FLIP_TESTNET,
   SwapProviderId.CHAIN_FLIP_MAINNET,
   SwapProviderId.HYDRADX_MAINNET,
-  // SwapProviderId.HYDRADX_TESTNET,
   SwapProviderId.POLKADOT_ASSET_HUB,
   SwapProviderId.KUSAMA_ASSET_HUB,
-  // SwapProviderId.ROCOCO_ASSET_HUB,
-  // SwapProviderId.WESTEND_ASSET_HUB,
   SwapProviderId.SIMPLE_SWAP,
   SwapProviderId.UNISWAP,
-  SwapProviderId.KYBER
+  SwapProviderId.KYBER,
+  SwapProviderId.OPTIMEX,
+  SwapProviderId.OPTIMEX_TESTNET,
+  SwapProviderId.BITTENSOR,
+  SwapProviderId.BITTENSOR_TESTNET
 ];
 
 export interface SwapProvider {
   id: SwapProviderId;
   name: string;
-
-  faq?: string;
 }
 
-// process handling
 export enum SwapFeeType {
   PLATFORM_FEE = 'PLATFORM_FEE',
   NETWORK_FEE = 'NETWORK_FEE',
@@ -138,35 +141,14 @@ export interface HydradxSwapTxData extends SwapBaseTxData {
 // parameters & responses
 export type GenSwapStepFuncV2 = (params: OptimalSwapPathParamsV2, stepIndex: number) => Promise<[BaseStepDetail, CommonStepFeeInfo] | undefined>;
 
-export interface ChainflipPreValidationMetadata {
-  minSwap: AmountData;
-  maxSwap?: AmountData;
-  chain: _ChainInfo;
-}
-
-export interface HydradxPreValidationMetadata {
-  maxSwap: AmountData;
-  chain: _ChainInfo;
-}
-
-export interface AssetHubPreValidationMetadata {
-  chain: _ChainInfo;
-  toAmount: string;
-  quoteRate: string;
-  priceImpactPct?: string;
-}
-
-export interface SimpleSwapValidationMetadata{
-  minSwap: AmountData;
-  maxSwap: AmountData;
-  chain: _ChainInfo;
-}
-
 export interface ProcessedQuoteAskResponse {
   quote?: SwapQuote;
   error?: SwapError;
 }
 
+/**
+ * @deprecated Use interface `SwapRequestV2` instead.
+ */
 export interface SwapRequest {
   address: string;
   pair: SwapPair;
@@ -179,6 +161,7 @@ export interface SwapRequest {
 
 export interface SwapRequestV2 {
   address: string;
+  alternativeAddress?: string; // use for dynamic swap in case the address is evm address on substrate chain
   pair: SwapPair;
   fromAmount: string;
   slippage: number; // Example: 0.01 for 1%
@@ -232,24 +215,10 @@ export interface DynamicSwapAction {
   pair: ActionPair;
 }
 
-export const enum BridgeStepPosition {
-  FIRST = 0,
-  AFTER_SWAP = 1
-}
-
 export interface OptimalSwapPathParamsV2 {
-  request: SwapRequest;
+  request: SwapRequestV2;
   selectedQuote?: SwapQuote;
   path: DynamicSwapAction[];
-}
-
-export interface SwapEarlyValidation {
-  error?: SwapErrorType;
-  metadata?: ChainflipPreValidationMetadata | HydradxPreValidationMetadata | AssetHubPreValidationMetadata;
-}
-
-export interface AssetHubSwapEarlyValidation extends SwapEarlyValidation {
-  metadata: AssetHubPreValidationMetadata;
 }
 
 export interface ValidateSwapProcessParams {

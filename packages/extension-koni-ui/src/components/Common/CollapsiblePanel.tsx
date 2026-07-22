@@ -12,15 +12,22 @@ interface Props extends ThemeProps{
   initOpen?: boolean;
   title: string;
   children?: React.ReactNode | React.ReactNode[]
+  onToggle?: (isOpen: boolean) => void;
 }
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { children, className, initOpen, title } = props;
+  const { children, className, initOpen, onToggle, title } = props;
   const [isOpen, setIsOpen] = useState(!!initOpen);
 
   const handleFilterOpening = useCallback(() => {
-    setIsOpen((prev) => !prev);
-  }, []);
+    setIsOpen((prev) => {
+      const next = !prev;
+
+      onToggle?.(next);
+
+      return next;
+    });
+  }, [onToggle]);
 
   return (
     <>
@@ -36,8 +43,8 @@ const Component: React.FC<Props> = (props: Props) => {
           <div className='__panel-title'>{title}</div>
           <div className='__panel-icon'>
             <Icon
+              customSize={'20px'}
               phosphorIcon={isOpen ? CaretUp : CaretDown}
-              size='sm'
             />
           </div>
         </div>

@@ -6,3 +6,4 @@ export { default as EarningPoolDetailModal } from './EarningPoolDetailModal';
 export { default as EarningNominationModal } from './EarningNominationModal';
 export { default as EarningValidatorDetailModal } from './EarningValidatorDetailModal';
 export { default as EarningValidatorDetailRWModal } from './EarningValidatorDetailRWModal';
+export { default as EarningBittensorClaimRewardTypeModal } from './EarningBittensorClaimRewardTypeModal';

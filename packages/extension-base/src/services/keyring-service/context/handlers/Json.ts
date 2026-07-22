@@ -60,6 +60,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (isPasswordValidated) {
       try {
         const { address, meta, type } = keyring.createFromJson(json);
+
         const { name } = meta;
         const account = transformAccount(address, type, meta);
         const accountExists = this.state.checkAddressExists([address]);
@@ -102,7 +103,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
         const _pair = keyring.createFromJson(file);
         const exists = this.state.checkAddressExists([_pair.address]);
 
-        assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
+        assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || _pair.address } }));
 
         const _name = _pair.meta.name as string || '';
 
@@ -254,7 +255,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
 
         if (!addresses.length) {
           if (_exists) {
-            throw new Error(t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: _exists.name || _exists.address || '' } }));
+            throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.accountAlreadyExistsWithName', { replace: { name: _exists.name || _exists.address || '' } }));
           } else {
             throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.noAccountsFoundToImport'));
           }
@@ -366,7 +367,7 @@ export class AccountJsonHandler extends AccountBaseHandler {
     } catch (e) {
       const error = e as Error;
 
-      if (error.message === 'bg.SETTING.services.service.setting.i18nExtend.invalidMasterPassword') {
+      if (error.message === 'Invalid master password') {
         throw new Error(t('bg.ACCOUNT.services.keyring.handler.Json.incorrectPassword'));
       } else {
         throw error;

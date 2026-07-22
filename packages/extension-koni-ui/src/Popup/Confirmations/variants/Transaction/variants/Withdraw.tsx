@@ -46,17 +46,17 @@ const Component: React.FC<Props> = (props: Props) => {
       >
         <MetaInfo.Number
           decimals={amountDecimals}
-          label={t('Amount')}
+          label={t('ui.TRANSACTION.Confirmations.Withdraw.amount')}
           suffix={amountSymbol}
           value={data.unstakingInfo.claimable}
         />
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('Estimated fee')}
+          label={t('ui.TRANSACTION.Confirmations.Withdraw.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </>
   );

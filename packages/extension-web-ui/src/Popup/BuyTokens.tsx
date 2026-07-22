@@ -13,7 +13,7 @@ import { useAssetChecker, useCoreCreateReformatAddress, useDefaultNavigate, useG
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { AccountAddressItemType, CreateBuyOrderFunction, ThemeProps, TokenSelectorItemType } from '@subwallet/extension-web-ui/types';
 import { BuyTokensParam } from '@subwallet/extension-web-ui/types/navigation';
-import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
+import { createBanxaOrder, createCoinbaseOrder, createMeldOrder, createTransakOrder, getAssetDisplayName, getSignModeByAccountProxy, noop, openInNewTab, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-web-ui/utils';
 import reformatAddress from '@subwallet/extension-web-ui/utils/account/reformatAddress';
 import { Button, Form, Icon, ModalContext, SwSubHeader } from '@subwallet/react-ui';
 import CN from 'classnames';
@@ -197,6 +197,7 @@ function Component ({ className, currentAccountProxy, modalContent, slug }: Prop
         name: assetRegistry[info.slug]?.name || info.symbol,
         slug: info.slug,
         symbol: info.symbol,
+        displayName: getAssetDisplayName(assetRegistry[info.slug], info.symbol),
         originChain: info.network,
         balanceInfo,
         isTestnet: !!balanceInfo?.isTestnet,

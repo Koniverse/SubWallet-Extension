@@ -64,8 +64,6 @@ const getPositionByRouteName = (currentRoute?: string) => {
       return 'nft';
     case '/home/earning':
       return 'earning';
-    case '/home/crowdloans':
-      return 'crowdloan';
     case '/home/mission-pools':
       return 'mission_pool';
     case '/home/history':
@@ -248,10 +246,6 @@ export const AppOnlineContentContextProvider = ({ children }: AppOnlineContentCo
           if (url.startsWith('subwallet://')) {
             if (parseUrl.pathname.startsWith('/main/nfts/collection')) {
               navigate('/home/nfts/collections');
-            }
-
-            if (parseUrl.pathname.startsWith('/main/crowdloans')) {
-              navigate('/home/crowdloans');
             }
 
             if (parseUrl.pathname.startsWith('/main/earning')) {

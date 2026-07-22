@@ -51,19 +51,19 @@ function Component ({ className, request }: Props) {
         <ConfirmationGeneralInfo request={request} />
         <div className={'account-list text-center'}>
           <Typography.Title level={4}>
-            {t('Your metadata is out of date')}
+            {t('ui.DAPP.Confirmations.Metadata.metadataOutOfDate')}
           </Typography.Title>
           <Typography.Paragraph className='text-tertiary'>
-            {t('Approving this update will sync your metadata for {{chainName}} chain from {{dAppUrl}}', { replace: { dAppUrl: request.url, chainName: chain } })}
+            {t('ui.DAPP.Confirmations.Metadata.approveMetadataUpdate', { replace: { dAppUrl: request.url, chainName: chain } })}
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
-            <span className='__prop-label text-tertiary text-right'>{t('Symbol')}</span> <span>{tokenSymbol}</span>
+            <span className='__prop-label text-tertiary text-right'>{t('ui.DAPP.Confirmations.Metadata.symbol')}</span> <span>{tokenSymbol}</span>
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
-            <span className='__prop-label text-tertiary text-right'>{t('Decimal')}</span> <span>{tokenDecimals}</span>
+            <span className='__prop-label text-tertiary text-right'>{t('ui.DAPP.Confirmations.Metadata.decimal')}</span> <span>{tokenDecimals}</span>
           </Typography.Paragraph>
           <Typography.Paragraph className={'text-left'}>
-            <span className='__prop-label text-tertiary text-right'>{t('Spec Version')}</span> <span>{specVersion}</span>
+            <span className='__prop-label text-tertiary text-right'>{t('ui.DAPP.Confirmations.Metadata.specVersion')}</span> <span>{specVersion}</span>
           </Typography.Paragraph>
         </div>
       </div>
@@ -79,7 +79,7 @@ function Component ({ className, request }: Props) {
           onClick={onCancel}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.DAPP.Confirmations.Metadata.cancel')}
         </Button>
         <Button
           icon={(
@@ -91,7 +91,7 @@ function Component ({ className, request }: Props) {
           loading={loading}
           onClick={onConfirm}
         >
-          {t('Approve')}
+          {t('ui.DAPP.Confirmations.Metadata.approve')}
         </Button>
       </div>
     </>

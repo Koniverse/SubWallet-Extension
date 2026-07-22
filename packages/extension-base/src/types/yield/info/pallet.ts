@@ -67,7 +67,7 @@ export enum PalletParachainStakingRequestType {
 }
 
 export interface PalletParachainStakingDelegationRequestsScheduledRequest {
-  delegator: string,
+  delegator?: string, // only for query 1 arg
   whenExecutable: number,
   action: Record<PalletParachainStakingRequestType, number>
 }

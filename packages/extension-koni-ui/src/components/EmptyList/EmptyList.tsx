@@ -21,15 +21,17 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={CN(className, 'empty-list')}>
-      <div className={'empty_icon_wrapper'}>
-        <PageIcon
-          color={token['gray-4']}
-          iconProps={{
-            phosphorIcon,
-            weight: 'fill'
-          }}
-        />
-      </div>
+      {!!phosphorIcon && (
+        <div className={'empty_icon_wrapper'}>
+          <PageIcon
+            color={token['gray-4']}
+            iconProps={{
+              phosphorIcon,
+              weight: 'fill'
+            }}
+          />
+        </div>
+      )}
 
       <div className={'empty_text_container'}>
         <div className={'empty_title'}>{emptyTitle}</div>

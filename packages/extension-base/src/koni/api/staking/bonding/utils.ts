@@ -223,6 +223,13 @@ export function calculateAlephZeroValidatorReturn (chainStakedReturn: number, co
   return chainStakedReturn * (100 - commission) / 100;
 }
 
+export function calculateEnergyWebCollatorReturn (annualReward: string, collatorCommission: number, numberCollators: number, totalStake: string): number {
+  const rewardForNominators = new BigNumber(annualReward).multipliedBy(1 - collatorCommission);
+  const rewardPerNominator = rewardForNominators.div(numberCollators);
+
+  return rewardPerNominator.div(totalStake).shiftedBy(2).toNumber();
+}
+
 export function calculateTernoaValidatorReturn (rewardPerValidator: number, validatorStake: number, commission: number) {
   const percentRewardForNominators = (100 - commission) / 100;
   const rewardForNominators = rewardPerValidator * percentRewardForNominators;
@@ -386,6 +393,8 @@ export function getYieldAvailableActionsByType (yieldPoolInfo: YieldPoolInfo): Y
     const chain = yieldPoolInfo.chain;
 
     if (_STAKING_CHAIN_GROUP.para.includes(chain)) {
+      return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
+    } else if (_STAKING_CHAIN_GROUP.energy.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.UNSTAKE, YieldAction.WITHDRAW, YieldAction.CANCEL_UNSTAKE];
     } else if (_STAKING_CHAIN_GROUP.astar.includes(chain)) {
       return [YieldAction.STAKE, YieldAction.CLAIM_REWARD, YieldAction.UNSTAKE, YieldAction.WITHDRAW];
@@ -717,13 +726,15 @@ export function getRelayEraRewardMap (eraRewardPointArray: Codec[], startEraForP
   return eraRewardMap;
 }
 
-export async function getRelayMaxNominations (substrateApi: _SubstrateApi) {
+export async function getRelayMaxNominations (substrateApi: _SubstrateApi, chain: string) {
   await substrateApi.isReady;
-  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || '16';
-  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0); // todo: review param. Currently return constant for all param.
+  const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString();
+  const _maxNominationsByNominationQuota = await substrateApi.api.call.stakingApi?.nominationsQuota(0);
   const maxNominationsByNominationQuota = _maxNominationsByNominationQuota?.toString();
 
-  return maxNominationsByNominationQuota || maxNominations;
+  const fallbackMaxNominations = ['zkverify_testnet', 'zkverify'].includes(chain) ? '10' : '16';
+
+  return maxNominationsByNominationQuota || maxNominations || fallbackMaxNominations;
 }
 
 export const getMinStakeErrorMessage = (chainInfo: _ChainInfo, bnMinStake: BN): string => {

@@ -38,13 +38,13 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const showNotification = useNotification();
   const [form] = Form.useForm<ChainDetailForm>();
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete network'),
+    title: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.deleteNetwork'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this network'),
-    content: t<string>('Confirm delete this network'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.aboutToDeleteNetwork'),
+    content: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.confirmDeleteNetwork'),
+    okText: t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.remove')
   });
 
   const [isChanged, setIsChanged] = useState(false);
@@ -95,18 +95,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             if (result) {
               navigate(-1);
               showNotification({
-                message: t('Deleted network successfully')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.deletedNetworkSuccessfully')
               });
             } else {
               showNotification({
-                message: t('Error. Please try again')
+                message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
               });
               setIsDeleting(false);
             }
           })
           .catch(() => {
             showNotification({
-              message: t('Error. Please try again')
+              message: t('ui.SETTINGS.screen.Setting.Chains.Detail.errorPleaseTryAgain')
             });
             setIsDeleting(false);
           });
@@ -202,19 +202,19 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
         if (result) {
           showNotification({
-            message: t('Updated network successfully')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.updatedNetworkSuccessfully')
           });
           navigate(-1);
         } else {
           showNotification({
-            message: t('An error occurred, please try again')
+            message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('An error occurred, please try again')
+          message: t('ui.SETTINGS.screen.Setting.Chains.Detail.anErrorOccurredPleaseTryAgain')
         });
       });
   }, [chainInfo.providers, chainInfo.slug, form, navigate, showNotification, t]);
@@ -254,7 +254,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Crowdloan URL must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrlMustBeValid')));
       }
     });
   }, [t]);
@@ -264,7 +264,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       if (value.length === 0 || isUrl(value)) {
         resolve();
       } else {
-        reject(new Error(t('Block explorer must be a valid URL')));
+        reject(new Error(t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorerMustBeValid')));
       }
     });
   }, [t]);
@@ -315,7 +315,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           ),
           loading: loading,
           onClick: onSubmit,
-          children: t('Save')
+          children: t('ui.SETTINGS.screen.Setting.Chains.Detail.save')
         }}
         showBackButton={true}
         showSubHeader={true}
@@ -323,7 +323,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Network detail')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Chains.Detail.networkDetail')}
       >
         <div className={'chain_detail__container'}>
           <Form
@@ -347,7 +347,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   : <Field
                     className={'chain_detail__provider_url'}
                     content={currentProviderUrl}
-                    placeholder={t('Provider URL')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.providerUrl')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -363,7 +363,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col span={16}>
                   <Field
                     content={chainInfo.name}
-                    placeholder={t('Network name')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     prefix={<Icon
                       customSize={'24px'}
                       iconColor={token['gray-4']}
@@ -371,15 +371,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                       type={'phosphor'}
                       weight={'bold'}
                     />}
-                    tooltip={t('Network name')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkName')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
                 <Col span={8}>
                   <Field
                     content={symbol}
-                    placeholder={t('Symbol')}
-                    tooltip={t('Symbol')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.symbol')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -389,8 +389,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={decimals}
-                    placeholder={t('Decimals')}
-                    tooltip={t('Decimals')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.decimals')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -400,8 +400,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={paraId > -1 ? paraId : undefined}
-                        placeholder={t('ParaId')}
-                        tooltip={t('ParaId')}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.paraId')}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -413,8 +413,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={chainId > -1 ? chainId : 'None'}
-                        placeholder={t('Chain ID')}
-                        tooltip={t('Chain ID')}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.chainId')}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -426,8 +426,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                     <Col>
                       <Field
                         content={addressPrefix.toString()}
-                        placeholder={t('Address prefix')}
-                        tooltip={t('Address prefix')}
+                        placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
+                        tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.addressPrefix')}
                         tooltipPlacement={'topLeft'}
                       />
                     </Col>
@@ -437,8 +437,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 <Col>
                   <Field
                     content={chainTypeString()}
-                    placeholder={t('Network type')}
-                    tooltip={t('Network type')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.networkType')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Col>
@@ -450,8 +450,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 statusHelpAsTooltip={true}
               >
                 <Input
-                  placeholder={t('Block explorer')}
-                  tooltip={t('Block explorer')}
+                  placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorer')}
+                  tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.blockExplorer')}
                   tooltipPlacement={'topLeft'}
                 />
               </Form.Item>
@@ -463,8 +463,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                   statusHelpAsTooltip={true}
                 >
                   <Input
-                    placeholder={t('Crowdloan URL')}
-                    tooltip={t('Crowdloan URL')}
+                    placeholder={t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrl')}
+                    tooltip={t('ui.SETTINGS.screen.Setting.Chains.Detail.crowdloanUrl')}
                     tooltipPlacement={'topLeft'}
                   />
                 </Form.Item>

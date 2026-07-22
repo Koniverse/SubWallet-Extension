@@ -82,7 +82,7 @@ export default class BitcoinRequestHandler {
     const duplicated = Object.values(confirmationType).find((c) => (c.url === url) && (c.payloadJson === payloadJson));
 
     if (duplicated) {
-      throw new Error('bg.DAPP.services.service.request.EvmHandler.duplicateRequest');
+      throw new Error('Duplicate request');
     }
 
     confirmationType[id] = {
@@ -129,7 +129,7 @@ export default class BitcoinRequestHandler {
     const exists = confirmationType[id];
 
     if (!exists) {
-      throw new Error('bg.DAPP.services.service.request.EvmHandler.requestDoesNotExist');
+      throw new Error('Request does not exist');
     }
 
     const payloadJson = JSON.stringify(payload);
@@ -292,7 +292,7 @@ export default class BitcoinRequestHandler {
     }
 
     if (!psptSignedTransaction) {
-      throw new Error('bg.TRANSACTION.core.validation.request.unableToSign');
+      throw new Error('Unable to sign');
     }
 
     if (!broadcast) {
@@ -392,8 +392,8 @@ export default class BitcoinRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('bg.koni.handler.Extension.unableToProceed'), type, id);
-        throw new Error('bg.koni.handler.Extension.unableToProceed');
+        this.#logger.error(t('bg.DAPP.services.service.request.BitcoinHandler.unableToProceed'), type, id);
+        throw new Error('Unable to proceed. Please try again');
       }
 
       if (isApproved) {

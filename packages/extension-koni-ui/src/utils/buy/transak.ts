@@ -1,22 +1,15 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { TRANSAK_API_KEY, TRANSAK_URL } from '@subwallet/extension-koni-ui/constants';
 import { CreateBuyOrderFunction } from '@subwallet/extension-koni-ui/types';
-import qs from 'querystring';
+import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 
 export const createTransakOrder: CreateBuyOrderFunction = (symbol, address, network) => {
-  return new Promise((resolve) => {
-    const params = {
-      apiKey: TRANSAK_API_KEY,
-      defaultCryptoCurrency: symbol,
-      networks: network,
-      cryptoCurrencyList: symbol,
-      walletAddress: address
-    };
-
-    const query = qs.stringify(params);
-
-    resolve(`${TRANSAK_URL}?${query}`);
+  return subwalletApiSdk.transakApi.generateOrderUrl({
+    symbol: symbol,
+    address: address,
+    network: network,
+    action: 'BUY',
+    referrerDomain: 'https://web.subwallet.app'
   });
 };

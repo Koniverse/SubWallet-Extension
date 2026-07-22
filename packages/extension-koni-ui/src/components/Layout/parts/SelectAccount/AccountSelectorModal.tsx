@@ -13,6 +13,7 @@ import { ACCOUNT_CHAIN_ADDRESSES_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/
 import { useDefaultNavigate, useExtensionDisplayModes, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
+import { AssetsTab } from '@subwallet/extension-koni-ui/Popup/Home/Tokens';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountDetailParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -114,6 +115,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const result: ListItem[] = [];
     const masterAccounts: AccountProxy[] = [];
     const qrSignerAccounts: ListItem[] = [];
+    const multisigAccounts: ListItem[] = [];
     const watchOnlyAccounts: ListItem[] = [];
     const ledgerAccounts: ListItem[] = [];
     const injectedAccounts: ListItem[] = [];
@@ -136,6 +138,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         masterAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.QR) {
         qrSignerAccounts.push(ap);
+      } else if (ap.accountType === AccountProxyType.MULTISIG) {
+        multisigAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.READ_ONLY) {
         watchOnlyAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.LEDGER) {
@@ -154,16 +158,25 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (qrSignerAccounts.length) {
       qrSignerAccounts.unshift({
         id: 'qr',
-        groupLabel: t('QR signer account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.qrSignerAccount')
       });
 
       result.push(...qrSignerAccounts);
     }
 
+    if (multisigAccounts.length) {
+      multisigAccounts.unshift({
+        id: 'multisig',
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.multisigAccount')
+      });
+
+      result.push(...multisigAccounts);
+    }
+
     if (watchOnlyAccounts.length) {
       watchOnlyAccounts.unshift({
         id: 'watch-only',
-        groupLabel: t('Watch-only account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.watchOnlyAccount')
       });
 
       result.push(...watchOnlyAccounts);
@@ -172,7 +185,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (ledgerAccounts.length) {
       ledgerAccounts.unshift({
         id: 'ledger',
-        groupLabel: t('Ledger account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.ledgerAccount')
       });
 
       result.push(...ledgerAccounts);
@@ -181,7 +194,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (injectedAccounts.length) {
       injectedAccounts.unshift({
         id: 'injected',
-        groupLabel: t('Injected account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.injectedAccount')
       });
 
       result.push(...injectedAccounts);
@@ -190,7 +203,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     if (unknownAccounts.length) {
       unknownAccounts.unshift({
         id: 'unknown',
-        groupLabel: t('Unknown account')
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.unknownAccount')
       });
 
       result.push(...unknownAccounts);
@@ -226,7 +239,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             if (locationPaths[1] === 'home') {
               if (locationPaths.length >= 3) {
                 if (pathName.startsWith('/home/nfts')) {
-                  navigate('/home/nfts/collections');
+                  navigate('/home/tokens', {
+                    state: { switchToTab: AssetsTab.NFTS }
+                  });
                 } else if (pathName.startsWith('/home/tokens/detail')) {
                   navigate('/home/tokens');
                 } else {
@@ -356,7 +371,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       onClick: () => {
         navigate('/settings/account-settings');
       },
-      tooltip: t('Account settings'),
+      tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.accountSettings'),
       tooltipPlacement: 'topRight'
     };
   }, [navigate, t]);
@@ -380,7 +395,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           destroyTooltipOnHide={true}
           overlayClassName={CN('__tooltip-overlay-remind')}
           placement={'bottomLeft'}
-          title={t('Export and back up accounts')}
+          title={t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.exportAndBackUpAccounts')}
         >
           <div>
             <Icon
@@ -424,7 +439,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         rightIconProps={rightIconProps}
         title={(
           <>
-            {t('Select account')}
+            {t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.selectAccount')}
 
             {isPopupMode && (
               <Button
@@ -441,7 +456,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           className={'__search-box'}
           key={searchInputRenderKey}
           onSearch={handleSearch}
-          placeholder={t<string>('Account name')}
+          placeholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.Modal.accountName')}
           searchValue={searchValue}
         />
         <SwList

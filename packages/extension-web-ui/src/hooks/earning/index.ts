@@ -11,3 +11,4 @@ export { default as usePreviewYieldGroupInfo } from './usePreviewYieldGroupInfo'
 export { default as usePreviewYieldPoolInfoByGroup } from './usePreviewYieldPoolInfoByGroup';
 export { default as useGetYieldPositionForSpecificAccount } from './useGetYieldPositionForSpecificAccount';
 export { default as useCreateGetSubnetStakingTokenName } from './useCreateGetSubnetStakingTokenName';
+export { default as useGetSubnetPoolPositionDetailByNetuid } from './useGetSubnetPoolPositionDetailByNetuid';

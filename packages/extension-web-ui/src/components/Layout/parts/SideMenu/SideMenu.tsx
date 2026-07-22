@@ -11,7 +11,7 @@ import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { computeStatus, getTransactionFromAccountProxyValue, isSoloTonAccountProxy, openInNewTab } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, Image } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { ArrowCircleLeft, ArrowCircleRight, ArrowsLeftRight, ArrowSquareUpRight, Clock, Gear, Globe, Info, MessengerLogo, Parachute, Rocket, Vault, Wallet } from 'phosphor-react';
+import { ArrowCircleLeft, ArrowCircleRight, ArrowsLeftRight, ArrowSquareUpRight, Clock, Gear, Globe, Info, MessengerLogo, Parachute, Vault, Wallet } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
@@ -81,7 +81,6 @@ function Component ({ className,
     'Home',
     'Tokens',
     'NftCollections',
-    'Crowdloans',
     'Staking',
     'Settings'
   ]);
@@ -142,16 +141,6 @@ function Component ({ className,
             </>
           )
         }
-      },
-      {
-        label: t('ui.components.Layout.Base.crowdloans'),
-        value: '/home/crowdloans',
-        icon: {
-          type: 'phosphor',
-          phosphorIcon: Rocket,
-          weight: 'fill'
-        },
-        disabled: isCurrentAccountProxySoloTon
       },
       {
         label: t('ui.components.Layout.Base.history'),

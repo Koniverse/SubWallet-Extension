@@ -17,7 +17,7 @@ export interface Web3TransactionBase {
   nonce: number;
   chainId: number;
   data?: string;
-  value: number;
+  value: number | string;
 }
 
 export interface Web3Transaction extends Web3TransactionBase {

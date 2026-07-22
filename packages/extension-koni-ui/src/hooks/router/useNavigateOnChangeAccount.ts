@@ -9,15 +9,15 @@ import { useNavigate } from 'react-router-dom';
 const useNavigateOnChangeAccount = (path = DEFAULT_ROUTER_PATH) => {
   const navigate = useNavigate();
 
-  const { currentAccount } = useSelector((state) => state.accountState);
+  const { currentAccountProxy } = useSelector((state) => state.accountState);
 
-  const [address] = useState(currentAccount?.address);
+  const [proxyId] = useState(currentAccountProxy?.id);
 
   useEffect(() => {
-    if (currentAccount?.address !== address) {
+    if (currentAccountProxy?.id !== proxyId) {
       navigate(path);
     }
-  }, [address, currentAccount?.address, navigate, path]);
+  }, [proxyId, currentAccountProxy?.id, navigate, path]);
 };
 
 export default useNavigateOnChangeAccount;

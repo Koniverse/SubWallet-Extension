@@ -12,6 +12,7 @@ export const IMPORT_ACCOUNT_MODAL = 'import-account-modal';
 export const ATTACH_ACCOUNT_MODAL = 'attach-account-modal';
 export const NEW_SEED_MODAL = 'new-seed-modal';
 export const IMPORT_SEED_MODAL = 'import-seed-modal';
+export const IMPORT_SEED_TRUST_MODAL = 'import-seed-trust-modal';
 export const DERIVE_ACCOUNT_MODAL = 'derive-account-modal';
 export const REQUEST_CREATE_PASSWORD_MODAL = 'request-create-password-modal';
 export const CONFIRMATION_DETAIL_MODAL = 'confirmation-detail-modal';
@@ -147,6 +148,7 @@ export const TRANSACTION_STEPS_MODAL = 'transaction-steps-modal';
 /* Other */
 export const EARNING_SLIPPAGE_MODAL = 'earning-slippage-modal';
 export const EARNING_SELECTED_VALIDATOR_MODAL = 'earning-selected-validator-modal';
+export const EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL = 'earning-bittensor-root-claim-type-modal';
 
 export const DAPP_CONFIGURATION_MODAL = 'dApp-configuration-modal';
 export const SWITCH_CURRENT_NETWORK_AUTHORIZE_MODAL = 'switch-current-network-authorize-modal';

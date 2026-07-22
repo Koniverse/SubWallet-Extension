@@ -20,7 +20,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       className={className}
       icon={FileArrowDown}
       id={IMPORT_SEED_MODAL}
-      label={t('Import account')}
+      label={t('ui.ACCOUNT.components.Modal.Account.ImportSeed.importAccount')}
       previousId={IMPORT_ACCOUNT_MODAL}
       url={'/accounts/import-seed-phrase'}
     />

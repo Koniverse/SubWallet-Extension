@@ -11,6 +11,7 @@ import { createAccountSuriV2, createSeedV2, windowOpen } from '@subwallet/extens
 import { RootState } from '@subwallet/extension-web-ui/stores';
 import { SeedPhraseTermStorage, ThemeProps } from '@subwallet/extension-web-ui/types';
 import { isFirefox, isNoAccount } from '@subwallet/extension-web-ui/utils';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType } from '@subwallet/keyring/types';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { saveAs } from 'file-saver';
@@ -119,11 +120,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   }, [seedPhrase, checkUnlock, activeModal]);
 
   const onSubmit = useCallback((accountName: string) => {
+    const types: KeypairType[] = selectedMnemonicType === 'ton'
+      ? ['ton-native']
+      : ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes];
+
     setLoading(true);
     createAccountSuriV2({
       name: accountName,
       suri: seedPhrase,
-      type: selectedMnemonicType === 'ton' ? 'ton-native' : undefined,
+      types,
       isAllowed: true
     })
       .then(() => {

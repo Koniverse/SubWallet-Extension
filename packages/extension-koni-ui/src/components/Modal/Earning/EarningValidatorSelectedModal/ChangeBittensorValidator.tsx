@@ -3,7 +3,6 @@
 
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
 import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -41,7 +40,7 @@ interface Props extends ThemeProps, BasicInputWrapper {
 }
 
 const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
-  const { chain, className = '', from, isSingleSelect: _isSingleSelect = false,
+  const { chain, className = '', from, isSingleSelect = false,
     modalId, nominations, onCancel, onChange, setForceFetchValidator, slug } = props;
 
   const [amountChange, setAmountChange] = useState(false);
@@ -63,7 +62,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const { alertModal: { close: closeAlert, open: openAlert } } = useContext(WalletModalContext);
   const { defaultData } = useTransactionContext<ChangeValidatorParams>();
   const { onError, onSuccess } = useHandleSubmitTransaction();
-
   const account = findAccountByAddress(accounts, from);
   const [form] = Form.useForm<ChangeValidatorParams>();
   const originValidator = useWatchTransaction('originValidator', form, defaultData);
@@ -73,8 +71,6 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   const poolInfo = poolInfoMap[slug];
 
   const formDefault = useMemo(() => ({ ...defaultData }), [defaultData]);
-  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(chain), [chain]);
-  const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
 
   const maxCount = useMemo(() => poolInfo?.statistic?.maxCandidatePerFarmer || 1, [poolInfo]);
   const networkPrefix = useMemo(() => chainInfoMap[poolInfo.chain]?.substrateInfo?.addressPrefix, [chainInfoMap, poolInfo]);
@@ -185,7 +181,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return (
       <MetaInfo.Default
         className='__label-bottom'
-        label={t('Subnet')}
+        label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.subnet')}
       >
         <div className='__subnet-wrapper'>
           <Logo
@@ -298,17 +294,17 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             if (error.message.includes('remaining')) {
               openAlert({
                 type: NotificationType.WARNING,
-                title: t('Pay attention!'),
+                title: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.payAttentionExclamation'),
                 content: error.message,
                 okButton: {
-                  text: t('Move all'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.moveAll'),
                   onClick: () => {
                     closeAlert();
                     send(bondedValue);
                   }
                 },
                 cancelButton: {
-                  text: t('Cancel'),
+                  text: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.cancel'),
                   onClick: () => {
                     closeAlert();
                     setSubmitLoading(false);
@@ -352,7 +348,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     chain && checkChain(chain);
   }, [chain, checkChain]);
 
-  const onPreCheck = usePreCheckAction(from);
+  const onPreCheck = usePreCheckAction({ chain, address: from });
 
   useExcludeModal(modalId);
 
@@ -374,12 +370,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           loading={submitLoading}
           onClick={onPreCheck(form.submit, ExtrinsicType.CHANGE_EARNING_VALIDATOR)}
         >
-          {t('Update validator')}
+          {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.updateValidator')}
         </Button>
       }
       id={modalId}
       onCancel={handleCancel}
-      title={t('Change validator')}
+      title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeValidator')}
     >
       <Form
         className={'form-container form-space-sm'}
@@ -397,7 +393,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           />
           <div className={'staked-balance__info'}>
             <span>
-              {t('Staked balance:')}
+              {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.stakedBalance')}
             </span>
             <span>
                   &nbsp;{formatBalance(bondedValue, decimals)}&nbsp;
@@ -412,7 +408,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             defaultValue={persistValidator}
             disabled={!from}
             isChangeValidator={true}
-            label={t('From')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.from')}
             networkPrefix={networkPrefix}
             nominators={nominations}
             poolInfo={poolInfo}
@@ -424,7 +420,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             chain={chain}
             disabled={!from}
             from={from}
-            label={t('Change to')}
+            label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeTo')}
             originValidator={originValidator}
             setForceFetchValidator={setForceFetchValidator}
             slug={slug}
@@ -436,7 +432,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             ? (
               <MetaInfo.Chain
                 chain={chain}
-                label={t('Network')}
+                label={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.network')}
               />
 
             )
@@ -447,9 +443,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         <div className='__amount-part'>
           <Tooltip
             placement={'topRight'}
-            title={t('Amount you want to move from the selected validator to the new validator')}
+            title={t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountToMoveDescription')}
           >
-            <div className='__item-left-part'>{t('Change staking amount')}
+            <div className='__item-left-part'>{t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.changeStakingAmount')}
               <Icon
                 className='__validator-info'
                 iconColor='white'
@@ -489,7 +485,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             </Form.Item>
             <div className={'minimum-stake__info'}>
               <div className={'minimum-stake__label'}>
-                {t('Minimum active stake')}
+                {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumActiveStake')}
               </div>
               <Number
                 className='minimum-stake__value'

@@ -56,14 +56,14 @@ export const parseInfuraFee = (info: InfuraFeeInfo, threshold: InfuraThresholdIn
 
 export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): Promise<EvmFeeInfo | null> => {
   const baseUrl = 'https://gas.api.infura.io/networks/{{chainId}}/suggestedGasFees';
-  const baseThressholdUrl = 'https://gas.api.infura.io/networks/{{chainId}}/busyThreshold';
+  const baseThresholdUrl = 'https://gas.api.infura.io/networks/{{chainId}}/busyThreshold';
   // const baseFeeHistoryUrl = 'https://gas.api.infura.io/networks/{{chainId}}/baseFeeHistory';
   // const baseFeePercentileUrl = 'https://gas.api.infura.io/networks/{{chainId}}/baseFeePercentile';
   const feeUrl = baseUrl.replaceAll('{{chainId}}', chainId.toString());
-  const thressholdUrl = baseThressholdUrl.replaceAll('{{chainId}}', chainId.toString());
+  const thresholdUrl = baseThresholdUrl.replaceAll('{{chainId}}', chainId.toString());
 
   try {
-    const [feeResp, thressholdResp] = await Promise.all([feeUrl, thressholdUrl].map((url) => {
+    const [feeResp, thresholdResp] = await Promise.all([feeUrl, thresholdUrl].map((url) => {
       return fetch(url, {
         method: 'GET',
         headers: {
@@ -75,7 +75,7 @@ export const fetchInfuraFeeData = async (chainId: number, infuraAuth?: string): 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const [feeInfo, thresholdInfo]: [InfuraFeeInfo, InfuraThresholdInfo] = await Promise.all([
       feeResp.json(),
-      thressholdResp.json()]);
+      thresholdResp.json()]);
 
     return parseInfuraFee(feeInfo, thresholdInfo);
   } catch (e) {
@@ -162,10 +162,8 @@ export const calculateGasFeeParams = async (web3: _EvmApi, networkKey: string, u
   }
 
   try {
-    if (networkKey === 'polygonzkEvm_cardona' || networkKey === 'polygonZkEvm') {
-      const isTestnet = networkKey === 'polygonzkEvm_cardona';
-      const gasDomain = isTestnet ? POLYGON_GAS_INDEXER.TESTNET : POLYGON_GAS_INDEXER.MAINNET;
-      const gasResponse = await fetch(`${gasDomain}`).then((res) => res.json()) as gasStation;
+    if (networkKey === 'polygonzkEvm_cardona') {
+      const gasResponse = await fetch(`${POLYGON_GAS_INDEXER.TESTNET}`).then((res) => res.json()) as gasStation;
       const gasPriceInWei = gasResponse.standard * 1e9 + 200000;
 
       return {

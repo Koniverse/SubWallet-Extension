@@ -51,6 +51,10 @@ function _getAppliedExistentialDeposit (accountInfo: FrameSystemAccountInfo, exi
     return bnExistentialDeposit;
   }
 
+  if (accountInfo.data.free.toString() === existentialDeposit) {
+    return BigInt(0);
+  }
+
   return _canAccountBeReaped(accountInfo) ? BigInt(0) : bnExistentialDeposit; // account for ED here will go better with max transfer logic
 }
 
@@ -76,4 +80,8 @@ function _getSystemPalletTransferableV1 (accountInfo: FrameSystemAccountInfoV1, 
 
 function _getSystemPalletTotalBalanceV1 (accountInfo: FrameSystemAccountInfoV1): bigint {
   return BigInt(accountInfo.data.free) + BigInt(accountInfo.data.reserved);
+}
+
+export function _getSystemPalletReservedBalance (accountInfo: FrameSystemAccountInfo): bigint {
+  return BigInt(accountInfo.data.reserved);
 }

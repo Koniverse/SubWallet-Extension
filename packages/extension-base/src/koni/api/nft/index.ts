@@ -17,7 +17,7 @@ import { VaraNftApi } from '@subwallet/extension-base/koni/api/nft/vara_nft';
 import { WasmNftApi } from '@subwallet/extension-base/koni/api/nft/wasm_nft';
 import { _NFT_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { _isChainSupportEvmNft, _isChainSupportNativeNft, _isChainSupportWasmNft, _isSupportOrdinal } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainSupportNativeNft, _isChainSupportWasmNft, _isSupportOrdinal } from '@subwallet/extension-base/services/chain-service/utils';
 import { getAddressesByChainType, targetIsWeb } from '@subwallet/extension-base/utils';
 
 import AssetHubNftsPalletApi from './assethub_nft';
@@ -39,8 +39,6 @@ function createSubstrateNftApi (chain: string, substrateApi: _SubstrateApi | nul
     return [new AssetHubUniquesPalletApi(substrateApi, substrateAddresses, chain), new AssetHubNftsPalletApi(substrateApi, substrateAddresses, chain)];
   } else if (_NFT_CHAIN_GROUP.statemint.includes(chain)) {
     return [new AssetHubUniquesPalletApi(substrateApi, substrateAddresses, chain), new AssetHubNftsPalletApi(substrateApi, substrateAddresses, chain)];
-  } else if (_NFT_CHAIN_GROUP.unique_network.includes(chain)) {
-    return [new UniqueNftApi(chain, substrateAddresses)];
   } else if (_NFT_CHAIN_GROUP.unique_evm.includes(chain)) {
     return [new UniqueNftApi(chain, evmAddresses)];
   } else if (_NFT_CHAIN_GROUP.bitcountry.includes(chain)) {
@@ -64,12 +62,6 @@ function createWasmNftApi (chain: string, apiProps: _SubstrateApi | null, addres
   const substrateAddresses = getAddressesByChainType(addresses, [ChainType.SUBSTRATE]);
 
   return new WasmNftApi(apiProps, substrateAddresses, chain);
-}
-
-function createWeb3NftApi (chain: string, evmApi: _EvmApi | null, addresses: string[]): BaseNftApi | null {
-  const evmAddresses = getAddressesByChainType(addresses, [ChainType.EVM]);
-
-  return new EvmNftApi(evmApi, evmAddresses, chain);
 }
 
 const createOrdinalApi = (chain: string, subscanChain: string, addresses: string[]) => {
@@ -151,16 +143,6 @@ export class NftHandler {
 
               if (handlers && !!handlers.length) {
                 this.handlers.push(...handlers);
-              }
-            }
-          }
-
-          if (_isChainSupportEvmNft(chainInfo)) {
-            if (this.evmApiMap[chain]) {
-              const handler = createWeb3NftApi(chain, this.evmApiMap[chain], evmAddresses);
-
-              if (handler) {
-                this.handlers.push(handler);
               }
             }
           }

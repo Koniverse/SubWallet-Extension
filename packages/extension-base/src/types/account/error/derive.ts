@@ -3,6 +3,7 @@
 
 import { SWError } from '@subwallet/extension-base/background/errors/SWError';
 import { detectTranslate } from '@subwallet/extension-base/utils';
+import { t } from 'i18next';
 
 export enum DeriveErrorType {
   INVALID_DERIVATION_PATH = 'INVALID_DERIVATION_PATH',
@@ -16,8 +17,8 @@ export enum DeriveErrorType {
 const DEFAULT_DATA: Record<DeriveErrorType, { message: string, code: number | undefined }> = {
   [DeriveErrorType.INVALID_DERIVATION_PATH]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.invalidDerivationPath'), code: 1001 },
   [DeriveErrorType.INVALID_DERIVATION_TYPE]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.derivationPathNotSupported'), code: 1002 },
-  [DeriveErrorType.ROOT_ACCOUNT_NOT_FOUND]: { message: detectTranslate('bg.ACCOUNT.types.error.account.common.accountNotFound'), code: 1003 },
-  [DeriveErrorType.INVALID_ACCOUNT_TYPE]: { message: detectTranslate('bg.TRANSACTION.core.validation.request.invalidAccountType'), code: 1004 },
+  [DeriveErrorType.ROOT_ACCOUNT_NOT_FOUND]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.accountNotFound'), code: 1003 },
+  [DeriveErrorType.INVALID_ACCOUNT_TYPE]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.invalidAccountType'), code: 1004 },
   [DeriveErrorType.MAX_DERIVATION_DEPTH]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.derivationPathNotSupported'), code: 1005 },
   [DeriveErrorType.MIN_DERIVATION_DEPTH]: { message: detectTranslate('bg.ACCOUNT.types.error.account.derive.derivationPathNotSupported'), code: 1006 }
 };
@@ -26,7 +27,7 @@ export class SWDeriveError extends SWError {
   override errorClass = 'Derive';
   constructor (errorType: DeriveErrorType, _message?: string) {
     const defaultData = DEFAULT_DATA[errorType];
-    const message = _message || defaultData.message;
+    const message = _message || t(defaultData.message) || '';
 
     super(errorType, message, defaultData.code);
   }

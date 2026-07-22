@@ -100,7 +100,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
     if (!accountProxies[proxyId]) {
       const pair = keyring.getPair(proxyId);
 
-      assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Modify.unableToFindAccount'));
 
       keyring.saveAccountMeta(pair, { ...pair.meta, name });
     } else {
@@ -113,7 +113,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
       for (const address of addresses) {
         const pair = keyring.getPair(address);
 
-        assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
+        assert(pair, t('bg.ACCOUNT.services.keyring.handler.Modify.unableToFindAccount'));
 
         keyring.saveAccountMeta(pair, { ...pair.meta, name });
       }
@@ -167,7 +167,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
     const pair = keyring.getPair(address);
 
     if (!pair) {
-      throw new Error('bg.ACCOUNT.types.error.account.common.accountNotFound');
+      throw new Error('Account not found');
     }
 
     const contractVersion: TonWalletContractVersion = pair.meta.tonContractVersion as TonWalletContractVersion;
@@ -224,17 +224,17 @@ export class AccountModifyHandler extends AccountBaseHandler {
     }
 
     if (!modifyAddress) {
-      throw new Error('bg.ACCOUNT.types.error.account.common.accountNotFound');
+      throw new Error('Account not found');
     }
 
     const pair = keyring.getPair(modifyAddress);
 
     if (!pair) {
-      throw new Error('bg.ACCOUNT.types.error.account.common.accountNotFound');
+      throw new Error('Account not found');
     }
 
     if (!TonKeypairTypes.includes(pair.type)) {
-      throw new Error('bg.TRANSACTION.core.validation.request.invalidAccountType');
+      throw new Error('Invalid account type');
     }
 
     const oldVerion = pair.ton.contractVersion;
@@ -277,7 +277,7 @@ export class AccountModifyHandler extends AccountBaseHandler {
     const childPairs = pairs.filter((pair) => pair.meta.parentAddress === oldAddress);
 
     for (const childPair of childPairs) {
-      assert(pair, t('bg.koni.handler.Extension.unableToFindAccount'));
+      assert(pair, t('bg.ACCOUNT.services.keyring.handler.Modify.unableToFindAccount'));
 
       keyring.saveAccountMeta(childPair, { ...childPair.meta, parentAddress: newAddress });
     }

@@ -10,7 +10,7 @@ import { TransactionError } from '../errors/TransactionError';
 
 const defaultWarningMap: Record<TransactionWarningType, { message: string, code?: number }> = {
   [BasicTxWarningCode.NOT_ENOUGH_EXISTENTIAL_DEPOSIT]: {
-    message: detectTranslate('bg.TRANSACTION.background.error.Transaction.insufficientBalanceForExistentialDeposit'),
+    message: detectTranslate('bg.TRANSACTION.background.warning.Transaction.insufficientBalanceForExistentialDeposit'),
     code: undefined
   },
   [BasicTxWarningCode.IS_BOUNCEABLE_ADDRESS]: {

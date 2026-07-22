@@ -10,6 +10,7 @@ export { default as useDeleteAccount } from './useDeleteAccount';
 export { default as useFormatAddress } from './useFormatAddress';
 export { default as useGetAccountByAddress } from './useGetAccountByAddress';
 export { default as useGetAccountChainAddresses } from './useGetAccountChainAddresses';
+export { default as useGetAccountProxyByAddress } from './useGetAccountProxyByAddress';
 export { default as useGetAccountProxyById } from './useGetAccountProxyById';
 export { default as useGetAccountSignModeByAddress } from './useGetAccountSignModeByAddress';
 export { default as useGetAccountTitleByAddress } from './useGetAccountTitleByAddress';

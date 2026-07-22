@@ -70,8 +70,30 @@ enum FilterValue {
   ETHEREUM = 'ethereum',
   CARDANO = 'cardano',
   BLOCKED = 'blocked',
-  Connected = 'connected',
+  CONNECTED = 'connected',
 }
+
+interface ItemRowProps {
+  item: AuthUrlInfo;
+  accountCount: number;
+  onNavigate: (item: AuthUrlInfo) => void;
+}
+
+const ItemRow = React.memo(function ItemRow ({ accountCount, item, onNavigate }: ItemRowProps) {
+  const handleClick = useCallback(() => {
+    onNavigate(item);
+  }, [item, onNavigate]);
+
+  return (
+    <WebsiteAccessItem
+      accountCount={accountCount}
+      className={'__item'}
+      domain={item.id}
+      onClick={handleClick}
+      siteName={item.origin || item.id}
+    />
+  );
+});
 
 function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const authUrlMap = useSelector((state: RootState) => state.settings.authUrls);
@@ -101,7 +123,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           if (!item.isAllowed) {
             return true;
           }
-        } else if (filter === FilterValue.Connected) {
+        } else if (filter === FilterValue.CONNECTED) {
           if (item.isAllowed) {
             return true;
           }
@@ -122,11 +144,11 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const filterOptions = useMemo(() => {
     return [
-      { label: t('Substrate dApp'), value: FilterValue.SUBSTRATE },
-      { label: t('Ethereum dApp'), value: FilterValue.ETHEREUM },
-      { label: t('Cardano dApp'), value: FilterValue.CARDANO },
-      { label: t('Blocked dApp'), value: FilterValue.BLOCKED },
-      { label: t('Connected dApp'), value: FilterValue.Connected }
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.substrateDapp'), value: FilterValue.SUBSTRATE },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.ethereumDapp'), value: FilterValue.ETHEREUM },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.cardanoDapp'), value: FilterValue.CARDANO },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.blockedDapp'), value: FilterValue.BLOCKED },
+      { label: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectedDapp'), value: FilterValue.CONNECTED }
     ];
   }, [t]);
 
@@ -148,7 +170,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'forget-all',
         icon: X,
         iconBackgroundColor: token.colorWarning,
-        title: t('Forget all'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.forgetAll'),
         onClick: () => {
           forgetAllSite(updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -158,7 +180,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'disconnect-all',
         icon: Plugs,
         iconBackgroundColor: token['gray-3'],
-        title: t('Disconnect all'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.disconnectAll'),
         onClick: () => {
           changeAuthorizationAll(false, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -168,7 +190,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         key: 'connect-all',
         icon: PlugsConnected,
         iconBackgroundColor: token['green-6'],
-        title: t('Connect all'),
+        title: t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.connectAll'),
         onClick: () => {
           changeAuthorizationAll(true, updateAuthUrls).catch(console.error);
           onCloseActionModal();
@@ -177,37 +199,43 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     ];
   }, [onCloseActionModal, t, token]);
 
-  const onClickItem = useCallback((item: AuthUrlInfo) => {
-    return () => {
-      navigate('/settings/dapp-access-edit', { state: {
-        siteName: item.origin,
-        origin: item.id,
-        accountAuthTypes: item.accountAuthTypes || ''
-      } as ManageWebsiteAccessDetailParam });
-    };
+  const accountCountMap = useMemo<Record<string, number>>(() => {
+    const map: Record<string, number> = {};
+
+    for (const item of websiteAccessItems) {
+      map[item.id] = getAccountCount(item, accountProxies);
+    }
+
+    return map;
+  }, [websiteAccessItems, accountProxies]);
+
+  const onNavigate = useCallback((item: AuthUrlInfo) => {
+    navigate('/settings/dapp-access-edit', { state: {
+      siteName: item.origin,
+      origin: item.id,
+      accountAuthTypes: item.accountAuthTypes || ''
+    } as ManageWebsiteAccessDetailParam });
   }, [navigate]);
 
   const renderItem = useCallback(
     (item: AuthUrlInfo) => {
       return (
-        <WebsiteAccessItem
-          accountCount={getAccountCount(item, accountProxies)}
-          className={'__item'}
-          domain={item.id}
+        <ItemRow
+          accountCount={accountCountMap[item.id] || 0}
+          item={item}
           key={item.id}
-          onClick={onClickItem(item)}
-          siteName={item.origin || item.id}
+          onNavigate={onNavigate}
         />
       );
     },
-    [accountProxies, onClickItem]
+    [accountCountMap, onNavigate]
   );
 
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your dApps will show up here')}
-        emptyTitle={t('No dApps found')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.yourDappsWillShowUpHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.noDappsFound')}
         phosphorIcon={GlobeHemisphereWest}
       />
     );
@@ -243,7 +271,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           }
         ]}
         showBackButton
-        title={t('Manage website access')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.manageWebsiteAccess')}
       />
 
       <SwList.Section
@@ -256,7 +284,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         renderWhenEmpty={renderEmptyList}
         searchFunction={searchFunc}
         searchMinCharactersCount={2}
-        searchPlaceholder={t<string>('Search or enter a website')}
+        searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.searchOrEnterWebsite')}
         showActionBtn
       />
 
@@ -264,7 +292,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         actions={actions}
         id={ACTION_MODAL_ID}
         onCancel={onCloseActionModal}
-        title={t('Access configuration')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.accessConfiguration')}
       />
 
       <FilterModal
@@ -274,7 +302,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         onChangeOption={onChangeFilterOption}
         optionSelectionMap={filterSelectionMap}
         options={filterOptions}
-        title={t('Filter')}
+        title={t('ui.SETTINGS.screen.Setting.Security.ManageWebsiteAccess.filter')}
       />
     </PageWrapper>
   );

@@ -64,6 +64,12 @@ export interface EventRegistry {
 
   // Ledger
   'ledger.ready': [boolean];
+
+  // Open Gov
+  'open-gov.ready': [boolean];
+
+  // Multisig
+  'multisig-service.ready': [boolean];
 }
 
 export type EventType = keyof EventRegistry;

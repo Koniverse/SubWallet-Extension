@@ -4,7 +4,7 @@
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { YieldPoolType } from '@subwallet/extension-base/types';
 import { EarningTagType } from '@subwallet/extension-web-ui/types';
-import { Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
+import { CirclesThreePlus, Database, HandsClapping, Leaf, User, Users } from 'phosphor-react';
 import { TFunction } from 'react-i18next';
 
 export const createEarningTagTypes = (t: TFunction): Record<YieldPoolType, EarningTagType> => {
@@ -43,6 +43,12 @@ export const createEarningTagTypes = (t: TFunction): Record<YieldPoolType, Earni
       label: t('ui.EARNING.screen.EarningPools.nativeStaking'),
       icon: Database,
       color: 'gold',
+      weight: 'fill'
+    },
+    [YieldPoolType.SUBNET_STAKING]: {
+      label: t('ui.EARNING.screen.EarningPools.subnetStaking'),
+      icon: CirclesThreePlus,
+      color: 'blue',
       weight: 'fill'
     }
   };

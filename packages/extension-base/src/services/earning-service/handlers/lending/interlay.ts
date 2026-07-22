@@ -12,6 +12,7 @@ import { BN, BN_TEN, BN_ZERO } from '@polkadot/util';
 import { fakeAddress } from '../../constants';
 import BaseLendingPoolHandler from './base';
 
+// TODO: disable earning and stake actions but keep showing existing earning positions (currently handle on UI)
 export default class InterlayLendingPoolHandler extends BaseLendingPoolHandler {
   public slug: string;
   protected readonly name: string;

@@ -26,7 +26,7 @@ import { AuthUrlInfo, AuthUrls } from '@subwallet/extension-base/services/reques
 import { DEFAULT_CHAIN_PATROL_ENABLE } from '@subwallet/extension-base/services/setting-service/constants';
 import { convertCardanoAddressToHex, getEVMChainInfo, reformatAddress, stripUrl } from '@subwallet/extension-base/utils';
 import { InjectedMetadataKnown, MetadataDef, ProviderMeta } from '@subwallet/extension-inject/types';
-import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, SubstrateKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, TonKeypairTypes } from '@subwallet/keyring/types';
 import { getBitcoinAddressInfo } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { SingleAddress, SubjectInfo } from '@subwallet/ui-keyring/observable/types';
@@ -66,7 +66,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
 
       const validTypes = {
         evm: EthereumKeypairTypes,
-        substrate: SubstrateKeypairTypes,
+        substrate: AllSubstrateKeypairTypes,
         ton: TonKeypairTypes,
         cardano: CardanoKeypairTypes,
         bitcoin: BitcoinKeypairTypes
@@ -96,7 +96,7 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
     }
   };
 
-  return Object
+  const injectedAccounts = Object
     .values(accounts)
     .filter(({ json: { meta: { isHidden } } }) => !isHidden)
     .filter(authTypeFilter)
@@ -108,6 +108,14 @@ function transformAccountsV2 (accounts: SubjectInfo, anyType = false, authInfo?:
       name,
       type
     }));
+
+  return injectedAccounts.map((acc) => {
+    if (acc.type === 'ed25519-tw') {
+      acc.type = 'ed25519';
+    }
+
+    return acc;
+  });
 }
 
 interface ChainPatrolResponse {
@@ -288,12 +296,17 @@ export default class KoniTabs {
       return this.checkPassList(url);
     }
 
-    if (this.#chainPatrolService) {
-      const isInChainPatrolDenyList = await chainPatrolCheckUrl(url);
+    // TODO: Temporarily disable the "Advanced phishing detection" feature
+    // because it produces incorrect results. It incorrectly flags
+    // YouTube, Facebook, and other social media platforms as phishing.
 
-      if (isInChainPatrolDenyList) {
-        return this.checkPassList(url);
-      }
+    if (this.#chainPatrolService) {
+      // const isInChainPatrolDenyList = await chainPatrolCheckUrl(url);
+      //
+      // if (isInChainPatrolDenyList) {
+      //   return this.checkPassList(url);
+      // }
+      return false;
     }
 
     return false;

@@ -37,6 +37,7 @@ export enum AccountProxyType {
   SOLO = 'solo',
   UNIFIED = 'unified',
   QR = 'qr',
+  MULTISIG = 'multisig',
   LEDGER = 'ledger',
   READ_ONLY = 'readonly',
   INJECTED = 'injected',

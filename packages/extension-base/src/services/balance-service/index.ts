@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { BalanceError } from '@subwallet/extension-base/background/errors/BalanceError';
 import { AmountData, APIItemState, BalanceErrorType, DetectBalanceCache, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
@@ -8,13 +9,13 @@ import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
+import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
-import { EthereumKeypairTypes, SubstrateKeypairTypes } from '@subwallet/keyring/types';
+import { AllSubstrateKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -23,6 +24,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { noop } from '@polkadot/util';
 
+import { _BALANCE_CHAIN_GROUP } from '../chain-service/constants';
 import { CreateXcmExtrinsicProps } from './transfer/xcm';
 import { _isAcrossChainBridge, getAcrossQuote } from './transfer/xcm/acrossBridge';
 import { BalanceMapImpl } from './BalanceMapImpl';
@@ -42,14 +44,16 @@ export class BalanceService implements StoppableServiceInterface {
   status: ServiceStatus = ServiceStatus.NOT_INITIALIZED;
 
   private isReload = false;
+  private requireOptimizeTokenList = false;
+
   get isStarted (): boolean {
     return this.status === ServiceStatus.STARTED;
   }
 
   private readonly detectAccountBalanceStore = new DetectAccountBalanceStore();
   private readonly balanceDetectSubject: BehaviorSubject<DetectBalanceCache> = new BehaviorSubject<DetectBalanceCache>({});
-  private readonly intervalTime = 3 * 60 * 1000;
-  private readonly cacheTime = 15 * 60 * 1000;
+  private readonly intervalTime = 3 * 60 * 1000; // scan balance every 3 mins
+  private readonly cacheTime = 15 * 60 * 1000; // cache time 15 mins to run again
 
   /**
    * @constructor
@@ -106,6 +110,11 @@ export class BalanceService implements StoppableServiceInterface {
     this.stopPromiseHandler = createPromiseHandler();
     this.status = ServiceStatus.STARTED;
     this.startPromiseHandler.resolve();
+
+    if (this.requireOptimizeTokenList) {
+      await this.optimizeEnableTokens();
+      this.requireOptimizeTokenList = false;
+    }
   }
 
   /** Stop service */
@@ -199,7 +208,7 @@ export class BalanceService implements StoppableServiceInterface {
     address: string,
     chain: string,
     tokenSlug: string | undefined,
-    balanceType: 'transferable' | 'total' | 'keepAlive' = 'transferable',
+    balanceType: BalanceType = BalanceType.TRANSFERABLE,
     extrinsicType?: ExtrinsicType,
     callback?: (rs: AmountData) => void
   ): Promise<[() => void, AmountData]> {
@@ -232,12 +241,34 @@ export class BalanceService implements StoppableServiceInterface {
 
       unsub = subscribeBalance([address], [chain], [tSlug], assetMap, chainInfoMap, substrateApiMap, evmApiMap, tonApiMap, cardanoApiMap, bitcoinApiMap, (result) => {
         const rs = result[0];
-
         let value: string;
 
         switch (balanceType) {
-          case 'total':
+          case BalanceType.TOTAL:
             value = new BigN(rs.free).plus(new BigN(rs.locked)).toFixed();
+            break;
+          case BalanceType.STAKING:
+            value = rs.lockedDetails?.staking || '0';
+            break;
+
+          case BalanceType.TOTAL_MINUS_RESERVED:
+            if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainInfo.slug)) {
+              // TODO: Currently Vara and Avail staking from nomination pools is not fully supported.
+              // Return `free` to avoid incorrect TOTAL_MINUS_RESERVED calculation.
+              // Improve later when full staking breakdown is available.
+              value = rs.free;
+            } else {
+              value = new BigN(rs.free)
+                .plus(new BigN(rs.locked))
+                .minus(
+                  BigN.max(
+                    new BigN(rs.lockedDetails?.reserved || 0),
+                    new BigN(rs.lockedDetails?.staking || 0)
+                  )
+                )
+                .toFixed();
+            }
+
             break;
           default:
             value = rs.free;
@@ -273,11 +304,15 @@ export class BalanceService implements StoppableServiceInterface {
   }
 
   public async subscribeTransferableBalance (address: string, chain: string, tokenSlug: string | undefined, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
-    return this.subscribeBalance(address, chain, tokenSlug, 'transferable', extrinsicType, callback);
+    return this.subscribeBalance(address, chain, tokenSlug, BalanceType.TRANSFERABLE, extrinsicType, callback);
   }
 
   public async subscribeTotalBalance (address: string, chain: string, tokenSlug: string | undefined, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
-    return this.subscribeBalance(address, chain, tokenSlug, 'total', extrinsicType, callback);
+    return this.subscribeBalance(address, chain, tokenSlug, BalanceType.TOTAL, extrinsicType, callback);
+  }
+
+  public async subscribeBalanceByType (address: string, chain: string, tokenSlug: string | undefined, balanceType: BalanceType = BalanceType.TRANSFERABLE, extrinsicType?: ExtrinsicType, callback?: (rs: AmountData) => void): Promise<[() => void, AmountData]> {
+    return this.subscribeBalance(address, chain, tokenSlug, balanceType, extrinsicType, callback);
   }
 
   /**
@@ -299,6 +334,12 @@ export class BalanceService implements StoppableServiceInterface {
 
   public async getTotalBalance (address: string, chain: string, tokenSlug?: string, extrinsicType?: ExtrinsicType): Promise<AmountData> {
     const [, balance] = await this.subscribeTotalBalance(address, chain, tokenSlug, extrinsicType);
+
+    return balance;
+  }
+
+  public async getBalanceByType (address: string, chain: string, tokenSlug?: string, balanceType: BalanceType = BalanceType.TRANSFERABLE, extrinsicType?: ExtrinsicType) {
+    const [, balance] = await this.subscribeBalanceByType(address, chain, tokenSlug, balanceType, extrinsicType);
 
     return balance;
   }
@@ -508,7 +549,7 @@ export class BalanceService implements StoppableServiceInterface {
     const assetMap = this.state.chainService.getAssetRegistry();
     const promiseList = addresses.map((address) => {
       const type = getKeypairTypeByAddress(address);
-      const typeValid = [...SubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+      const typeValid = [...AllSubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
         return this.state.subscanService.getMultiChainBalance(address)
@@ -527,22 +568,14 @@ export class BalanceService implements StoppableServiceInterface {
       const typeValid = [...EthereumKeypairTypes].includes(type);
 
       if (typeValid) {
-        return new Promise<string[] | null>((resolve) => {
-          const timeOutPromise = new Promise<string[]>((_resolve) => {
-            setTimeout(() => _resolve([]), 30000);
+        return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
+          .catch((e) => {
+            console.error(e);
+
+            return null;
           });
-
-          const balanceDetectionApi = subwalletApiSdk.balanceDetectionApi || Promise.resolve([]);
-
-          Promise.race([timeOutPromise, balanceDetectionApi.getEvmTokenBalanceSlug(address)])
-            .then((result) => resolve(result))
-            .catch((error) => {
-              console.error(error);
-              resolve(null);
-            });
-        });
       } else {
-        return Promise.resolve(null);
+        return null;
       }
     });
 
@@ -593,15 +626,15 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const balanceData of evmBalanceDataList) {
       if (balanceData) {
-        for (const slug of balanceData) {
-          const chainSlug = slug.split('-')[0];
+        for (const tokenSlug of balanceData) {
+          const chainSlug = tokenSlug.split('-')[0];
           const chainState = this.state.chainService.getChainStateByKey(chainSlug);
-          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === slug.toLowerCase());
 
-          // Cancel is chain is turned off by user
-          if (chainState && chainState.manualTurnOff) {
+          if (chainState?.manualTurnOff) {
             continue;
           }
+
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
 
           if (existedKey && !currentAssetSettings[existedKey]?.visible) {
             needEnableChains.push(chainSlug);
@@ -678,10 +711,10 @@ export class BalanceService implements StoppableServiceInterface {
     }
 
     const destChainInfo = this.state.chainService.getChainInfoByKey(params.destChain);
+    const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
 
     // xcm
     if (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && _isPureEvmChain(originChainInfo)) {
-      const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       return getSnowbridgeTransferProcessFromEvm(params.address, evmApi, tokenInfo, params.amount);
@@ -716,10 +749,290 @@ export class BalanceService implements StoppableServiceInterface {
           throw new Error('Failed to fetch Across Bridge Data. Please try again later');
         }
 
-        return getAcrossbridgeTransferProcessFromEvm(data.to);
+        return getAcrossbridgeTransferProcessFromEvm(data.to, params.address, originTokenInfo, evmApi, params.amount);
       }
     }
 
     return getDefaultTransferProcess();
+  }
+
+  // only evm addresses
+  public async evmDetectBalanceToken (addresses: string[]) {
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const evmPromiseList = addresses.map((address) => {
+      return subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalance(address)
+        .catch((e) => {
+          console.error(e);
+
+          return null;
+        });
+    });
+
+    const needActiveTokens: string[] = [];
+    const evmBalanceDataList = await Promise.all(evmPromiseList);
+
+    for (const balanceData of evmBalanceDataList) {
+      if (balanceData) {
+        for (const tokenSlug of balanceData) {
+          const chainSlug = tokenSlug.split('-')[0];
+          const chainState = this.state.chainService.getChainStateByKey(chainSlug);
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenSlug.toLowerCase());
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey) {
+            needActiveTokens.push(existedKey);
+          }
+        }
+      }
+    }
+
+    return needActiveTokens;
+  }
+
+  // only for substrate addresses
+  public async substrateDetectBalanceToken (addresses: string[]) {
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const promiseList = addresses.map((address) => {
+      return this.state.subscanService.getMultiChainBalance(address)
+        .catch((e) => {
+          console.error(e);
+
+          return null;
+        });
+    });
+
+    const needActiveTokens: string[] = [];
+    const balanceDataList = await Promise.all(promiseList);
+    const chainInfoMap = this.state.chainService.getChainInfoMap();
+    const detectBalanceChainSlugMap = this.state.chainService.detectBalanceChainSlugMap;
+
+    for (const balanceData of balanceDataList) {
+      if (balanceData) {
+        for (const balanceDatum of balanceData) {
+          const { balance, bonded, category, locked, network, symbol } = balanceDatum;
+          const chain = detectBalanceChainSlugMap[network];
+          const chainState = this.state.chainService.getChainStateByKey(chain);
+          const chainInfo = chain ? chainInfoMap[chain] : null;
+          const balanceIsEmpty = (!balance || balance === '0') && (!locked || locked === '0') && (!bonded || bonded === '0');
+          const tokenKey = `${chain}-${category === 'native' ? 'NATIVE' : 'LOCAL'}-${symbol.toUpperCase()}`;
+          const existedKey = Object.keys(assetMap).find((v) => v.toLowerCase() === tokenKey.toLowerCase());
+
+          // Cancel if chain is not supported or is testnet
+          if (!chainInfo || chainInfo.isTestnet) {
+            continue;
+          }
+
+          // Cancel is balance is 0
+          if (balanceIsEmpty) {
+            continue;
+          }
+
+          // Cancel is chain is turned off by user
+          if (chainState && chainState.manualTurnOff) {
+            continue;
+          }
+
+          if (existedKey) {
+            needActiveTokens.push(existedKey);
+          }
+        }
+      }
+    }
+
+    return needActiveTokens;
+  }
+
+  public async evmDetectBalanceChain () {
+    const blockscoutChain = await subwalletApiSdk.balanceDetectionApi.getBlockscoutChainData();
+    const blockscoutChainId = Object.keys(blockscoutChain);
+
+    const evmDetectChain = Object.values(this.state.chainService.getChainInfoMap())
+      .filter((info) => !!info.evmInfo?.evmChainId && blockscoutChainId.includes(info.evmInfo?.evmChainId.toString()))
+      .map((chainInfo) => chainInfo.slug);
+
+    return evmDetectChain;
+  }
+
+  public substrateDetectBalanceChain () {
+    const substrateDetectChain = Object.values(this.state.chainService.getChainInfoMap())
+      .filter((info) => !!info.substrateInfo && !!info.extraInfo?.chainBalanceSlug)
+      .map((chainInfo) => chainInfo.slug);
+
+    return substrateDetectChain;
+  }
+
+  /** optimize token area **/
+
+  public enableOptimizeTokenPromise (): void {
+    this.requireOptimizeTokenList = true;
+  }
+
+  public async optimizeEnableTokens () {
+    try {
+      const assetSettings = await this.state.chainService.getAssetSettings();
+      const assetMap = this.state.chainService.getAssetRegistry();
+
+      const addresses = keyring.getPairs().map((account) => account.address);
+      const evmAddresses = addresses.filter((address) => [...EthereumKeypairTypes].includes(getKeypairTypeByAddress(address)));
+      const substrateAddresses = addresses.filter((address) => [...AllSubstrateKeypairTypes].includes(getKeypairTypeByAddress(address)));
+
+      const [nonZeroBalanceEvmToken, nonZeroBalanceSubstrateToken] = await Promise.all([
+        this.evmDetectBalanceToken(evmAddresses),
+        this.substrateDetectBalanceToken(substrateAddresses)
+      ]);
+
+      const substrateDetectChain = this.substrateDetectBalanceChain();
+      const evmDetectChain = await this.evmDetectBalanceChain();
+
+      const updatedSettings = structuredClone(assetSettings);
+
+      Object.entries(assetSettings).forEach(([tokenSlug, setting]) => {
+        const isNonZeroBalanceToken = nonZeroBalanceEvmToken.includes(tokenSlug) || nonZeroBalanceSubstrateToken.includes(tokenSlug);
+        const assetInfo = assetMap[tokenSlug];
+        const isEvmDetectChain = evmDetectChain.includes(assetInfo.originChain);
+        const isSubstrateDetectChain = substrateDetectChain.includes(assetInfo.originChain);
+
+        if (isNonZeroBalanceToken && !setting.visible) {
+          // enable non-zero balance tokens
+          updatedSettings[tokenSlug] = {
+            visible: true
+          };
+        } else if (!isNonZeroBalanceToken && setting.visible && !_isNativeToken(assetInfo) && !_isCustomAsset(tokenSlug) && (isEvmDetectChain || isSubstrateDetectChain)) {
+          // hide tokens with zero balance that aren't native or custom
+          updatedSettings[tokenSlug] = {
+            visible: false
+          };
+        }
+      });
+
+      this.state.chainService.setAssetSettings(updatedSettings);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /** Return token slugs with balance in evm chain - only work with evm addresses & pure evm chains  **/
+  public async getEvmTokensBalanceByChain (address: string, chainSlug: string): Promise<string[]> {
+    const tokenBalanceSlugs = await subwalletApiSdk.balanceDetectionApi.getSwEvmTokenBalanceByChain(address, chainSlug);
+
+    return tokenBalanceSlugs;
+  }
+
+  /** Return token slugs with balance in substrate chain - only work with substrate chains that have subscanSlug **/
+  public async getSubstrateTokensBalanceByChain (address: string, chainSlug: string, assetsByChain: Record<string, _ChainAsset>): Promise<string[]> {
+    const tokenBalanceSlugs: string[] = [];
+
+    // Do not block chain enabling flow when balance detection fails.
+    const balanceData = await this.state.subscanService.getMultiChainBalance(address)
+      .catch((e) => {
+        console.error(e);
+
+        return [];
+      });
+
+    if (!balanceData) {
+      return [];
+    }
+
+    for (const datum of balanceData) {
+      const { balance, bonded, category, locked, network, symbol } = datum;
+      const chain = this.state.chainService.detectBalanceChainSlugMap[network];
+
+      if (chain !== chainSlug) {
+        continue;
+      }
+
+      const isBalanceEmpty = (!balance || balance === '0') && (!locked || locked === '0') && (!bonded || bonded === '0');
+
+      if (isBalanceEmpty) {
+        continue;
+      }
+
+      const tokenKey = `${chain}-${category === 'native' ? 'NATIVE' : 'LOCAL'}-${symbol.toUpperCase()}`;
+      const existedKey = Object.keys(assetsByChain).find((v) => v.toLowerCase() === tokenKey.toLowerCase());
+
+      if (existedKey) {
+        tokenBalanceSlugs.push(existedKey);
+      }
+    }
+
+    return tokenBalanceSlugs;
+  }
+
+  public getCurrentAccountAddressByChain (chainInfo: _ChainInfo): string | undefined {
+    const proxyId = this.state.keyringService.context.currentAccount.proxyId;
+    const addresses = this.state.keyringService.context.addressesByProxyId(proxyId);
+
+    if (_isPureEvmChain(chainInfo)) {
+      const evmAddress = addresses.find((address) => {
+        const type = getKeypairTypeByAddress(address);
+
+        return [...EthereumKeypairTypes].includes(type);
+      });
+
+      if (evmAddress) {
+        return evmAddress;
+      }
+    }
+
+    if (_isChainSubstrateCompatible(chainInfo)) {
+      const substrateAddress = addresses.find((address) => {
+        const type = getKeypairTypeByAddress(address);
+
+        return [...AllSubstrateKeypairTypes, ...EthereumKeypairTypes].includes(type);
+      });
+
+      if (substrateAddress) {
+        return substrateAddress;
+      }
+    }
+
+    return undefined;
+  }
+
+  /** re-detect balance & enable custom, priority tokens when enabling chain again **/
+  public async updatePriorityAssetsByChain (chainSlug: string, visible: boolean) {
+    const currentAssetSettings = await this.state.chainService.getAssetSettings();
+    const assetsByChain = this.state.chainService.getFungibleTokensByChain(chainSlug);
+    const priorityTokensMap = this.state.chainService.value.priorityTokens || {};
+    const chainInfo = this.state.chainService.getChainInfoByKey(chainSlug);
+
+    const address = this.getCurrentAccountAddressByChain(chainInfo);
+
+    const tokenSlugsWithBalance: string[] = [];
+
+    if (address && !_isCustomChain(chainInfo.slug)) {
+      if (_isPureEvmChain(chainInfo)) {
+        tokenSlugsWithBalance.push(...await this.getEvmTokensBalanceByChain(address, chainSlug));
+      } else if (_isChainSubstrateCompatible(chainInfo)) {
+        tokenSlugsWithBalance.push(...await this.getSubstrateTokensBalanceByChain(address, chainSlug, assetsByChain));
+      }
+    }
+
+    tokenSlugsWithBalance.forEach((tokenSlug) => {
+      currentAssetSettings[tokenSlug] = { visible: true };
+    });
+
+    const priorityTokensList = priorityTokensMap.token && typeof priorityTokensMap.token === 'object'
+      ? Object.keys(priorityTokensMap.token)
+      : [];
+
+    for (const asset of Object.values(assetsByChain)) {
+      if (visible) {
+        const isPriorityToken = priorityTokensList.includes(asset.slug) || _isCustomAsset(asset.slug);
+
+        if (isPriorityToken || _isNativeToken(asset)) {
+          currentAssetSettings[asset.slug] = { visible: true };
+        }
+      } else {
+        currentAssetSettings[asset.slug] = { visible: false };
+      }
+    }
+
+    this.state.chainService.setAssetSettings(currentAssetSettings);
   }
 }

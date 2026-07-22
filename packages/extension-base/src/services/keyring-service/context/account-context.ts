@@ -1,11 +1,14 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { AccountExternalError, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestChangeMasterPassword, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestPingSession, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseMigratePassword } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountExternalError, AccountMultisigError, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateMultisig, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestChangeMasterPassword, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestPingSession, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseMigratePassword } from '@subwallet/extension-base/background/KoniTypes';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { AccountMigrationHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Migration';
+import { AccountMultisigHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Multisig';
 import { AccountProxyMap, CurrentAccountInfo, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseJsonGetAccountInfo, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2 } from '@subwallet/extension-base/types';
+import { MultisigAccountInfo, RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
+import { reformatAddress } from '@subwallet/extension-base/utils';
 import { InjectedAccountWithMeta } from '@subwallet/extension-inject/types';
 import { SubjectInfo } from '@subwallet/ui-keyring/observable/types';
 
@@ -22,6 +25,7 @@ export class AccountContext {
   private readonly modifyHandler: AccountModifyHandler;
   private readonly secretHandler: AccountSecretHandler;
   private readonly migrationHandler: AccountMigrationHandler;
+  private readonly multisigHandler: AccountMultisigHandler;
 
   constructor (private readonly koniState: KoniState, private readonly parentService: KeyringService) {
     this.state = new AccountState(this.koniState);
@@ -33,6 +37,7 @@ export class AccountContext {
     this.modifyHandler = new AccountModifyHandler(this.parentService, this.state);
     this.secretHandler = new AccountSecretHandler(this.parentService, this.state);
     this.migrationHandler = new AccountMigrationHandler(this.parentService, this.state);
+    this.multisigHandler = new AccountMultisigHandler(this.parentService, this.state);
   }
 
   // TODO: Merge to value
@@ -165,6 +170,17 @@ export class AccountContext {
     return this.secretHandler.accountsCreateExternalV2(request);
   }
 
+  /* Multisig */
+  public async accountsCreateMultisig (request: RequestAccountCreateMultisig): Promise<AccountMultisigError[]> {
+    return this.multisigHandler.accountsCreateMultisig(request);
+  }
+
+  public getSignableAccountInfos (request: RequestGetSignableAccountInfos): ResponseGetSignableAccountInfos {
+    const chainInfo = this.koniState.chainService.getChainInfoByKey(request.chain);
+
+    return this.multisigHandler.getSignableAccountInfos(request, chainInfo);
+  }
+
   /* Import ethereum account with the private key  */
   public privateKeyValidateV2 (request: RequestPrivateKeyValidateV2): ResponsePrivateKeyValidateV2 {
     return this.secretHandler.privateKeyValidateV2(request);
@@ -288,6 +304,46 @@ export class AccountContext {
   }
 
   /* Migration */
+
+  /* Multisig */
+
+  public getMultisigAccounts () {
+    return this.state.getMultisigAccounts();
+  }
+
+  public getMultisigAccountByAddress (address?: string) {
+    if (!address) {
+      return undefined;
+    }
+
+    const allMultisigAccounts = this.getMultisigAccounts();
+
+    return allMultisigAccounts.find((acc) => acc.accounts[0].address === reformatAddress(address));
+  }
+
+  public getMultisigAccountInfoByAddress (address?: string): MultisigAccountInfo | undefined {
+    const accountProxy = this.getMultisigAccountByAddress(address);
+
+    if (!accountProxy) {
+      return undefined;
+    }
+
+    const threshold = accountProxy.accounts[0].threshold as number;
+    const signers = accountProxy.accounts[0].signers as string[];
+    const multisigAddress = accountProxy.accounts[0].address;
+
+    return {
+      threshold,
+      signers,
+      multisigAddress
+    };
+  }
+
+  public getMultisigAddresses () {
+    return this.state.getMultisigAddresses();
+  }
+
+  /* Multisig */
 
   /* Others */
 

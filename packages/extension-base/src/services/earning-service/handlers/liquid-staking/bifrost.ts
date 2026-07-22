@@ -55,7 +55,7 @@ export default class BifrostLiquidStakingPoolHandler extends BaseLiquidStakingPo
   public slug: string;
   protected name: string;
   protected shortName: string;
-  protected readonly altInputAsset: string = 'polkadot-NATIVE-DOT';
+  protected readonly altInputAsset: string = 'statemint-NATIVE-DOT';
   protected readonly derivativeAssets: string[] = ['bifrost_dot-LOCAL-vDOT'];
   protected readonly inputAsset: string = 'bifrost_dot-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['bifrost_dot-LOCAL-DOT'];

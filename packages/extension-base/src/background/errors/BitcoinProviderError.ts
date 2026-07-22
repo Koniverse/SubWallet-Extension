@@ -8,31 +8,31 @@ import { t } from 'i18next';
 
 const defaultErrorMap: Record<BitcoinProviderErrorType, { message: string, code?: number }> = {
   USER_REJECTED_REQUEST: {
-    message: detectTranslate('bg.DAPP.background.error.EvmProvider.userRejectedRequest'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.userRejectedRequest'),
     code: 4001
   },
   UNAUTHORIZED: {
-    message: detectTranslate('bg.DAPP.background.error.EvmProvider.failedToSign'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.failedToSign'),
     code: 4100
   },
   UNSUPPORTED_METHOD: {
-    message: detectTranslate('bg.DAPP.background.error.EvmProvider.unsupportedMethod'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.unsupportedMethod'),
     code: 4200
   },
   DISCONNECTED: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.networkIsDisconnected'),
     code: 4900
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.networkIsDisconnected'),
     code: 4901
   },
   INVALID_PARAMS: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.undefinedErrorContactSupport'),
     code: -32602
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.DAPP.background.error.BitcoinProvider.undefinedErrorContactSupport'),
     code: -32603
   }
 };

@@ -40,8 +40,10 @@ const Component: React.FC<Props> = (props: Props) => {
     cancelDisabled,
     rightIconProps,
     content,
+    hideIcon,
     modalId,
     subtitle,
+    subtitleDanger,
     okButton,
     okLoading,
     title,
@@ -104,25 +106,27 @@ const Component: React.FC<Props> = (props: Props) => {
         title={title}
       >
         <div className='__modal-content'>
-          <div className={CN('__alert-icon', {
-            '-info': type === NotificationType.INFO,
-            '-success': type === NotificationType.SUCCESS,
-            '-warning': type === NotificationType.WARNING,
-            '-error': type === NotificationType.ERROR
-          })}
-          >
-            <PageIcon
-              color='var(--page-icon-color)'
-              iconProps={{
-                weight: alertTypeAndIconMap[type].weight as IconProps['weight'],
-                phosphorIcon: alertTypeAndIconMap[type].icon
-              }}
-            />
-          </div>
+          {!hideIcon && (
+            <div className={CN('__alert-icon', {
+              '-info': type === NotificationType.INFO,
+              '-success': type === NotificationType.SUCCESS,
+              '-warning': type === NotificationType.WARNING,
+              '-error': type === NotificationType.ERROR
+            })}
+            >
+              <PageIcon
+                color='var(--page-icon-color)'
+                iconProps={{
+                  weight: alertTypeAndIconMap[type].weight as IconProps['weight'],
+                  phosphorIcon: alertTypeAndIconMap[type].icon
+                }}
+              />
+            </div>
+          )}
 
           {
             !!subtitle && (
-              <div className={'__subtitle'}>{subtitle}</div>
+              <div className={CN('__subtitle', { '-danger': subtitleDanger })}>{subtitle}</div>
             )
           }
 
@@ -183,7 +187,11 @@ const AlertModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
       color: token.colorTextLight1,
       fontSize: token.fontSizeLG,
       lineHeight: token.lineHeightLG,
-      marginBottom: 20
+      marginBottom: 20,
+
+      '&.-danger': {
+        color: token.colorError
+      }
     }
   };
 });

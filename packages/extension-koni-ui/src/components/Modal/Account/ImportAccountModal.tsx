@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import DefaultLogosMap from '@subwallet/extension-koni-ui/assets/logo';
+import { IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { useClickOutSide, useExtensionDisplayModes, useGoBackSelectAccount, useSetSessionLatest, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
@@ -22,7 +23,7 @@ type Props = ThemeProps;
 interface ImportAccountItem {
   label: string;
   key: string;
-  icon: PhosphorIcon;
+  icon: PhosphorIcon | React.ReactNode;
   backgroundColor: string;
   onClick: () => void;
 }
@@ -72,44 +73,66 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     navigate('/accounts/import-seed-phrase');
   }, [inactiveModal, navigate]);
 
+  const onClickSeedTrust = useCallback(() => {
+    inactiveModal(modalId);
+    navigate(`/accounts/import-seed-phrase?type=${TRUST_WALLET_MNEMONIC_TYPE}`);
+  }, [inactiveModal, navigate]);
+
   const items = useMemo((): ImportAccountItem[] => [
     {
       backgroundColor: token['green-7'],
       icon: Leaf,
       key: 'import-seed-phrase',
-      label: t('Import from seed phrase'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhrase'),
       onClick: onClickSeed
     },
     {
       backgroundColor: token['orange-7'],
       icon: FileJs,
       key: 'restore-json',
-      label: t('Import from JSON file'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromJsonFile'),
       onClick: onClickJson
     },
     {
       backgroundColor: token['gray-3'],
       icon: Wallet,
       key: 'import-private-key',
-      label: t('Import from private key'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromPrivateKey'),
       onClick: onClickItem('/accounts/import-private-key')
     },
     {
       backgroundColor: token['blue-7'],
       icon: QrCode,
       key: 'import-by-qr',
-      label: t('Import by QR code'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importByQrCode'),
       onClick: onClickItem('/accounts/import-by-qr')
+    },
+    {
+      backgroundColor: token.colorTextBase,
+      icon: (
+        <img
+          alt=''
+          src={DefaultLogosMap.trust}
+          style={{ width: '24px', height: '24px', objectFit: 'contain', display: 'block', borderRadius: '50%' }}
+        />
+      ),
+      key: 'import-seed-phrase-trust',
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust'),
+      onClick: onClickSeedTrust
     }
-  ], [token, t, onClickSeed, onClickJson, onClickItem]);
+  ], [token, t, onClickSeed, onClickJson, onClickItem, onClickSeedTrust]);
 
   const renderIcon = useCallback((item: ImportAccountItem) => {
+    const isNode = React.isValidElement(item.icon);
+
     return (
       <BackgroundIcon
         backgroundColor={item.backgroundColor}
+        customIcon={isNode ? item.icon as React.ReactNode : undefined}
         iconColor={token.colorText}
-        phosphorIcon={item.icon}
+        phosphorIcon={isNode ? undefined : item.icon as PhosphorIcon}
         size='sm'
+        type={isNode ? 'customIcon' : 'phosphor'}
         weight='fill'
       />
     );
@@ -126,7 +149,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         icon: <CloseIcon />,
         onClick: onCancel
       }}
-      title={t<string>('Import account')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Import.importAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

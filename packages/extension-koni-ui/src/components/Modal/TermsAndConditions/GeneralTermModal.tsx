@@ -64,7 +64,7 @@ const Component = ({ className, onOk }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('Terms of Use')}
+      title={t('ui.TERM.components.Modal.Terms.General.termsOfUseTitle')}
     >
       <div
         className={'term-body'}
@@ -88,7 +88,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >{t('I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature')}</Checkbox>
+        >{t('ui.TERM.components.Modal.Terms.General.agreeToTermsOfUse')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}
@@ -102,9 +102,9 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('Continue')}
+            {t('ui.TERM.components.Modal.Terms.General.continue')}
           </Button>
-          <span className={'term-footer-annotation'}>{t('Scroll to read all sections')}</span>
+          <span className={'term-footer-annotation'}>{t('ui.TERM.components.Modal.Terms.General.scrollToReadAll')}</span>
         </div>
 
       </div>

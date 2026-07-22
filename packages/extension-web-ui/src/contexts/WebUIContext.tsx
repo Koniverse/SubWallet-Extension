@@ -115,7 +115,7 @@ export const WebUIContextProvider = ({ children }: WebUIContextProviderProps) =>
       !isPortfolio && setBackground(BackgroundColorMap.COMMON);
 
       if (isPortfolio) {
-        setHeaderType(HeaderType.COMMON);
+        setHeaderType(showBackButtonOnHeader ? HeaderType.COMMON_BACK : HeaderType.COMMON);
       } else if (pathName.startsWith('/home') ||
         pathName === '/settings' ||
         pathName === '/settings/list' ||

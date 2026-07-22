@@ -12,8 +12,7 @@ const CONFIG = {
   WEBAPP_LOCALES_DIR: 'packages/webapp/public/locales',
   TRANSLATION_FILE: 'translation.json',
   ENCODING: 'utf-8',
-  BG_PREFIX: 'bg.',
-  UI_PREFIX: 'ui.'
+  BG_PREFIX: 'bg.'
 };
 
 const PATHS = {
@@ -79,25 +78,11 @@ class TranslationService {
 
     return { newTranslations, addedCount };
   }
-
-  static copyUiKeys(sourceTranslations, targetTranslations) {
-    const newTranslations = { ...targetTranslations };
-    let addedCount = 0;
-
-    Object.entries(sourceTranslations).forEach(([key, value]) => {
-      if (key.startsWith(CONFIG.UI_PREFIX) && !newTranslations[key]) {
-        newTranslations[key] = value;
-        addedCount++;
-      }
-    });
-
-    return { newTranslations, addedCount };
-  }
 }
 
 
 async function copyBgKeysToApps() {
-  Logger.start('Starting to copy bg. and ui. keys to web-runner and webapp...');
+  Logger.start('Starting to copy bg. keys to web-runner and webapp...');
 
 
   CONFIG.LANGUAGES.forEach(lng => {
@@ -118,15 +103,14 @@ async function copyBgKeysToApps() {
         fs.mkdirSync(targetDir, { recursive: true });
       }
 
-      const { newTranslations: afterBg, addedCount: bgCount } = TranslationService.copyBgKeys(sourceTranslations, targetTranslations);
-      const { newTranslations: afterUi, addedCount: uiCount } = TranslationService.copyUiKeys(sourceTranslations, afterBg);
+      const { newTranslations, addedCount } = TranslationService.copyBgKeys(sourceTranslations, targetTranslations);
 
-      FileRepository.saveJson(targetFile, afterUi);
-      Logger.languageStats(app, lng, bgCount + uiCount);
+      FileRepository.saveJson(targetFile, newTranslations);
+      Logger.languageStats(app, lng, addedCount);
     });
   });
 
-  Logger.success('Successfully copied bg. and ui. keys to all translation files!');
+  Logger.success('Successfully copied bg. keys to all translation files!');
 }
 
 // --- THỰC THI ---

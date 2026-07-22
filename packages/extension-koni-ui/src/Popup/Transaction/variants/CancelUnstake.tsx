@@ -66,7 +66,6 @@ const Component = () => {
 
   const { list: allPositionInfos } = useYieldPositionDetail(slug);
   const { compound: positionInfo } = useYieldPositionDetail(slug, fromValue);
-
   const [isDisable, setIsDisable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
@@ -124,9 +123,9 @@ const Component = () => {
           setLoading(false);
         });
     }, 300);
-  }, [onError, onSuccess, positionInfo]);
+  }, [positionInfo, onSuccess, onError]);
 
-  const onPreCheck = usePreCheckAction(fromValue);
+  const onPreCheck = usePreCheckAction({ chain: chainValue, address: fromValue });
 
   useRestoreTransaction(form);
   useInitValidateTransaction(validateFields, form, defaultData);
@@ -170,7 +169,7 @@ const Component = () => {
             address={fromValue}
             chain={chainValue}
             className={'free-balance'}
-            label={t('Available balance')}
+            label={t('ui.TRANSACTION.screen.Transaction.CancelUnstake.availableBalance')}
             onBalanceReady={setIsBalanceReady}
           />
           <Form.Item name={'unstake'}>
@@ -178,7 +177,7 @@ const Component = () => {
               chain={chainValue}
               defaultValue={persistUnstake}
               disabled={!fromValue}
-              label={t('Select an unstake request')}
+              label={t('ui.TRANSACTION.screen.Transaction.CancelUnstake.selectUnstakeRequest')}
               nominators={fromValue ? positionInfo?.unstakings || [] : []}
             />
           </Form.Item>
@@ -196,7 +195,7 @@ const Component = () => {
           onClick={goHome}
           schema={'secondary'}
         >
-          {t('Cancel')}
+          {t('ui.TRANSACTION.screen.Transaction.CancelUnstake.cancel')}
         </Button>
 
         <Button
@@ -210,7 +209,7 @@ const Component = () => {
           loading={loading}
           onClick={onPreCheck(form.submit, ExtrinsicType.STAKING_CANCEL_UNSTAKE)}
         >
-          {t('Approve')}
+          {t('ui.TRANSACTION.screen.Transaction.CancelUnstake.approve')}
         </Button>
       </TransactionFooter>
     </>

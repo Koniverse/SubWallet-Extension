@@ -31,12 +31,10 @@ interface ClaimNotification {
 }
 
 export const POLYGON_PROOF_INDEXER = {
-  MAINNET: 'https://api-gateway.polygon.technology/api/v3/proof/mainnet/merkle-proof',
   TESTNET: 'https://api-gateway.polygon.technology/api/v3/proof/testnet/merkle-proof'
 };
 
 export const POLYGON_GAS_INDEXER = {
-  MAINNET: 'https://gasstation.polygon.technology/zkevm',
   TESTNET: 'https://gasstation.polygon.technology/zkevm/cardona'
 };
 
@@ -102,8 +100,7 @@ export async function getClaimPolygonBridge (chainSlug: string, notification: _N
   const polygonBridgeContract = getWeb3Contract(polygonBridgeContractAddress, evmApi, _POLYGON_BRIDGE_ABI);
   const metadata = notification.metadata as ClaimPolygonBridgeNotificationMetadata;
 
-  const isTestnet = chainSlug === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA;
-  const proofDomain = isTestnet ? POLYGON_PROOF_INDEXER.TESTNET : POLYGON_PROOF_INDEXER.MAINNET;
+  const proofDomain = POLYGON_PROOF_INDEXER.TESTNET;
 
   const proofResponse = await fetch(`${proofDomain}?networkId=${metadata.sourceNetwork ?? ''}&depositCount=${metadata.counter ?? ''}`)
     .then((res) => res.json()) as ClaimNotification;
@@ -142,10 +139,6 @@ export function _isPolygonChainBridge (srcChain: string, destChain: string): boo
   if (srcChain === 'polygonzkEvm_cardona' && destChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
     return true;
   } else if (srcChain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA && destChain === 'polygonzkEvm_cardona') {
-    return true;
-  } else if (srcChain === 'polygonZkEvm' && destChain === COMMON_CHAIN_SLUGS.ETHEREUM) {
-    return true;
-  } else if (srcChain === COMMON_CHAIN_SLUGS.ETHEREUM && destChain === 'polygonZkEvm') {
     return true;
   }
 

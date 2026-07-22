@@ -14,6 +14,7 @@ interface Props extends ThemeProps {
   onClick?: VoidFunction;
   tokenSlug: string;
   tokenSymbol: string;
+  tokenDisplayName: string;
   chainSlug: string;
   isSelected?: boolean;
   chainName: string;
@@ -21,7 +22,7 @@ interface Props extends ThemeProps {
   showBalance?: boolean;
 }
 
-const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, onClick, showBalance, tokenSlug, tokenSymbol }: Props) => {
+const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, onClick, showBalance, tokenDisplayName, tokenSlug }: Props) => {
   const isShowBalance = useSelector((state: RootState) => state.settings.isShowBalance);
 
   return (
@@ -42,8 +43,8 @@ const Component = ({ balanceInfo, chainName, chainSlug, className, isSelected, o
         />
       </div>
       <div className='__item-center-part'>
-        <div className='__token-symbol'>
-          {tokenSymbol}
+        <div className='__token-display-name'>
+          {tokenDisplayName}
         </div>
         <div className='__chain-name'>
           {chainName}
@@ -107,7 +108,7 @@ const TokenSelectorItem = styled(Component)<Props>(({ theme: { token } }: Props)
       flex: 1
     },
 
-    '.__token-symbol': {
+    '.__token-display-name': {
       fontSize: token.fontSizeLG,
       lineHeight: token.lineHeightLG,
       color: token.colorTextLight1,

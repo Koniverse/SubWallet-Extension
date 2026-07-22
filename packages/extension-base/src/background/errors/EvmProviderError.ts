@@ -20,11 +20,11 @@ const defaultErrorMap: Record<EvmProviderErrorType, { message: string, code?: nu
     code: 4200
   },
   DISCONNECTED: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.networkIsDisconnected'),
     code: 4900
   },
   CHAIN_DISCONNECTED: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.networkIsDisconnected'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.networkIsDisconnected'),
     code: 4901
   },
   NETWORK_NOT_SUPPORTED: {
@@ -32,11 +32,11 @@ const defaultErrorMap: Record<EvmProviderErrorType, { message: string, code?: nu
     code: 4902
   },
   INVALID_PARAMS: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.undefinedErrorContactSupport'),
     code: -32602
   },
   INTERNAL_ERROR: {
-    message: detectTranslate('bg.NETWORK.background.error.Provider.undefinedErrorContactSupport'),
+    message: detectTranslate('bg.DAPP.background.error.EvmProvider.undefinedErrorContactSupport'),
     code: -32603
   }
 };

@@ -63,36 +63,36 @@ function Component ({ className, request }: Props) {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t('No available Substrate account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableSubstrateAccount');
         case 'evm':
-          return t('No available EVM account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableEvmAccount');
         case 'ton':
-          return t('No available TON account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableTonAccount');
         case 'cardano':
-          return t('No available Cardano account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableCardanoAccount');
         case 'bitcoin':
-          return t('No available Bitcoin account');
+          return t('ui.DAPP.Confirmations.Authorize.noAvailableBitcoinAccount');
       }
     }
 
-    return t('No available account');
+    return t('ui.DAPP.Confirmations.Authorize.noAvailableAccount');
   }, [accountAuthTypes, t]);
 
   const noAvailableDescription = useMemo(() => {
     if (accountAuthTypes && accountAuthTypes.length === 1) {
       switch (accountAuthTypes[0]) {
         case 'substrate':
-          return t("You don't have any Substrate account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noSubstrateAccountToConnect');
         case 'evm':
-          return t("You don't have any EVM account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noEvmAccountToConnect');
         case 'cardano':
-          return t("You don't have any Cardano account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noCardanoAccountToConnect');
         case 'bitcoin':
-          return t("You don't have any Bitcoin account to connect. Please create one or skip this step by hitting Cancel.");
+          return t('ui.DAPP.Confirmations.Authorize.noBitcoinAccountToConnect');
       }
     }
 
-    return t("You don't have any account to connect. Please create one or skip this step by hitting Cancel.");
+    return t('ui.DAPP.Confirmations.Authorize.noAccountToConnect');
   }, [accountAuthTypes, t]);
 
   // Handle buttons actions
@@ -215,7 +215,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableTitle
-              : t('Choose the account(s) you’d like to connect')
+              : t('ui.DAPP.Confirmations.Authorize.chooseAccountsToConnect')
           }
         </div>
         {
@@ -251,7 +251,7 @@ function Component ({ className, request }: Props) {
           {
             visibleAccountProxies.length === 0
               ? noAvailableDescription
-              : t('Make sure you trust this site before connecting')
+              : t('ui.DAPP.Confirmations.Authorize.trustSiteBeforeConnecting')
           }
         </div>
       </div>
@@ -272,14 +272,14 @@ function Component ({ className, request }: Props) {
                 onClick={onCancel}
                 schema={'secondary'}
               >
-                {t('Cancel')}
+                {t('ui.DAPP.Confirmations.Authorize.cancel')}
               </Button>
               <Button
                 disabled={isDisableConnect}
                 loading={loading}
                 onClick={onConfirm}
               >
-                {t('Connect')}
+                {t('ui.DAPP.Confirmations.Authorize.connect')}
               </Button>
             </>
           )
@@ -299,7 +299,7 @@ function Component ({ className, request }: Props) {
                   onClick={onCancel}
                   schema={'secondary'}
                 >
-                  {t('Cancel')}
+                  {t('ui.DAPP.Confirmations.Authorize.cancel')}
                 </Button>
                 <Button
                   disabled={loading}
@@ -311,7 +311,7 @@ function Component ({ className, request }: Props) {
                   )}
                   onClick={onAddAccount}
                 >
-                  {t('Create one')}
+                  {t('ui.DAPP.Confirmations.Authorize.createOne')}
                 </Button>
               </>
             )

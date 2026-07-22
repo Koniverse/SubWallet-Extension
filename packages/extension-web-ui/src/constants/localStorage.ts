@@ -22,11 +22,13 @@ export const WITHDRAW_TRANSACTION = 'transaction.withdraw';
 export const CLAIM_REWARD_TRANSACTION = 'transaction.claim-reward';
 export const CLAIM_BRIDGE_TRANSACTION = 'transaction.claim-bridge';
 export const CHANGE_VALIDATOR_TRANSACTION = 'transaction.change-validator';
+export const CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION = 'transaction.change-bittensor-root-claim-type';
 
-export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION];
+export const TRANSACTION_STORAGES = [TRANSFER_TRANSACTION, NFT_TRANSACTION, EARN_TRANSACTION, UN_STAKE_TRANSACTION, CANCEL_UN_STAKE_TRANSACTION, WITHDRAW_TRANSACTION, CLAIM_REWARD_TRANSACTION, CHANGE_VALIDATOR_TRANSACTION, CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION];
 
 export const SELECTED_ACCOUNT_TYPE = 'account.selected-type';
 export const SELECTED_MNEMONIC_TYPE = 'account.selected-mnemonic-type';
+export const ROOT_NFT_TOKEN_ID = 'nft.root-token-id';
 export const SEED_PREVENT_MODAL = 'seed.prevent-modal';
 export const IS_SHOW_TON_CONTRACT_VERSION_WARNING = 'account.is-show-ton-contract-version-warning';
 export const CONFIRM_GENERAL_TERM = 'general.term-and-condition';

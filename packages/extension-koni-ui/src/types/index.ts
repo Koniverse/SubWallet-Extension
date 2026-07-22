@@ -25,6 +25,8 @@ export type AlertDialogProps = {
   title: string;
   subtitle?: React.ReactNode;
   type?: NotificationType;
+  hideIcon?: boolean;
+  subtitleDanger?: boolean;
   closable?: boolean;
   content: React.ReactNode;
   cancelButton?: AlertDialogButtonProps;
@@ -144,3 +146,4 @@ export * from './staking';
 export * from './transaction';
 export * from './walletConnect';
 export * from './component';
+export * from './governance';

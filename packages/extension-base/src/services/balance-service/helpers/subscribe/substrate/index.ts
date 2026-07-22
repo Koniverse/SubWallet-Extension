@@ -8,13 +8,13 @@ import { _getAssetsPalletLocked, _getAssetsPalletTransferable } from '@subwallet
 import { _getForeignAssetPalletLockedBalance, _getForeignAssetPalletTransferable } from '@subwallet/extension-base/core/substrate/foreign-asset-pallet';
 import { _getTotalStakeInNominationPool } from '@subwallet/extension-base/core/substrate/nominationpools-pallet';
 import { _getOrmlTokensPalletLockedBalance, _getOrmlTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/ormlTokens-pallet';
-import { _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
+import { _getSystemPalletReservedBalance, _getSystemPalletTotalBalance, _getSystemPalletTransferable } from '@subwallet/extension-base/core/substrate/system-pallet';
 import { _getTokensPalletLocked, _getTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/tokens-pallet';
-import { FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
+import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
-import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
@@ -28,6 +28,7 @@ import { ContractPromise } from '@polkadot/api-contract';
 import { subscribeERC20Interval } from '../evm';
 import { subscribeEquilibriumTokenBalance } from './equilibrium';
 import { subscribeGRC20Balance, subscribeVftBalance } from './gear';
+import { buildLockedDetails, getSpecialStakingBalances } from './utils';
 
 export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: _ChainInfo, assetMap: Record<string, _ChainAsset>, substrateApi: _SubstrateApi, evmApi: _EvmApi, callback: (rs: BalanceItem[]) => void, extrinsicType?: ExtrinsicType) => {
   let unsubNativeToken: () => void;
@@ -122,7 +123,6 @@ export const subscribeSubstrateBalance = async (addresses: string[], chainInfo: 
   };
 };
 
-// handler according to different logic
 // eslint-disable-next-line @typescript-eslint/require-await
 const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo, extrinsicType, substrateApi }: SubscribeSubstratePalletBalance) => {
   const systemAccountKey = 'query_system_account';
@@ -150,49 +150,95 @@ const subscribeWithSystemAccountPallet = async ({ addresses, callback, chainInfo
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
     const balances = rs[systemAccountKey];
     const poolMemberInfos = rs[poolMembersKey];
 
-    let bittensorStakingBalances: BigN[] = new Array<BigN>(addresses.length).fill(new BigN(0));
+    const bittensorStakingBalances = await getSpecialStakingBalances(chainInfo, addresses, substrateApi);
 
-    if (_BALANCE_CHAIN_GROUP.bittensor.includes(chainInfo.slug)) {
-      const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
-      const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-
-      bittensorStakingBalances = values.map(([, stakes]) => {
-        return stakes.filter((i) => i.netuid === 0).reduce((previousValue, currentValue) => previousValue.plus(currentValue.stake), BigN(0));
-      });
-    }
-
-    const items: BalanceItem[] = balances.map((_balance, index) => {
+    // Precompute totalLockedFromTransfer for each account to decide if need fetch locks/holds
+    const preItems = balances.map((_balance, index) => {
       const balanceInfo = _balance as unknown as FrameSystemAccountInfo;
-
       const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
       const totalBalance = _getSystemPalletTotalBalance(balanceInfo);
       let totalLockedFromTransfer = totalBalance - transferableBalance;
 
       if (!isNominationPoolMigrated) {
         const poolMemberInfo = poolMemberInfos[index] as unknown as PalletNominationPoolsPoolMember;
-
         const nominationPoolBalance = poolMemberInfo ? _getTotalStakeInNominationPool(poolMemberInfo) : BigInt(0);
 
         totalLockedFromTransfer += nominationPoolBalance;
       }
 
-      const stakeValue = BigInt(bittensorStakingBalances[index].toString());
+      totalLockedFromTransfer += BigInt(bittensorStakingBalances[index].toString());
 
-      totalLockedFromTransfer += stakeValue;
+      return { index, totalLockedFromTransfer, balanceInfo };
+    });
 
-      return ({
+    // Filter account's locked > 0
+    const accountsWithLocks = preItems.filter((i) => i.totalLockedFromTransfer > 0).map((i) => addresses[i.index]);
+
+    let locks: FrameBalancesLocksInfo[][] = [];
+    let holds: FrameBalancesHoldsInfo[][] = [];
+    let freezes: FrameBalancesFreezesInfo[][] = [];
+
+    // Fetch locks/holds only for accounts that have locked balances
+    if (accountsWithLocks.length > 0) {
+      const [rawLocks, rawHolds, rawFreezes] = await Promise.all([
+        substrateApi.api.query.balances.locks.multi(accountsWithLocks),
+        substrateApi.api.query.balances.holds.multi(accountsWithLocks),
+        substrateApi.api.query.balances.freezes.multi(accountsWithLocks)
+      ]);
+
+      locks = rawLocks.map((lockArr) =>
+        lockArr.map((l) => ({
+          id: l.id.toPrimitive(),
+          amount: l.amount.toString()
+        }))
+      ) as FrameBalancesLocksInfo[][];
+
+      holds = rawHolds.map((holdArr) =>
+        holdArr.map((h) => ({
+          id: h.id.toPrimitive(),
+          amount: h.amount.toString()
+        }))
+      ) as FrameBalancesHoldsInfo[][];
+
+      freezes = rawFreezes.map((freezeArr) =>
+        freezeArr.map((f) => ({
+          id: f.id.toPrimitive(),
+          amount: f.amount.toString()
+        }))
+      ) as FrameBalancesFreezesInfo[][];
+    }
+
+    // Map locks/holds back to original index
+    const items: BalanceItem[] = preItems.map(({ balanceInfo, index, totalLockedFromTransfer }) => {
+      const lockIndex = accountsWithLocks.indexOf(addresses[index]);
+      const lockItems = lockIndex >= 0 ? locks[lockIndex] || [] : [];
+      const holdItems = lockIndex >= 0 ? holds[lockIndex] || [] : [];
+      const freezeItems = lockIndex >= 0 ? freezes[lockIndex] || [] : [];
+
+      const allLockEntries = [...lockItems, ...holdItems, ...freezeItems];
+
+      const lockedDetails = buildLockedDetails(
+        allLockEntries,
+        totalLockedFromTransfer,
+        _getSystemPalletReservedBalance(balanceInfo),
+        bittensorStakingBalances[index]
+      );
+
+      const transferableBalance = _getSystemPalletTransferable(balanceInfo, _getChainExistentialDeposit(chainInfo), extrinsicType);
+
+      return {
         address: addresses[index],
         tokenSlug: _getChainNativeTokenSlug(chainInfo),
         free: transferableBalance.toString(),
         locked: totalLockedFromTransfer.toString(),
         state: APIItemState.READY,
+        lockedDetails,
         metadata: balanceInfo
-      });
+      };
     });
 
     callback(items);
@@ -430,19 +476,35 @@ const subscribeAssetsAccountPallet = async ({ addresses, assetMap, callback, cha
   });
 
   const unsubList = await Promise.all(Object.values(tokenMap).map((tokenInfo) => {
+    if (tokenInfo.slug === 'energy_web_x-LOCAL-stEWT') {
+      return timer(0, CRON_REFRESH_PRICE_INTERVAL).subscribe(() => {
+        const getEwtFrozenBalance = async () => {
+          const ewtTokenBalances = await queryEwtFrozenBalance(substrateApi, addresses, assetMap[tokenInfo.slug], extrinsicType);
+
+          callback(ewtTokenBalances);
+        };
+
+        getEwtFrozenBalance().catch(console.error);
+      });
+    }
+
     try {
       const assetIndex = _getTokenOnChainAssetId(tokenInfo);
 
-      if (assetIndex === '-1') {
+      if (assetIndex === '-1' && !USE_MULTILOCATION_INDEX.includes(chainInfo.slug)) {
         return undefined;
       }
+
+      const version: number = ['statemint', 'statemine', 'westend_assethub'].includes(chainInfo.slug) ? 4 : 3;
+
+      const index = USE_MULTILOCATION_INDEX.includes(chainInfo.slug) ? _adaptX1Interior(_getXcmAssetMultilocation(tokenInfo), version) : assetIndex;
 
       const params: _SubstrateAdapterSubscriptionArgs[] = [
         {
           section: 'query',
           module: assetsAccountKey.split('_')[1],
           method: assetsAccountKey.split('_')[2],
-          args: addresses.map((address) => [assetIndex, address])
+          args: addresses.map((address) => [index, address])
         }
       ];
 
@@ -614,6 +676,50 @@ async function queryGigaTokenBalance (substrateApi: _SubstrateApi, addresses: st
       state: APIItemState.READY,
       free: transferableBalance.toString(),
       locked: totalLockedFromTransfer.toString()
+    } as unknown as BalanceItem;
+  }));
+}
+
+async function queryEwtFrozenBalance (substrateApi: _SubstrateApi, addresses: string[], tokenInfo: _ChainAsset, extrinsicType?: ExtrinsicType | undefined): Promise<BalanceItem[]> {
+  const multilocation = _getXcmAssetMultilocation(tokenInfo);
+
+  return await Promise.all(addresses.map(async (address) => {
+    const [_frozenBalance, _balanceInfo] = await Promise.all([
+      substrateApi.api.query.assetsFreezer.frozenBalances(multilocation, address),
+      substrateApi.api.query.assets.account(multilocation, address)
+    ]);
+
+    const balanceInfo = _balanceInfo.toPrimitive() as unknown as PalletAssetsAssetAccount | undefined;
+
+    if (!balanceInfo) { // no balance info response
+      return {
+        address: address,
+        tokenSlug: tokenInfo.slug,
+        free: '0',
+        locked: '0',
+        state: APIItemState.READY
+      } as unknown as BalanceItem;
+    }
+
+    const transferableBalance = _getAssetsPalletTransferable(balanceInfo, _getAssetExistentialDeposit(tokenInfo), extrinsicType);
+    const totalLockedFromTransfer = _getAssetsPalletLocked(balanceInfo);
+
+    let freeBalance: bigint = transferableBalance;
+    let lockedBalance: bigint = totalLockedFromTransfer;
+
+    const frozenBalance = _frozenBalance.toPrimitive() as string;
+
+    if (frozenBalance) {
+      freeBalance = transferableBalance - BigInt(frozenBalance);
+      lockedBalance = totalLockedFromTransfer + BigInt(frozenBalance);
+    }
+
+    return {
+      address: address,
+      tokenSlug: tokenInfo.slug,
+      free: freeBalance.toString(),
+      locked: lockedBalance.toString(),
+      state: APIItemState.READY
     } as unknown as BalanceItem;
   }));
 }

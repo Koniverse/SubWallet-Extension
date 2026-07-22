@@ -203,17 +203,17 @@ const Component: React.FC<Props> = (props: Props) => {
           {isShowAmount && (
             <MetaInfo.Number
               decimals={decimals}
-              label={t('Amount')}
+              label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.amount')}
               suffix={data.metadata?.subnetSymbol || symbol}
               value={data.amount}
             />
           )}
-          <MetaInfo.Number
+          {!transaction.wrappingStatus && <MetaInfo.Number
             decimals={decimals}
-            label={t('Estimated fee')}
+            label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
-          />
+          />}
           {(compound && !isBittensorChain) && (
             <ValidatorGroupModal
               accounts={newValidatorAccounts}
@@ -251,8 +251,8 @@ const Component: React.FC<Props> = (props: Props) => {
           {!!stakingFee && (
             <AlertBox
               className={'alert-box'}
-              description={t('A fee equivalent of {{fee}} TAO will be deducted from your stake amount on the new validator once the transaction is complete', { replace: { fee: stakingFee } })}
-              title={t('Validator change fee')}
+              description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', { replace: { number: stakingFee } })}
+              title={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee')}
               type='info'
             />
           )}
@@ -268,7 +268,6 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       background: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
       marginTop: token.marginSM,
-      marginBottom: token.marginSM,
       whiteSpace: 'nowrap'
     },
 

@@ -90,7 +90,8 @@ export function subscribeBalance (
         assetMap: chainAssetMap,
         callback,
         chainInfo,
-        evmApi
+        evmApi,
+        substrateApiMap
       });
     }
 

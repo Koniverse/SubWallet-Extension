@@ -46,13 +46,13 @@ export class Transaction {
   }
 }
 
-export const anyNumberToBN = (value?: string | number | BNEther): BigN => {
+export const anyNumberToBN = (value?: string | number | BNEther): BigN => { // TODO: Be careful when using .toNumber() outside this function. It may not round exactly for very large numbers.
   if (typeof value === 'string' || typeof value === 'number') {
     return new BigN(value);
   } else if (typeof value === 'undefined') {
     return new BigN(0);
   } else {
-    return new BigN(value.toNumber());
+    return new BigN(value.toString());
   }
 };
 

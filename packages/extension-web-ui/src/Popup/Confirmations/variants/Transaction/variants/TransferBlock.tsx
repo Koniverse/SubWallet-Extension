@@ -3,10 +3,12 @@
 
 import { ExtrinsicDataTypeMap, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _isAcrossChainBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { isSubstrateCrossChain } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { AlertBox, QuoteRateDisplay } from '@subwallet/extension-web-ui/components';
 import MetaInfo from '@subwallet/extension-web-ui/components/MetaInfo/MetaInfo';
 import { useGetNativeTokenBasicInfo } from '@subwallet/extension-web-ui/hooks';
 import { RootState } from '@subwallet/extension-web-ui/stores';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,6 +46,18 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
   const { decimals: nativeTokenDecimals, symbol: nativeTokenSymbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const feeInfo = transaction.estimateFee;
+  const crossChainFeeInfo = transaction.xcmDestinationFee;
+
+  const isSubstrateXcm = useMemo(() => {
+    const originChainInfo = chainInfoMap[xcmData?.originNetworkKey || transaction.chain];
+    const destinationChainInfo = chainInfoMap[xcmData?.destinationNetworkKey || transaction.chain];
+
+    if (!originChainInfo || !destinationChainInfo) {
+      return false;
+    }
+
+    return isSubstrateCrossChain(originChainInfo, destinationChainInfo);
+  }, [chainInfoMap, transaction.chain, xcmData?.destinationNetworkKey, xcmData?.originNetworkKey]);
 
   return (
     <>
@@ -127,10 +141,19 @@ const Component: React.FC<Props> = ({ className, transaction }: Props) => {
 
         <MetaInfo.Number
           decimals={feeInfo ? feeInfo.decimals : nativeTokenDecimals}
-          label={t('ui.TRANSACTION.components.Field.FeeEditor.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.TransferBlock.networkFee')}
           suffix={feeInfo ? feeInfo.symbol : nativeTokenSymbol}
           value={feeInfo ? feeInfo.value : 0}
         />
+
+        {transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM && crossChainFeeInfo?.value && new BigN(crossChainFeeInfo.value).gt(0) && isSubstrateXcm && (
+          <MetaInfo.Number
+            decimals={crossChainFeeInfo.decimals || undefined}
+            label={t('ui.TRANSACTION.Confirmations.TransferBlock.crossChainFee')}
+            suffix={crossChainFeeInfo.symbol || undefined}
+            value={crossChainFeeInfo.value}
+          />
+        )}
       </MetaInfo>
       {
         transaction.extrinsicType === ExtrinsicType.TRANSFER_XCM &&

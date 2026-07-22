@@ -335,6 +335,8 @@ const Component = function ({ className }: Props) {
           }
 
           return t('ui.Confirmations.changeValidatorConfirm');
+        case ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE:
+          return t('ui.Confirmations.changeClaimTypeConfirm');
         case ExtrinsicType.MINT_VDOT:
           return t('ui.Confirmations.mintVDotConfirm');
         case ExtrinsicType.MINT_VMANTA:
@@ -381,13 +383,13 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
-        case ExtrinsicType.SET_FEE_TOKEN:
-          return t('ui.CONFIRMATIONS.Popup.Confirmations.changeFeeTokenConfirm');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
       }
+
+      return t('ui.Confirmations.transactionConfirm');
     } else {
       return t(titleMap[confirmation.type] || '');
     }

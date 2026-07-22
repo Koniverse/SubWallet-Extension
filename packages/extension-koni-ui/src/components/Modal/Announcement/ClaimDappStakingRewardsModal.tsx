@@ -105,7 +105,7 @@ const Component: React.FC<Props> = (props: Props) => {
                 />
               )
             }}
-            i18nKey={detectTranslate('<highlight>Astar dApp staking V3</highlight> is launching in early February. Make sure to claim any ASTR rewards before the launch or they will be lost.')}
+            i18nKey={detectTranslate('ui.EARNING.components.Modal.Announcement.ClaimDappStakingRewards.astarStakingV3LaunchWarning')}
           />
         </div>
       </SwModal>

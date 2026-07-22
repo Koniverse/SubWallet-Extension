@@ -47,7 +47,7 @@ export default abstract class BaseLendingPoolHandler extends BaseSpecialStakingP
     const derivativeTokenInfo = this.state.getAssetBySlug(this.derivativeAssets[0]);
 
     if (bnAmount.lte(BN_ZERO)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.SWAP.background.error.Swap.amountMustBeGreaterThanZero'))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.lending.amountMustBeGreaterThanZero'))];
     }
 
     if (bnAmount.lt(minUnstake)) {
@@ -62,7 +62,7 @@ export default abstract class BaseLendingPoolHandler extends BaseSpecialStakingP
       }
 
       if (poolPosition.unstakings.length > maxUnstakeRequest) {
-        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.koni.api.staking.bonding.relayChain.maxUnstakeTimes', { replace: { number: maxUnstakeRequest } })));
+        errors.push(new TransactionError(StakingTxErrorType.EXCEED_MAX_UNSTAKING, t('bg.EARNING.services.service.earning.lending.maxUnstakeTimes', { replace: { number: maxUnstakeRequest } })));
       }
     }
 

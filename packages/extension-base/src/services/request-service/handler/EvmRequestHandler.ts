@@ -218,7 +218,7 @@ export default class EvmRequestHandler {
     const params = {
       ...transaction,
       gas: anyNumberToBN(gas).toNumber(),
-      value: anyNumberToBN(value).toNumber(),
+      value: anyNumberToBN(value).toFixed(),
       gasPrice: anyNumberToBN(gasPrice).toNumber(),
       gasLimit: anyNumberToBN(estimateGas).toNumber(),
       maxFeePerGas: anyNumberToBN(maxFeePerGas).toNumber(),
@@ -269,8 +269,8 @@ export default class EvmRequestHandler {
       const confirmation = confirmations[type][id];
 
       if (!resolver || !confirmation) {
-        this.#logger.error(t('bg.koni.handler.Extension.unableToProceed'), type, id);
-        throw new Error(t('bg.koni.handler.Extension.unableToProceed'));
+        this.#logger.error(t('bg.DAPP.services.service.request.EvmHandler.unableToProceed'), type, id);
+        throw new Error(t('bg.DAPP.services.service.request.EvmHandler.unableToProceed'));
       }
 
       // Fill signature for some special type

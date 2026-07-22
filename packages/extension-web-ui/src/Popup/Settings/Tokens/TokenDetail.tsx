@@ -14,6 +14,7 @@ import useFetchChainInfo from '@subwallet/extension-web-ui/hooks/screen/common/u
 import useGetChainAssetInfo from '@subwallet/extension-web-ui/hooks/screen/common/useGetChainAssetInfo';
 import { deleteCustomAssets, upsertCustomToken } from '@subwallet/extension-web-ui/messaging';
 import { Theme, ThemeProps } from '@subwallet/extension-web-ui/types';
+import { getAssetDisplayName } from '@subwallet/extension-web-ui/utils';
 import { Button, ButtonProps, Col, Field, Icon, Input, Logo, Row, Tooltip } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { CheckCircle, Copy, Trash } from 'phosphor-react';
@@ -38,6 +39,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     return location.state as string;
   }, [location.state]);
   const tokenInfo = useGetChainAssetInfo(tokenSlug) as _ChainAsset;
+  const displayName = getAssetDisplayName(tokenInfo, tokenInfo?.symbol);
 
   useEffect(() => {
     if (!tokenInfo) {
@@ -256,7 +258,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             </div>
 
             <div className={'token_detail__header_text_container'}>
-              {tokenInfo.symbol}
+              {displayName}
             </div>
           </div>
 

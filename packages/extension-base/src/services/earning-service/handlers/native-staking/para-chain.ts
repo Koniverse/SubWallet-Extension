@@ -13,6 +13,7 @@ import { BaseYieldPositionInfo, BasicTxErrorType, CollatorExtraInfo, EarningStat
 import { balanceFormatter, formatNumber, parseRawNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
+import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { UnsubscribePromise } from '@polkadot/api-base/types/base';
 import { Codec } from '@polkadot/types/types';
@@ -46,6 +47,19 @@ interface InflationInfo {
 interface AutoCompoundingDelegation {
   delegator: string,
   value: string
+}
+
+async function queryDelegationScheduledRequestsFallback (api: ApiPromise, delegator: string, collator: string) {
+  const query = api.query.parachainStaking.delegationScheduledRequests;
+  const key = await query.keys();
+
+  if (key[0].args.length === 1) {
+    return await query(collator);
+  } else if (key[0].args.length === 2) {
+    return await query(collator, delegator);
+  } else {
+    throw new TransactionError(BasicTxErrorType.INVALID_PARAMS, 'More args than 2 and 1');
+  }
 }
 
 function calculateMantaNominatorReturn (decimal: number, commission: number, totalActiveCollators: number, bnAnnualInflation: BigN, blocksPreviousRound: number, bnCollatorExpectedBlocksPerRound: BigN, bnCollatorTotalStaked: BigN, isCountCommission: boolean) {
@@ -214,7 +228,11 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
 
     await Promise.all(delegatorState.delegations.map(async (delegation) => {
       const [_delegationScheduledRequests, [identity], _collatorInfo, _currentBlock, _currentTimestamp] = await Promise.all([
-        substrateApi.api.query.parachainStaking.delegationScheduledRequests(delegation.owner),
+        queryDelegationScheduledRequestsFallback(
+          substrateApi.api,
+          address, // delegator
+          delegation.owner // collator
+        ),
         parseIdentity(substrateIdentityApi, delegation.owner),
         substrateApi.api.query.parachainStaking.candidateInfo(delegation.owner),
         substrateApi.api.query.system.number(),
@@ -233,7 +251,9 @@ export default class ParaNativeStakingPoolHandler extends BaseParaNativeStakingP
       // parse unstaking info
       if (delegationScheduledRequests) {
         for (const scheduledRequest of delegationScheduledRequests) {
-          if (reformatAddress(scheduledRequest.delegator, 0) === reformatAddress(address, 0)) { // add network prefix
+          const requestDelegator = scheduledRequest.delegator ? scheduledRequest.delegator : address;
+
+          if (reformatAddress(requestDelegator, 0) === reformatAddress(address, 0)) { // add network prefix
             const isClaimable = scheduledRequest.whenExecutable - parseInt(currentRound) <= 0;
             const remainingEra = scheduledRequest.whenExecutable - parseInt(currentRound);
             const waitingTime = remainingEra * _STAKING_ERA_LENGTH_MAP[chainInfo.slug];

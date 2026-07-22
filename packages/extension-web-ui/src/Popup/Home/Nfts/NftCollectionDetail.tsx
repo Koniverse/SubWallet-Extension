@@ -5,25 +5,27 @@ import { NftCollection, NftItem } from '@subwallet/extension-base/background/Kon
 import { _isCustomAsset, _isSmartContractToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { EmptyList, Layout, PageWrapper } from '@subwallet/extension-web-ui/components';
 import NoContent, { PAGE_TYPE } from '@subwallet/extension-web-ui/components/NoContent';
-import { SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-web-ui/constants';
+import { ROOT_NFT_TOKEN_ID, SHOW_3D_MODELS_CHAIN } from '@subwallet/extension-web-ui/constants';
 import { DataContext } from '@subwallet/extension-web-ui/contexts/DataContext';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
-import { useNavigateOnChangeAccount } from '@subwallet/extension-web-ui/hooks';
+import { useNavigateOnChangeAccount, useSelector } from '@subwallet/extension-web-ui/hooks';
 import useNotification from '@subwallet/extension-web-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import useConfirmModal from '@subwallet/extension-web-ui/hooks/modal/useConfirmModal';
 import useDefaultNavigate from '@subwallet/extension-web-ui/hooks/router/useDefaultNavigate';
 import useGetChainAssetInfo from '@subwallet/extension-web-ui/hooks/screen/common/useGetChainAssetInfo';
-import { deleteCustomAssets } from '@subwallet/extension-web-ui/messaging';
+import { deleteCustomAssets, getFullNftList } from '@subwallet/extension-web-ui/messaging';
 import { NftGalleryWrapper } from '@subwallet/extension-web-ui/Popup/Home/Nfts/component/NftGalleryWrapper';
 import { getNftsByCollection, INftCollectionDetail, INftItemDetail } from '@subwallet/extension-web-ui/Popup/Home/Nfts/utils';
+import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, ButtonProps, Icon, SwList } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { Image, Trash } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
+import { useLocalStorage } from 'usehooks-ts';
 
 type WrapperProps = ThemeProps;
 type Props = ThemeProps & {
@@ -53,8 +55,11 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
   const navigate = useNavigate();
   const { goBack } = useDefaultNavigate();
   const showNotification = useNotification();
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const [, setRootTokenId] = useLocalStorage(ROOT_NFT_TOKEN_ID, '');
 
   const dataContext = useContext(DataContext);
+  const fetchingKeyRef = useRef('');
 
   useNavigateOnChangeAccount('/home/nfts/collections');
 
@@ -80,11 +85,18 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
   }, []);
 
   const handleOnClickNft = useCallback((state: INftItemDetail) => {
-    navigate('/home/nfts/item-detail', { state });
-  }, [navigate]);
+    const nftItem = nftList.find((item) => item.id === state.nftId && item.collectionId === state.collectionId && item.chain === state.chain);
+    const isBundle = (nftItem?.nestingTokens?.length ?? 0) > 0 || !!nftItem?.isBundle;
+
+    if (isBundle) {
+      setRootTokenId(state.nftId);
+    }
+
+    navigate(`/home/nfts/${isBundle ? 'bundle-item-detail' : 'item-detail'}`, { state });
+  }, [navigate, nftList, setRootTokenId]);
 
   const renderNft = useCallback((nftItem: NftItem) => {
-    const routingParams = { collectionId: collectionInfo.collectionId, nftId: nftItem.id } as INftItemDetail;
+    const routingParams = { collectionId: collectionInfo.collectionId, nftId: nftItem.id, chain: collectionInfo.chain } as INftItemDetail;
 
     return (
       <NftGalleryWrapper
@@ -92,6 +104,7 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
         handleOnClick={handleOnClickNft}
         have3dViewer={SHOW_3D_MODELS_CHAIN.includes(nftItem.chain)}
         image={nftItem.image}
+        isBundle={!!nftItem.isBundle || (nftItem.nestingTokens?.length ?? 0) > 0}
         key={`${nftItem.chain}_${nftItem.collectionId}_${nftItem.id}`}
         routingParams={routingParams}
         title={nftItem.name || nftItem.id}
@@ -171,6 +184,43 @@ function Component ({ className = '', collectionInfo, nftList }: Props): React.R
       outletContext.setShowSearchInput?.(true);
     }
   }, [outletContext, title]);
+
+  const tokenIds = useMemo(() => {
+    return nftList.map((nft) => nft.id);
+  }, [nftList]);
+
+  const ownerAddresses = useMemo(() => {
+    const ownerSet = new Set<string>();
+
+    for (const item of nftList) {
+      if (item.owner) {
+        ownerSet.add(item.owner);
+      }
+    }
+
+    return Array.from(ownerSet);
+  }, [nftList]);
+
+  useEffect(() => {
+    const chainInfo = chainInfoMap[collectionInfo.chain];
+
+    if (!chainInfo || ownerAddresses.length === 0 || tokenIds.length === 0) {
+      return;
+    }
+
+    const requestKey = `${collectionInfo.chain}:${collectionInfo.collectionId}:${tokenIds.join(',')}:${ownerAddresses.join(',')}`;
+
+    if (fetchingKeyRef.current === requestKey) {
+      return;
+    }
+
+    fetchingKeyRef.current = requestKey;
+    getFullNftList({ collectionId: collectionInfo.collectionId, tokenIds, owners: ownerAddresses, chainInfo })
+      .catch((error) => {
+        console.error(error);
+        fetchingKeyRef.current = '';
+      });
+  }, [chainInfoMap, collectionInfo.chain, collectionInfo.collectionId, ownerAddresses, tokenIds]);
 
   return (
     <PageWrapper
@@ -267,8 +317,11 @@ function WrapperComponent (props: WrapperProps): React.ReactElement<WrapperProps
       return;
     }
 
-    return outletContext?.nftCollections?.find((c) => c.collectionId === collectionDetail.collectionId);
-  }, [collectionDetail?.collectionId, outletContext?.nftCollections]);
+    return outletContext?.nftCollections?.find((c) =>
+      c.collectionId === collectionDetail.collectionId &&
+      (!collectionDetail.chain || c.chain === collectionDetail.chain)
+    );
+  }, [collectionDetail?.chain, collectionDetail?.collectionId, outletContext?.nftCollections]);
 
   const nftList = useMemo(() => {
     if (!outletContext?.nftItems || !collectionInfo) {

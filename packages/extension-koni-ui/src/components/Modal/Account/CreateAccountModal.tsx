@@ -16,7 +16,7 @@ import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { renderModalSelector } from '@subwallet/extension-koni-ui/utils/common/dom';
 import { BackgroundIcon, ModalContext, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Leaf, ShareNetwork } from 'phosphor-react';
+import { Leaf, ShareNetwork, UserSwitch } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -78,7 +78,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: false,
       icon: Leaf,
       key: 'new-seed-phrase',
-      label: t('Create with a new seed phrase'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.createWithNewSeedPhrase'),
       onClick: () => {
         inactiveModal(modalId);
         setSelectedMnemonicType('general');
@@ -90,10 +90,21 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       disabled: disableDerive,
       icon: ShareNetwork,
       key: 'derive-account',
-      label: t('Derive from an existing account'),
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.deriveFromExistingAccount'),
       onClick: () => {
         inactiveModal(modalId);
         activeModal(DERIVE_ACCOUNT_LIST_MODAL);
+      }
+    },
+    {
+      backgroundColor: token['geekblue-7'],
+      disabled: false,
+      icon: UserSwitch,
+      key: 'multisig-account',
+      label: t('ui.ACCOUNT.components.Modal.Account.Create.createMultisigAccount'),
+      onClick: () => {
+        inactiveModal(modalId);
+        navigate('/accounts/new-multisig');
       }
     }
   ]), [token, t, disableDerive, inactiveModal, setSelectedMnemonicType, navigate, activeModal]);
@@ -109,7 +120,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         icon: <CloseIcon />,
         onClick: onCancel
       }}
-      title={t<string>('Create a new account')}
+      title={t<string>('ui.ACCOUNT.components.Modal.Account.Create.createNewAccount')}
     >
       <div className='items-container'>
         {items.map((item) => {

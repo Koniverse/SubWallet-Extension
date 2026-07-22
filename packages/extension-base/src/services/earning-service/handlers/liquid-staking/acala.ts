@@ -37,7 +37,7 @@ function convertDerivativeToken (amount: BN, exchangeRate: number, decimals: num
 export default class AcalaLiquidStakingPoolHandler extends BaseLiquidStakingPoolHandler {
   protected readonly name: string;
   protected readonly shortName: string;
-  protected readonly altInputAsset: string = 'polkadot-NATIVE-DOT';
+  protected readonly altInputAsset: string = 'statemint-NATIVE-DOT';
   protected readonly derivativeAssets: string[] = ['acala-LOCAL-LDOT'];
   protected readonly inputAsset: string = 'acala-LOCAL-DOT';
   protected readonly rewardAssets: string[] = ['acala-LOCAL-DOT'];

@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { MissionCategory } from '@subwallet/extension-koni-ui/types';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import { CheckCircle, Coin, Cube, DiceSix, MegaphoneSimple, SelectionBackground, User } from 'phosphor-react';
@@ -23,15 +24,15 @@ export enum MissionTab {
 export const missionCategoryMap: Record<string, MissionCategory> = {
   [MissionCategoryType.UPCOMING]: {
     slug: MissionCategoryType.UPCOMING,
-    name: 'Upcoming'
+    name: detectTranslate('ui.MISSION_POOL.defined.upcoming')
   },
   [MissionCategoryType.LIVE]: {
     slug: MissionCategoryType.LIVE,
-    name: 'Live'
+    name: detectTranslate('ui.MISSION_POOL.defined.live')
   },
   [MissionCategoryType.ARCHIVED]: {
     slug: MissionCategoryType.ARCHIVED,
-    name: 'Archived'
+    name: detectTranslate('ui.MISSION_POOL.defined.archived')
   }
 };
 
@@ -59,47 +60,47 @@ type TagInfo = {
 export const tagMap: Record<string, TagInfo> = {
   [TagType.FCFS]: {
     theme: 'yellow',
-    name: 'FCFS',
+    name: detectTranslate('ui.MISSION_POOL.defined.fcfs'),
     slug: TagType.FCFS,
     icon: User
   },
   [TagType.POINTS]: {
     theme: 'success',
-    name: 'Points',
+    name: detectTranslate('ui.MISSION_POOL.defined.points'),
     slug: TagType.POINTS,
     icon: Coin,
     iconWeight: 'fill'
   },
   [TagType.LUCKY_DRAW]: {
     theme: 'gold',
-    name: 'Lucky draw',
+    name: detectTranslate('ui.MISSION_POOL.defined.luckyDraw'),
     slug: TagType.LUCKY_DRAW,
     icon: DiceSix,
     iconWeight: 'fill'
   },
   [TagType.MANUAL_SELECTION]: {
     theme: 'blue',
-    name: 'Manual selection',
+    name: detectTranslate('ui.MISSION_POOL.defined.manualSelection'),
     slug: TagType.MANUAL_SELECTION,
     icon: SelectionBackground
   },
   [MissionCategoryType.UPCOMING]: {
     theme: 'gray-6',
-    name: 'Upcoming',
+    name: detectTranslate('ui.MISSION_POOL.defined.upcoming'),
     slug: MissionCategoryType.UPCOMING,
     icon: MegaphoneSimple,
     iconWeight: 'fill'
   },
   [MissionCategoryType.LIVE]: {
     theme: 'success',
-    name: 'Live',
+    name: detectTranslate('ui.MISSION_POOL.defined.live'),
     slug: MissionCategoryType.LIVE,
     icon: CheckCircle,
     iconWeight: 'fill'
   },
   [MissionCategoryType.ARCHIVED]: {
     theme: 'blue',
-    name: 'Archived',
+    name: detectTranslate('ui.MISSION_POOL.defined.archived'),
     slug: MissionCategoryType.ARCHIVED,
     icon: Cube,
     iconWeight: 'fill'

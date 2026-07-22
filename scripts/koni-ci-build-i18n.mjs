@@ -2,50 +2,25 @@
 // Copyright 2017-2022 @polkadot/dev authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import fs from "fs";
+import fs from 'fs';
 
 import execSync from '@polkadot/dev/scripts/execSync.mjs';
 
+execSync('yarn i18next-scanner --config i18next-scanner.config.js');
+execSync('yarn i18next-scanner --config i18next-scanner.webapp.config.js');
 
-function runBuild() {
-  execSync('yarn i18next-scanner --config i18next-scanner.config.js');
-}
+// ponytail: preserve webapp content and only fill blank shared keys from extension locales.
+const english = JSON.parse(fs.readFileSync('./packages/webapp/public/locales/en/translation.json', 'utf8'));
 
-// After cloning the extension-koni locale to webapp, run a second pass that
-// scans extension-web-ui and removes keys not used by the webapp UI.
-// This keeps the webapp locale lean and avoids merge conflicts.
-function runWebappI18n() {
-  execSync('yarn i18next-scanner --config i18next-scanner.webapp.config.js');
-}
+for (const { name: language } of fs.readdirSync('./packages/extension-koni/public/locales', { withFileTypes: true }).filter((entry) => entry.isDirectory())) {
+  const extensionPath = `./packages/extension-koni/public/locales/${language}/translation.json`;
+  const webappPath = `./packages/webapp/public/locales/${language}/translation.json`;
+  const extension = JSON.parse(fs.readFileSync(extensionPath, 'utf8'));
+  const webapp = JSON.parse(fs.readFileSync(webappPath, 'utf8'));
 
-const path = './packages/{{name}}/public/locales';
-
-const source = 'extension-koni'
-const destinations = ['web-runner', 'webapp']
-
-
-const createPath = (source) => {
-  return path.replace('{{name}}', source);
-}
-
-function cloneTrans() {
-  const sourcePath = createPath(source)
-  for (const destination of destinations) {
-    const destinationPath = createPath(destination)
-
-    try {
-      fs.cpSync(sourcePath, destinationPath, { recursive: true })
-      console.log(`Clone ${destination} done`);
-    } catch (e) {
-      console.error(`Fail to clone trans on ${destination}`, e);
-    }
+  for (const key of Object.keys(webapp)) {
+    webapp[key] ||= extension[key] || english[key] || '';
   }
+
+  fs.writeFileSync(webappPath, JSON.stringify(webapp, null, 2));
 }
-
-// runTest();
-// runBuild();
-
-// Web runner
-cloneTrans();
-
-runWebappI18n();

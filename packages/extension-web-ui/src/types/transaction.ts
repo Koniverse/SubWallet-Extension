@@ -28,6 +28,8 @@ export interface TransferParams extends TransactionFormBaseProps {
   orderId?: string;
   service?: string;
   isReadonly?: boolean;
+  fromValidator?: string;
+  toValidator?: string;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {
@@ -88,4 +90,8 @@ export interface SwapParams extends TransactionFormBaseProps {
 
 export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
+}
+
+export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
+  bittensorRootClaimType: string;
 }

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { StakingType } from '@subwallet/extension-base/background/KoniTypes';
+import { SubstrateProxyType } from '@subwallet/extension-base/types';
 
 export interface TransactionFormBaseProps {
   fromAccountProxy: string;
@@ -15,6 +16,10 @@ export interface TransferParams extends TransactionFormBaseProps {
   destChain: string;
   value: string;
   defaultSlug: string;
+
+  // Transfer alpha token params
+  fromValidator?: string;
+  toValidator?: string;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {
@@ -73,4 +78,37 @@ export interface SwapParams extends TransactionFormBaseProps {
 
 export interface ClaimBridgeParams extends TransactionFormBaseProps {
   notificationId: string;
+}
+
+export interface GovReferendumVoteParams extends TransactionFormBaseProps {
+  amount?: string;
+  abstainAmount?: string;
+  ayeAmount?: string;
+  nayAmount?: string;
+  conviction: number;
+  referendumId: string;
+  track: number;
+}
+
+export interface GovReferendumUnvoteParams extends TransactionFormBaseProps {
+  referendumId: string;
+  track: number;
+}
+
+export interface GovUnlockVoteParams extends TransactionFormBaseProps {
+  amount: string;
+  referendumIds?: string[];
+  tracks: number[];
+}
+
+export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
+  bittensorRootClaimType: string;
+}
+export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps {
+  substrateProxyAddress: string;
+  substrateProxyType: SubstrateProxyType;
+}
+
+export interface RemoveSubstrateProxyAccountParams extends TransactionFormBaseProps {
+  substrateProxyAddressKeys: string[]; // key format is "substrateProxyType:address"
 }

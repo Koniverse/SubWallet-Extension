@@ -24,6 +24,7 @@ export const DefaultLogosMap: Record<string, string> = {
   simple_swap: '/images/projects/simple-swap.png',
   uniswap: '/images/projects/uniswap.png',
   kyber: '/images/projects/kyber.png',
+  optimex: '/images/projects/optimex.png',
   ordinal_rune: './images/projects/ordinal_rune.png',
   polkadot_assethub: '/images/projects/polkadot-asset-hub.png',
   kusama_assethub: '/images/projects/kusama-asset-hub.png',
@@ -35,7 +36,10 @@ export const DefaultLogosMap: Record<string, string> = {
   [SUBSTRATE_GENERIC_KEY]: './images/projects/polkadot.png',
   [SUBSTRATE_MIGRATION_KEY]: './images/projects/polkadot-migration.png',
   ton: './images/projects/ton.png',
-  meld: './images/projects/meld.png'
+  meld: './images/projects/meld.png',
+  polkassembly: './images/projects/polkassembly.png',
+  subsquare: './images/projects/subsquare.png',
+  trust: './images/projects/trust.png'
 };
 
 export const IconMap = {

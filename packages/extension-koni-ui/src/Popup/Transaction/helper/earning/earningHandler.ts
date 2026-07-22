@@ -15,12 +15,12 @@ export function getUnstakingPeriod (t: TFunction, unstakingPeriod?: number) {
       if (unstakingPeriod < 1) {
         const minutes = unstakingPeriod * 60;
 
-        return t('{{time}} minutes', { replace: { time: minutes } });
+        return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.timeMinutes', { replace: { time: minutes } });
       }
 
-      return t('{{time}} hours', { replace: { time: unstakingPeriod } });
+      return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.timeHours', { replace: { time: unstakingPeriod } });
     } else {
-      return t('{{time}} days', { replace: { time: days } });
+      return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.timeDays', { replace: { time: days } });
     }
   }
 
@@ -36,12 +36,12 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
     if (waitingTime !== undefined) {
       remainingTimestampMs = waitingTime * 60 * 60 * 1000;
     } else {
-      return t('Automatic withdrawal');
+      return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.automaticWithdrawal');
     }
   }
 
   if (remainingTimestampMs <= 0) {
-    return t('Available for withdrawal');
+    return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.availableForWithdrawal');
   } else {
     const remainingTimeHr = remainingTimestampMs / 1000 / 60 / 60;
 
@@ -75,7 +75,7 @@ export function getWaitingTime (t: TFunction, currentTimestampMs: number, target
       return segment;
     }).join(' ');
 
-    return t('Withdrawable in {{time}}', { replace: { time: formattedWaitingTime } });
+    return t('ui.TRANSACTION.screen.Transaction.helper.earningHandler.withdrawableInTime', { replace: { time: formattedWaitingTime } });
   }
 }
 

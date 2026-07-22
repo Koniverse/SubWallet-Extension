@@ -30,6 +30,10 @@ export function getReceiveDescription (amount: string, symbol: string) {
   return `You have just received ${amount} ${symbol}`;
 }
 
+export function getMultisigApprovalDescription () {
+  return 'A multisig transaction is waiting for your approval. Click to view details';
+}
+
 /* Description */
 
 export function getIsTabRead (notificationTab: NotificationTab) {

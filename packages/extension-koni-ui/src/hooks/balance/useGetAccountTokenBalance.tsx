@@ -7,6 +7,7 @@ import { _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSym
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import BigN from 'bignumber.js';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
@@ -31,6 +32,7 @@ function getDefaultBalanceItem (
   slug: string,
   symbol: string,
   logoKey: string,
+  displayName?: string,
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   return {
@@ -56,6 +58,7 @@ function getDefaultBalanceItem (
     priceValue: 0,
     logoKey,
     slug,
+    displayName,
     currency: currency || defaultCurrency,
     symbol
   };
@@ -67,8 +70,9 @@ function getDefaultTokenBalance (
   currency?: CurrencyJson
 ): TokenBalanceItemType {
   const symbol = _getAssetSymbol(chainAsset);
+  const displayName = getAssetDisplayName(chainAsset);
 
-  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), currency);
+  return getDefaultBalanceItem(tokenSlug, symbol, chainAsset.slug.toLowerCase(), displayName, currency);
 }
 
 function getTokenBalanceMap (
@@ -116,6 +120,16 @@ function getTokenBalanceMap (
       tokenBalance.free.value = tokenBalance.free.value.plus(getBalanceValue(balanceItem.free || '0', decimals));
       tokenBalance.locked.value = tokenBalance.locked.value.plus(getBalanceValue(balanceItem.locked || '0', decimals));
       tokenBalance.total.value = tokenBalance.free.value.plus(tokenBalance.locked.value);
+
+      tokenBalance.lockedDetails = balanceItem?.lockedDetails
+        ? {
+          staking: getBalanceValue(balanceItem.lockedDetails.staking || '0', decimals).toFixed(),
+          governance: getBalanceValue(balanceItem.lockedDetails.governance || '0', decimals).toFixed(),
+          democracy: getBalanceValue(balanceItem.lockedDetails.democracy || '0', decimals).toFixed(),
+          reserved: getBalanceValue(balanceItem.lockedDetails.reserved || '0', decimals).toFixed(),
+          others: getBalanceValue(balanceItem.lockedDetails.others || '0', decimals).toFixed()
+        }
+        : undefined;
     }
 
     const priceId = _getAssetPriceId(chainAsset);
