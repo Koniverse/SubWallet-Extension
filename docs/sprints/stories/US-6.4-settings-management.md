@@ -23,6 +23,11 @@ which tokens show, and how their accounts are labeled. Settings is the shared
 preference surface every feature reads from, so users tune the wallet once and
 every screen respects it.
 
+## Status
+
+> **✅ done — shipped in 0.4.3.** All acceptance criteria are ticked and the 3 rows below are
+> settled, every one with a release.
+
 ## Background
 
 A multi-chain wallet that surfaces 200+ networks and their tokens is unusable
@@ -133,9 +138,28 @@ backfilled during version reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**3 tracker issues**, all with a release. Folded in from the former one-issue-per-story maintenance
+ledger (2026-07-23).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.2 | [#85](https://github.com/Koniverse/SubWallet-Extension/issues/85) | Update the new Settings screen | ✅ done |
+| 1.1.41 | [#2647](https://github.com/Koniverse/SubWallet-Extension/issues/2647) | Extension - Restructure Settings screen | ✅ done |
+| 1.1.55 | [#2701](https://github.com/Koniverse/SubWallet-Extension/issues/2701) | WebApp - Restructure Settings screen | ✅ done |
+
+> **The Settings screen was rebuilt three times in three years** — #85 (0.3.2, *"the new Settings
+> screen"*), #2647 (1.1.41, *"restructure Settings screen"*), #2701 (1.1.55, the WebApp doing the
+> same). Settings is where every other epic adds a control, so it grows until it has to be
+> restructured rather than extended. The open request to add more
+> ([#3757](https://github.com/Koniverse/SubWallet-Extension/issues/3757)) is in
+> [US-6.6](US-6.6-design-system-and-ux-hardening.md).
+
 ## Cross-references
 
 - [PRD FR-66](../../PRD.md#functional-requirements)
 - [Epic EPIC-6](../epics/EPIC-6.md)
 - [US-6.1](US-6.1-dark-only-responsive-popup-and-expand-view.md)
 - [US-6.5](US-6.5-display-fiat-currency-selection.md)
+- [consolidation note](../../notes/2026-07-23.md#d-epic-26-maintenance--ui--ux-merged-into-epic-6)

@@ -26,6 +26,12 @@ mis-formatted numbers, and Confirmation-screen polish. Users keep seeing a
 coherent, correctly-rendered wallet across viewports and platforms instead of a
 UI that silently drifts apart screen-by-screen.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** All 24 rows below are **open on the tracker**, and
+> **12 of them carry no board column at all**. No acceptance criterion is ticked, and
+> `commit`, `sprint` and `version_shipped` stay empty until work lands.
+
 ## Background
 
 US-6.1 builds the dark-only, responsive shell every screen renders into. This is
@@ -209,9 +215,70 @@ per-issue fix SHAs during version reconciliation._
 
 _Filled during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**24 tracker issues.** They are the open remainder of the UI/UX area; every settled row went to a
+capability story ([AGENTS.md](../../../AGENTS.md) rule 9). Folded in from the former one-issue-per-story maintenance ledger
+(2026-07-23).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#1286](https://github.com/Koniverse/SubWallet-Extension/issues/1286) | The extension break when scaling > 100% | 📋 backlog |
+| — | [#1345](https://github.com/Koniverse/SubWallet-Extension/issues/1345) | Border bug on the some device | 📋 backlog |
+| — | [#1436](https://github.com/Koniverse/SubWallet-Extension/issues/1436) | [QRScanner] Update style | 📋 backlog |
+| — | [#1800](https://github.com/Koniverse/SubWallet-Extension/issues/1800) | Improve UI for reset wallet feature | 📋 backlog |
+| — | [#2141](https://github.com/Koniverse/SubWallet-Extension/issues/2141) | WebApp - Improve UI for mobile (round 2) | 📋 backlog |
+| — | [#2311](https://github.com/Koniverse/SubWallet-Extension/issues/2311) | Extension - Update some UX for extension and webapp | 📋 backlog |
+| — | [#2568](https://github.com/Koniverse/SubWallet-Extension/issues/2568) | Extension - Fix some UI bug | 📋 backlog |
+| — | [#2736](https://github.com/Koniverse/SubWallet-Extension/issues/2736) | WebApp - Change the position of the toast and popup | 📋 backlog |
+| — | [#2832](https://github.com/Koniverse/SubWallet-Extension/issues/2832) | WebApp - Re-check the screens displaying incomplete list information | 📋 backlog |
+| — | [#2930](https://github.com/Koniverse/SubWallet-Extension/issues/2930) | WebApp - Show incorrect information on Confirmation screen for Avail | 📋 backlog |
+| — | [#3341](https://github.com/Koniverse/SubWallet-Extension/issues/3341) | WebApp - Fix some UI bug | 📋 backlog |
+| — | [#3655](https://github.com/Koniverse/SubWallet-Extension/issues/3655) | Add hard reload button | 📋 backlog |
+| — | [#3737](https://github.com/Koniverse/SubWallet-Extension/issues/3737) | Extension - Bug UI for MKT campaign | 📋 backlog |
+| — | [#3757](https://github.com/Koniverse/SubWallet-Extension/issues/3757) | Extension - Add some feature on Settings screen | 📋 backlog |
+| — | [#3766](https://github.com/Koniverse/SubWallet-Extension/issues/3766) | Extension - Update UI for Confirmation screen | 📋 backlog |
+| — | [#3982](https://github.com/Koniverse/SubWallet-Extension/issues/3982) | Extension - Improved small number display | 📋 backlog |
+| — | [#3988](https://github.com/Koniverse/SubWallet-Extension/issues/3988) | Extension - Check UI bug when scrolling | 📋 backlog |
+| — | [#4137](https://github.com/Koniverse/SubWallet-Extension/issues/4137) | Extension - Re-check the display of the app popup for the Marketing campaign | 📋 backlog |
+| — | [#4180](https://github.com/Koniverse/SubWallet-Extension/issues/4180) | Extension - Improve banner MKT campaign | 📋 backlog |
+| — | [#4236](https://github.com/Koniverse/SubWallet-Extension/issues/4236) | Extension - Update number display rules | 📋 backlog |
+| — | [#4472](https://github.com/Koniverse/SubWallet-Extension/issues/4472) | 🧠 High-Impact, Low-Effort UX Improvements | 📋 backlog |
+| — | [#4473](https://github.com/Koniverse/SubWallet-Extension/issues/4473) | High Impact – High Effort UX Issues | 📋 backlog |
+| — | [#4474](https://github.com/Koniverse/SubWallet-Extension/issues/4474) | 🟡 Low Impact UX Issues | 📋 backlog |
+| — | [#4710](https://github.com/Koniverse/SubWallet-Extension/issues/4710) | [Extension] Improve some UI | 📋 backlog |
+
+> **Three rows are not issues, they are backlogs.** #4472 (*"🧠 High-Impact, Low-Effort UX
+> Improvements"*), #4473 (*"High Impact – High Effort UX Issues"*) and #4474 (*"🟡 Low Impact UX
+> Issues"*) each hold a **bulleted list of a dozen or more separate UX asks** in their body — broken
+> "Request Feature" link, gear icon for Settings, swap quote expiry not communicated, inconsistent
+> USD display, locked-token actions. They are **not umbrellas** by
+> [AGENTS.md](../../../AGENTS.md) rule 10: the bullets are prose, not issue references, so there are no children to carry
+> the work. Roughly forty individual UX findings exist only as text inside three tickets, and none
+> of them will ever be closed individually.
+>
+> **Five rows are the marketing-campaign surface.** #3737, #4137, #4180 here, plus the settled
+> campaign work in [US-6.10](US-6.10-notification-and-campaign-surfaces.md). The banner is the most
+> re-worked single element in this epic.
+>
+> **#1800 has been open since 2023** — *"Improve UI for reset wallet feature"* — the screen a user
+> reaches at the worst moment.
+>
+> **Nine of these rows were this story's own scope, named in its Background and provable in no
+> table** until 2026-07-23 — #1286 (the extension breaks above 100% scaling), #1345 (border bug on
+> some devices), #2141, #2832, #3341 (WebApp), #2568, #3766, #3988 (extension), #4236 (number
+> display rules). They were the evidence for the story's existence and belonged to no row
+> ([AGENTS.md](../../../AGENTS.md) rule 9).
+>
+> **#4236 and #3988 are the open ends of two settled stories** — the number-display rule
+> ([US-6.8](US-6.8-number-and-value-display.md), where #1303 closed `NOT_PLANNED`) and scroll
+> behaviour ([US-6.1](US-6.1-dark-only-responsive-popup-and-expand-view.md), where #1336 shipped in
+> 1.0.5). Both questions were answered once and re-opened.
+
 ## Cross-references
 
 - [Epic EPIC-6](../epics/EPIC-6.md)
 - [US-6.1](US-6.1-dark-only-responsive-popup-and-expand-view.md)
 - [Issue #1286](https://github.com/Koniverse/SubWallet-Extension/issues/1286) · [#1345](https://github.com/Koniverse/SubWallet-Extension/issues/1345) · [#2568](https://github.com/Koniverse/SubWallet-Extension/issues/2568) · [#3341](https://github.com/Koniverse/SubWallet-Extension/issues/3341) · [#3988](https://github.com/Koniverse/SubWallet-Extension/issues/3988) · [#2141](https://github.com/Koniverse/SubWallet-Extension/issues/2141) · [#2832](https://github.com/Koniverse/SubWallet-Extension/issues/2832) · [#3766](https://github.com/Koniverse/SubWallet-Extension/issues/3766) · [#4236](https://github.com/Koniverse/SubWallet-Extension/issues/4236)
 - [ARCHITECTURE AD-05](../../ARCHITECTURE.md#architecture-decisions)
+- [consolidation note](../../notes/2026-07-23.md#d-epic-26-maintenance--ui--ux-merged-into-epic-6)

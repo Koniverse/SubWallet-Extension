@@ -123,7 +123,13 @@ security maintenance ledger landed here (per-issue map: [consolidation note](../
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **23 issues** mentioning "master password" / "password", sitting in EPIC-23, EPIC-26, EPIC-30, EPIC-41.
+> ledgers still separate** finds **17 issues** mentioning "master password" / "password", sitting in EPIC-23, EPIC-30, EPIC-41.
+>
+> **The UI ledger's six went to UI stories, not here.** When it folded on 2026-07-23, #1012, #1193
+> (the 1.0.2 rewrite's master-password screens) landed in
+> [US-6.7](US-6.7-the-1-0-2-ui-upgrade-programme.md) and #1703, #1740, #2040, #2056 in
+> [US-6.2](US-6.2-web-app-feature-parity.md). Each is *the screen that shows the password flow*,
+> not the policy this story owns — which is the boundary the count above cannot see.
 > Treat that as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

@@ -331,54 +331,54 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off "Advanced phishing detection" feature (#4891) | 1.3.69 | 2025-12-08 | US-5.1 |
 | [#1226](https://github.com/Koniverse/SubWallet-Extension/issues/1226) | Detect phishing page with ChainPatrol (#1226) | 1.0.5 | 2023-05-21 | US-5.1 |
 | [#1823](https://github.com/Koniverse/SubWallet-Extension/issues/1823) | Update webpack config environment for page.js and content.js to improve security (#1823) | 1.1.9 | 2023-08-22 | US-5.10 |
-| [#255](https://github.com/Koniverse/SubWallet-Extension/issues/255) | Improve data fetching for better performance and UX (#255) | 0.5.3 | 2022-07-29 | US-26.10 |
-| [#258](https://github.com/Koniverse/SubWallet-Extension/issues/258) | Fix some style bug in (#258) | 0.4.2 | 2022-05-20 | US-26.11 |
-| [#1748](https://github.com/Koniverse/SubWallet-Extension/issues/1748) | Fixed bug Do not display the history of addresses other than the original address (#1748) | 1.1.6 | 2023-08-04 | US-26.111 |
-| [#340](https://github.com/Koniverse/SubWallet-Extension/issues/340) | Fix some bugs & feedback to improve UX-UI (#340) | 0.5.6 | 2022-08-24 | US-26.12 |
-| [#1857](https://github.com/Koniverse/SubWallet-Extension/issues/1857) | Update empty list screens (#1857) | 1.1.13 | 2023-09-21 | US-26.121 |
-| [#377](https://github.com/Koniverse/SubWallet-Extension/issues/377) | Improve request permission screen (#377) | 0.4.7 | 2022-06-24 | US-26.13 |
-| [#2038](https://github.com/Koniverse/SubWallet-Extension/issues/2038) | Improve banner campaign in app (#2038) | 1.1.33 | 2024-01-23 | US-26.131 |
-| [#2203](https://github.com/Koniverse/SubWallet-Extension/issues/2203) | Fixed some UI bug (#2203) | 1.1.29 | 2023-12-29 | US-26.137 |
+| [#255](https://github.com/Koniverse/SubWallet-Extension/issues/255) | Improve data fetching for better performance and UX (#255) | 0.5.3 | 2022-07-29 | US-6.12 |
+| [#258](https://github.com/Koniverse/SubWallet-Extension/issues/258) | Fix some style bug in (#258) | 0.4.2 | 2022-05-20 | US-6.1 |
+| [#1748](https://github.com/Koniverse/SubWallet-Extension/issues/1748) | Fixed bug Do not display the history of addresses other than the original address (#1748) | 1.1.6 | 2023-08-04 | US-6.11 |
+| [#340](https://github.com/Koniverse/SubWallet-Extension/issues/340) | Fix some bugs & feedback to improve UX-UI (#340) | 0.5.6 | 2022-08-24 | US-6.12 |
+| [#1857](https://github.com/Koniverse/SubWallet-Extension/issues/1857) | Update empty list screens (#1857) | 1.1.13 | 2023-09-21 | US-6.1 |
+| [#377](https://github.com/Koniverse/SubWallet-Extension/issues/377) | Improve request permission screen (#377) | 0.4.7 | 2022-06-24 | US-6.12 |
+| [#2038](https://github.com/Koniverse/SubWallet-Extension/issues/2038) | Improve banner campaign in app (#2038) | 1.1.33 | 2024-01-23 | US-6.10 |
+| [#2203](https://github.com/Koniverse/SubWallet-Extension/issues/2203) | Fixed some UI bug (#2203) | 1.1.29 | 2023-12-29 | US-6.1 |
 | [#2317](https://github.com/Koniverse/SubWallet-Extension/issues/2317) | Add popup to remind users to perform backups account (popup hiển thị định kỳ) (#2317) | 1.1.68 | 2024-05-25 | US-19.1 |
-| [#2362](https://github.com/Koniverse/SubWallet-Extension/issues/2362) | Fixed bug show EVM transaction history (#2362) | 1.1.27 | 2023-12-20 | US-26.142 |
-| [#2387](https://github.com/Koniverse/SubWallet-Extension/issues/2387) | Add "time-out" status for transaction history (#2387) | 1.1.33 | 2024-01-23 | US-26.143 |
-| [#2647](https://github.com/Koniverse/SubWallet-Extension/issues/2647) | Restructure Settings screen (#2647) | 1.1.41 | 2024-03-02 | US-26.151 |
-| [#2751](https://github.com/Koniverse/SubWallet-Extension/issues/2751) | Improve display collators list (#2751) | 1.3.7 | 2024-11-23 | US-26.154 |
+| [#2362](https://github.com/Koniverse/SubWallet-Extension/issues/2362) | Fixed bug show EVM transaction history (#2362) | 1.1.27 | 2023-12-20 | US-6.11 |
+| [#2387](https://github.com/Koniverse/SubWallet-Extension/issues/2387) | Add "time-out" status for transaction history (#2387) | 1.1.33 | 2024-01-23 | US-6.11 |
+| [#2647](https://github.com/Koniverse/SubWallet-Extension/issues/2647) | Restructure Settings screen (#2647) | 1.1.41 | 2024-03-02 | US-6.4 |
+| [#2751](https://github.com/Koniverse/SubWallet-Extension/issues/2751) | Improve display collators list (#2751) | 1.3.7 | 2024-11-23 | US-6.8 |
 | [#2796](https://github.com/Koniverse/SubWallet-Extension/issues/2796) | Improve UI for Mission Pools (#2796) | 1.1.49 | 2024-03-26 | US-19.7 |
-| [#585](https://github.com/Koniverse/SubWallet-Extension/issues/585) | Improved decimal display UX (#585) | 0.5.7 | 2022-09-06 | US-26.16 |
-| [#3062](https://github.com/Koniverse/SubWallet-Extension/issues/3062) | Fixed bug Unable to back screen in case open General settings to Marketing campaign (#3062) | 1.1.65 | 2024-05-16 | US-26.161 |
-| [#3131](https://github.com/Koniverse/SubWallet-Extension/issues/3131) | Fix bug Screen flickering error when interacting with extensions (#3131) | 1.2.10 | 2024-06-25 | US-26.162 |
-| [#3228](https://github.com/Koniverse/SubWallet-Extension/issues/3228) | Update subwallet-react-ui (#3228) | 1.2.10 | 2024-06-25 | US-26.164 |
-| [#3507](https://github.com/Koniverse/SubWallet-Extension/issues/3507) | Support Notification in app (#3507, #3515) | 1.3.4 | 2024-10-28 | US-26.169 |
-| [#3515](https://github.com/Koniverse/SubWallet-Extension/issues/3515) | Support Notification in app (#3507, #3515) | 1.3.4 | 2024-10-28 | US-26.169 |
-| [#4023](https://github.com/Koniverse/SubWallet-Extension/issues/4023) | Turn off the update manifest v3 popup (#4023) | 1.3.37 | 2025-05-23 | US-26.175 |
-| [#4347](https://github.com/Koniverse/SubWallet-Extension/issues/4347) | Update UI to clearly display fees (#4347) | 1.3.38 | 2025-05-23 | US-26.178 |
-| [#4617](https://github.com/Koniverse/SubWallet-Extension/issues/4617) | Improve UX for the "Advanced phishing detection" feature (#4617) | 1.3.56 | 2025-09-11 | US-26.187 |
-| [#4739](https://github.com/Koniverse/SubWallet-Extension/issues/4739) | [Energy Web X] Display APY for collators in collator list (#4739) | 1.3.64 | 2025-10-31 | US-26.189 |
-| [#820](https://github.com/Koniverse/SubWallet-Extension/issues/820) | Update new way to get transaction history (#820) | 0.7.6 | 2022-12-17 | US-26.21 |
-| [#830](https://github.com/Koniverse/SubWallet-Extension/issues/830) | Do not show tooltip on the Firefox browser (#830) | 0.7.3 | 2022-11-25 | US-26.22 |
-| [#912](https://github.com/Koniverse/SubWallet-Extension/issues/912) | Turn off background in case extension reloaded and popup never opened (#912) | 0.7.5 | 2022-12-15 | US-26.23 |
-| [#19](https://github.com/Koniverse/SubWallet-Extension/issues/19) | Integrate Darwinia 2 (#19) | 1.0.5 | 2023-05-21 | US-26.3 |
-| [#85](https://github.com/Koniverse/SubWallet-Extension/issues/85) | Update the new Settings screen (issue #85) | 0.3.2 | 2022-04-07 | US-26.5 |
-| [#91](https://github.com/Koniverse/SubWallet-Extension/issues/91) | Improve custom access screen (issue #91) | 0.3.4 | 2022-04-16 | US-26.6 |
-| [#156](https://github.com/Koniverse/SubWallet-Extension/issues/156) | Fix grammar error and type issue of button (issue #156,#166) | 0.3.4 | 2022-04-16 | US-26.7 |
-| [#166](https://github.com/Koniverse/SubWallet-Extension/issues/166) | Fix grammar error and type issue of button (issue #156,#166) | 0.3.4 | 2022-04-16 | US-26.7 |
-| [#224](https://github.com/Koniverse/SubWallet-Extension/issues/224) | Fix tooltip not showing on the popup view on firefox browser (#224) | 0.4.2 | 2022-05-20 | US-26.8 |
-| [#1229](https://github.com/Koniverse/SubWallet-Extension/issues/1229) | Update UI for expand view (#1229) | 1.0.11 | 2023-06-24 | US-26.82 |
-| [#1243](https://github.com/Koniverse/SubWallet-Extension/issues/1243) | Fixed sync configuration between expand view and popup view (#1243) | 1.1.2 | 2023-07-14 | US-26.84 |
-| [#1336](https://github.com/Koniverse/SubWallet-Extension/issues/1336) | UI bug when scrolling (#1336) | 1.0.5 | 2023-05-21 | US-26.87 |
-| [#1380](https://github.com/Koniverse/SubWallet-Extension/issues/1380) | Add “I trust this site” option on the phishing page screen (#1380) | 1.0.6 | 2023-05-26 | US-26.88 |
-| [#1393](https://github.com/Koniverse/SubWallet-Extension/issues/1393) | Fixed bug on Firefox browser (#1394, #1393) | 1.0.5 | 2023-05-21 | US-26.89 |
-| [#1394](https://github.com/Koniverse/SubWallet-Extension/issues/1394) | Fixed bug on Firefox browser (#1394, #1393) | 1.0.5 | 2023-05-21 | US-26.89 |
-| [#228](https://github.com/Koniverse/SubWallet-Extension/issues/228) | Fix bug not update them when change them from popup view (#228) | 0.4.1 | 2022-05-11 | US-26.9 |
-| [#1419](https://github.com/Koniverse/SubWallet-Extension/issues/1419) | Update some screens follow by design (#1419) | 1.0.8 | 2023-06-08 | US-26.90 |
-| [#1450](https://github.com/Koniverse/SubWallet-Extension/issues/1450) | Update login & welcome screen (#1450) | 1.0.6 | 2023-05-26 | US-26.92 |
-| [#1507](https://github.com/Koniverse/SubWallet-Extension/issues/1507) | Fixed UI bugs (#1548, #1507) | 1.1.2 | 2023-07-14 | US-26.93 |
-| [#1548](https://github.com/Koniverse/SubWallet-Extension/issues/1548) | Fixed UI bugs (#1548, #1507) | 1.1.2 | 2023-07-14 | US-26.93 |
-| [#1569](https://github.com/Koniverse/SubWallet-Extension/issues/1569) | Fixed UI bugs on the Expand view (#1569) | 1.0.12 | 2023-06-29 | US-26.95 |
-| [#1639](https://github.com/Koniverse/SubWallet-Extension/issues/1639) | Update UI for notification (#1639) | 1.1.3 | 2023-07-21 | US-26.97 |
+| [#585](https://github.com/Koniverse/SubWallet-Extension/issues/585) | Improved decimal display UX (#585) | 0.5.7 | 2022-09-06 | US-6.8 |
+| [#3062](https://github.com/Koniverse/SubWallet-Extension/issues/3062) | Fixed bug Unable to back screen in case open General settings to Marketing campaign (#3062) | 1.1.65 | 2024-05-16 | US-6.10 |
+| [#3131](https://github.com/Koniverse/SubWallet-Extension/issues/3131) | Fix bug Screen flickering error when interacting with extensions (#3131) | 1.2.10 | 2024-06-25 | US-6.1 |
+| [#3228](https://github.com/Koniverse/SubWallet-Extension/issues/3228) | Update subwallet-react-ui (#3228) | 1.2.10 | 2024-06-25 | US-6.7 |
+| [#3507](https://github.com/Koniverse/SubWallet-Extension/issues/3507) | Support Notification in app (#3507, #3515) | 1.3.4 | 2024-10-28 | US-6.10 |
+| [#3515](https://github.com/Koniverse/SubWallet-Extension/issues/3515) | Support Notification in app (#3507, #3515) | 1.3.4 | 2024-10-28 | US-6.10 |
+| [#4023](https://github.com/Koniverse/SubWallet-Extension/issues/4023) | Turn off the update manifest v3 popup (#4023) | 1.3.37 | 2025-05-23 | US-6.1 |
+| [#4347](https://github.com/Koniverse/SubWallet-Extension/issues/4347) | Update UI to clearly display fees (#4347) | 1.3.38 | 2025-05-23 | US-6.8 |
+| [#4617](https://github.com/Koniverse/SubWallet-Extension/issues/4617) | Improve UX for the "Advanced phishing detection" feature (#4617) | 1.3.56 | 2025-09-11 | US-6.9 |
+| [#4739](https://github.com/Koniverse/SubWallet-Extension/issues/4739) | [Energy Web X] Display APY for collators in collator list (#4739) | 1.3.64 | 2025-10-31 | US-6.8 |
+| [#820](https://github.com/Koniverse/SubWallet-Extension/issues/820) | Update new way to get transaction history (#820) | 0.7.6 | 2022-12-17 | US-6.11 |
+| [#830](https://github.com/Koniverse/SubWallet-Extension/issues/830) | Do not show tooltip on the Firefox browser (#830) | 0.7.3 | 2022-11-25 | US-6.1 |
+| [#912](https://github.com/Koniverse/SubWallet-Extension/issues/912) | Turn off background in case extension reloaded and popup never opened (#912) | 0.7.5 | 2022-12-15 | US-6.12 |
+| [#19](https://github.com/Koniverse/SubWallet-Extension/issues/19) | Integrate Darwinia 2 (#19) | 1.0.5 | 2023-05-21 | US-6.12 |
+| [#85](https://github.com/Koniverse/SubWallet-Extension/issues/85) | Update the new Settings screen (issue #85) | 0.3.2 | 2022-04-07 | US-6.4 |
+| [#91](https://github.com/Koniverse/SubWallet-Extension/issues/91) | Improve custom access screen (issue #91) | 0.3.4 | 2022-04-16 | US-6.12 |
+| [#156](https://github.com/Koniverse/SubWallet-Extension/issues/156) | Fix grammar error and type issue of button (issue #156,#166) | 0.3.4 | 2022-04-16 | US-6.12 |
+| [#166](https://github.com/Koniverse/SubWallet-Extension/issues/166) | Fix grammar error and type issue of button (issue #156,#166) | 0.3.4 | 2022-04-16 | US-6.12 |
+| [#224](https://github.com/Koniverse/SubWallet-Extension/issues/224) | Fix tooltip not showing on the popup view on firefox browser (#224) | 0.4.2 | 2022-05-20 | US-6.1 |
+| [#1229](https://github.com/Koniverse/SubWallet-Extension/issues/1229) | Update UI for expand view (#1229) | 1.0.11 | 2023-06-24 | US-6.1 |
+| [#1243](https://github.com/Koniverse/SubWallet-Extension/issues/1243) | Fixed sync configuration between expand view and popup view (#1243) | 1.1.2 | 2023-07-14 | US-6.1 |
+| [#1336](https://github.com/Koniverse/SubWallet-Extension/issues/1336) | UI bug when scrolling (#1336) | 1.0.5 | 2023-05-21 | US-6.1 |
+| [#1380](https://github.com/Koniverse/SubWallet-Extension/issues/1380) | Add “I trust this site” option on the phishing page screen (#1380) | 1.0.6 | 2023-05-26 | US-6.9 |
+| [#1393](https://github.com/Koniverse/SubWallet-Extension/issues/1393) | Fixed bug on Firefox browser (#1394, #1393) | 1.0.5 | 2023-05-21 | US-6.1 |
+| [#1394](https://github.com/Koniverse/SubWallet-Extension/issues/1394) | Fixed bug on Firefox browser (#1394, #1393) | 1.0.5 | 2023-05-21 | US-6.1 |
+| [#228](https://github.com/Koniverse/SubWallet-Extension/issues/228) | Fix bug not update them when change them from popup view (#228) | 0.4.1 | 2022-05-11 | US-6.1 |
+| [#1419](https://github.com/Koniverse/SubWallet-Extension/issues/1419) | Update some screens follow by design (#1419) | 1.0.8 | 2023-06-08 | US-6.7 |
+| [#1450](https://github.com/Koniverse/SubWallet-Extension/issues/1450) | Update login & welcome screen (#1450) | 1.0.6 | 2023-05-26 | US-6.7 |
+| [#1507](https://github.com/Koniverse/SubWallet-Extension/issues/1507) | Fixed UI bugs (#1548, #1507) | 1.1.2 | 2023-07-14 | US-6.1 |
+| [#1548](https://github.com/Koniverse/SubWallet-Extension/issues/1548) | Fixed UI bugs (#1548, #1507) | 1.1.2 | 2023-07-14 | US-6.1 |
+| [#1569](https://github.com/Koniverse/SubWallet-Extension/issues/1569) | Fixed UI bugs on the Expand view (#1569) | 1.0.12 | 2023-06-29 | US-6.1 |
+| [#1639](https://github.com/Koniverse/SubWallet-Extension/issues/1639) | Update UI for notification (#1639) | 1.1.3 | 2023-07-21 | US-6.10 |
 | [#1644](https://github.com/Koniverse/SubWallet-Extension/issues/1644) | Support new language: Japanese (#1644) | 1.1.10 | 2023-08-26 | US-19.2 |
-| [#1684](https://github.com/Koniverse/SubWallet-Extension/issues/1684) | Improve lock UX (#1684) | 1.1.10 | 2023-08-26 | US-26.99 |
+| [#1684](https://github.com/Koniverse/SubWallet-Extension/issues/1684) | Improve lock UX (#1684) | 1.1.10 | 2023-08-26 | US-6.12 |
 | [#981](https://github.com/Koniverse/SubWallet-Extension/issues/981) | Fix bug getting multiple balances for Equilibrium (#981) | 0.7.9 | 2023-01-30 | US-7.2 |
 | [#1360](https://github.com/Koniverse/SubWallet-Extension/issues/1360) | Fixed bug get balance (#1360) | 1.0.5 | 2023-05-21 | US-7.2 |
 | [#1428](https://github.com/Koniverse/SubWallet-Extension/issues/1428) | Fix bug get balance when send token (#1428) | 1.0.6 | 2023-05-26 | US-7.2 |

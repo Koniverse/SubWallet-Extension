@@ -123,15 +123,23 @@ security maintenance ledger landed here (per-issue map: [consolidation note](../
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **9
-> ledgers still separate** finds **26 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-26, EPIC-28, EPIC-32, EPIC-41.
+> ledgers still separate** finds **23 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-28, EPIC-32, EPIC-41.
 >
 > **The hardware ledger's three candidates were all false positives**, and they are worth recording
 > as the shape of the error: `Unblock`, `block action`, `Block networks` — the heuristic matched
 > "lock" as a substring. None is a screen-lock issue; all three are Ledger action-blocking, now in
 > [US-16.6](US-16.6-ledger-signing-across-wallet-features.md) and
-> [US-16.7](US-16.7-generic-ledger-app-migration-and-metadata.md). The count fell 29 → 26 when the
-> hardware ledger folded on 2026-07-23 and **not one of its issues landed here**.
-> Treat that as an **upper bound, not a count**: routing there is a title heuristic
+> [US-16.7](US-16.7-generic-ledger-app-migration-and-metadata.md).
+>
+> **The UI ledger's three were real, and still did not land here**: #1102 and #1134 (*"handle case
+> lock wallet"*, *"auto lock wallet"*) went into
+> [US-6.7](US-6.7-the-1-0-2-ui-upgrade-programme.md) with the rest of the 1.0.2 rewrite, and #1684
+> (*"improve lock UX"*, 1.1.10) into [US-6.12](US-6.12-early-ux-iteration.md). The lock **flow** is
+> this story's; the **screens that show it** are EPIC-6's — a distinction a title scan cannot make.
+>
+> The count fell 29 → 26 when the hardware ledger folded on 2026-07-23, then 26 → 23 when the UI
+> ledger folded the same day, and **not one of those six issues landed here**.
+> Treat the remainder as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers
 > are folded, not now.

@@ -125,7 +125,12 @@ security maintenance ledger landed here (per-issue map: [consolidation note](../
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **7 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-26, EPIC-30, EPIC-41.
+> ledgers still separate** finds **4 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-30, EPIC-41.
+>
+> **The UI ledger's three were surface work.** #1075 went to
+> [US-6.7](US-6.7-the-1-0-2-ui-upgrade-programme.md), #2056 to
+> [US-6.2](US-6.2-web-app-feature-parity.md), and #1800 — *"Improve UI for reset wallet feature"*,
+> open since 2023 — to [US-6.6](US-6.6-design-system-and-ux-hardening.md).
 > Treat that as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

@@ -12,7 +12,7 @@ arch_ref:
   - AD-05
   - AD-03
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-07-23
 ---
 
 ## Goal
@@ -113,9 +113,31 @@ here; currency-converted *amounts* are computed by the balance epic
 | [US-6.4](../stories/US-6.4-settings-management.md) | Settings management | Manage network selection, token preferences, and account metadata | ✅ done | 0.4.3 |
 | [US-6.5](../stories/US-6.5-display-fiat-currency-selection.md) | Display fiat-currency selection | Pick the fiat currency used to display balances and prices | ✅ done | 1.1.60 |
 | [US-6.6](../stories/US-6.6-design-system-and-ux-hardening.md) | Design-system & UX hardening | Real UI/UX bug + iteration fixes across extension & WebApp — scaling/border/scroll regressions, mobile & incomplete-list layout, Confirmation screen, number display | 📋 backlog | — |
+| [US-6.7](../stories/US-6.7-the-1-0-2-ui-upgrade-programme.md) | The 1.0.2 UI upgrade programme | The rewrite that replaced the whole interface — 60 rows, one issue in three | ✅ done | 1.2.10 |
+| [US-6.8](../stories/US-6.8-number-and-value-display.md) | Number, decimal & value display | Decimals, small and large values, rates and fees — a number the user can trust | ✅ done | 1.3.64 |
+| [US-6.9](../stories/US-6.9-phishing-and-security-surfaces.md) | Phishing & security surfaces | The warning screen and its escape hatch — EPIC-5 detects, EPIC-6 presents | ✅ done | 1.3.56 |
+| [US-6.10](../stories/US-6.10-notification-and-campaign-surfaces.md) | Notification & marketing-campaign surfaces | Where the banner lands, in what order, and how the user gets out | ✅ done | 1.3.4 |
+| [US-6.11](../stories/US-6.11-transaction-history-surface.md) | Transaction-history surface | The list the user reads, and the indexers behind it | ✅ done | 1.3.1 |
+| [US-6.12](../stories/US-6.12-early-ux-iteration.md) | Early UX iteration (pre-design-system) | UX work from before there was a design system to work in | ✅ done | 1.1.10 |
 
 > Every FR is assigned a story ID up front (FR order) so numbering is locked — no
 > renumber later. US-6.6 is the epic's hardening story (no FR).
+>
+> **US-6.7 … US-6.12 carry no FR either.** They hold the incremental work, fixes and chores that
+> landed on this epic — **186 tracker issues**, folded in from the former one-issue-per-story
+> maintenance ledger on 2026-07-23
+> ([note](../../notes/2026-07-23.md#d-epic-26-maintenance--ui--ux-merged-into-epic-6)). The FR map
+> above is unchanged.
+>
+> **This ledger had no umbrella issues at all** — 177 issues, not one with sub-issues. UI work is
+> filed flat: a screen, a bug, a round. The one programme in it, the 1.0.2 rewrite, is held together
+> by a **title prefix** (`Upgrade UI - `) rather than by a parent, which is why the generator could
+> not see it and why it is [US-6.7](../stories/US-6.7-the-1-0-2-ui-upgrade-programme.md) here.
+>
+> **[US-6.3](../stories/US-6.3-mobile-web-runner-webview.md) received no rows.** The mobile
+> web-runner has shipped since 0.4.2 and generated no UI/UX tracker issue of its own in three years
+> — its surface defects are filed against the WebApp
+> ([US-6.2](../stories/US-6.2-web-app-feature-parity.md)) instead.
 
 ## Object map & user-story interactions
 

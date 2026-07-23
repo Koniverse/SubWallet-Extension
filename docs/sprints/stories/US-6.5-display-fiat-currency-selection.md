@@ -22,6 +22,11 @@ Let users see their portfolio in the currency they think in. The user picks a
 display fiat currency once; the wallet persists that choice and every balance and
 price across the app is formatted in it.
 
+## Status
+
+> **✅ done — shipped in 1.1.60.** All acceptance criteria are ticked and the single row below is
+> settled.
+
 ## Background
 
 The wallet defaults to USD, but a global user base needs balances and prices in
@@ -118,9 +123,23 @@ backfilled during version reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**1 tracker issue** — a defect two releases after delivery. Folded in from the former
+one-issue-per-story maintenance ledger (2026-07-23).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.62 | [#2977](https://github.com/Koniverse/SubWallet-Extension/issues/2977) | Extension - Currency settings are reset when upgrade version | ✅ done |
+
+> **The one follow-up is a persistence bug, not a display bug.** #2977 (1.1.62) — *"currency
+> settings are reset when the version is upgraded"* — two releases after the feature shipped in
+> 1.1.60. A preference that does not survive an upgrade is not a preference.
+
 ## Cross-references
 
 - [PRD FR-67](../../PRD.md#functional-requirements)
 - [Epic EPIC-6](../epics/EPIC-6.md)
 - [US-6.4](US-6.4-settings-management.md)
 - [EPIC-7](../epics/EPIC-7.md)
+- [consolidation note](../../notes/2026-07-23.md#d-epic-26-maintenance--ui--ux-merged-into-epic-6)

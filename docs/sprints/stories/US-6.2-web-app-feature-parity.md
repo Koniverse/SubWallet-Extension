@@ -24,6 +24,12 @@ chains, balances, and flows are available because the web app bundles the *same*
 background logic; only the packaging and a few web-specific UI adaptations
 differ.
 
+## Status
+
+> **✅ done — shipped in 1.1.36.** All acceptance criteria are ticked and the 32 rows below are
+> settled: 31 delivered, 1 closed without shipping. **This is the second-largest story in the epic**
+> — feature parity was not one delivery, it was thirty-two.
+
 ## Background
 
 The extension is the primary delivery target, but a non-trivial audience cannot
@@ -141,9 +147,62 @@ and any implementation caveats during version reconciliation._
 
 _Filled during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**32 tracker issues** — 22 with a release, 9 delivered with no line naming them, 1 closed without
+shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-23).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.36 | [#1685](https://github.com/Koniverse/SubWallet-Extension/issues/1685) | WebApp - UI bugs on the Welcome screen | ✅ done |
+| 1.1.36 | [#1698](https://github.com/Koniverse/SubWallet-Extension/issues/1698) | WebApp - Bugs related to the History feature | ✅ done |
+| 1.1.36 | [#1699](https://github.com/Koniverse/SubWallet-Extension/issues/1699) | WebApp - An error occurs when user click button Cancel on the Confirmations screens | ✅ done |
+| 1.1.36 | [#1706](https://github.com/Koniverse/SubWallet-Extension/issues/1706) | WebApp - Update show display version from package.json | ✅ done |
+| 1.1.36 | [#1739](https://github.com/Koniverse/SubWallet-Extension/issues/1739) | WebApp - Update UI some screen | ✅ done |
+| 1.1.36 | [#1740](https://github.com/Koniverse/SubWallet-Extension/issues/1740) | Can not back to Welcome screen when click back on Create master password screen | ✅ done |
+| 1.1.36 | [#1751](https://github.com/Koniverse/SubWallet-Extension/issues/1751) | WebApp - UI bug header | ✅ done |
+| 1.1.36 | [#1820](https://github.com/Koniverse/SubWallet-Extension/issues/1820) | WebApp - Update general modal UI | ✅ done |
+| 1.1.36 | [#1828](https://github.com/Koniverse/SubWallet-Extension/issues/1828) | WebApp - Screen navigation is incorrect | ✅ done |
+| 1.1.36 | [#1831](https://github.com/Koniverse/SubWallet-Extension/issues/1831) | WebApp - Add the tooltip for icon button without text | ✅ done |
+| 1.1.36 | [#1863](https://github.com/Koniverse/SubWallet-Extension/issues/1863) | WebApp - Some UI bug | ✅ done |
+| 1.1.36 | [#1879](https://github.com/Koniverse/SubWallet-Extension/issues/1879) | WebApp - Update welcome screen | ✅ done |
+| 1.1.36 | [#1977](https://github.com/Koniverse/SubWallet-Extension/issues/1977) | WebApp - UI bug on DApps screen | ✅ done |
+| 1.1.36 | [#2040](https://github.com/Koniverse/SubWallet-Extension/issues/2040) | Recheck bug show apply master password screen when using webapp | ✅ done |
+| 1.1.36 | [#2056](https://github.com/Koniverse/SubWallet-Extension/issues/2056) | WebApp - Show create master password screen when reset wallet | ✅ done |
+| 1.1.36 | [#2086](https://github.com/Koniverse/SubWallet-Extension/issues/2086) | WebApp - Improve UI for mobile | ✅ done |
+| 1.1.36 | [#2210](https://github.com/Koniverse/SubWallet-Extension/issues/2210) | WebApp - UI bug on the small screen | ✅ done |
+| 1.1.36 | [#2326](https://github.com/Koniverse/SubWallet-Extension/issues/2326) | WebApp \| Extension - Incorrect display of filter results when filtering by "Failed" criteria | ✅ done |
+| 1.1.36 | [#2417](https://github.com/Koniverse/SubWallet-Extension/issues/2417) | WebApp \| Extension - Fix some UI bug (Round 2) | ✅ done |
+| 1.2.26 | [#1902](https://github.com/Koniverse/SubWallet-Extension/issues/1902) | WebApp - The display is very slow when opened for the first time | ✅ done |
+| 1.2.26 | [#3258](https://github.com/Koniverse/SubWallet-Extension/issues/3258) | WebApp - Refactor Code to Handle inputValue Not Updating When Clicking Switch Button | ✅ done |
+| 1.2.26 | [#3331](https://github.com/Koniverse/SubWallet-Extension/issues/3331) | WebApp - Fix some UI bugs | ✅ done |
+| — | [#1686](https://github.com/Koniverse/SubWallet-Extension/issues/1686) | WebApp - Do not attach watch any wallet from Welcome screen | ✅ done |
+| — | [#1703](https://github.com/Koniverse/SubWallet-Extension/issues/1703) | WebApp - Update apply apply master password screen | ⏸ deprecated |
+| — | [#1704](https://github.com/Koniverse/SubWallet-Extension/issues/1704) | WebApp - Update webapp popup - popover UX | ✅ done |
+| — | [#1723](https://github.com/Koniverse/SubWallet-Extension/issues/1723) | WebApp - Update confirmation UX | ✅ done |
+| — | [#1730](https://github.com/Koniverse/SubWallet-Extension/issues/1730) | WebApp - Bug duplicate title in some screens | ✅ done |
+| — | [#1776](https://github.com/Koniverse/SubWallet-Extension/issues/1776) | WebApp - Re-check screen navigation | ✅ done |
+| — | [#1790](https://github.com/Koniverse/SubWallet-Extension/issues/1790) | WebApp - Bugs related to responsive UI | ✅ done |
+| — | [#1816](https://github.com/Koniverse/SubWallet-Extension/issues/1816) | WebApp - Update popup position | ✅ done |
+| — | [#3343](https://github.com/Koniverse/SubWallet-Extension/issues/3343) | WebApp - The display is very slow when opened for the first time | ✅ done |
+| — | [#4535](https://github.com/Koniverse/SubWallet-Extension/issues/4535) | WebApp - Fix some UI bug | ✅ done |
+
+> **Twenty-two of these rows land in 1.1.36 itself.** The WebApp did not reach parity and then
+> accumulate fixes — the parity release *is* the pile: welcome screen, header, navigation, modals,
+> tooltips, the DApps screen, the small-screen layout, the master-password screen shown when it
+> should not be. A surface that reuses the same background still has to re-earn every screen.
+>
+> **The WebApp has its own version space** ([AGENTS.md](../../../AGENTS.md) rule 1b), which is why nine settled rows carry
+> `Shipped: —` rather than missing evidence.
+>
+> **#1902 and #3343 have the same title** — *"The display is very slow when opened for the first
+> time"* — one shipped in 1.2.26 and one carries no line. First-open latency on a web surface that
+> boots the whole extension background is the cost of the parity this story claims.
+
 ## Cross-references
 
 - [PRD FR-64](../../PRD.md#functional-requirements)
 - [Epic EPIC-6](../epics/EPIC-6.md)
 - [US-6.1](US-6.1-dark-only-responsive-popup-and-expand-view.md)
 - [US-6.3](US-6.3-mobile-web-runner-webview.md)
+- [consolidation note](../../notes/2026-07-23.md#d-epic-26-maintenance--ui--ux-merged-into-epic-6)

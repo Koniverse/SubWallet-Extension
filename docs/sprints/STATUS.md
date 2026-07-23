@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 10:19:56 UTC
-> Total stories: 2258
+> Last generated: 2026-07-23 11:14:26 UTC
+> Total stories: 2091
 
-## 📋 Backlog (256)
+## 📋 Backlog (241)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -95,21 +95,6 @@
 | US-24.317 | Extension - Improve Filter To token Based on Selected From token ( Round 2) | EPIC-24 | P3 | 1 | — | Quangdm-cdm |
 | US-24.318 | Extension – Bundling Extension Code for Mobile Wallet App Integration | EPIC-24 | P3 | 1 | — | — |
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
-| US-26.91 | [QRScanner] Update style | EPIC-26 | P3 | 1 | — | S2kael |
-| US-26.116 | Improve UI for reset wallet feature | EPIC-26 | P3 | 1 | — | — |
-| US-26.139 | Extension - Update some UX for extension and webapp | EPIC-26 | P3 | 1 | — | Thiendekaco |
-| US-26.153 | WebApp - Change the position of the toast and popup | EPIC-26 | P3 | 1 | — | — |
-| US-26.156 | WebApp - Show incorrect information on Confirmation screen for Avail | EPIC-26 | P3 | 1 | — | lw-cdm |
-| US-26.170 | Add hard reload button | EPIC-26 | P3 | 1 | — | nulllpc |
-| US-26.172 | Extension - Bug UI for MKT campaign | EPIC-26 | P3 | 1 | — | — |
-| US-26.173 | Extension - Add some feature on Settings screen | EPIC-26 | P3 | 1 | — | — |
-| US-26.174 | Extension - Improved small number display | EPIC-26 | P3 | 1 | — | — |
-| US-26.176 | Extension - Re-check the display of the app popup for the Marketing campaign | EPIC-26 | P3 | 1 | — | — |
-| US-26.177 | Extension - Improve banner MKT campaign | EPIC-26 | P3 | 1 | — | — |
-| US-26.181 | 🧠 High-Impact, Low-Effort UX Improvements | EPIC-26 | P3 | 1 | — | — |
-| US-26.182 | High Impact – High Effort UX Issues | EPIC-26 | P3 | 1 | — | — |
-| US-26.183 | 🟡 Low Impact UX Issues | EPIC-26 | P3 | 1 | — | — |
-| US-26.188 | [Extension] Improve some UI | EPIC-26 | P3 | 1 | — | — |
 | US-28.86 | Re-check case send Max on some tokens | EPIC-28 | P3 | 1 | — | S2kael |
 | US-28.99 | Handle the case of transfer Max for some tokens | EPIC-28 | P3 | 1 | — | — |
 | US-28.108 | WebApp - Update more transaction history types | EPIC-28 | P3 | 1 | — | lw-cdm |
@@ -327,7 +312,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1801)
+## ✅ Done (1658)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -899,155 +884,6 @@
 | US-24.339 | Unable to turn network when no add correct API key | EPIC-24 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
 | US-24.340 | Update ParaSpell API integration to v1 | EPIC-24 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-24.341 | Add support for USDC & stEWT | EPIC-24 | P3 | 1 | sprint-2026-M01 | nulllpc |
-| US-26.1 | Improve Polkadot JS Extension UX/UI for more friendly | EPIC-26 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
-| US-26.2 | Some tasks about UX improvement after building the first MVP version | EPIC-26 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
-| US-26.3 | Integrate Darwinia 2 | EPIC-26 | P3 | 1 | sprint-2023-M05 | Quangdm-cdm |
-| US-26.4 | Does not automatically turn off popup | EPIC-26 | P3 | 1 | sprint-2022-M04 | S2kael |
-| US-26.5 | Update the new Settings screen | EPIC-26 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-26.6 | Improve custom access screen | EPIC-26 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-26.7 | Fix grammar error and type issue of button | EPIC-26 | P3 | 1 | sprint-2022-M04 | S2kael |
-| US-26.8 | Fix tooltip not showing on the popup view on firefox browser | EPIC-26 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-26.9 | Fix bug not update them when change them from popup view | EPIC-26 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-26.10 | Improve data fetching for better performance and UX | EPIC-26 | P3 | 1 | sprint-2022-M07 | huukhai |
-| US-26.11 | Fix some style bug in | EPIC-26 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-26.12 | Fix some bugs & feedback to improve UX-UI | EPIC-26 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-26.13 | Improve request permission screen | EPIC-26 | P3 | 1 | sprint-2022-M06 | saltict |
-| US-26.14 | Restyle Error screen | EPIC-26 | P3 | 1 | sprint-2023-M04 | — |
-| US-26.16 | Improved decimal display UX | EPIC-26 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-26.17 | Improve UI to warn users about phishing websites | EPIC-26 | P3 | 1 | sprint-2023-M06 | hieudd |
-| US-26.18 | Display decimals according to the following rule | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.19 | Remove _NftItem interface in extension UI | EPIC-26 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-26.20 | Improve UI when users access phishing websites (listed on Polkadot JS Phishing list) | EPIC-26 | P3 | 1 | sprint-2023-M06 | hieudd |
-| US-26.21 | Update new way to get transaction history | EPIC-26 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-26.22 | Do not show tooltip on the Firefox browser | EPIC-26 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-26.23 | Turn off background in case extension reloaded and popup never opened | EPIC-26 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-26.24 | UI Bug when zoom in/ zoom out browser | EPIC-26 | P3 | 1 | sprint-2023-M05 | Quangdm-cdm |
-| US-26.25 | Upgrade UI - Upgrade navigation | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.26 | Upgrade UI - Restructure Init App Flow | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.27 | Upgrade UI - Upgrade Theme Structure for new Design System | EPIC-26 | P3 | 1 | sprint-2023-M07 | lw-cdm |
-| US-26.28 | Upgrade UI - Update Redux | EPIC-26 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-26.29 | Upgrade UI - Add support SubWallet React UI | EPIC-26 | P3 | 1 | sprint-2023-M06 | lw-cdm |
-| US-26.30 | Upgrade UI - Build navigation structure | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.31 | Upgrade UI - Screen Welcome | EPIC-26 | P3 | 1 | sprint-2023-M03 | S2kael |
-| US-26.32 | Upgrade UI - Screen Phishing Page | EPIC-26 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-26.33 | Upgrade UI - Screen Home / Crypto | EPIC-26 | P3 | 1 | sprint-2023-M04 | lw-cdm |
-| US-26.34 | Upgrade UI - Screen Home / Histories | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.35 | Upgrade UI - Screen Confirmations | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.36 | Upgrade UI - Screen Setting / General | EPIC-26 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-26.37 | Upgrade UI - Screen Settings / Master Password | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.38 | Upgrade UI - Screen Settings List | EPIC-26 | P3 | 1 | sprint-2023-M02 | lw-cdm |
-| US-26.39 | Upgrade UI - Modal / Implement ScanQR | EPIC-26 | P3 | 1 | sprint-2023-M07 | Quangdm-cdm |
-| US-26.40 | Upgrade UI - Modal / Implement Select Modal | EPIC-26 | P3 | 1 | sprint-2023-M02 | Quangdm-cdm |
-| US-26.41 | Upgrade UI - Modal / Implement Simple Confirm | EPIC-26 | P3 | 1 | sprint-2023-M07 | Quangdm-cdm |
-| US-26.42 | Upgrade UI - Layout | EPIC-26 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-26.43 | Upgrade UI - Login | EPIC-26 | P3 | 1 | sprint-2023-M03 | S2kael |
-| US-26.44 | Upgrade UI - Screen Settings / Migrate to Master Pasword | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.45 | Upgrade UI - Update Data Format | EPIC-26 | P3 | 1 | sprint-2023-M02 | nulllpc |
-| US-26.46 | Upgrade UI - Debug Popup (Navigate - Call API) | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.47 | Upgrade UI - Allow open predefined popup via URL | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.48 | Upgrade UI - Fix build problems | EPIC-26 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-26.49 | Upgrade UI - Other issues | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.50 | Upgrade UI - Optimize Navigation | EPIC-26 | P3 | 1 | sprint-2023-M03 | saltict |
-| US-26.51 | Upgrade UI - Optimize Components | EPIC-26 | P3 | 1 | sprint-2023-M03 | saltict |
-| US-26.53 | Upgrade UI - Optimize Extension General UI | EPIC-26 | P3 | 1 | sprint-2023-M04 | Quangdm-cdm |
-| US-26.54 | Upgrade UI - Add Components for Confirmation Screeens | EPIC-26 | P3 | 1 | sprint-2023-M04 | Quangdm-cdm |
-| US-26.55 | Upgrade UI - Background for History Service | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.56 | Upgrade UI - Setting / Security Setting screen | EPIC-26 | P3 | 1 | sprint-2023-M03 | S2kael |
-| US-26.57 | Upgrade UI - Reset wallet | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.58 | Upgrade UI - Fix Modal Problems | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.59 | Upgrade UI - Expand view | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.60 | Upgrade UI - Auto focus form item | EPIC-26 | P3 | 1 | sprint-2023-M03 | saltict |
-| US-26.61 | Upgrade UI - Filter | EPIC-26 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-26.62 | Upgrade UI - Handle case lock wallet | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.63 | Upgrade UI - Handling the display of large numbers | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.64 | Upgrade UI - Manage address book | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.65 | Upgrade UI - Grammar Verification | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.66 | Upgrade UI - Improve some UX | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.67 | Upgrade UI - Auto lock wallet | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.68 | Upgrade UI - Bugs related to migration when user upgrade version | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.69 | Upgrade UI - Update PSP standard | EPIC-26 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-26.70 | Upgrade UI - Implement Reload button | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.71 | Upgrade UI - Bugs related to History feature | EPIC-26 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-26.72 | Upgrade UI - Update style of the error message in some screens | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.73 | Upgrade UI - Keep the address inputted by the user | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.74 | Upgrade UI - Update UI confirmation screen follow by design | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.75 | Upgrade UI - Update chainlist | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.76 | Update title and icon in done screen | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.78 | Implement SubWallet UI Kit | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.79 | Upgrade UI - Do not show the Successful screen after migrated password successfully | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.80 | Upgrade UI - Apply sort for some list | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.81 | Error page when search website in Manage website access screen | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.82 | Update UI for expand view | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.83 | Display multi window in case multi request | EPIC-26 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-26.84 | Fixed sync configuration between expand view and popup view | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.85 | Upgrade UI - Incorrect size popup on Windows | EPIC-26 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-26.87 | UI bug when scrolling | EPIC-26 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-26.88 | Add “I trust this site” option on the phishing page screen | EPIC-26 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-26.89 | Fixed bug on Firefox browser | EPIC-26 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-26.90 | Update some screens follow by design | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.92 | Update login & welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-26.93 | Fixed UI bugs | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.95 | Fixed UI bugs on the Expand view | EPIC-26 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-26.96 | Improve Notifcation Logic And UI | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.97 | Update UI for notification | EPIC-26 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-26.99 | Improve lock UX | EPIC-26 | P3 | 1 | sprint-2023-M08 | saltict |
-| US-26.100 | WebApp - UI bugs on the Welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.101 | WebApp - Do not attach watch any wallet from Welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.102 | WebApp - Bugs related to the History feature | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.103 | WebApp - An error occurs when user click button Cancel on the Confirmations screens | EPIC-26 | P3 | 1 | sprint-2023-M07 | lw-cdm |
-| US-26.105 | WebApp - Update webapp popup - popover UX | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.106 | WebApp - Update show display version from package.json | EPIC-26 | P3 | 1 | sprint-2023-M07 | saltict |
-| US-26.107 | WebApp - Update confirmation UX | EPIC-26 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-26.108 | WebApp - Bug duplicate title in some screens | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.109 | WebApp - Update UI some screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.110 | Can not back to Welcome screen when click back on Create master password screen | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.111 | Fixed bug Do not display the history of addresses other than the original address | EPIC-26 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-26.112 | WebApp - UI bug header | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.114 | WebApp - Re-check screen navigation | EPIC-26 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-26.115 | WebApp - Bugs related to responsive UI | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.117 | WebApp - Update popup position | EPIC-26 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-26.118 | WebApp - Update general modal UI | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.119 | WebApp - Screen navigation is incorrect | EPIC-26 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-26.120 | WebApp - Add the tooltip for icon button without text | EPIC-26 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-26.121 | Update empty list screens | EPIC-26 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-26.122 | WebApp - Some UI bug | EPIC-26 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-26.123 | WebApp - Update welcome screen | EPIC-26 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-26.124 | Extension - Improve history list view | EPIC-26 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-26.125 | WebApp - The display is very slow when opened for the first time | EPIC-26 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-26.127 | WebApp - UI bug on DApps screen | EPIC-26 | P3 | 1 | sprint-2023-M11 | Thiendekaco |
-| US-26.128 | In App marketing banners, features | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-26.131 | Improve banner campaign in app | EPIC-26 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-26.132 | Recheck bug show apply master password screen when using webapp | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-26.133 | WebApp - Show create master password screen when reset wallet | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-26.134 | WebApp - Improve UI for mobile | EPIC-26 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-26.135 | Add button on the Minting success screen to navigate user to Airlyft | EPIC-26 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-26.137 | Fixed some UI bug | EPIC-26 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-26.138 | WebApp - UI bug on the small screen | EPIC-26 | P3 | 1 | sprint-2023-M11 | Thiendekaco |
-| US-26.141 | WebApp \| Extension - Incorrect display of filter results when filtering by 'Failed' criteria | EPIC-26 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-26.142 | Fixed bug show EVM transaction history | EPIC-26 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-26.143 | Add 'time-out' status for transaction history | EPIC-26 | P3 | 1 | sprint-2024-M01 | Thiendekaco |
-| US-26.144 | WebApp \| Extension - Fix some UI bug (Round 2) | EPIC-26 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-26.145 | Extension - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-26.147 | Improve notification/banner in app feature (Round 2) | EPIC-26 | P3 | 1 | sprint-2025-M03 | — |
-| US-26.151 | Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-26.152 | WebApp - Restructure Settings screen | EPIC-26 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-26.154 | Improve display collators list | EPIC-26 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
-| US-26.157 | Extension - Currency settings are reset when upgrade version | EPIC-26 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-26.161 | Fixed bug Unable to back screen in case open General settings to Marketing campaign | EPIC-26 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-26.162 | Fix bug Screen flickering error when interacting with extensions | EPIC-26 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-26.163 | Extension - Add popup to remind user upgrade Firefox version | EPIC-26 | P3 | 1 | sprint-2024-M06 | Thiendekaco |
-| US-26.164 | Update subwallet-react-ui | EPIC-26 | P3 | 1 | sprint-2024-M06 | lw-cdm |
-| US-26.165 | WebApp - Refactor Code to Handle inputValue Not Updating When Clicking Switch Button | EPIC-26 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-26.166 | Follow-up the time of withdrawable and UX UI in case have multiple redeem request | EPIC-26 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-26.167 | WebApp - Fix some UI bugs | EPIC-26 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-26.168 | WebApp - The display is very slow when opened for the first time | EPIC-26 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-26.169 | Support Notification in app | EPIC-26 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-26.171 | Review API to track TON tx history | EPIC-26 | P3 | 1 | sprint-2024-M10 | bluezdot |
-| US-26.175 | Turn off the update manifest v3 popup | EPIC-26 | P3 | 1 | sprint-2025-M05 | frenkie-ng |
-| US-26.178 | Update UI to clearly display fees | EPIC-26 | P3 | 1 | sprint-2025-M05 | frenkie-ng |
-| US-26.185 | WebApp - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-26.187 | Improve UX for the 'Advanced phishing detection' feature | EPIC-26 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
-| US-26.189 | [Energy Web X] Display APY for collators in collator list | EPIC-26 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
 | US-28.1 | Send/Receive substrate based chain assets | EPIC-28 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-28.2 | Implement new Send Fund UI with support send tokens, send EVM assets | EPIC-28 | P3 | 1 | sprint-2022-M05 | saltict |
 | US-28.3 | Check the Send Fund Full Balance screen | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
@@ -2106,6 +1942,12 @@
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
 | US-6.4 | Settings management: network selection, token preferences, account metadata | EPIC-6 | P2 | 3 | sprint-2022-M05 | saltict |
 | US-6.5 | Select display fiat currency for balances and prices | EPIC-6 | P2 | 2 | sprint-2024-M04 | saltict |
+| US-6.7 | The 1.0.2 UI upgrade programme | EPIC-6 | P3 | 8 | sprint-2024-M06 | — |
+| US-6.8 | Number, decimal & value display | EPIC-6 | P3 | 2 | sprint-2025-M10 | — |
+| US-6.9 | Phishing & security surfaces | EPIC-6 | P3 | 2 | sprint-2025-M09 | — |
+| US-6.10 | Notification & marketing-campaign surfaces | EPIC-6 | P3 | 3 | sprint-2024-M10 | — |
+| US-6.11 | Transaction-history surface | EPIC-6 | P3 | 2 | sprint-2024-M10 | — |
+| US-6.12 | Early UX iteration (pre-design-system) | EPIC-6 | P3 | 2 | sprint-2023-M08 | — |
 | US-7.1 | Aggregate portfolio across accounts and chains | EPIC-7 | P1 | 5 | sprint-2022-M02 | LeeW0ng |
 | US-7.2 | Transferable vs locked/frozen balance calculation | EPIC-7 | P1 | 3 | sprint-2022-M02 | Quangdm-cdm |
 | US-7.3 | Auto-detect tokens; show/hide zero-balance | EPIC-7 | P1 | 3 | sprint-2023-M04 | saltict |
@@ -2137,7 +1979,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (154)
+## 🗑️ Deprecated (145)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2183,15 +2025,6 @@ _No stories_
 | US-24.323 | Support Minting DOT and POAP at Token2049 | EPIC-24 | P3 | 1 | — | bluezdot |
 | US-24.326 | [WebApp / Network detail] - Unable to open network detail screen when clicking first time on edit button of network | EPIC-24 | P3 | 1 | — | lw-cdm |
 | US-24.342 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-24 | P3 | 1 | — | anhntk54 |
-| US-26.15 | Some UI bugs & feedback to improve UX-UI (v2) | EPIC-26 | P3 | 1 | — | S2kael |
-| US-26.52 | Update background logic for history | EPIC-26 | P3 | 1 | — | saltict |
-| US-26.77 | Upgrade UI - Address book | EPIC-26 | P3 | 1 | — | S2kael |
-| US-26.86 | Update the decimal display rule | EPIC-26 | P3 | 1 | — | S2kael |
-| US-26.104 | WebApp - Update apply apply master password screen | EPIC-26 | P3 | 1 | — | lw-cdm |
-| US-26.130 | Vara's withdrawal amount is displayed incorrectly | EPIC-26 | P3 | 1 | — | S2kael |
-| US-26.148 | Optimize UX/UI round 1 | EPIC-26 | P3 | 1 | — | Sokol142196 |
-| US-26.150 | Extension - Improved display order of campain banner | EPIC-26 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
-| US-26.180 | Extension - Check get online history from subscan | EPIC-26 | P3 | 1 | — | PDTnhah |
 | US-28.21 | Transfer with account keep-alive checks & add transaction tip | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.23 | The transferable balance of the token on the Astar-EVM chain is incorrect on the Send Fund screen | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.24 | Origin Chain Fee displayed is delayed | EPIC-28 | P3 | 1 | — | nulllpc |
@@ -2300,12 +2133,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 256
+- 📋 **Backlog**: 241
 - 🟢 **Ready**: 12
 - 🟡 **In Progress**: 24
 - 👀 **Review**: 11
-- ✅ **Done**: 1801
+- ✅ **Done**: 1658
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 154
+- 🗑️ **Deprecated**: 145
 
 ⚠️  **WIP limit exceeded**: 24 stories in-progress (limit: 3).
