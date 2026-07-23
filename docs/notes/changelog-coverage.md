@@ -846,57 +846,57 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1634](https://github.com/Koniverse/SubWallet-Extension/issues/1634) | Updated the criteria's icon on the Sorting pool/validator/collator/dApp screen (#1634) | 1.1.2 | 2023-07-14 | US-32.95 |
 | [#1643](https://github.com/Koniverse/SubWallet-Extension/issues/1643) | Fixed bug Showing staking account on the Staking detail screen (#1643) | 1.1.6 | 2023-08-04 | US-32.96 |
 | [#1721](https://github.com/Koniverse/SubWallet-Extension/issues/1721) | Fixed bug Do not reset selected validator when change token to stake (#1721) | 1.1.6 | 2023-08-04 | US-32.99 |
-| [#411](https://github.com/Koniverse/SubWallet-Extension/issues/411) | Update XCM transfer support for Relaychain to Parachains (#411) | 0.5.5 | 2022-08-11 | US-33.10 |
-| [#4787](https://github.com/Koniverse/SubWallet-Extension/issues/4787) | Update params for XCM transfer - Related to DOT/KSM XCM (#4787) | 1.3.63 | 2025-10-23 | US-33.101 |
-| [#4822](https://github.com/Koniverse/SubWallet-Extension/issues/4822) | Re-enable Cross-chain transfer related to Relay-chain (#4822) | 1.3.66 | 2025-11-07 | US-33.102 |
-| [#4830](https://github.com/Koniverse/SubWallet-Extension/issues/4830) | Re-check logic approve token when perform XCM (#4830) | 1.3.80 | 2026-06-02 | US-33.103 |
-| [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901) | Bridge native TAO <-> Subtensor EVM (#4901) | 1.3.78 | 2026-05-14 | US-33.105 |
-| [#552](https://github.com/Koniverse/SubWallet-Extension/issues/552) | Fix support Xcm transfer on Kusama, Polkadot, Astar, Shiden chain for QR Account (#552) | 0.5.7 | 2022-09-06 | US-33.16 |
-| [#586](https://github.com/Koniverse/SubWallet-Extension/issues/586) | Fix issue display lack of transaction history when user performs xcm transfer#586 | 0.5.7 | 2022-09-06 | US-33.18 |
-| [#621](https://github.com/Koniverse/SubWallet-Extension/issues/621) | Integrate Bit.Country Token and XCM (#621) | 0.6.1 | 2022-09-13 | US-33.19 |
-| [#684](https://github.com/Koniverse/SubWallet-Extension/issues/684) | Support transfer and XCM for Statemine/Statemint (#684) | 0.6.8 | 2022-10-31 | US-33.22 |
-| [#695](https://github.com/Koniverse/SubWallet-Extension/issues/695) | Enable xcm transfer for Acala chain (#695) | 0.6.7 | 2022-10-22 | US-33.23 |
-| [#945](https://github.com/Koniverse/SubWallet-Extension/issues/945) | Fix XCM transfer feature for the some chain (#945) | 0.7.7 | 2022-12-28 | US-33.25 |
-| [#1000](https://github.com/Koniverse/SubWallet-Extension/issues/1000) | Fix bug XCM for Moonbeam, Bifrost Kusama (#1000) | 0.8.2 | 2023-03-15 | US-33.26 |
-| [#1094](https://github.com/Koniverse/SubWallet-Extension/issues/1094) | Add XCM for Kusama --> Statemint (#1094) | 0.8.3 | 2023-03-29 | US-33.28 |
-| [#1352](https://github.com/Koniverse/SubWallet-Extension/issues/1352) | Add support for USDT on more chains and update param for XCM on Astar (#1352) | 1.0.8 | 2023-06-08 | US-33.33 |
-| [#1440](https://github.com/Koniverse/SubWallet-Extension/issues/1440) | Temporarily hide XCM channels from Moonbeam (#1440) | 1.0.6 | 2023-05-26 | US-33.36 |
-| [#1457](https://github.com/Koniverse/SubWallet-Extension/issues/1457) | Add support new XCM channels (#1457) | 1.3.55 | 2025-09-05 | US-33.37 |
-| [#1499](https://github.com/Koniverse/SubWallet-Extension/issues/1499) | Fixed bug Don’t show send history in case xcm on same account (#1499) | 1.0.8 | 2023-06-08 | US-33.38 |
-| [#1505](https://github.com/Koniverse/SubWallet-Extension/issues/1505) | Fixed bug error page when perform XCM on Firefox browser (#1505) | 1.0.8 | 2023-06-08 | US-33.39 |
-| [#35](https://github.com/Koniverse/SubWallet-Extension/issues/35) | Support Send / Receive cross-chain assets (update some label and variablea and xc logo) (#35) | 0.4.5 | 2022-06-09 | US-33.4 |
-| [#1546](https://github.com/Koniverse/SubWallet-Extension/issues/1546) | Re-check and update XCM feature for some chains: Polkadot, Statemint, Statemine, Bifrost Polkadot (#1546) | 1.0.10 | 2023-06-17 | US-33.40 |
-| [#1550](https://github.com/Koniverse/SubWallet-Extension/issues/1550) | Fixed bug Show incorrect Destination Chain fee on XCM history detail (#1550) | 1.0.10 | 2023-06-17 | US-33.41 |
-| [#1579](https://github.com/Koniverse/SubWallet-Extension/issues/1579) | Update XCM for Astar, Interlay, HydraDX (#1579) | 1.1.1 | 2023-07-06 | US-33.43 |
-| [#1984](https://github.com/Koniverse/SubWallet-Extension/issues/1984) | Support SnowBridge (#1984) | 1.2.9 | 2024-06-24 | US-33.45 |
-| [#2091](https://github.com/Koniverse/SubWallet-Extension/issues/2091) | Fixed bug XCM transfer USDT (Parallel —> Statemint) (#2091) | 1.1.20 | 2023-11-04 | US-33.46 |
-| [#2196](https://github.com/Koniverse/SubWallet-Extension/issues/2196) | Update XCM for Astar network (#2196) | 1.1.23 | 2023-11-24 | US-33.48 |
-| [#2353](https://github.com/Koniverse/SubWallet-Extension/issues/2353) | Support some XCM transfer (#2353) | 1.1.26 | 2023-12-16 | US-33.50 |
-| [#2604](https://github.com/Koniverse/SubWallet-Extension/issues/2604) | Support Rococo asset hub (#2604) | 1.1.41 | 2024-03-02 | US-33.54 |
-| [#2786](https://github.com/Koniverse/SubWallet-Extension/issues/2786) | Add support XCM for PINK token (#2786) | 1.1.47 | 2024-03-23 | US-33.56 |
-| [#2814](https://github.com/Koniverse/SubWallet-Extension/issues/2814) | Fixed bug when performing XCM transfer on Kusama (#2814) | 1.1.49 | 2024-03-26 | US-33.58 |
-| [#303](https://github.com/Koniverse/SubWallet-Extension/issues/303) | Fix bug display incorrect transferable balance in the Send Fund/Donate/XCM Transfer screen (#303) | 0.4.4 | 2022-06-08 | US-33.6 |
-| [#3134](https://github.com/Koniverse/SubWallet-Extension/issues/3134) | Support more XCM channels (#3134) | 1.2.4 | 2024-06-08 | US-33.61 |
-| [#3230](https://github.com/Koniverse/SubWallet-Extension/issues/3230) | Fix bug not showing popup Swap confirmation when swap with Injected account (#3230) | 1.2.12 | 2024-07-02 | US-33.63 |
-| [#332](https://github.com/Koniverse/SubWallet-Extension/issues/332) | Fix bug can not send fund/XCM transfer of the Kintsugi Chain (#332) | 0.4.4 | 2022-06-08 | US-33.7 |
-| [#3519](https://github.com/Koniverse/SubWallet-Extension/issues/3519) | Fix bug XCM (#3519) | 1.2.28 | 2024-09-04 | US-33.70 |
-| [#3561](https://github.com/Koniverse/SubWallet-Extension/issues/3561) | Fix bug XCM for channel: DOT: KAH -> PAH (#3561) | 1.2.29 | 2024-09-13 | US-33.71 |
-| [#3606](https://github.com/Koniverse/SubWallet-Extension/issues/3606) | Fixed bug XCM USDT: PAH -> ASTR (#3606) | 1.3.31 | 2025-04-18 | US-33.72 |
-| [#3617](https://github.com/Koniverse/SubWallet-Extension/issues/3617) | Re-calculate max transferable for XCM native token (#3617) | 1.2.30 | 2024-09-20 | US-33.74 |
-| [#3725](https://github.com/Koniverse/SubWallet-Extension/issues/3725) | Fixed bug XCM for Acala (#3725) | 1.3.31 | 2025-04-18 | US-33.75 |
-| [#3895](https://github.com/Koniverse/SubWallet-Extension/issues/3895) | Add validate sufficient token for XCM transfer (#3895) | 1.3.29 | 2025-04-08 | US-33.77 |
-| [#3903](https://github.com/Koniverse/SubWallet-Extension/issues/3903) | Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903) | 1.3.31 | 2025-04-18 | US-33.78 |
-| [#3911](https://github.com/Koniverse/SubWallet-Extension/issues/3911) | Fix max transferable for Avail Bridge (#3911) | 1.3.12 | 2025-01-06 | US-33.79 |
-| [#333](https://github.com/Koniverse/SubWallet-Extension/issues/333) | Fix bug can't XCM Transfer of the Bifrost Chain (#333) | 0.5.6 | 2022-08-24 | US-33.8 |
-| [#3918](https://github.com/Koniverse/SubWallet-Extension/issues/3918) | Support Across bridge (#3918, #4299) | 1.3.31 | 2025-04-18 | US-33.80 |
-| [#4299](https://github.com/Koniverse/SubWallet-Extension/issues/4299) | Support Across bridge (#3918, #4299) | 1.3.31 | 2025-04-18 | US-33.80 |
-| [#4133](https://github.com/Koniverse/SubWallet-Extension/issues/4133) | Estimate delivery fee when XCM (#4133) | 1.3.31 | 2025-04-18 | US-33.83 |
-| [#4134](https://github.com/Koniverse/SubWallet-Extension/issues/4134) | Dry run XCM (#4134) | 1.3.31 | 2025-04-18 | US-33.84 |
-| [#4233](https://github.com/Koniverse/SubWallet-Extension/issues/4233) | Improve validate recipient when make XCM transfer (#4233) | 1.3.31 | 2025-04-18 | US-33.89 |
-| [#4282](https://github.com/Koniverse/SubWallet-Extension/issues/4282) | Refactor Across bridge (#4282) | 1.3.35 | 2025-05-09 | US-33.92 |
-| [#4310](https://github.com/Koniverse/SubWallet-Extension/issues/4310) | Improve estimate fee through Across Bridge (#4310) | 1.3.65 | 2025-11-06 | US-33.93 |
-| [#4416](https://github.com/Koniverse/SubWallet-Extension/issues/4416) | Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416) | 1.3.41 | 2025-06-11 | US-33.97 |
-| [#4444](https://github.com/Koniverse/SubWallet-Extension/issues/4444) | Remove MYTH (PAH -> Ethereum) (#4444) | 1.3.55 | 2025-09-05 | US-33.98 |
+| [#411](https://github.com/Koniverse/SubWallet-Extension/issues/411) | Update XCM transfer support for Relaychain to Parachains (#411) | 0.5.5 | 2022-08-11 | US-13.1 |
+| [#4787](https://github.com/Koniverse/SubWallet-Extension/issues/4787) | Update params for XCM transfer - Related to DOT/KSM XCM (#4787) | 1.3.63 | 2025-10-23 | US-13.16 |
+| [#4822](https://github.com/Koniverse/SubWallet-Extension/issues/4822) | Re-enable Cross-chain transfer related to Relay-chain (#4822) | 1.3.66 | 2025-11-07 | US-13.16 |
+| [#4830](https://github.com/Koniverse/SubWallet-Extension/issues/4830) | Re-check logic approve token when perform XCM (#4830) | 1.3.80 | 2026-06-02 | US-13.14 |
+| [#4901](https://github.com/Koniverse/SubWallet-Extension/issues/4901) | Bridge native TAO <-> Subtensor EVM (#4901) | 1.3.78 | 2026-05-14 | US-13.7 |
+| [#552](https://github.com/Koniverse/SubWallet-Extension/issues/552) | Fix support Xcm transfer on Kusama, Polkadot, Astar, Shiden chain for QR Account (#552) | 0.5.7 | 2022-09-06 | US-13.1 |
+| [#586](https://github.com/Koniverse/SubWallet-Extension/issues/586) | Fix issue display lack of transaction history when user performs xcm transfer#586 | 0.5.7 | 2022-09-06 | US-13.15 |
+| [#621](https://github.com/Koniverse/SubWallet-Extension/issues/621) | Integrate Bit.Country Token and XCM (#621) | 0.6.1 | 2022-09-13 | US-13.12 |
+| [#684](https://github.com/Koniverse/SubWallet-Extension/issues/684) | Support transfer and XCM for Statemine/Statemint (#684) | 0.6.8 | 2022-10-31 | US-13.12 |
+| [#695](https://github.com/Koniverse/SubWallet-Extension/issues/695) | Enable xcm transfer for Acala chain (#695) | 0.6.7 | 2022-10-22 | US-13.12 |
+| [#945](https://github.com/Koniverse/SubWallet-Extension/issues/945) | Fix XCM transfer feature for the some chain (#945) | 0.7.7 | 2022-12-28 | US-13.12 |
+| [#1000](https://github.com/Koniverse/SubWallet-Extension/issues/1000) | Fix bug XCM for Moonbeam, Bifrost Kusama (#1000) | 0.8.2 | 2023-03-15 | US-13.12 |
+| [#1094](https://github.com/Koniverse/SubWallet-Extension/issues/1094) | Add XCM for Kusama --> Statemint (#1094) | 0.8.3 | 2023-03-29 | US-13.12 |
+| [#1352](https://github.com/Koniverse/SubWallet-Extension/issues/1352) | Add support for USDT on more chains and update param for XCM on Astar (#1352) | 1.0.8 | 2023-06-08 | US-13.17 |
+| [#1440](https://github.com/Koniverse/SubWallet-Extension/issues/1440) | Temporarily hide XCM channels from Moonbeam (#1440) | 1.0.6 | 2023-05-26 | US-13.13 |
+| [#1457](https://github.com/Koniverse/SubWallet-Extension/issues/1457) | Add support new XCM channels (#1457) | 1.3.55 | 2025-09-05 | US-13.12 |
+| [#1499](https://github.com/Koniverse/SubWallet-Extension/issues/1499) | Fixed bug Don’t show send history in case xcm on same account (#1499) | 1.0.8 | 2023-06-08 | US-13.15 |
+| [#1505](https://github.com/Koniverse/SubWallet-Extension/issues/1505) | Fixed bug error page when perform XCM on Firefox browser (#1505) | 1.0.8 | 2023-06-08 | US-13.1 |
+| [#35](https://github.com/Koniverse/SubWallet-Extension/issues/35) | Support Send / Receive cross-chain assets (update some label and variablea and xc logo) (#35) | 0.4.5 | 2022-06-09 | US-13.1 |
+| [#1546](https://github.com/Koniverse/SubWallet-Extension/issues/1546) | Re-check and update XCM feature for some chains: Polkadot, Statemint, Statemine, Bifrost Polkadot (#1546) | 1.0.10 | 2023-06-17 | US-13.12 |
+| [#1550](https://github.com/Koniverse/SubWallet-Extension/issues/1550) | Fixed bug Show incorrect Destination Chain fee on XCM history detail (#1550) | 1.0.10 | 2023-06-17 | US-13.14 |
+| [#1579](https://github.com/Koniverse/SubWallet-Extension/issues/1579) | Update XCM for Astar, Interlay, HydraDX (#1579) | 1.1.1 | 2023-07-06 | US-13.12 |
+| [#1984](https://github.com/Koniverse/SubWallet-Extension/issues/1984) | Support SnowBridge (#1984) | 1.2.9 | 2024-06-24 | US-13.2 |
+| [#2091](https://github.com/Koniverse/SubWallet-Extension/issues/2091) | Fixed bug XCM transfer USDT (Parallel —> Statemint) (#2091) | 1.1.20 | 2023-11-04 | US-13.12 |
+| [#2196](https://github.com/Koniverse/SubWallet-Extension/issues/2196) | Update XCM for Astar network (#2196) | 1.1.23 | 2023-11-24 | US-13.12 |
+| [#2353](https://github.com/Koniverse/SubWallet-Extension/issues/2353) | Support some XCM transfer (#2353) | 1.1.26 | 2023-12-16 | US-13.12 |
+| [#2604](https://github.com/Koniverse/SubWallet-Extension/issues/2604) | Support Rococo asset hub (#2604) | 1.1.41 | 2024-03-02 | US-13.12 |
+| [#2786](https://github.com/Koniverse/SubWallet-Extension/issues/2786) | Add support XCM for PINK token (#2786) | 1.1.47 | 2024-03-23 | US-13.12 |
+| [#2814](https://github.com/Koniverse/SubWallet-Extension/issues/2814) | Fixed bug when performing XCM transfer on Kusama (#2814) | 1.1.49 | 2024-03-26 | US-13.12 |
+| [#303](https://github.com/Koniverse/SubWallet-Extension/issues/303) | Fix bug display incorrect transferable balance in the Send Fund/Donate/XCM Transfer screen (#303) | 0.4.4 | 2022-06-08 | US-13.1 |
+| [#3134](https://github.com/Koniverse/SubWallet-Extension/issues/3134) | Support more XCM channels (#3134) | 1.2.4 | 2024-06-08 | US-13.12 |
+| [#3230](https://github.com/Koniverse/SubWallet-Extension/issues/3230) | Fix bug not showing popup Swap confirmation when swap with Injected account (#3230) | 1.2.12 | 2024-07-02 | US-13.2 |
+| [#332](https://github.com/Koniverse/SubWallet-Extension/issues/332) | Fix bug can not send fund/XCM transfer of the Kintsugi Chain (#332) | 0.4.4 | 2022-06-08 | US-13.1 |
+| [#3519](https://github.com/Koniverse/SubWallet-Extension/issues/3519) | Fix bug XCM (#3519) | 1.2.28 | 2024-09-04 | US-13.12 |
+| [#3561](https://github.com/Koniverse/SubWallet-Extension/issues/3561) | Fix bug XCM for channel: DOT: KAH -> PAH (#3561) | 1.2.29 | 2024-09-13 | US-13.12 |
+| [#3606](https://github.com/Koniverse/SubWallet-Extension/issues/3606) | Fixed bug XCM USDT: PAH -> ASTR (#3606) | 1.3.31 | 2025-04-18 | US-13.12 |
+| [#3617](https://github.com/Koniverse/SubWallet-Extension/issues/3617) | Re-calculate max transferable for XCM native token (#3617) | 1.2.30 | 2024-09-20 | US-13.14 |
+| [#3725](https://github.com/Koniverse/SubWallet-Extension/issues/3725) | Fixed bug XCM for Acala (#3725) | 1.3.31 | 2025-04-18 | US-13.12 |
+| [#3895](https://github.com/Koniverse/SubWallet-Extension/issues/3895) | Add validate sufficient token for XCM transfer (#3895) | 1.3.29 | 2025-04-08 | US-13.14 |
+| [#3903](https://github.com/Koniverse/SubWallet-Extension/issues/3903) | Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam (#3903) | 1.3.31 | 2025-04-18 | US-13.12 |
+| [#3911](https://github.com/Koniverse/SubWallet-Extension/issues/3911) | Fix max transferable for Avail Bridge (#3911) | 1.3.12 | 2025-01-06 | US-13.3 |
+| [#333](https://github.com/Koniverse/SubWallet-Extension/issues/333) | Fix bug can't XCM Transfer of the Bifrost Chain (#333) | 0.5.6 | 2022-08-24 | US-13.1 |
+| [#3918](https://github.com/Koniverse/SubWallet-Extension/issues/3918) | Support Across bridge (#3918, #4299) | 1.3.31 | 2025-04-18 | US-13.5 |
+| [#4299](https://github.com/Koniverse/SubWallet-Extension/issues/4299) | Support Across bridge (#3918, #4299 — the bullet's second number is an unrelated Bitcoin issue) | 1.3.31 | 2025-04-18 | US-13.5 |
+| [#4133](https://github.com/Koniverse/SubWallet-Extension/issues/4133) | Estimate delivery fee when XCM (#4133) | 1.3.31 | 2025-04-18 | US-13.14 |
+| [#4134](https://github.com/Koniverse/SubWallet-Extension/issues/4134) | Dry run XCM (#4134) | 1.3.31 | 2025-04-18 | US-13.14 |
+| [#4233](https://github.com/Koniverse/SubWallet-Extension/issues/4233) | Improve validate recipient when make XCM transfer (#4233) | 1.3.31 | 2025-04-18 | US-13.14 |
+| [#4282](https://github.com/Koniverse/SubWallet-Extension/issues/4282) | Refactor Across bridge (#4282) | 1.3.35 | 2025-05-09 | US-13.5 |
+| [#4310](https://github.com/Koniverse/SubWallet-Extension/issues/4310) | Improve estimate fee through Across Bridge (#4310) | 1.3.65 | 2025-11-06 | US-13.5 |
+| [#4416](https://github.com/Koniverse/SubWallet-Extension/issues/4416) | Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416) | 1.3.41 | 2025-06-11 | US-13.12 |
+| [#4444](https://github.com/Koniverse/SubWallet-Extension/issues/4444) | Remove MYTH (PAH -> Ethereum) (#4444) | 1.3.55 | 2025-09-05 | US-13.13 |
 | [#245](https://github.com/Koniverse/SubWallet-Extension/issues/245) | Integrate on-ramp feature to buy crypto from fiat currencies (#245) | 0.5.7 | 2022-09-06 | US-14.1 |
 | [#1760](https://github.com/Koniverse/SubWallet-Extension/issues/1760) | Improve case delete connection when reset wallet (#1760) | 1.1.9 | 2023-08-22 | US-14.1 |
 | [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834) | Integrate Coinbase Pay fiat on-ramp feature (#1834) | 1.1.11 | 2023-09-09 | US-14.1 |

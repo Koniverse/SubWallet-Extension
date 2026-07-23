@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 09:59:38 UTC
-> Total stories: 2357
+> Last generated: 2026-07-23 10:19:56 UTC
+> Total stories: 2258
 
-## 📋 Backlog (262)
+## 📋 Backlog (256)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -178,12 +178,6 @@
 | US-32.362 | Improve UX for staking when one or more collators/validators staked are inactive | EPIC-32 | P3 | 1 | — | tunghp2002 |
 | US-32.365 | Extension - Do not display Withdraw button although available for withdrawal of the Direct nomination - Parachain | EPIC-32 | P3 | 1 | — | — |
 | US-32.371 | [ Extension ]  Able to scroll up /đown in account info in TAO direct nomination earnings | EPIC-32 | P3 | 1 | — | — |
-| US-33.24 | Add support for XCM transfer between Bifrost Polkadot and Moonbeam | EPIC-33 | P3 | 1 | — | PDTnhah |
-| US-33.34 | Bridge tokens from Octopus Network to Near | EPIC-33 | P3 | 1 | — | nulllpc |
-| US-33.35 | Integrate bridge asset feature | EPIC-33 | P3 | 1 | — | nulllpc |
-| US-33.65 | Improve experience when users wait to receive tokens after XCM | EPIC-33 | P3 | 1 | — | bluezdot |
-| US-33.82 | Extension - Add option transfer Max when bridge WETH: Polygon -> Ethereum | EPIC-33 | P3 | 1 | — | — |
-| US-33.96 | Extension - Improve XCM feature | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
 | US-4.13 | Bitcoin UTXO multi-asset transfer & custom fee | EPIC-4 | P1 | 5 | — | — |
 | US-4.16 | Cosmos ecosystem support | EPIC-4 | P1 | 5 | — | — |
@@ -288,13 +282,14 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (26)
+## 🟡 In Progress (24)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
 | US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
+| US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
@@ -304,9 +299,6 @@
 | US-28.172 | Unable to send funds out of Polkadot Vault | EPIC-28 | P3 | 1 | sprint-2026-W28 | AndyT-51 |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
-| US-33.33 | Add support for USDT on more chains and update param for XCM on Astar | EPIC-33 | P3 | 1 | sprint-2026-W28 | PDTnhah |
-| US-33.85 | Review and add more XCM Channels | EPIC-33 | P3 | 1 | sprint-2026-W28 | saltict |
-| US-33.86 | Support bridge without XCM | EPIC-33 | P3 | 1 | sprint-2026-W28 | — |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
@@ -335,7 +327,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1883)
+## ✅ Done (1801)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -380,6 +372,11 @@
 | US-13.5 | Across protocol cross-chain bridge | EPIC-13 | P2 | 5 | sprint-2025-M04 | tunghp2002 |
 | US-13.6 | Bridge claim / withdrawal step to finalize cross-chain transfers | EPIC-13 | P1 | 5 | sprint-2024-M10 | bluezdot |
 | US-13.7 | Bittensor TAO ↔ Subtensor-EVM native-token bridge | EPIC-13 | P2 | 5 | sprint-2026-M05 | tunghp2002 |
+| US-13.12 | XCM route & channel coverage | EPIC-13 | P3 | 5 | sprint-2025-M09 | — |
+| US-13.13 | XCM channel operations & health | EPIC-13 | P3 | 3 | sprint-2025-M09 | — |
+| US-13.14 | XCM fee, dry-run & transfer validation | EPIC-13 | P3 | 5 | sprint-2026-M06 | — |
+| US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | sprint-2024-M07 | — |
+| US-13.16 | Asset Hub Migration & relay-chain wind-down | EPIC-13 | P3 | 3 | sprint-2025-M11 | — |
 | US-14.1 | Fiat on-ramp: buy crypto with card | EPIC-14 | P1 | 8 | sprint-2022-M09 | S2kael |
 | US-14.2 | Fiat off-ramp: sell crypto for fiat | EPIC-14 | P2 | 3 | sprint-2025-M09 | tunghp2002 |
 | US-15.1 | OpenGov referenda + conviction voting | EPIC-15 | P1 | 5 | sprint-2025-M12 | saltict |
@@ -1707,93 +1704,6 @@
 | US-32.373 | Deploying Bittensor ecosystem features | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
 | US-32.374 | Add icon info for DelegationItem | EPIC-32 | P3 | 1 | — | — |
 | US-32.375 | Add incrementDelegatorRewards call to Amplitude reward claiming | EPIC-32 | P3 | 1 | — | — |
-| US-33.1 | Integration Native and Cross-chain assets for Acala | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-33.2 | Integration cross-chain assets for Bifrost | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-33.3 | Integration Cross-chain assets for Moonbeam, Moonriver | EPIC-33 | P3 | 1 | sprint-2022-M03 | saltict |
-| US-33.4 | Support Send / Receive cross-chain assets (update some label and variablea and xc logo) | EPIC-33 | P3 | 1 | sprint-2022-M06 | saltict |
-| US-33.5 | Add cross-chain token on SORA | EPIC-33 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-33.6 | Fix bug display incorrect transferable balance in the Send Fund/Donate/XCM Transfer screen | EPIC-33 | P3 | 1 | sprint-2022-M06 | lw-cdm |
-| US-33.7 | Fix bug can not send fund/XCM transfer of the Kintsugi Chain | EPIC-33 | P3 | 1 | sprint-2022-M06 | lw-cdm |
-| US-33.8 | Fix bug can't XCM Transfer of the Bifrost Chain | EPIC-33 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-33.10 | Update XCM transfer support for Relaychain to Parachains | EPIC-33 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-33.11 | Support sorting the default token list in the send fund/xcm transfer screen by network, by assets that have balances | EPIC-33 | P3 | 1 | sprint-2022-M07 | — |
-| US-33.13 | Update UI/UX for XCM transfer | EPIC-33 | P3 | 1 | sprint-2022-M08 | hieudd |
-| US-33.14 | XCM transfers for Interlay/Kintsugi <-> Moonbeam/Moonriver | EPIC-33 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-33.15 | Add warning for xcm transfer feature | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-33.16 | Fix support Xcm transfer on Kusama, Polkadot, Astar, Shiden chain for QR Account | EPIC-33 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-33.17 | Re-check XCM transfer feature for Astar | EPIC-33 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-33.18 | Fix issue display lack of transaction history when user performs xcm transfer#586 | EPIC-33 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-33.19 | Integrate Bit.Country Token and XCM | EPIC-33 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-33.20 | Update existential deposit for XCM transfer feature & transaction history | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-33.21 | Integrate Polkaholic API for XCM transfer history | EPIC-33 | P3 | 1 | sprint-2023-M04 | hieudd |
-| US-33.22 | Support transfer and XCM for Statemine/Statemint | EPIC-33 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-33.23 | Enable xcm transfer for Acala chain | EPIC-33 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-33.25 | Fix XCM transfer feature for the some chain | EPIC-33 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-33.26 | Fix bug XCM for Moonbeam, Bifrost Kusama | EPIC-33 | P3 | 1 | sprint-2023-M03 | S2kael |
-| US-33.27 | Update XCM function for Kintsugi chain | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-33.28 | Add XCM for Kusama --> Statemint | EPIC-33 | P3 | 1 | sprint-2023-M03 | nulllpc |
-| US-33.29 | Upgrade UI - Some issues related to XCM feature | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-33.30 | Incorrect fee when XCM GLMR Acala to Moombeam | EPIC-33 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-33.36 | Temporarily hide XCM channels from Moonbeam | EPIC-33 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-33.37 | Add support new XCM channels | EPIC-33 | P3 | 1 | sprint-2025-M09 | PDTnhah |
-| US-33.38 | Fixed bug Don’t show send history in case xcm on same account | EPIC-33 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-33.39 | Fixed bug error page when perform XCM on Firefox browser | EPIC-33 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-33.40 | Re-check and update XCM feature for some chains: Polkadot, Statemint, Statemine, Bifrost Polkadot | EPIC-33 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-33.41 | Fixed bug Show incorrect Destination Chain fee on XCM history detail | EPIC-33 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-33.42 | Check the Flags attribute in the balance of Polkadot Collectives, Kusama Bridge Hub | EPIC-33 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-33.43 | Update XCM for Astar, Interlay, HydraDX | EPIC-33 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-33.44 | Recheck XCM Weekly | EPIC-33 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-33.45 | Support SnowBridge | EPIC-33 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-33.46 | Fixed bug XCM transfer USDT (Parallel —> Statemint) | EPIC-33 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-33.47 | Recheck XCM problems on Kusama | EPIC-33 | P3 | 1 | sprint-2023-M11 | nulllpc |
-| US-33.48 | Update XCM for Astar network | EPIC-33 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-33.49 | Add support some XCM DOT channels | EPIC-33 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-33.50 | Support some XCM transfer | EPIC-33 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-33.51 | WebApp - Update RPC and XCM channels online | EPIC-33 | P3 | 1 | sprint-2024-M02 | saltict |
-| US-33.52 | Check XCM channels | EPIC-33 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-33.53 | Update XCM channel online | EPIC-33 | P3 | 1 | sprint-2024-M02 | nulllpc |
-| US-33.54 | Support Rococo asset hub | EPIC-33 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-33.55 | Fix bug not updating blocked XCM channels | EPIC-33 | P3 | 1 | sprint-2024-M03 | nulllpc |
-| US-33.56 | Add support XCM for PINK token | EPIC-33 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-33.58 | Fixed bug when performing XCM transfer on Kusama | EPIC-33 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-33.60 | Support XCM for Pendulum | EPIC-33 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-33.61 | Support more XCM channels | EPIC-33 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-33.62 | WebApp - Update validate for popup warning cross-chain PAH --> KAH | EPIC-33 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-33.63 | Fix bug not showing popup Swap confirmation when swap with Injected account | EPIC-33 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-33.66 | Extension - Support XCM for Mythos | EPIC-33 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-33.68 | Extension - Update XCM to V4 | EPIC-33 | P3 | 1 | sprint-2025-M08 | bluezdot |
-| US-33.69 | Support Snowbridge transfer from Ethereum -> Mythos for MYTH | EPIC-33 | P3 | 1 | sprint-2024-M10 | bluezdot |
-| US-33.70 | Fix bug XCM | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-33.71 | Fix bug XCM for channel: DOT: KAH -> PAH | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-33.72 | Fixed bug XCM USDT: PAH -> ASTR | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-33.73 | Integrate XCM/extrinsic dry run API | EPIC-33 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-33.74 | Re-calculate max transferable for XCM native token | EPIC-33 | P3 | 1 | sprint-2024-M09 | nulllpc |
-| US-33.75 | Fixed bug XCM for Acala | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-33.76 | Extension - Re-check Transfer Max for EVM account when XCM transfer | EPIC-33 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
-| US-33.77 | Add validate sufficient token for XCM transfer | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-33.78 | Fixed bug Cannot read properties of undefined when performing XCM for Moonbeam | EPIC-33 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-33.79 | Fix max transferable for Avail Bridge | EPIC-33 | P3 | 1 | sprint-2025-M01 | bluezdot |
-| US-33.80 | Support Across bridge | EPIC-33 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-33.81 | Avail Space - Support Avail bridge for Avail Space | EPIC-33 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-33.83 | Estimate delivery fee when XCM | EPIC-33 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-33.84 | Dry run XCM | EPIC-33 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-33.87 | Support exporting/creating files to manage XCM pairs | EPIC-33 | P3 | 1 | sprint-2025-M07 | PDTnhah |
-| US-33.88 | SubWallet - Add some Across bridge channels | EPIC-33 | P3 | 1 | sprint-2025-M04 | PDTnhah |
-| US-33.89 | Improve validate recipient when make XCM transfer | EPIC-33 | P3 | 1 | sprint-2025-M04 | PDTnhah |
-| US-33.90 | Extension - Support bridge step from EVM address to Substrate | EPIC-33 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-33.91 | Extension - Support display destination fee for transfer XCM | EPIC-33 | P3 | 1 | sprint-2026-M05 | Thiendekaco |
-| US-33.92 | Refactor Across bridge | EPIC-33 | P3 | 1 | sprint-2025-M05 | tunghp2002 |
-| US-33.93 | Improve estimate fee through Across Bridge | EPIC-33 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-33.94 | Extension - Some improvements for cross-chain swaps on the EVM network | EPIC-33 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-33.95 | Making sure teleports don't fail | EPIC-33 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-33.97 | Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub | EPIC-33 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-33.98 | Remove MYTH (PAH -> Ethereum) | EPIC-33 | P3 | 1 | sprint-2025-M09 | PDTnhah |
-| US-33.100 | Validate XCM amount before transfer with min and max | EPIC-33 | P3 | 1 | sprint-2025-M12 | PDTnhah |
-| US-33.101 | Update params for XCM transfer - Related to DOT/KSM XCM | EPIC-33 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-33.102 | Re-enable Cross-chain transfer related to Relay-chain | EPIC-33 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-33.103 | Re-check logic approve token when perform XCM | EPIC-33 | P3 | 1 | sprint-2026-M06 | PDTnhah |
-| US-33.104 | WebApp - Update params for XCM transfer (Related to DOT/KSM XCM) | EPIC-33 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
-| US-33.105 | Bridge native TAO <-> Subtensor EVM | EPIC-33 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -2227,7 +2137,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (163)
+## 🗑️ Deprecated (154)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2340,15 +2250,6 @@ _No stories_
 | US-32.282 | Re-check and update earning for Edgware | EPIC-32 | P3 | 1 | — | nulllpc |
 | US-32.301 | Extension - Do not allow entering Amount without selecting an account in the Stake, Unstake screen | EPIC-32 | P3 | 1 | — | — |
 | US-32.307 | WebApp - Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | — | — |
-| US-33.9 | Support sorting the default token list in the send fund/xcm transfer screen by network, by assets that have balances | EPIC-33 | P3 | 1 | — | — |
-| US-33.12 | Improve UI for XCM transaction with EVM provider | EPIC-33 | P3 | 1 | — | S2kael |
-| US-33.31 | Support for transferring xcm for Kintsugi | EPIC-33 | P3 | 1 | sprint-2025-M12 | nulllpc |
-| US-33.32 | Add XCM Support Between Picasso and Statemine | EPIC-33 | P3 | 1 | — | — |
-| US-33.57 | Handle XCM delivery fee | EPIC-33 | P3 | 1 | — | — |
-| US-33.59 | Add support XCM channels for DED | EPIC-33 | P3 | 1 | — | nulllpc |
-| US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-41.3 | Intergrate Collab.Land for private channel in Discord | EPIC-41 | P3 | 1 | — | — |
 | US-41.21 | Get Data subtoken from Subquery: | EPIC-41 | P3 | 1 | — | — |
 | US-41.28 | Support txn Queueing | EPIC-41 | P3 | 1 | — | — |
@@ -2399,12 +2300,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 262
+- 📋 **Backlog**: 256
 - 🟢 **Ready**: 12
-- 🟡 **In Progress**: 26
+- 🟡 **In Progress**: 24
 - 👀 **Review**: 11
-- ✅ **Done**: 1883
+- ✅ **Done**: 1801
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 163
+- 🗑️ **Deprecated**: 154
 
-⚠️  **WIP limit exceeded**: 26 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 24 stories in-progress (limit: 3).

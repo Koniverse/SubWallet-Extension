@@ -19,7 +19,7 @@ arch_ref:
   - AD-19
   - AD-24
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-07-23
 ---
 
 ## Goal
@@ -141,7 +141,43 @@ it bridges.
 | [US-13.8](../stories/US-13.8-bittensor-alpha-token-bridges.md) | Bittensor alpha-token bridges | Planned alpha-token bridge family (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | 📋 backlog | — |
 | [US-13.9](../stories/US-13.9-hyperbridge.md) | Hyperbridge integration | Planned Hyperbridge cross-chain provider integration | 📋 backlog | — |
 | [US-13.10](../stories/US-13.10-axelar-cross-chain.md) | Axelar cross-chain integration | Planned Axelar cross-chain provider integration | 📋 backlog | — |
-| [US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | Keep XCM/bridge routes working and funds recoverable across runtime upgrades, ParaSpell version drift, and the real-world claim / error-surfacing / fee-re-query failures of the async bridges | 📋 backlog | — |
+| [US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | Keep XCM/bridge routes working and funds recoverable across runtime upgrades, ParaSpell version drift, and the real-world claim / error-surfacing / fee-re-query failures of the async bridges | 🚧 in-progress | — |
+| [US-13.12](../stories/US-13.12-xcm-route-and-channel-coverage.md) | XCM route & channel coverage | Make one more corridor work — 36 rows, the largest story in the epic | ✅ done | 1.3.55 |
+| [US-13.13](../stories/US-13.13-xcm-channel-operations-and-health.md) | XCM channel operations & health | Watch the routes, hide the broken ones, push the list without a release | ✅ done | 1.3.55 |
+| [US-13.14](../stories/US-13.14-xcm-fee-dry-run-and-validation.md) | XCM fee, dry-run & transfer validation | What it costs and whether it will arrive — answered by simulation from 1.3.31 | ✅ done | 1.3.80 |
+| [US-13.15](../stories/US-13.15-xcm-ui-history-and-token-selection.md) | XCM UI, history & token selection | The screen, the warning, and a history entry that proves the transfer happened | ✅ done | 1.2.14 |
+| [US-13.16](../stories/US-13.16-asset-hub-migration-and-relay-chain-wind-down.md) | Asset Hub Migration & relay-chain wind-down | Disable, re-point, re-enable — surviving an ecosystem event the wallet did not control | ✅ done | 1.3.66 |
+| [US-13.17](../stories/US-13.17-open-xcm-route-and-bridge-coverage.md) | Open XCM route & bridge coverage | Corridors and bridge options asked for and never delivered | 🚧 in-progress | — |
+
+> **US-13.12 … US-13.17 carry no FR.** They hold the incremental work, fixes and chores that landed
+> on this epic — **115 tracker issues**, folded in from the former one-issue-per-story maintenance
+> ledger on 2026-07-23 ([note](../../notes/2026-07-23.md#c-epic-33-maintenance--xcm--bridge-merged-into-epic-13)).
+> The FR map above is unchanged.
+
+## Umbrella issues owned by this epic
+
+Three tracker issues here have children and no delivery of their own. They are **the epic's**, not
+any story's ([AGENTS.md](../../../AGENTS.md) rule 10).
+
+| Issue | Title | State | Children |
+|---|---|---|---|
+| [#4157](https://github.com/Koniverse/SubWallet-Extension/issues/4157) | Review and add more XCM Channels | open | 15 real (6 more links are board noise) — the corridor backlog |
+| [#4188](https://github.com/Koniverse/SubWallet-Extension/issues/4188) | Support bridge without XCM | open | 2 — #3918 (Across, shipped 1.3.31) and #1378 (open) |
+| [#4392](https://github.com/Koniverse/SubWallet-Extension/issues/4392) | Extension — Improve XCM feature | open | 4 — nested under #4157 |
+
+> **#4157 is the corridor backlog itself, filed as one issue.** Fifteen of its children are rows in
+> this epic; it has been open long enough to have collected work that shipped across nine releases
+> and work that has not started.
+>
+> **Six of #4157's sub-issue links are not children** — #60, #331, #412, #425, #468 and **#442,
+> which is a pull request** (`[Issue-425] Fix UI`). They are unrelated 2022 issues. Filtering them
+> before applying rule 10 is what keeps #4267 and #4278 as rows rather than false umbrellas; the
+> same pattern appeared in the hardware and swap ledgers.
+>
+> **#4392 is nested under #4157 and has its own four children**, two of them shipped
+> ([US-13.14](../stories/US-13.14-xcm-fee-dry-run-and-validation.md)) and two open
+> ([US-13.11](../stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md)). An umbrella
+> inside an umbrella is not an error — it is how a multi-year programme records its rounds.
 
 > US-13.1–13.10 each materialize one FR (US-13.1–13.7 retroactive; US-13.8–13.10
 > forward); US-13.11 is the epic's bridge-reliability hardening cluster and owns no
