@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 05:42:56 UTC
-> Total stories: 2459
+> Last generated: 2026-07-23 09:59:38 UTC
+> Total stories: 2357
 
-## 📋 Backlog (273)
+## 📋 Backlog (262)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -152,17 +152,6 @@
 | US-30.202 | Extension - Update UI for connect dApp features | EPIC-30 | P3 | 1 | — | — |
 | US-30.205 | Extension - Improve when sign transaction with dApp on Cardano | EPIC-30 | P3 | 1 | — | Thiendekaco |
 | US-30.214 | Extension - Support connect dApp for Bitcoin ( Round 2) | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-31.6 | Integrate Axelar for swap assets feature | EPIC-31 | P3 | 1 | — | nulllpc |
-| US-31.7 | Research and integrate flexible gas fees in any asset via DEX Pallet | EPIC-31 | P3 | 1 | — | nulllpc |
-| US-31.37 | Extension - Fees displayed incorrectly on Swap Confirmation screen when reopening popup | EPIC-31 | P3 | 1 | — | — |
-| US-31.40 | Extension - Add custom slippage for ChainFlip | EPIC-31 | P3 | 1 | — | — |
-| US-31.60 | Extension - Allows calculation of XCM/Swap balance based on current account balance | EPIC-31 | P3 | 1 | — | bluezdot |
-| US-31.66 | [Round 3] Extension - Improve UX for swap cross-chain | EPIC-31 | P3 | 1 | — | — |
-| US-31.69 | Extension - Improve some UX for swap | EPIC-31 | P3 | 1 | — | Quangdm-cdm |
-| US-31.80 | Extension - Show Total fee for swap feature | EPIC-31 | P3 | 1 | — | bluezdot |
-| US-31.86 | Extension - Update warning low liquidity for some provider on Swap features | EPIC-31 | P3 | 1 | — | — |
-| US-31.99 | Support swap between native BTC & tBTC on Hydration | EPIC-31 | P3 | 1 | — | — |
-| US-31.106 | Extension - Improve for Optimex provider on Swap features | EPIC-31 | P3 | 1 | — | — |
 | US-32.16 | Built-in staking for Dotsama layer2 dapps' tokens | EPIC-32 | P3 | 1 | — | hieudd |
 | US-32.73 | Supporting Fast unstake | EPIC-32 | P3 | 1 | — | nulllpc |
 | US-32.90 | Support Stake Max | EPIC-32 | P3 | 1 | — | — |
@@ -282,7 +271,7 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (14)
+## 🟢 Ready (12)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -292,8 +281,6 @@
 | US-23.245 | Extension - Error can't derive F2 TON solo account | EPIC-23 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-24.338 | Extension - Update chain-list stable v0.2.124 | EPIC-24 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-30.56 | Integrate with AirGap Vault for QR signer | EPIC-30 | P3 | 1 | sprint-2026-W28 | PDTnhah |
-| US-31.25 | Extension - Show incorrect fee when swap | EPIC-31 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
-| US-31.79 | Extension - Update content in-app for Swap (Round 2) | EPIC-31 | P3 | 1 | sprint-2026-W28 | Quangdm-cdm |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
@@ -301,10 +288,12 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (32)
+## 🟡 In Progress (26)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
+| US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
+| US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
@@ -313,13 +302,6 @@
 | US-23.222 | WebApp - Wallet account injection feature (related to unified account feature) | EPIC-23 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
 | US-28.172 | Unable to send funds out of Polkadot Vault | EPIC-28 | P3 | 1 | sprint-2026-W28 | AndyT-51 |
-| US-31.53 | Integrate Bitcoin into SubWallet and support Crosschain swap BTC ↔ DOT | EPIC-31 | P3 | 1 | sprint-2025-W14 | nulllpc |
-| US-31.59 | 1 Click cross chain Swap | EPIC-31 | P3 | 1 | sprint-2025-W26 | saltict |
-| US-31.63 | Support exporting/creating files to manage Swap pairs | EPIC-31 | P3 | 1 | sprint-2026-W28 | PDTnhah |
-| US-31.84 | Extension - Can't reset quote on Swap features | EPIC-31 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
-| US-31.94 | Update chain-list stable v0.2.112 | EPIC-31 | P3 | 1 | sprint-2026-W28 | bluezdot |
-| US-31.102 | Extension - Support Hollar (Hydration) token in list token to paid fee | EPIC-31 | P3 | 1 | sprint-2026-W28 | bluezdot |
-| US-31.105 | Improve the algorithm to support more swap path | EPIC-31 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-33.33 | Add support for USDT on more chains and update param for XCM on Astar | EPIC-33 | P3 | 1 | sprint-2026-W28 | PDTnhah |
@@ -335,7 +317,6 @@
 | US-41.426 | Product review Q3-2024 | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
-| US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 
 ## 👀 Review (11)
@@ -354,7 +335,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1953)
+## ✅ Done (1883)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -378,6 +359,10 @@
 | US-11.7 | In-wallet Bittensor dTAO swap | EPIC-11 | P1 | 5 | sprint-2026-M05 | tunghp2002 |
 | US-11.8 | Cross-chain swap routing (Swap↔Bridge multi-hop) | EPIC-11 | P1 | 8 | sprint-2025-M04 | saltict |
 | US-11.9 | In-wallet swap via Optimex | EPIC-11 | P1 | 8 | sprint-2025-M10 | bluezdot |
+| US-11.12 | Swap UI, content & confirmation flow | EPIC-11 | P3 | 3 | sprint-2026-M06 | — |
+| US-11.13 | Swap quote pipeline & service internals | EPIC-11 | P3 | 3 | sprint-2026-M05 | — |
+| US-11.14 | Swap pair catalogue & operational tooling (out-of-repo) | EPIC-11 | P3 | 2 | sprint-2025-M10 | — |
+| US-11.15 | Swap providers evaluated but not integrated | EPIC-11 | P3 | 1 | sprint-2025-M04 | — |
 | US-12.1 | Native nomination staking (relay + parachains) | EPIC-12 | P1 | 5 | sprint-2022-M06 | saltict |
 | US-12.2 | Nomination pool staking | EPIC-12 | P1 | 3 | sprint-2023-M03 | nulllpc |
 | US-12.3 | Collator / parachain staking | EPIC-12 | P1 | 3 | sprint-2022-M07 | nulllpc |
@@ -1412,81 +1397,6 @@
 | US-30.215 | WebApp - Don't show Migrate to unified account screen in case wallet only has account connected from extension | EPIC-30 | P3 | 1 | sprint-2025-M07 | lw-cdm |
 | US-30.216 | Handle case connecting with network systems that do not support WalletConnect connection | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
 | US-30.217 | Add Launchly dApp to SubWallet dApp list | EPIC-30 | P3 | 1 | sprint-2026-M07 | — |
-| US-31.4 | Integrate SubWallet into ArthSwap WASM DEX (ApolloSwap) | EPIC-31 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-31.8 | Research Chainflip swapping  feature | EPIC-31 | P3 | 1 | sprint-2024-M04 | nulllpc |
-| US-31.9 | Research swap pallet on asset hub | EPIC-31 | P3 | 1 | sprint-2024-M06 | S2kael |
-| US-31.10 | Integrate swap feature for Chainflip | EPIC-31 | P3 | 1 | sprint-2024-M03 | nulllpc |
-| US-31.11 | Bug can't start uniswap with SubWallet | EPIC-31 | P3 | 1 | sprint-2024-M02 | saltict |
-| US-31.12 | Build UI for swap feature | EPIC-31 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-31.13 | Integrate HydraDX swap SDK | EPIC-31 | P3 | 1 | sprint-2024-M04 | nulllpc |
-| US-31.14 | WebApp - Bug related to Swap feature | EPIC-31 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-31.15 | Add Swap button | EPIC-31 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-31.16 | Implement Swap feature for extension | EPIC-31 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-31.18 | Optimize swap pair selection | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-31.19 | WebApp - Show incorrect recipient on Swap confirmation screen | EPIC-31 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-31.23 | Fixed bug Can't hit the 'Confirm' button on ToS of the Swap feature | EPIC-31 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-31.24 | Improve swap quote fetching speed | EPIC-31 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-31.26 | WebApp - Update some message related to earning and swap feature | EPIC-31 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-31.27 | WebApp - Update logo for Hydration provider on the Swap screen | EPIC-31 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-31.28 | Research Uniswap price impact | EPIC-31 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-31.29 | Add support Swap Asset Hub | EPIC-31 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-31.31 | Support XCM channels | EPIC-31 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-31.33 | Research USDT, USDC swap volume on Hydration, Stellaswap | EPIC-31 | P3 | 1 | sprint-2024-M10 | saltict |
-| US-31.34 | Add Chainflip broker | EPIC-31 | P3 | 1 | sprint-2024-M09 | saltict |
-| US-31.35 | Unified account - Fix bug related to the Swap feature | EPIC-31 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-31.36 | Checklist and Testing for Unified account: Earning, Swap... | EPIC-31 | P3 | 1 | sprint-2024-M10 | haiyenvu23 |
-| US-31.38 | Add swap pairs for Hydration and ChainFlip | EPIC-31 | P3 | 1 | sprint-2024-M09 | PDTnhah |
-| US-31.39 | Update default slippage for ChainFlip | EPIC-31 | P3 | 1 | sprint-2024-M10 | PDTnhah |
-| US-31.41 | Support swap TAO on SimpleSwap | EPIC-31 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
-| US-31.42 | Add slippage protection for Chainflip | EPIC-31 | P3 | 1 | sprint-2025-M03 | tunghp2002 |
-| US-31.43 | Improve Select provider in Swap feature | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-31.44 | Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning | EPIC-31 | P3 | 1 | sprint-2026-M06 | PDTnhah |
-| US-31.46 | Support Uniswap | EPIC-31 | P3 | 1 | sprint-2025-M03 | tunghp2002 |
-| US-31.47 | Error when swap on hydration | EPIC-31 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-31.48 | Setup swap BI report for SubWallet | EPIC-31 | P3 | 1 | sprint-2025-M04 | anhntk54 |
-| US-31.49 | Improve swap feature | EPIC-31 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-31.51 | Add validation to swap handlers | EPIC-31 | P3 | 1 | sprint-2025-M03 | nulllpc |
-| US-31.52 | Review Uniswap fee | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-31.54 | Support 1inch dex aggregator | EPIC-31 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-31.55 | Recheck swap quote with asset hub | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-31.56 | Fixed bug Swap from DOT -> ETH(Arbitrum) | EPIC-31 | P3 | 1 | sprint-2025-M03 | tunghp2002 |
-| US-31.57 | Support KyberSwap Aggregator | EPIC-31 | P3 | 1 | sprint-2025-M05 | tunghp2002 |
-| US-31.58 | Add more Swap Provider | EPIC-31 | P3 | 1 | sprint-2025-M06 | nulllpc |
-| US-31.61 | Update New UI for Swap quote | EPIC-31 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-31.62 | Manage supported XCM pairs & Swap pairs | EPIC-31 | P3 | 1 | sprint-2026-M03 | PDTnhah |
-| US-31.64 | Swap support and direct cross-chain swap on more EVM chains | EPIC-31 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-31.65 | Support swap-bridge for EVM chains | EPIC-31 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-31.67 | Fixed bug Error page when perform sign permit from Uniswap | EPIC-31 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-31.68 | Update content in-app for swap | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-31.70 | Support Asset Hub Testnet swap for Chainflip | EPIC-31 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-31.72 | Support GIGADOT token for Hydration | EPIC-31 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-31.73 | Support UniswapX Dutch Swap | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-31.74 | Add more swap pairs from Simple swap | EPIC-31 | P3 | 1 | sprint-2025-M07 | bluezdot |
-| US-31.75 | Remove all swap asset ref on SubWallet CMS | EPIC-31 | P3 | 1 | sprint-2025-M06 | PDTnhah |
-| US-31.76 | Support Bridge-Swap process for cross-chain swap on EVM | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-31.78 | Update latest Hydration SDK | EPIC-31 | P3 | 1 | sprint-2025-M07 | saltict |
-| US-31.81 | Update fee for UniSwap | EPIC-31 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-31.82 | Update Hydration Unified address formatting | EPIC-31 | P3 | 1 | sprint-2025-M05 | PDTnhah |
-| US-31.83 | Support swap for Unichain | EPIC-31 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-31.85 | Integrate swap providers | EPIC-31 | P3 | 1 | sprint-2025-M05 | — |
-| US-31.87 | [Backend - Swap] Filtering Supportable Swap Pair by Metadata | EPIC-31 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-31.88 | Extension - Support Crosschain swap BTC <-> DOT | EPIC-31 | P3 | 1 | sprint-2025-M08 | bluezdot |
-| US-31.89 | Review Swap logic | EPIC-31 | P3 | 1 | sprint-2025-M07 | Quangdm-sw |
-| US-31.90 | Extension - Don't show list token to choose to paid fee on Hydration network | EPIC-31 | P3 | 1 | sprint-2025-M07 | — |
-| US-31.91 | Support for New Swap Pairs on Chainflip | EPIC-31 | P3 | 1 | sprint-2025-M07 | bluezdot |
-| US-31.92 | Integrate Optimex into BTC Swap Flow | EPIC-31 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-31.93 | Update new content to submitted screen when swap | EPIC-31 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-31.95 | Support for Bitcoin swap on ChainFlip | EPIC-31 | P3 | 1 | sprint-2025-M07 | bluezdot |
-| US-31.96 | Update UX/UI when support Swap for Bitcoin on Chainflip | EPIC-31 | P3 | 1 | sprint-2025-M08 | bluezdot |
-| US-31.97 | Check swap TAO (Bittensor) with SimpleSwap Provider | EPIC-31 | P3 | 1 | sprint-2025-M08 | bluezdot |
-| US-31.98 | Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge | EPIC-31 | P3 | 1 | sprint-2025-M08 | bluezdot |
-| US-31.100 | Apply dry-run to validate bridge step for swap feature | EPIC-31 | P3 | 1 | sprint-2025-M09 | bluezdot |
-| US-31.101 | Improve Swap validation by Dry-run-preview API from ParaSpell | EPIC-31 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-31.103 | [Swap] Update Chainflip @chainflip/sdk v1.11.0 | EPIC-31 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-31.104 | Remove support swap to DOT/KSM on Polkadot/Kusama | EPIC-31 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-31.107 | Refactor Swap Service interface and redundant code | EPIC-31 | P3 | 1 | sprint-2026-M05 | bluezdot |
-| US-31.108 | Support bittensor on-chain swap | EPIC-31 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-31.109 | [Extension] Display error message when swapping Chainflip | EPIC-31 | P3 | 1 | sprint-2026-M07 | — |
 | US-32.1 | Integrate Vara network | EPIC-32 | P3 | 1 | sprint-2023-M05 | saltict |
 | US-32.2 | Staking Portfolio Management | EPIC-32 | P3 | 1 | sprint-2022-M03 | nulllpc |
 | US-32.3 | Integration with SubQuery & SubSquid to show Transactions History & Crowdloan Status and Staking Information | EPIC-32 | P3 | 1 | sprint-2022-M03 | saltict |
@@ -2270,6 +2180,7 @@
 | US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
@@ -2316,7 +2227,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (176)
+## 🗑️ Deprecated (163)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2407,19 +2318,6 @@ _No stories_
 | US-30.173 | Fix some bugs when connect to dApps | EPIC-30 | P3 | 1 | — | Thiendekaco |
 | US-30.187 | Error using WalletConnect with Energy Web app | EPIC-30 | P3 | 1 | — | — |
 | US-30.209 | Check dApp connect | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-31.1 | Integrate Zenlink for Swap Assets | EPIC-31 | P3 | 1 | — | tunghp2002 |
-| US-31.2 | Integrate Acala for Swap Assets | EPIC-31 | P3 | 1 | — | — |
-| US-31.3 | Integrate Parallel Finance for Swap Assets | EPIC-31 | P3 | 1 | — | — |
-| US-31.5 | Update UI for the approve token popup when swap on the dApp | EPIC-31 | P3 | 1 | — | Sokol142196 |
-| US-31.17 | WebApp - Do not navigate to Swap screen in case connect WebApp with Extension | EPIC-31 | P3 | 1 | — | — |
-| US-31.20 | Extension - Improve Swap feature on extension | EPIC-31 | P3 | 1 | — | — |
-| US-31.21 | Extension - Do not get Swap quote | EPIC-31 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-31.22 | Extension MV3 - Unable to get quote when perform swap | EPIC-31 | P3 | 1 | — | Thiendekaco |
-| US-31.30 | Update ChainFlip version | EPIC-31 | P3 | 1 | sprint-2025-M01 | saltict |
-| US-31.32 | WebApp - Improve UI for selecting token to pay transaction fee on Hydration | EPIC-31 | P3 | 1 | — | — |
-| US-31.45 | Extension - Implement paid token exchange feature for Swap | EPIC-31 | P3 | 1 | — | frenkie-ng |
-| US-31.50 | Support dynamic swap pair | EPIC-31 | P3 | 1 | — | bluezdot |
-| US-31.77 | Update API for SimpleSwap | EPIC-31 | P3 | 1 | — | — |
 | US-32.17 | Support staking for cross-chain tokens inside parachains | EPIC-32 | P3 | 1 | — | hieudd |
 | US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-32.42 | Bug withdrawing GLMR stake | EPIC-32 | P3 | 1 | — | Sokol142196 |
@@ -2501,12 +2399,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 273
-- 🟢 **Ready**: 14
-- 🟡 **In Progress**: 32
+- 📋 **Backlog**: 262
+- 🟢 **Ready**: 12
+- 🟡 **In Progress**: 26
 - 👀 **Review**: 11
-- ✅ **Done**: 1953
+- ✅ **Done**: 1883
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 176
+- 🗑️ **Deprecated**: 163
 
-⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 26 stories in-progress (limit: 3).

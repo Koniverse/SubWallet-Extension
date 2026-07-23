@@ -631,49 +631,49 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1670](https://github.com/Koniverse/SubWallet-Extension/issues/1670) | Fix bug signing transaction on Avail (#1670) | 1.1.3 | 2023-07-21 | US-30.92 |
 | [#1674](https://github.com/Koniverse/SubWallet-Extension/issues/1674) | Fixed bug signature method handling is not supported for Wallet Connect (#1674) | 1.1.5 | 2023-07-29 | US-30.93 |
 | [#1712](https://github.com/Koniverse/SubWallet-Extension/issues/1712) | Allow substrate Dapp subscribe allow access accounts List (#1712) | 1.1.5 | 2023-07-29 | US-30.97 |
-| [#4644](https://github.com/Koniverse/SubWallet-Extension/issues/4644) | Apply dry-run to validate bridge step for swap feature (#4644) | 1.3.55 | 2025-09-05 | US-31.100 |
-| [#4671](https://github.com/Koniverse/SubWallet-Extension/issues/4671) | Improve Swap validation by Dry-run-preview API from ParaSpell (#4671) | 1.3.67 | 2025-11-13 | US-31.101 |
-| [#4826](https://github.com/Koniverse/SubWallet-Extension/issues/4826) | Refactor Swap Service interface and redundant code (#4826) | 1.3.79 | 2026-05-21 | US-31.107 |
-| [#4899](https://github.com/Koniverse/SubWallet-Extension/issues/4899) | Support bittensor on-chain swap (#4899) | 1.3.78 | 2026-05-14 | US-31.108 |
-| [#2590](https://github.com/Koniverse/SubWallet-Extension/issues/2590) | Fixed bug Unable to connect with eip6763 dApp (#2590) | 1.1.37 | 2024-02-07 | US-31.11 |
-| [#2784](https://github.com/Koniverse/SubWallet-Extension/issues/2784) | Add Swap button (#2784) | 1.1.50 | 2024-03-28 | US-31.15 |
-| [#2823](https://github.com/Koniverse/SubWallet-Extension/issues/2823) | Implement Swap feature for extension (#2823) | 1.1.55 | 2024-04-14 | US-31.16 |
-| [#3007](https://github.com/Koniverse/SubWallet-Extension/issues/3007) | Fixed bug Can't hit the "Confirm" button on ToS of the Swap feature (#3007) | 1.1.62 | 2024-05-08 | US-31.23 |
-| [#3104](https://github.com/Koniverse/SubWallet-Extension/issues/3104) | Improve swap quote fetching speed (#3104) | 1.2.3 | 2024-06-03 | US-31.24 |
-| [#3272](https://github.com/Koniverse/SubWallet-Extension/issues/3272) | Add support Swap Asset Hub (#3272) | 1.2.14 | 2024-07-09 | US-31.29 |
-| [#3453](https://github.com/Koniverse/SubWallet-Extension/issues/3453) | Support XCM channels (#3453) | 1.2.29 | 2024-09-13 | US-31.31 |
-| [#3483](https://github.com/Koniverse/SubWallet-Extension/issues/3483) | Add Chainflip broker (#3483) | 1.2.30 | 2024-09-20 | US-31.34 |
-| [#3633](https://github.com/Koniverse/SubWallet-Extension/issues/3633) | Add swap pairs for Hydration and ChainFlip (#3633, #3651) | 1.2.31 | 2024-09-28 | US-31.38 |
-| [#3651](https://github.com/Koniverse/SubWallet-Extension/issues/3651) | Add swap pairs for Hydration and ChainFlip (#3633, #3651) | 1.2.31 | 2024-09-28 | US-31.38 |
-| [#3634](https://github.com/Koniverse/SubWallet-Extension/issues/3634) | Update default slippage for ChainFlip (#3634) | 1.3.2 | 2024-10-12 | US-31.39 |
-| [#3855](https://github.com/Koniverse/SubWallet-Extension/issues/3855) | Support swap TAO on SimpleSwap (#3855) | 1.3.11 | 2024-12-23 | US-31.41 |
-| [#3933](https://github.com/Koniverse/SubWallet-Extension/issues/3933) | Improve Select provider in Swap feature (#3933) | 1.3.30 | 2025-04-14 | US-31.43 |
-| [#3936](https://github.com/Koniverse/SubWallet-Extension/issues/3936) | Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning (#3936) | 1.3.80 | 2026-06-02 | US-31.44 |
-| [#3977](https://github.com/Koniverse/SubWallet-Extension/issues/3977) | Support Uniswap (#3977) | 1.3.23 | 2025-03-05 | US-31.46 |
-| [#3993](https://github.com/Koniverse/SubWallet-Extension/issues/3993) | Error when swap on hydration (#3993) | 1.3.30 | 2025-04-14 | US-31.47 |
-| [#4069](https://github.com/Koniverse/SubWallet-Extension/issues/4069) | Improve swap feature (#4069) | 1.3.30 | 2025-04-14 | US-31.49 |
-| [#4088](https://github.com/Koniverse/SubWallet-Extension/issues/4088) | Review Uniswap fee (#4088) | 1.3.36 | 2025-05-16 | US-31.52 |
-| [#4113](https://github.com/Koniverse/SubWallet-Extension/issues/4113) | Recheck swap quote with asset hub (#4113) | 1.3.30 | 2025-04-14 | US-31.55 |
-| [#4141](https://github.com/Koniverse/SubWallet-Extension/issues/4141) | Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141) | 1.3.27 | 2025-03-29 | US-31.56 |
-| [#4144](https://github.com/Koniverse/SubWallet-Extension/issues/4144) | Support KyberSwap Aggregator (#4144) | 1.3.36 | 2025-05-16 | US-31.57 |
-| [#4204](https://github.com/Koniverse/SubWallet-Extension/issues/4204) | Update New UI for Swap quote (#4204) | 1.3.30 | 2025-04-14 | US-31.61 |
-| [#4219](https://github.com/Koniverse/SubWallet-Extension/issues/4219) | Swap support and direct cross-chain swap on more EVM chains (#4219) | 1.3.32 | 2025-04-26 | US-31.64 |
-| [#4220](https://github.com/Koniverse/SubWallet-Extension/issues/4220) | Support swap-bridge for EVM chains (#4220) | 1.3.32 | 2025-04-26 | US-31.65 |
-| [#4248](https://github.com/Koniverse/SubWallet-Extension/issues/4248) | Fixed bug Error page when perform sign permit from Uniswap (#4248) | 1.3.30 | 2025-04-14 | US-31.67 |
-| [#4259](https://github.com/Koniverse/SubWallet-Extension/issues/4259) | Update content in-app for swap (#4259) | 1.3.35 | 2025-05-09 | US-31.68 |
-| [#4265](https://github.com/Koniverse/SubWallet-Extension/issues/4265) | Support Asset Hub Testnet swap for Chainflip (#4265) | 1.3.41 | 2025-06-11 | US-31.70 |
-| [#4283](https://github.com/Koniverse/SubWallet-Extension/issues/4283) | Support GIGADOT token for Hydration (#4283) | 1.3.31 | 2025-04-18 | US-31.72 |
-| [#4293](https://github.com/Koniverse/SubWallet-Extension/issues/4293) | Support UniswapX Dutch Swap (#4293) | 1.3.36 | 2025-05-16 | US-31.73 |
-| [#4321](https://github.com/Koniverse/SubWallet-Extension/issues/4321) | Support Bridge-Swap process for cross-chain swap on EVM (#4321) | 1.3.38 | 2025-05-23 | US-31.76 |
-| [#4385](https://github.com/Koniverse/SubWallet-Extension/issues/4385) | Update fee for UniSwap (#4385) | 1.3.37 | 2025-05-23 | US-31.81 |
-| [#4389](https://github.com/Koniverse/SubWallet-Extension/issues/4389) | Support swap for Unichain (#4389) | 1.3.54 | 2025-08-21 | US-31.83 |
-| [#4495](https://github.com/Koniverse/SubWallet-Extension/issues/4495) | Support for New Swap Pairs on Chainflip (#4495) | 1.3.50 | 2025-07-30 | US-31.91 |
-| [#4496](https://github.com/Koniverse/SubWallet-Extension/issues/4496) | Integrate Optimex into BTC Swap Flow (#4496) | 1.3.63 | 2025-10-23 | US-31.92 |
-| [#4512](https://github.com/Koniverse/SubWallet-Extension/issues/4512) | Update new content to submitted screen when swap (#4512) | 1.3.48 | 2025-07-21 | US-31.93 |
-| [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517) | Update chain-list stable v0.2.112 (#4517) | 1.3.54 | 2025-08-21 | US-31.94 |
-| [#4573](https://github.com/Koniverse/SubWallet-Extension/issues/4573) | Support for Bitcoin swap on ChainFlip (#4573) | 1.3.51 | 2025-07-31 | US-31.95 |
-| [#4581](https://github.com/Koniverse/SubWallet-Extension/issues/4581) | Update UX/UI when support Swap for Bitcoin on Chainflip (#4581) | 1.3.53 | 2025-08-12 | US-31.96 |
-| [#4593](https://github.com/Koniverse/SubWallet-Extension/issues/4593) | Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593) | 1.3.54 | 2025-08-21 | US-31.98 |
+| [#4644](https://github.com/Koniverse/SubWallet-Extension/issues/4644) | Apply dry-run to validate bridge step for swap feature (#4644) | 1.3.55 | 2025-09-05 | US-11.8 |
+| [#4671](https://github.com/Koniverse/SubWallet-Extension/issues/4671) | Improve Swap validation by Dry-run-preview API from ParaSpell (#4671) | 1.3.67 | 2025-11-13 | US-11.8 |
+| [#4826](https://github.com/Koniverse/SubWallet-Extension/issues/4826) | Refactor Swap Service interface and redundant code (#4826) | 1.3.79 | 2026-05-21 | US-11.13 |
+| [#4899](https://github.com/Koniverse/SubWallet-Extension/issues/4899) | Support bittensor on-chain swap (#4899) | 1.3.78 | 2026-05-14 | US-11.7 |
+| [#2588](https://github.com/Koniverse/SubWallet-Extension/issues/2588) | Fixed bug Unable to connect with eip6763 dApp (#2590 — a PR for issue #2588) | 1.1.37 | 2024-02-07 | US-11.3 |
+| [#2784](https://github.com/Koniverse/SubWallet-Extension/issues/2784) | Add Swap button (#2784) | 1.1.50 | 2024-03-28 | US-11.12 |
+| [#2823](https://github.com/Koniverse/SubWallet-Extension/issues/2823) | Implement Swap feature for extension (#2823) | 1.1.55 | 2024-04-14 | US-11.12 |
+| [#3007](https://github.com/Koniverse/SubWallet-Extension/issues/3007) | Fixed bug Can't hit the "Confirm" button on ToS of the Swap feature (#3007) | 1.1.62 | 2024-05-08 | US-11.12 |
+| [#3104](https://github.com/Koniverse/SubWallet-Extension/issues/3104) | Improve swap quote fetching speed (#3104) | 1.2.3 | 2024-06-03 | US-11.13 |
+| [#3272](https://github.com/Koniverse/SubWallet-Extension/issues/3272) | Add support Swap Asset Hub (#3272) | 1.2.14 | 2024-07-09 | US-11.6 |
+| [#3453](https://github.com/Koniverse/SubWallet-Extension/issues/3453) | Support XCM channels (#3453) | 1.2.29 | 2024-09-13 | US-11.8 |
+| [#3483](https://github.com/Koniverse/SubWallet-Extension/issues/3483) | Add Chainflip broker (#3483) | 1.2.30 | 2024-09-20 | US-11.1 |
+| [#3633](https://github.com/Koniverse/SubWallet-Extension/issues/3633) | Add swap pairs for Hydration and ChainFlip (#3633, #3651) | 1.2.31 | 2024-09-28 | US-11.1 |
+| [#3651](https://github.com/Koniverse/SubWallet-Extension/issues/3651) | Add swap pairs for Hydration and ChainFlip (#3633, #3651) | 1.2.31 | 2024-09-28 | US-11.2 |
+| [#3634](https://github.com/Koniverse/SubWallet-Extension/issues/3634) | Update default slippage for ChainFlip (#3634) | 1.3.2 | 2024-10-12 | US-11.1 |
+| [#3855](https://github.com/Koniverse/SubWallet-Extension/issues/3855) | Support swap TAO on SimpleSwap (#3855) | 1.3.11 | 2024-12-23 | US-11.5 |
+| [#3933](https://github.com/Koniverse/SubWallet-Extension/issues/3933) | Improve Select provider in Swap feature (#3933) | 1.3.30 | 2025-04-14 | US-11.13 |
+| [#3936](https://github.com/Koniverse/SubWallet-Extension/issues/3936) | Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning (#3936) | 1.3.80 | 2026-06-02 | US-11.12 |
+| [#3977](https://github.com/Koniverse/SubWallet-Extension/issues/3977) | Support Uniswap (#3977) | 1.3.23 | 2025-03-05 | US-11.3 |
+| [#3993](https://github.com/Koniverse/SubWallet-Extension/issues/3993) | Error when swap on hydration (#3993) | 1.3.30 | 2025-04-14 | US-11.2 |
+| [#4069](https://github.com/Koniverse/SubWallet-Extension/issues/4069) | Improve swap feature (#4069) | 1.3.30 | 2025-04-14 | US-11.12 |
+| [#4088](https://github.com/Koniverse/SubWallet-Extension/issues/4088) | Review Uniswap fee (#4088) | 1.3.36 | 2025-05-16 | US-11.3 |
+| [#4113](https://github.com/Koniverse/SubWallet-Extension/issues/4113) | Recheck swap quote with asset hub (#4113) | 1.3.30 | 2025-04-14 | US-11.6 |
+| [#4141](https://github.com/Koniverse/SubWallet-Extension/issues/4141) | Fixed bug Swap from DOT -> ETH(Arbitrum) (#4141) | 1.3.27 | 2025-03-29 | US-11.8 |
+| [#4144](https://github.com/Koniverse/SubWallet-Extension/issues/4144) | Support KyberSwap Aggregator (#4144) | 1.3.36 | 2025-05-16 | US-11.4 |
+| [#4204](https://github.com/Koniverse/SubWallet-Extension/issues/4204) | Update New UI for Swap quote (#4204) | 1.3.30 | 2025-04-14 | US-11.12 |
+| [#4219](https://github.com/Koniverse/SubWallet-Extension/issues/4219) | Swap support and direct cross-chain swap on more EVM chains (#4219) | 1.3.32 | 2025-04-26 | US-11.8 |
+| [#4220](https://github.com/Koniverse/SubWallet-Extension/issues/4220) | Support swap-bridge for EVM chains (#4220) | 1.3.32 | 2025-04-26 | US-11.8 |
+| [#4248](https://github.com/Koniverse/SubWallet-Extension/issues/4248) | Fixed bug Error page when perform sign permit from Uniswap (#4248) | 1.3.30 | 2025-04-14 | US-11.3 |
+| [#4259](https://github.com/Koniverse/SubWallet-Extension/issues/4259) | Update content in-app for swap (#4259) | 1.3.35 | 2025-05-09 | US-11.12 |
+| [#4265](https://github.com/Koniverse/SubWallet-Extension/issues/4265) | Support Asset Hub Testnet swap for Chainflip (#4265) | 1.3.41 | 2025-06-11 | US-11.1 |
+| [#4283](https://github.com/Koniverse/SubWallet-Extension/issues/4283) | Support GIGADOT token for Hydration (#4283) | 1.3.31 | 2025-04-18 | US-11.2 |
+| [#4293](https://github.com/Koniverse/SubWallet-Extension/issues/4293) | Support UniswapX Dutch Swap (#4293) | 1.3.36 | 2025-05-16 | US-11.3 |
+| [#4321](https://github.com/Koniverse/SubWallet-Extension/issues/4321) | Support Bridge-Swap process for cross-chain swap on EVM (#4321) | 1.3.38 | 2025-05-23 | US-11.8 |
+| [#4385](https://github.com/Koniverse/SubWallet-Extension/issues/4385) | Update fee for UniSwap (#4385) | 1.3.37 | 2025-05-23 | US-11.3 |
+| [#4389](https://github.com/Koniverse/SubWallet-Extension/issues/4389) | Support swap for Unichain (#4389) | 1.3.54 | 2025-08-21 | US-11.3 |
+| [#4495](https://github.com/Koniverse/SubWallet-Extension/issues/4495) | Support for New Swap Pairs on Chainflip (#4495) | 1.3.50 | 2025-07-30 | US-11.1 |
+| [#4496](https://github.com/Koniverse/SubWallet-Extension/issues/4496) | Integrate Optimex into BTC Swap Flow (#4496) | 1.3.63 | 2025-10-23 | US-11.9 |
+| [#4512](https://github.com/Koniverse/SubWallet-Extension/issues/4512) | Update new content to submitted screen when swap (#4512) | 1.3.48 | 2025-07-21 | US-11.12 |
+| [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517) | Update chain-list stable v0.2.112 (#4517 — a partial delivery; the issue is still open) | 1.3.54 | 2025-08-21 | EPIC-11 |
+| [#4573](https://github.com/Koniverse/SubWallet-Extension/issues/4573) | Support for Bitcoin swap on ChainFlip (#4573) | 1.3.51 | 2025-07-31 | US-11.1 |
+| [#4581](https://github.com/Koniverse/SubWallet-Extension/issues/4581) | Update UX/UI when support Swap for Bitcoin on Chainflip (#4581) | 1.3.53 | 2025-08-12 | US-11.1 |
+| [#4593](https://github.com/Koniverse/SubWallet-Extension/issues/4593) | Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593) | 1.3.54 | 2025-08-21 | US-11.2 |
 | [#11](https://github.com/Koniverse/SubWallet-Extension/issues/11) | Integrate Vara network (#11) | 1.0.5 | 2023-05-21 | US-32.1 |
 | [#375](https://github.com/Koniverse/SubWallet-Extension/issues/375) | Not showing crowdloan data properly (#375) | 0.4.7 | 2022-06-24 | US-32.10 |
 | [#1726](https://github.com/Koniverse/SubWallet-Extension/issues/1726) | Fixed bug showing staking APY (#1726) | 1.1.8 | 2023-08-12 | US-32.100 |
@@ -940,7 +940,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#3458](https://github.com/Koniverse/SubWallet-Extension/issues/3458) | Support XCM for Ledger Polkadot generic app (#3458) | 1.2.29 | 2024-09-13 | US-16.6 |
 | [#3464](https://github.com/Koniverse/SubWallet-Extension/issues/3464) | Add validate for Solochain when receive, transfer with Generic ledger account (#3464) | 1.2.25 | 2024-08-17 | US-16.1 |
 | [#3835](https://github.com/Koniverse/SubWallet-Extension/issues/3835) | Support Generic ledger app for Vara network (#3835) | 1.3.9 | 2024-12-09 | US-16.4 |
-| [#3902](https://github.com/Koniverse/SubWallet-Extension/issues/3902) | Optimize swap pair selection (#3902) | 1.3.30 | 2025-04-14 | US-31.18 |
+| [#2902](https://github.com/Koniverse/SubWallet-Extension/issues/2902) | Optimize swap pair selection (#3902 — the bullet mis-numbers issue #2902) | 1.3.30 | 2025-04-14 | US-11.13 |
 | [#3915](https://github.com/Koniverse/SubWallet-Extension/issues/3915) | Support Avail Recovery app (#3915) | 1.3.12 | 2025-01-06 | US-16.4 |
 | [#3931](https://github.com/Koniverse/SubWallet-Extension/issues/3931) | Unblock when perform stake on Bifrost with ledger account (#3931) | 1.3.43 | 2025-06-26 | US-16.6 |
 | [#4365](https://github.com/Koniverse/SubWallet-Extension/issues/4365) | Update ledger-substrate-js library (#4365) | 1.3.46 | 2025-07-04 | US-16.7 |

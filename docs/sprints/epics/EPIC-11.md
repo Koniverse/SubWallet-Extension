@@ -18,7 +18,7 @@ arch_ref:
   - AD-24
   - AD-18
 created: 2026-06-11
-updated: 2026-06-11
+updated: 2026-07-23
 ---
 
 ## Goal
@@ -106,9 +106,60 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 | [US-11.9](../stories/US-11.9-in-wallet-swap-via-optimex.md) | In-wallet swap via Optimex | Intent-based cross-chain swap | ✅ done | 1.3.63 |
 | [US-11.10](../stories/US-11.10-in-wallet-swap-via-piperx.md) | In-wallet swap via PiperX | EVM DEX swap (planned) | 📋 backlog | — |
 | [US-11.11](../stories/US-11.11-in-wallet-swap-via-stellaswap.md) | In-wallet swap via StellaSwap | Moonbeam DEX swap (planned) | 📋 backlog | — |
+| [US-11.12](../stories/US-11.12-swap-ui-content-and-confirmation.md) | Swap UI, content & confirmation flow | The entry point, form, quote screen, ToS and confirmation every provider surfaces through | ✅ done | 1.3.80 |
+| [US-11.13](../stories/US-11.13-swap-quote-pipeline-and-service.md) | Swap quote pipeline & service internals | Which pairs are offerable, which provider is asked, what the answer is validated against | ✅ done | 1.3.79 |
+| [US-11.14](../stories/US-11.14-swap-pair-catalogue-and-tooling.md) | Swap pair catalogue & operational tooling | The CMS/backend control surface that decides which pairs the wallet offers at all | ✅ done | — |
+| [US-11.15](../stories/US-11.15-providers-evaluated-not-integrated.md) | Providers evaluated but not integrated | Zenlink, Acala, Parallel Finance, ArthSwap, 1inch — the record of five decisions not to build | ✅ done | — |
+| [US-11.16](../stories/US-11.16-swap-flow-improvements.md) | Swap flow improvements | Open provider-neutral work — four of ten rows are the fee | 🚧 in-progress | — |
+| [US-11.17](../stories/US-11.17-swap-coverage-expansion.md) | Swap coverage expansion | Open per-provider reach — one more venue, pair, fee token or control | 🚧 in-progress | — |
 
-> All 11 stories (US-11.1–11.11) are now authored and linked above. The shipped
-> state of each provider lives in [PRD](../../PRD.md#functional-requirements) (most are `✅ shipped`).
+> The 11 provider stories (US-11.1–11.11) are the **FR map**: one requirement each, FR-103 … FR-113.
+> The shipped state of each lives in [PRD](../../PRD.md#functional-requirements).
+>
+> **US-11.12 … US-11.17 carry no FR.** They hold the incremental work, fixes and chores that landed
+> on this epic — **106 tracker issues**, folded in from the former one-issue-per-story maintenance
+> ledger on 2026-07-23 ([note](../../notes/2026-07-23.md#b-epic-31-maintenance--swap-merged-into-epic-11)).
+> They exist because **this epic's FR map is provider-shaped and half its maintenance is not**: no
+> requirement says "the swap screen" or "the quote pipeline", so the issues about them had no
+> capability to belong to.
+
+## Umbrella issues owned by this epic
+
+Eight tracker issues here have children and no delivery of their own. They are **the epic's**, not
+any story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would
+double-count work its children already carry.
+
+| Issue | Title | State | Children |
+|---|---|---|---|
+| [#4407](https://github.com/Koniverse/SubWallet-Extension/issues/4407) | Integrate swap providers | closed | 13 — the whole first swap programme, 12 of them rows in this epic |
+| [#4155](https://github.com/Koniverse/SubWallet-Extension/issues/4155) | Add more Swap Provider | closed | 2 — KyberSwap (#4144, shipped) and 1inch (#4105, cancelled) |
+| [#4207](https://github.com/Koniverse/SubWallet-Extension/issues/4207) | Manage supported XCM pairs & Swap pairs | closed | 2 — #4208 (XCM, closed) and #4209 (swap, open) |
+| [#4156](https://github.com/Koniverse/SubWallet-Extension/issues/4156) | 1 Click cross chain Swap | open | 5 — rounds 1–3 of the cross-chain UX programme |
+| [#4227](https://github.com/Koniverse/SubWallet-Extension/issues/4227) | [Round 3] Improve UX for swap cross-chain | open | 15 — nested under #4156; 9 rows here, 6 in other areas' ledgers |
+| [#4096](https://github.com/Koniverse/SubWallet-Extension/issues/4096) | Integrate Bitcoin into SubWallet and support cross-chain swap | open | 12 — a **Bitcoin programme**, only 2 of them swap |
+| [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517) | Add support for 1-click swap between native BTC & tBTC on Hydration | open | 2 — #4573 (shipped 1.3.51) and #4595 (open) |
+| [#4791](https://github.com/Koniverse/SubWallet-Extension/issues/4791) | Improve the algorithm to support more swap path | open | 1 — #4865, explicitly *"[Phase 2]"* |
+
+> **#4096 is an umbrella that is mostly not this epic's.** Ten of its twelve children are Bitcoin
+> account, transfer, dApp and indexing work already owned by other areas' stories; only #4467
+> (BTC ↔ DOT cross-chain swap) and #4517 are swap. It is listed here because the swap ledger claimed
+> it, and it is a reminder that **an umbrella's area is the area of its children, not of whoever
+> filed it**. Its one genuinely unowned child,
+> [#4434](https://github.com/Koniverse/SubWallet-Extension/issues/4434) — *"Optimize request
+> handling in the SendFund form"* — is transaction work; **flag for the EPIC-28 fold.**
+>
+> **Eleven sub-issue links in this area point at things that are not children.** Across #4389,
+> #4495, #4496, #4573, #4724, #4733 and #4791, GitHub's sub-issue list contains #75, #79, #87, #89,
+> #101, #123, #132, #151, #154, #591 and #599 — four of them **pull requests** (`Update yarn.lock`,
+> `Fix UI in General Settings`), the rest unrelated 2022 issues. They are filtered out before rule
+> 10 is applied: **a child that is a PR or unrelated work is not a child**, and without that filter
+> a dependency bump with two bogus links would read as an umbrella. This is the second area where
+> the pattern has appeared.
+>
+> **#4724 and #4733 stay rows, not umbrellas.** After filtering, #4724 has no children at all, and
+> #4733's only real child is #4724 — an incidental sub-task rather than a phase, so the parent keeps
+> its row ([AGENTS.md](../../../AGENTS.md) rule 10). Both are in
+> [US-11.1](../stories/US-11.1-in-wallet-swap-via-chainflip.md).
 
 ## Object map & user-story interactions
 
