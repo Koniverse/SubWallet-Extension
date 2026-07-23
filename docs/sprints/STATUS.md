@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-22 12:02:09 UTC
-> Total stories: 2649
+> Last generated: 2026-07-23 02:32:18 UTC
+> Total stories: 2627
 
 ## 📋 Backlog (282)
 
@@ -195,7 +195,6 @@
 | US-34.20 | Integrate Onramp fiat on-ramp feature | EPIC-34 | P3 | 1 | — | Thiendekaco |
 | US-34.29 | WebApp - Improve off-ramp for Transak | EPIC-34 | P3 | 1 | — | — |
 | US-34.36 | [Extension] Improve off-ramp flow for seamless token selling experience | EPIC-34 | P3 | 1 | — | — |
-| US-35.25 | Extention - Add Block Action handling for new features (Governance, Proxy Account) | EPIC-35 | P3 | 1 | — | bluezdot |
 | US-36.21 | Improve UX in case the feature is not supported for of Ledger account | EPIC-36 | P3 | 1 | — | — |
 | US-36.46 | Support account ledger import by JSON from another wallet | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.47 | WebApp - Add validate account in case sign transaction with Ledger account | EPIC-36 | P3 | 1 | — | frenkie-ng |
@@ -273,6 +272,7 @@
 | US-41.489 | Replace Console Statements with Proper Logging Service | EPIC-41 | P3 | 1 | — | ruhil6789 |
 | US-41.490 | Refactor code related to get block explorer url | EPIC-41 | P3 | 1 | — | PDTnhah |
 | US-41.491 | Replace console usage with centralized logger across all packages (excluding extension-base) | EPIC-41 | P3 | 1 | — | — |
+| US-41.499 | Extension - Add Block Action handling for new features (Governance, Proxy Account) | EPIC-41 | P3 | 1 | — | — |
 | US-5.8 | Blockaid tx/signature risk scanning | EPIC-5 | P0 | 5 | — | — |
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
 | US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
@@ -310,7 +310,7 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (33)
+## 🟡 In Progress (32)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -334,7 +334,6 @@
 | US-33.33 | Add support for USDT on more chains and update param for XCM on Astar | EPIC-33 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-33.85 | Review and add more XCM Channels | EPIC-33 | P3 | 1 | sprint-2026-W28 | saltict |
 | US-33.86 | Support bridge without XCM | EPIC-33 | P3 | 1 | sprint-2026-W28 | — |
-| US-35.7 | [OpenGov] Support Polkadot Governance | EPIC-35 | P3 | 1 | sprint-2025-W16 | frenkie-ng |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
@@ -364,7 +363,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2115)
+## ✅ Done (2095)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -1848,6 +1847,8 @@
 | US-32.369 | Remove the Crowdloans tab | EPIC-32 | P3 | 1 | sprint-2026-M01 | frenkie-ng |
 | US-32.370 | Fix bug get Earning position parachain | EPIC-32 | P3 | 1 | sprint-2026-M01 | tunghp2002 |
 | US-32.373 | Deploying Bittensor ecosystem features | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
+| US-32.374 | Add icon info for DelegationItem | EPIC-32 | P3 | 1 | — | — |
+| US-32.375 | Add incrementDelegatorRewards call to Amplitude reward claiming | EPIC-32 | P3 | 1 | — | — |
 | US-33.1 | Integration Native and Cross-chain assets for Acala | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-33.2 | Integration cross-chain assets for Bifrost | EPIC-33 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-33.3 | Integration Cross-chain assets for Moonbeam, Moonriver | EPIC-33 | P3 | 1 | sprint-2022-M03 | saltict |
@@ -1971,28 +1972,6 @@
 | US-34.39 | Check buy options for DOT & KSM token | EPIC-34 | P3 | 1 | sprint-2025-M11 | PDTnhah |
 | US-34.40 | Update Transak Widget URL | EPIC-34 | P3 | 1 | sprint-2025-M12 | tunghp2002 |
 | US-34.41 | WebApp - Update Transak Widget URL | EPIC-34 | P3 | 1 | sprint-2026-M07 | — |
-| US-35.1 | Add icon info for DelegationItem | EPIC-35 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-35.2 | Add incrementDelegatorRewards call to Amplitude reward claiming | EPIC-35 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-35.3 | Support OpenGov and Vote Delegation on Polkadot | EPIC-35 | P3 | 1 | sprint-2023-M11 | nulllpc |
-| US-35.5 | [OpenGov] Experiment: Implement logic & API integration | EPIC-35 | P3 | 1 | sprint-2025-M09 | tunghp2002 |
-| US-35.6 | Research OpenGov | EPIC-35 | P3 | 1 | sprint-2024-M01 | bluezdot |
-| US-35.8 | [OpenGov][Extension] UI/UX Review Evaluate governance feature | EPIC-35 | P3 | 1 | sprint-2025-M08 | lw-cdm |
-| US-35.9 | [OpenGov][Extension] Phase 1 - Build logic services and connect initial UI flow | EPIC-35 | P3 | 1 | sprint-2025-M09 | lw-cdm |
-| US-35.10 | [OpenGov][Extension] Phase 1 - Finalize UI and polish product for Referenda & Votes | EPIC-35 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-35.11 | [OpenGov][Doc] OpenGov Technical Design | EPIC-35 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-35.12 | Support OpenGov (Phase 1) | EPIC-35 | P3 | 1 | sprint-2025-M12 | tunghp2002 |
-| US-35.13 | [OpenGov][Extension] Phase 1 - Prepare data and logic for screens | EPIC-35 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-35.14 | [OpenGov][Extension] Phase 1 - Referenda List | EPIC-35 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-35.15 | [OpenGov][Extension] Phase 1 - Referendum Detail | EPIC-35 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-35.16 | [OpenGov][Extension] Phase 1 - Vote/Revote Form | EPIC-35 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-35.17 | [OpenGov][Extension] Phase 1 - Vote/Revote Confirmation | EPIC-35 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-35.18 | [OpenGov][Extension] Phase 1 - Unvote form & confirmation | EPIC-35 | P3 | 1 | sprint-2025-M10 | frenkie-ng |
-| US-35.19 | [OpenGov][Extension] Phase 1 - Locked Token Detail screen | EPIC-35 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-35.20 | [OpenGov][Extension] Phase 1 - Unlock token form & confirmation | EPIC-35 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-35.21 | [OpenGov][Extension] Phase 1 - Integrate OpenGov transactions into History | EPIC-35 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-35.22 | [OpenGov][Extension] Research and Integrate Supported Networks | EPIC-35 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-35.23 | [OpenGov][Extension] Display referendums from chains using the old governance system (Governance V1) | EPIC-35 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-35.24 | [OpenGov][Extension] Other issues for OpenGov Integration | EPIC-35 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
 | US-36.1 | Integrate with Keystone | EPIC-36 | P3 | 1 | sprint-2022-M08 | S2kael |
 | US-36.2 | Integration Ledger Acala account | EPIC-36 | P3 | 1 | sprint-2022-M09 | S2kael |
 | US-36.3 | Improve UX for on-ramp feature with Ledger Account | EPIC-36 | P3 | 1 | sprint-2023-M06 | S2kael |
@@ -2488,7 +2467,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (194)
+## 🗑️ Deprecated (193)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2632,7 +2611,6 @@ _No stories_
 | US-34.22 | Follow up case Token list to buy is empty | EPIC-34 | P3 | 1 | — | — |
 | US-34.30 | Research Meld on-ramp | EPIC-34 | P3 | 1 | — | nulllpc |
 | US-34.42 | Extension - Display incorrect token in buy tọken screen when selecting meld option | EPIC-34 | P3 | 1 | — | tunghp2002 |
-| US-35.4 | WebApp \| Mobile - Integrate OpenGov | EPIC-35 | P3 | 1 | — | saltict |
 | US-36.13 | An error when sign transaction from moonbeam app via Ledger | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.15 | Still show all token when standing All accounts mode in case there is only Ledger account in wallet | EPIC-36 | P3 | 1 | — | — |
 | US-36.19 | [Ledger] Support connect Ledger device for Centrifuge, Darwinia, Energy Web Chain | EPIC-36 | P3 | 1 | — | Quangdm-cdm |
@@ -2693,10 +2671,10 @@ _No stories_
 
 - 📋 **Backlog**: 282
 - 🟢 **Ready**: 14
-- 🟡 **In Progress**: 33
+- 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2115
+- ✅ **Done**: 2095
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 194
+- 🗑️ **Deprecated**: 193
 
-⚠️  **WIP limit exceeded**: 33 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

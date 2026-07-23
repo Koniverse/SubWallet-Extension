@@ -39,6 +39,36 @@ the chain's referendum state into a read-and-act surface so users can exercise
 the say their tokens give them on chain decisions, without leaving the wallet for
 a third-party governance UI.
 
+> **Implementation ledger →** the tracker issues that built these capabilities live **inside the
+> stories below**, each a row in that story's own incremental-work table. The former
+> one-issue-per-story maintenance ledger was dissolved on 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22.md#i-epic-35-maintenance--governance-merged-into-epic-15).
+
+### Umbrella issues — owned by this epic, not by a story
+
+The governance tracker is a **five-level tree**. An issue that has children and whose children are
+the rows delegated its scope; the epic records it and the children stay in the stories
+([AGENTS.md](../../../AGENTS.md) rule 10). Re-derive with
+`gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`.
+
+| Issue | Title | Tracker state | Shipped | Children |
+|---|---|---|---|---|
+| [#4257](https://github.com/Koniverse/SubWallet-Extension/issues/4257) | [OpenGov] Support Polkadot Governance *(programme root)* | 📋 open | — | #2222, #4553 ([US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md)) · #4677 ([US-15.5](../stories/US-15.5-web-app-governance-surface.md)) · #4672 |
+| [#4672](https://github.com/Koniverse/SubWallet-Extension/issues/4672) | [OpenGov][Extension] Support governance features | 📋 open | — | #4492 ([US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md)) · #4679 ([US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md)) · #4678 · #4555 (UI ledger) |
+| [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | [OpenGov][Extension] Phase 1 — **the issue the 1.3.70 CHANGELOG names** | ✅ closed COMPLETED | 1.3.70 | #4529, #4689, #4722, #4809 ([US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md)) · #4729 ([US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md)) · #4530 |
+| [#4530](https://github.com/Koniverse/SubWallet-Extension/issues/4530) | [Extension] Phase 1 — Finalize UI and polish for Referenda & Votes | ✅ closed COMPLETED | — | #4680–#4685 ([US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md)) · #4686, #4687 ([US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md)) |
+
+> **#4678 has a CHANGELOG line and is still an umbrella** — the case that refined
+> [rule 10](../../../AGENTS.md) on 2026-07-22. The exemption for a parent with its own release was
+> written for a delivery that *happened* to spawn one sub-task (#4884, #4568). #4678 delegated
+> **all six** of its children to this ledger, and the CHANGELOG names it because a CHANGELOG names
+> the phase, not the eleven screens under it. Its release is carried in the `Shipped` column here,
+> so nothing is lost by keeping it out of a story's table.
+>
+> The tracker also lists **#809** (*"Error withdrawing stake with slashing spans"*, 2022, staking)
+> under #4257. Board error, not governance work — #809 is owned by the earning ledger and is
+> deliberately **not** modelled here.
+
 ## Overview
 
 ### Business context

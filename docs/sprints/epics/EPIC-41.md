@@ -36,8 +36,8 @@ keeping the unit of status honest).
 
 ## Scope
 
-**489 stories** — 369 done (shipped), 12 in flight (ready / in-progress /
-review, from the Projects board), 63 backlog (open, not yet started), 45 deprecated
+**490 stories** — 369 done (shipped), 12 in flight (ready / in-progress /
+review, from the Projects board), 64 backlog (open, not yet started), 45 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
 detail is the [CHANGELOG coverage index](../../notes/changelog-coverage.md) and each frontmatter.
@@ -539,6 +539,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-41.496](../stories/US-41.496-webapp-update-the-latest-code-1-3-83.md) | 🚧 in-progress | WebApp - Update the latest code 1.3.83 | [#5004](https://github.com/Koniverse/SubWallet-Extension/issues/5004) | tunghp2002 | — |
 | [US-41.497](../stories/US-41.497-extension-some-issues-are-open-when-upgrade-version.md) | 👀 review | [ Extension ] Some issues are open when upgrade version | [#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013) | tunghp2002 | — |
 | [US-41.498](../stories/US-41.498-wallet.md) | ✅ done | Wallet | [#5016](https://github.com/Koniverse/SubWallet-Extension/issues/5016) | — | — |
+| [US-41.499](../stories/US-41.499-extension---add-block-action-handling-for-new-features-g.md) | 📋 backlog | Extension — Add Block Action handling for new features (Governance, Proxy Account) *(relocated from the governance ledger)* | [#4933](https://github.com/Koniverse/SubWallet-Extension/issues/4933) | — | — |
 
 ## Acceptance criteria
 

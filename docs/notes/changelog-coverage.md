@@ -915,8 +915,8 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835) | Update Transak Widget URL (#4835) | 1.3.68 | 2025-12-03 | US-34.40 |
 | [#1084](https://github.com/Koniverse/SubWallet-Extension/issues/1084) | Integrate Banxa for fiat on-ramp (#1084) | 1.1.6 | 2023-08-04 | US-34.6 |
 | [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | Add support for $NEER on Transak (#1317) | 1.0.4 | 2023-05-12 | US-34.8 |
-| [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | Support OpenGov (Phase 1) (#4678) | 1.3.70 | 2025-12-11 | US-35.10 |
-| [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-35.2 |
+| [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | Support OpenGov (Phase 1) (#4678) | 1.3.70 | 2025-12-11 | US-15.1 |
+| [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-32.375 |
 | [#1454](https://github.com/Koniverse/SubWallet-Extension/issues/1454) | Excluded Ledger account from the "My Wallet" list when sending tokens that are not supported by the Ledger account (#1454) | 1.0.7 | 2023-06-01 | US-36.11 |
 | [#1565](https://github.com/Koniverse/SubWallet-Extension/issues/1565) | Add support Ledger with Aleph Zero network (#1565) | 1.0.12 | 2023-06-29 | US-36.12 |
 | [#1573](https://github.com/Koniverse/SubWallet-Extension/issues/1573) | Improved connection experience with Ledger (#1573) | 1.1.1 | 2023-07-06 | US-36.14 |

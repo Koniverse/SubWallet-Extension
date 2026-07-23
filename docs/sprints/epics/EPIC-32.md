@@ -36,7 +36,7 @@ keeping the unit of status honest).
 
 ## Scope
 
-**359 stories** — 308 done (shipped), 3 in flight (ready / in-progress /
+**361 stories** — 310 done (shipped), 3 in flight (ready / in-progress /
 review, from the Projects board), 26 backlog (open, not yet started), 22 deprecated
 (closed **not-planned / duplicate** — never shipped). Open-issue status mirrors the GitHub
 Projects board (#2); closed-issue status comes from the tracker's close reason. Per-issue
@@ -408,6 +408,8 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 | [US-32.370](../stories/US-32.370-fix-bug-get-earning-position-parachain.md) | ✅ done | Fix bug get Earning position parachain | [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950) | tunghp2002 | 1.3.73 |
 | [US-32.371](../stories/US-32.371-extension-able-to-scroll-up-own-in-account-info-in-tao.md) | 📋 backlog | [ Extension ]  Able to scroll up /đown in account info in TAO direct nomination earnings | [#4974](https://github.com/Koniverse/SubWallet-Extension/issues/4974) | — | — |
 | [US-32.372](../stories/US-32.372-add-recommend-validator-for-native-and-subnet-staking.md) | 🟡 ready | Add recommend validator for native and subnet staking | [#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024) | tunghp2002 | — |
+| [US-32.374](../stories/US-32.374-add-icon-info-for-delegationitem.md) | ✅ done | Add icon info for DelegationItem *(relocated from the governance ledger)* | [#720](https://github.com/Koniverse/SubWallet-Extension/issues/720) | — | 0.6.7 |
+| [US-32.375](../stories/US-32.375-add-incrementdelegatorrewards-call-to-amplitude-reward-c.md) | ✅ done | Add `incrementDelegatorRewards` call to Amplitude reward claiming *(relocated)* | [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | — | 0.7.5 |
 | [US-32.373](../stories/US-32.373-deploying-bittensor-ecosystem-features.md) | ✅ done | Deploying Bittensor ecosystem features *(cross-epic umbrella)* | [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | tunghp2002 | 1.3.48 |
 
 > **US-32.373 arrived on 2026-07-22, not from the generator.** #4189 had been mis-filed as

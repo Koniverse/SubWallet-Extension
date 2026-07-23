@@ -397,9 +397,15 @@ gh issue view <N> --json body --jq .body | grep -E '^\s*- \[[ x]\]' -A2 | grep -
 
 One row in 252 turned on this. That is not a reason to skip it: it was the root of the largest
 capability in its epic. Both → it delegated all its scope, so the epic records it in an umbrella table and the
-children are the rows. Sub-issues *with* a CHANGELOG line → it is a **delivery that happened to
+children are the rows. Sub-issues *with* a CHANGELOG line → usually a **delivery that happened to
 have a sub-task**, and it stays a row: `#4884` has one child and its own 1.3.80 line, `#4568` the
 same at 1.3.68.
+
+**That exemption is for an incidental sub-task, not for a phase.** `#4678` *"[OpenGov] Phase 1"*
+has its own 1.3.70 line **and** six children that were all ledger stories — because a CHANGELOG
+names the phase, not the eleven screens under it. It is an umbrella. The distinguishing question is
+**do the children carry the scope**: one stray sub-task, no; a phase whose every child is a row,
+yes. The umbrella table's `Shipped` column keeps the release fact either way.
 
 **Read the tree, not the title.** `#4189` *"Deploying Bittensor ecosystem features"* was filed as
 out-of-repo deploy work by a title heuristic; it is an umbrella over **six shipped sub-issues**
