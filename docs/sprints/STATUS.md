@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 02:32:18 UTC
-> Total stories: 2627
+> Last generated: 2026-07-23 04:08:08 UTC
+> Total stories: 2586
 
-## 📋 Backlog (282)
+## 📋 Backlog (280)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -25,6 +25,7 @@
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
 | US-14.3 | Additional on-ramp providers | EPIC-14 | P3 | 5 | — | — |
+| US-14.4 | Off-ramp flow improvements (improvement on US-14.2) | EPIC-14 | P3 | 1 | — | — |
 | US-15.5 | Web-app governance surface | EPIC-15 | P3 | 8 | — | — |
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
@@ -192,9 +193,6 @@
 | US-33.65 | Improve experience when users wait to receive tokens after XCM | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-33.82 | Extension - Add option transfer Max when bridge WETH: Polygon -> Ethereum | EPIC-33 | P3 | 1 | — | — |
 | US-33.96 | Extension - Improve XCM feature | EPIC-33 | P3 | 1 | — | bluezdot |
-| US-34.20 | Integrate Onramp fiat on-ramp feature | EPIC-34 | P3 | 1 | — | Thiendekaco |
-| US-34.29 | WebApp - Improve off-ramp for Transak | EPIC-34 | P3 | 1 | — | — |
-| US-34.36 | [Extension] Improve off-ramp flow for seamless token selling experience | EPIC-34 | P3 | 1 | — | — |
 | US-36.21 | Improve UX in case the feature is not supported for of Ledger account | EPIC-36 | P3 | 1 | — | — |
 | US-36.46 | Support account ledger import by JSON from another wallet | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.47 | WebApp - Add validate account in case sign transaction with Ledger account | EPIC-36 | P3 | 1 | — | frenkie-ng |
@@ -363,7 +361,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2095)
+## ✅ Done (2059)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -1936,42 +1934,6 @@
 | US-33.103 | Re-check logic approve token when perform XCM | EPIC-33 | P3 | 1 | sprint-2026-M06 | PDTnhah |
 | US-33.104 | WebApp - Update params for XCM transfer (Related to DOT/KSM XCM) | EPIC-33 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
 | US-33.105 | Bridge native TAO <-> Subtensor EVM | EPIC-33 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-34.1 | Integrate on-ramp feature to buy crypto from fiat currencies | EPIC-34 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-34.2 | Fix bug happens when user disconnect network or remove account that selected to buy cryptos | EPIC-34 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-34.3 | Fix Transak logo | EPIC-34 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-34.4 | Support on-ramp for Binance & Etheneum network | EPIC-34 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-34.5 | Upgrade UI - Buy token | EPIC-34 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-34.6 | Integrate Banxa for fiat on-ramp | EPIC-34 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-34.7 | Upgrade UI - Disable button buy token in the token detail screen | EPIC-34 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-34.8 | Add support for $NEER on Transak | EPIC-34 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-34.9 | Update some banxa and transak api with api key from environments | EPIC-34 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-34.10 | WebApp - Do not buy token (Transak) | EPIC-34 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-34.11 | Improve case delete connection when reset wallet | EPIC-34 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-34.12 | WebApp - Still show list token when buy from token detail screen | EPIC-34 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-34.13 | Integrate Coinbase Pay fiat on-ramp feature | EPIC-34 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-34.14 | Update list of tokens supported on fiat-onramp feature | EPIC-34 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-34.15 | UI bug on the Buy token screen on the Firefox browser | EPIC-34 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-34.16 | WebApp - Do not buy token buy Transak | EPIC-34 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-34.17 | Sorting the token list to buy | EPIC-34 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-34.18 | Updated list of tokens supported by Transak | EPIC-34 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-34.19 | Update online token list in fiat-onramp feature | EPIC-34 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-34.21 | [WebApp] Effect when open modal Select token, Select account in case Buy token | EPIC-34 | P3 | 1 | sprint-2023-M12 | Thiendekaco |
-| US-34.23 | Add support for AZERO fiat onramp on Banxa | EPIC-34 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-34.24 | Re-check case List token to buy is empty after run static content | EPIC-34 | P3 | 1 | sprint-2024-M01 | saltict |
-| US-34.25 | Unified account - Bug related to the Buy token feature | EPIC-34 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-34.26 | Extension - Re-check list token for Buy feature | EPIC-34 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-34.27 | Integrate off-ramp | EPIC-34 | P3 | 1 | sprint-2024-M11 | tunghp2002 |
-| US-34.28 | Support Transak on-ramp for more tokens | EPIC-34 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-34.31 | Extension - Integrate off-ramp Transak | EPIC-34 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-34.32 | Add support for VARA fiat onramp on Banxa | EPIC-34 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-34.33 | Extension - Review list Buy token | EPIC-34 | P3 | 1 | sprint-2025-M06 | — |
-| US-34.34 | Add onramp support for more tokens | EPIC-34 | P3 | 1 | sprint-2025-M04 | PDTnhah |
-| US-34.35 | TAO On-ramp Integration in SubWallet | EPIC-34 | P3 | 1 | sprint-2025-M06 | PDTnhah |
-| US-34.37 | Support buy token BTC (Bitcoin) | EPIC-34 | P3 | 1 | sprint-2025-M07 | S2kael |
-| US-34.38 | Update coinbase on-ramp feature | EPIC-34 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-34.39 | Check buy options for DOT & KSM token | EPIC-34 | P3 | 1 | sprint-2025-M11 | PDTnhah |
-| US-34.40 | Update Transak Widget URL | EPIC-34 | P3 | 1 | sprint-2025-M12 | tunghp2002 |
-| US-34.41 | WebApp - Update Transak Widget URL | EPIC-34 | P3 | 1 | sprint-2026-M07 | — |
 | US-36.1 | Integrate with Keystone | EPIC-36 | P3 | 1 | sprint-2022-M08 | S2kael |
 | US-36.2 | Integration Ledger Acala account | EPIC-36 | P3 | 1 | sprint-2022-M09 | S2kael |
 | US-36.3 | Improve UX for on-ramp feature with Ledger Account | EPIC-36 | P3 | 1 | sprint-2023-M06 | S2kael |
@@ -2467,7 +2429,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (193)
+## 🗑️ Deprecated (190)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2608,9 +2570,6 @@ _No stories_
 | US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
 | US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
-| US-34.22 | Follow up case Token list to buy is empty | EPIC-34 | P3 | 1 | — | — |
-| US-34.30 | Research Meld on-ramp | EPIC-34 | P3 | 1 | — | nulllpc |
-| US-34.42 | Extension - Display incorrect token in buy tọken screen when selecting meld option | EPIC-34 | P3 | 1 | — | tunghp2002 |
 | US-36.13 | An error when sign transaction from moonbeam app via Ledger | EPIC-36 | P3 | 1 | — | S2kael |
 | US-36.15 | Still show all token when standing All accounts mode in case there is only Ledger account in wallet | EPIC-36 | P3 | 1 | — | — |
 | US-36.19 | [Ledger] Support connect Ledger device for Centrifuge, Darwinia, Energy Web Chain | EPIC-36 | P3 | 1 | — | Quangdm-cdm |
@@ -2669,12 +2628,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 282
+- 📋 **Backlog**: 280
 - 🟢 **Ready**: 14
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2095
+- ✅ **Done**: 2059
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 193
+- 🗑️ **Deprecated**: 190
 
 ⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

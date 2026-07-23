@@ -448,6 +448,12 @@ gh api graphql -f query='{repository(owner:"Koniverse",name:"SubWallet-Extension
     field{... on ProjectV2SingleSelectField{name}} name}}}}}}}}'
 ```
 
+**A `|` inside a table cell must be written `\|`.** It splits the cell otherwise, silently: every
+cell after the break shifts one column right and the last falls off the row, so a **status column
+renders a title**. Four issue titles in this tracker begin `WebApp | …` or `Web Runner | …`, and
+each one broke its row until `check-ids` grew a cell-count check on 2026-07-22. The generator
+escapes; hand-written rows are where this bites.
+
 ### The two change logs
 
 `docs/CHANGELOG.md` is the **canonical** release history, in koni-docs format.

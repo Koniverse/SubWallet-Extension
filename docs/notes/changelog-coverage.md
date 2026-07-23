@@ -897,24 +897,24 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4310](https://github.com/Koniverse/SubWallet-Extension/issues/4310) | Improve estimate fee through Across Bridge (#4310) | 1.3.65 | 2025-11-06 | US-33.93 |
 | [#4416](https://github.com/Koniverse/SubWallet-Extension/issues/4416) | Fixed bug Unable to XCM Polkadot Asset Hub -> Kusama Asset Hub (#4416) | 1.3.41 | 2025-06-11 | US-33.97 |
 | [#4444](https://github.com/Koniverse/SubWallet-Extension/issues/4444) | Remove MYTH (PAH -> Ethereum) (#4444) | 1.3.55 | 2025-09-05 | US-33.98 |
-| [#245](https://github.com/Koniverse/SubWallet-Extension/issues/245) | Integrate on-ramp feature to buy crypto from fiat currencies (#245) | 0.5.7 | 2022-09-06 | US-34.1 |
-| [#1760](https://github.com/Koniverse/SubWallet-Extension/issues/1760) | Improve case delete connection when reset wallet (#1760) | 1.1.9 | 2023-08-22 | US-34.11 |
-| [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834) | Integrate Coinbase Pay fiat on-ramp feature (#1834) | 1.1.11 | 2023-09-09 | US-34.13 |
-| [#1848](https://github.com/Koniverse/SubWallet-Extension/issues/1848) | Update list of tokens supported on fiat-onramp feature (#1848) | 1.1.11 | 2023-09-09 | US-34.14 |
-| [#2025](https://github.com/Koniverse/SubWallet-Extension/issues/2025) | Sorting the token list to buy (#2025) | 1.1.20 | 2023-11-04 | US-34.17 |
-| [#2026](https://github.com/Koniverse/SubWallet-Extension/issues/2026) | Updated list of tokens supported by Transak (#2026) | 1.1.17 | 2023-10-17 | US-34.18 |
-| [#2031](https://github.com/Koniverse/SubWallet-Extension/issues/2031) | Update online token list in fiat-onramp feature (#2031) | 1.1.20 | 2023-11-04 | US-34.19 |
-| [#609](https://github.com/Koniverse/SubWallet-Extension/issues/609) | Fix bug happens when user disconnect network or remove account that selected to buy cryptos (#609) | 0.5.7 | 2022-09-06 | US-34.2 |
-| [#2319](https://github.com/Koniverse/SubWallet-Extension/issues/2319) | Add support for AZERO fiat onramp on Banxa (#2319) | 1.1.26 | 2023-12-16 | US-34.23 |
-| [#616](https://github.com/Koniverse/SubWallet-Extension/issues/616) | Fix Transak logo (#616) | 0.5.9 | 2022-09-07 | US-34.3 |
-| [#4358](https://github.com/Koniverse/SubWallet-Extension/issues/4358) | TAO On-ramp Integration in SubWallet (#4358) | 1.3.43 | 2025-06-26 | US-34.35 |
-| [#4490](https://github.com/Koniverse/SubWallet-Extension/issues/4490) | Support buy token BTC (Bitcoin) (#4490) | 1.3.47 | 2025-07-11 | US-34.37 |
-| [#4572](https://github.com/Koniverse/SubWallet-Extension/issues/4572) | Update coinbase on-ramp feature (#4572) | 1.3.52 | 2025-08-07 | US-34.38 |
-| [#4815](https://github.com/Koniverse/SubWallet-Extension/issues/4815) | Check buy options for DOT & KSM token (#4815) | 1.3.65 | 2025-11-06 | US-34.39 |
-| [#736](https://github.com/Koniverse/SubWallet-Extension/issues/736) | Support on-ramp for Binance & Etheneum network (#736) | 0.6.7 | 2022-10-22 | US-34.4 |
-| [#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835) | Update Transak Widget URL (#4835) | 1.3.68 | 2025-12-03 | US-34.40 |
-| [#1084](https://github.com/Koniverse/SubWallet-Extension/issues/1084) | Integrate Banxa for fiat on-ramp (#1084) | 1.1.6 | 2023-08-04 | US-34.6 |
-| [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | Add support for $NEER on Transak (#1317) | 1.0.4 | 2023-05-12 | US-34.8 |
+| [#245](https://github.com/Koniverse/SubWallet-Extension/issues/245) | Integrate on-ramp feature to buy crypto from fiat currencies (#245) | 0.5.7 | 2022-09-06 | US-14.1 |
+| [#1760](https://github.com/Koniverse/SubWallet-Extension/issues/1760) | Improve case delete connection when reset wallet (#1760) | 1.1.9 | 2023-08-22 | US-14.1 |
+| [#1834](https://github.com/Koniverse/SubWallet-Extension/issues/1834) | Integrate Coinbase Pay fiat on-ramp feature (#1834) | 1.1.11 | 2023-09-09 | US-14.1 |
+| [#1848](https://github.com/Koniverse/SubWallet-Extension/issues/1848) | Update list of tokens supported on fiat-onramp feature (#1848) | 1.1.11 | 2023-09-09 | US-14.1 |
+| [#2025](https://github.com/Koniverse/SubWallet-Extension/issues/2025) | Sorting the token list to buy (#2025) | 1.1.20 | 2023-11-04 | US-14.1 |
+| [#2026](https://github.com/Koniverse/SubWallet-Extension/issues/2026) | Updated list of tokens supported by Transak (#2026) | 1.1.17 | 2023-10-17 | US-14.1 |
+| [#2031](https://github.com/Koniverse/SubWallet-Extension/issues/2031) | Update online token list in fiat-onramp feature (#2031) | 1.1.20 | 2023-11-04 | US-14.1 |
+| [#609](https://github.com/Koniverse/SubWallet-Extension/issues/609) | Fix bug happens when user disconnect network or remove account that selected to buy cryptos (#609) | 0.5.7 | 2022-09-06 | US-14.1 |
+| [#2319](https://github.com/Koniverse/SubWallet-Extension/issues/2319) | Add support for AZERO fiat onramp on Banxa (#2319) | 1.1.26 | 2023-12-16 | US-14.1 |
+| [#616](https://github.com/Koniverse/SubWallet-Extension/issues/616) | Fix Transak logo (#616) | 0.5.9 | 2022-09-07 | US-14.1 |
+| [#4358](https://github.com/Koniverse/SubWallet-Extension/issues/4358) | TAO On-ramp Integration in SubWallet (#4358) | 1.3.43 | 2025-06-26 | US-14.1 |
+| [#4490](https://github.com/Koniverse/SubWallet-Extension/issues/4490) | Support buy token BTC (Bitcoin) (#4490) | 1.3.47 | 2025-07-11 | US-14.1 |
+| [#4572](https://github.com/Koniverse/SubWallet-Extension/issues/4572) | Update coinbase on-ramp feature (#4572) | 1.3.52 | 2025-08-07 | US-14.1 |
+| [#4815](https://github.com/Koniverse/SubWallet-Extension/issues/4815) | Check buy options for DOT & KSM token (#4815) | 1.3.65 | 2025-11-06 | US-14.1 |
+| [#736](https://github.com/Koniverse/SubWallet-Extension/issues/736) | Support on-ramp for Binance & Etheneum network (#736) | 0.6.7 | 2022-10-22 | US-14.1 |
+| [#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835) | Update Transak Widget URL (#4835) | 1.3.68 | 2025-12-03 | US-14.1 |
+| [#1084](https://github.com/Koniverse/SubWallet-Extension/issues/1084) | Integrate Banxa for fiat on-ramp (#1084) | 1.1.6 | 2023-08-04 | US-14.1 |
+| [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | Add support for $NEER on Transak (#1317) | 1.0.4 | 2023-05-12 | US-14.1 |
 | [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | Support OpenGov (Phase 1) (#4678) | 1.3.70 | 2025-12-11 | US-15.1 |
 | [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-32.375 |
 | [#1454](https://github.com/Koniverse/SubWallet-Extension/issues/1454) | Excluded Ledger account from the "My Wallet" list when sending tokens that are not supported by the Ledger account (#1454) | 1.0.7 | 2023-06-01 | US-36.11 |

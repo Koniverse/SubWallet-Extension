@@ -362,10 +362,56 @@ if (badAnchor.length) {
   console.log('    the top of the page. Usually the heading was retitled and its slug moved.\n');
 }
 
-if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length && !badLink.length) {
+const badTable = [];
+
+// A `|` inside a table cell splits it, silently. The status column shifts one
+// place right and the last cell falls off the row — the reader sees a title
+// where a status should be, and no tool complains. Four issue titles here start
+// `WebApp | …` or `Web Runner | …`, and every one of them broke its row.
+// Archives are checked too: a dated note is read, not just stored.
+
+for (const file of targets) {
+  const r = rel(file);
+  const cells = (l) => l.trim().replace(/^\||\|$/g, '').split(/(?<!\\)\|/).length;
+  let header = null;
+
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    const t = line.trim();
+
+    if (!(t.startsWith('|') && t.endsWith('|'))) {
+      header = null;
+
+      return;
+    }
+
+    if (/^\|[\s:|-]+\|$/.test(t)) {
+      return;
+    }
+
+    if (header === null) {
+      header = cells(t);
+
+      return;
+    }
+
+    if (cells(t) !== header) {
+      badTable.push(`${r}:${i + 1} — header has ${header} cells, this row ${cells(t)}`);
+    }
+  });
+}
+
+if (badTable.length) {
+  console.log(`  ✗ ${badTable.length} table row(s) whose cell count does not match their header:\n`);
+  badTable.forEach((b) => console.log(`    ${b}`));
+  console.log('\n    Almost always an unescaped `|` inside a cell — write `\\|`. The row still');
+  console.log('    renders, with every cell after the break shifted one column over.\n');
+}
+
+if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length && !badLink.length && !badTable.length) {
   console.log('  ✓ every ID named in the doc surface resolves');
   console.log('  ✓ every in-repo link resolves to a file, and to a heading when anchored');
   console.log('  ✓ no decision ships in a release older than itself');
+  console.log('  ✓ every table row has as many cells as its header');
   process.exit(0);
 }
 

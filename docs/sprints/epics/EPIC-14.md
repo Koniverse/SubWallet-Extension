@@ -26,6 +26,17 @@ feature epic has to think about card payments, KYC, or provider compliance: it
 hands off to a provider through one provider-agnostic buy/sell surface and one
 backend-built order URL.
 
+> **Implementation ledger →** the tracker issues that built these capabilities live **inside the
+> stories below**, each a row in that story's own incremental-work table. The former
+> one-issue-per-story maintenance ledger was dissolved on 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22.md#j-epic-34-maintenance--fiat-merged-into-epic-14).
+>
+> **No umbrella issue exists in this area.** Every one of the 42 issues is a leaf
+> ([AGENTS.md](../../../AGENTS.md) rule 10) — the only two parents the tracker reports are #4835,
+> whose single child #4882 is its WebApp twin rather than its scope, and #4572, whose two listed
+> children (#91, #92) are **2022 issues about dApp permissions and Astar EVM accounts**. Board
+> error, not on-ramp work.
+
 ## Overview
 
 ### Business context
@@ -107,9 +118,13 @@ balances itself.
 | [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) | Fiat on-ramp: buy crypto with card | Buy crypto with a card via aggregated regulated providers (Transak, Banxa, Coinbase Pay, Meld) | ✅ done | 0.5.7 |
 | [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | Fiat off-ramp: sell crypto for fiat | Sell crypto for fiat via the Transak hand-off (`action: SELL`) | ✅ done | 1.3.56 |
 | [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md) | Additional on-ramp providers | Add MoonPay, Ramp.Network and native Apple Pay / Google Pay rails as new adapters | 📋 backlog | — |
+| [US-14.4](../stories/US-14.4-off-ramp-flow-improvements.md) | Off-ramp flow improvements | Improvement on US-14.2 — keep selling inside the popup (#4453) and finish the WebApp surface (#3839) | 📋 backlog | — |
 
 > US-14.1 and US-14.2 are retroactive (capability already ships); US-14.3 is
-> forward/planned. Each story materializes exactly one FR.
+> forward/planned. Each of those materializes exactly one FR.
+>
+> **US-14.4 carries no FR.** It is the unfinished half of US-14.2, split out on 2026-07-22 so that
+> story is judged on what it delivered ([AGENTS.md](../../../AGENTS.md) rule 9).
 
 ## Cross-cutting invariants
 
