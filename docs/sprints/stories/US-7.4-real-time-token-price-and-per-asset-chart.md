@@ -23,6 +23,11 @@ the portfolio's fiat total is real-time and a user can see how an asset's price 
 moving without leaving the wallet. This is what turns the balance dashboard from a
 token-count view into a *value* view.
 
+## Status
+
+> **✅ done — shipped in 1.3.33.** All acceptance criteria are ticked and the 10 rows below are
+> settled.
+
 ## Background
 
 The aggregated portfolio (US-7.1) sums *token amounts*; to show fiat value it needs
@@ -111,6 +116,33 @@ reconciliation.
 
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
+
+## Incremental work, fixes & chores
+
+**9 tracker issues** built and maintained this capability — the price chart on extension and WebApp, the price-source fallback chain, per-chain price IDs, and the alpha-price correction. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.6.9 | [#785](https://github.com/Koniverse/SubWallet-Extension/issues/785) | Update the price for KBTC | ✅ done |
+| 0.7.5 | [#921](https://github.com/Koniverse/SubWallet-Extension/issues/921) | Update the price for iBTC | ✅ done |
+| 1.1.41 | [#2664](https://github.com/Koniverse/SubWallet-Extension/issues/2664) | Enable priceId update online | ✅ done |
+| 1.1.45 | [#2772](https://github.com/Koniverse/SubWallet-Extension/issues/2772) | Update priceId and block explorer for Polimec | ✅ done |
+| 1.2.15 | [#3183](https://github.com/Koniverse/SubWallet-Extension/issues/3183) | Update the fallback API for the SubWallet API (price, exchange rate) | ✅ done |
+| 1.3.30 | [#2393](https://github.com/Koniverse/SubWallet-Extension/issues/2393) | WebApp — shows `$balance = NaN` in history when the price service fails | ✅ done |
+| 1.3.33 | [#4122](https://github.com/Koniverse/SubWallet-Extension/issues/4122) | Support the price chart UI in the wallet | ✅ done |
+| 1.3.79 | [#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987) | Alpha price calculation mismatch vs TaoStats | ✅ done |
+| — | [#4318](https://github.com/Koniverse/SubWallet-Extension/issues/4318) | Extension — handle the fallback for the price chart | ✅ done |
+| — | [#4380](https://github.com/Koniverse/SubWallet-Extension/issues/4380) | Support the price chart UI on the web app | ✅ done |
+
+> **Price is a third-party read, so most of this is fallback and correction.** #3183 adds a
+> fallback API, #4318 a fallback for the chart, #2393 handles the price service returning nothing,
+> #4987 corrects an alpha price against TaoStats. The chart itself shipped once.
+>
+> **1.1.45 on #2772 comes from its linked PR** ([#2775](https://github.com/Koniverse/SubWallet-Extension/pull/2775)),
+> not the CHANGELOG ([AGENTS.md](../../../AGENTS.md) rule 1b-bis).
+>
+> The area's umbrella, [#4186](https://github.com/Koniverse/SubWallet-Extension/issues/4186) *"Price & Portfolio Chart"*, is owned by
+> [EPIC-7](../epics/EPIC-7.md) ([AGENTS.md](../../../AGENTS.md) rule 10).
 
 ## Cross-references
 

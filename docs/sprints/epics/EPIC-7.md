@@ -41,6 +41,29 @@ hiding, and live price plus per-asset charts. When this epic holds the line,
 feature epics get to stop re-deriving "how much does the user have and what is it
 worth".
 
+> **Implementation ledger →** the tracker issues that built these capabilities live **inside the
+> stories below**, each a row in that story's own incremental-work table. The former
+> one-issue-per-story maintenance ledger was dissolved on 2026-07-22; the forwarding map is the
+> [consolidation note](../../notes/2026-07-22.md#l-epic-27-maintenance--portfolio-merged-into-epic-7).
+
+### Umbrella issues — owned by this epic, not by a story
+
+An issue that **has children and no CHANGELOG line of its own** delegated all its scope
+([AGENTS.md](../../../AGENTS.md) rule 10).
+
+| Issue | Title | Tracker state | Children |
+|---|---|---|---|
+| [#4186](https://github.com/Koniverse/SubWallet-Extension/issues/4186) | Price & Portfolio Chart | ✅ closed COMPLETED | #4122, #4380 ([US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md)) · #4266 ([US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md)) · #4121 ([US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md)) |
+
+> **Two of its four children were never in the ledger** — #4266 *"Implement price history API"* and
+> #4121 *"Support portfolio chart"*. The generator reached issues a CHANGELOG line or a release
+> touched; #4121 is still open and #4266 shipped under a sibling's line, so neither was visible to
+> it. They reached their stories through this umbrella's child list.
+>
+> **#4708 is *not* an umbrella.** It has one child, #4718 *"Research locked balance display"*, and
+> carries its own 1.3.68 CHANGELOG line — a delivery that spawned a sub-task. Both stay rows in
+> [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md).
+
 ## Overview
 
 ### Business context
@@ -131,6 +154,7 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 | [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md) | Price history (OHLCV) chart per asset | Historical OHLCV chart with selectable ranges per asset | ✅ done | 1.3.33 |
 | [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) | Balance history (portfolio value over time) | Historical portfolio value series over time (planned) | 📋 backlog | — |
 | [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) | Balance-cache invalidation hardening | Keep the home-screen balance cache correct under change: multi-step balance-change listening (#4337), crowdloan in locked composition (#1583), stale-cache invalidation on account removal (#2410) plus the account-switch / chain-toggle / transfer-submit invariant | 📋 backlog | — |
+| [US-7.8](../stories/US-7.8-earlier-balance-cache-fixes.md) | Earlier balance-cache fixes (2022–2023) | The three cache fixes that shipped before US-7.7's scope was written | ✅ done | 1.1.29 |
 
 > US-7.1–7.6 each materialize one FR (US-7.6 forward; the rest retroactive); US-7.7
 > is the epic's balance-correctness hardening cluster and owns no FR — it is anchored

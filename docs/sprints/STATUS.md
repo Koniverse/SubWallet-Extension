@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 04:08:37 UTC
-> Total stories: 2586
+> Last generated: 2026-07-23 04:19:35 UTC
+> Total stories: 2533
 
 ## 📋 Backlog (280)
 
@@ -361,7 +361,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2059)
+## ✅ Done (2012)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -1068,54 +1068,6 @@
 | US-26.185 | WebApp - Fix some UI bug | EPIC-26 | P3 | 1 | sprint-2025-M07 | lw-cdm |
 | US-26.187 | Improve UX for the 'Advanced phishing detection' feature | EPIC-26 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
 | US-26.189 | [Energy Web X] Display APY for collators in collator list | EPIC-26 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-27.1 | Chrome extension wallet not showing correct balance of my crust mainnet address. | EPIC-27 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-27.2 | The screen is loading when click on Show/Hide balance | EPIC-27 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-27.3 | Wrong balance display due to data caching | EPIC-27 | P3 | 1 | sprint-2022-M07 | huukhai |
-| US-27.4 | Fix bug showing balance on very small balance | EPIC-27 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-27.5 | Update price for KBTC | EPIC-27 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-27.6 | Update balance logic for Equilibrium | EPIC-27 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-27.7 | Update get balance function for Kusama | EPIC-27 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-27.8 | Update price for iBTC | EPIC-27 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-27.9 | Update Equilibrium balance structure | EPIC-27 | P3 | 1 | sprint-2023-M01 | nulllpc |
-| US-27.10 | Fix bug getting multiple balances for Equilibrium | EPIC-27 | P3 | 1 | sprint-2023-M01 | nulllpc |
-| US-27.11 | Upgrade UI - Re-check the % increase/ decrease of the Total balance | EPIC-27 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-27.12 | Add validate in case the recipient does not enough balance to keep alive | EPIC-27 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-27.13 | Fixed bug get balance | EPIC-27 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-27.14 | Fix bug get balance when send token | EPIC-27 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-27.15 | Re-check case 'Get balance error' | EPIC-27 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-27.16 | Support show/hide balance | EPIC-27 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-27.17 | Fixed bug still send local token in case the native token balance = 0 | EPIC-27 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-27.18 | WebApp - Update useBalance for compute some common factor of balances | EPIC-27 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-27.19 | WebApp - Still show balance when user select hide balance | EPIC-27 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-27.20 | WebApp - Wrong portfolio balance UI | EPIC-27 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-27.21 | WebApp - Implement Portfolio Statistic | EPIC-27 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-27.24 | Add reload balance feature | EPIC-27 | P3 | 1 | sprint-2023-M12 | saltict |
-| US-27.25 | Fixed enforcing the minimum miner tip 1 wei | EPIC-27 | P3 | 1 | sprint-2025-M04 | Thiendekaco |
-| US-27.26 | Update balance service | EPIC-27 | P3 | 1 | sprint-2024-M04 | S2kael |
-| US-27.27 | [Balance] [PSP] Convert free type from number to string | EPIC-27 | P3 | 1 | sprint-2024-M05 | bluezdot |
-| US-27.28 | Enable price-id online | EPIC-27 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-27.29 | Auto detect balance | EPIC-27 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-27.30 | Update priceId and block explorer for Polimec | EPIC-27 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-27.31 | Support auto detect balance for EVM | EPIC-27 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-27.33 | Update fallback API for SubWallet API (Price, Exchange rate) | EPIC-27 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
-| US-27.34 | WebApp - Show incorrect Available balance | EPIC-27 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-27.35 | Fix bug calculating balance for relaychain | EPIC-27 | P3 | 1 | sprint-2024-M07 | nulllpc |
-| US-27.36 | Fix balance calculation formula | EPIC-27 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-27.37 | Update balance calculation for DeepBrainChain | EPIC-27 | P3 | 1 | sprint-2024-M08 | bluezdot |
-| US-27.40 | Unable to load TAO balance | EPIC-27 | P3 | 1 | sprint-2025-M02 | tunghp2002 |
-| US-27.41 | Support price chart | EPIC-27 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-27.43 | Update logic fetching Bitcoin balance | EPIC-27 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-27.44 | Price & Portfolio Chart | EPIC-27 | P3 | 1 | sprint-2026-M01 | — |
-| US-27.45 | Extension - Handle fallback for price chart | EPIC-27 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-27.46 | Support the price chart UI on the web app | EPIC-27 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-27.47 | Extension - Don't show balance for TON testnet | EPIC-27 | P3 | 1 | sprint-2025-M08 | PDTnhah |
-| US-27.48 | Fixed bug Incorrect price history chart display when changing currency in popup mode | EPIC-27 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-27.49 | Update API for Bitcoin Testnet balance display | EPIC-27 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
-| US-27.50 | Locked Balance Display | EPIC-27 | P3 | 1 | sprint-2025-M12 | tunghp2002 |
-| US-27.51 | Research locked balance display | EPIC-27 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-27.52 | Standardize the Module Price History according to the new standard | EPIC-27 | P3 | 1 | sprint-2025-M12 | Thiendekaco |
-| US-27.53 | Price history API returns empty data on Production but works on Dev environment | EPIC-27 | P3 | 1 | sprint-2026-M04 | tunghp2002 |
-| US-27.54 | Alpha price calculation mismatch vs TaoStats | EPIC-27 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-28.1 | Send/Receive substrate based chain assets | EPIC-28 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-28.2 | Implement new Send Fund UI with support send tokens, send EVM assets | EPIC-28 | P3 | 1 | sprint-2022-M05 | saltict |
 | US-28.3 | Check the Send Fund Full Balance screen | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
@@ -2404,6 +2356,7 @@
 | US-7.3 | Auto-detect tokens; show/hide zero-balance | EPIC-7 | P1 | 3 | sprint-2023-M04 | saltict |
 | US-7.4 | Real-time token price and per-asset chart | EPIC-7 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
 | US-7.5 | Price history (OHLCV) chart per asset | EPIC-7 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
+| US-7.8 | Earlier balance-cache fixes (2022–2023) | EPIC-7 | P3 | 1 | sprint-2023-M06 | — |
 | US-8.1 | Send native & fungible tokens | EPIC-8 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-8.2 | Receive (QR + copyable address) | EPIC-8 | P1 | 3 | sprint-2022-M02 | LeeW0ng |
 | US-8.3 | Custom fee / tip | EPIC-8 | P1 | 5 | sprint-2025-M03 | frenkie-ng |
@@ -2429,7 +2382,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (190)
+## 🗑️ Deprecated (184)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2484,12 +2437,6 @@ _No stories_
 | US-26.148 | Optimize UX/UI round 1 | EPIC-26 | P3 | 1 | — | Sokol142196 |
 | US-26.150 | Extension - Improved display order of campain banner | EPIC-26 | P3 | 1 | sprint-2025-M03 | ThaoNguyen998 |
 | US-26.180 | Extension - Check get online history from subscan | EPIC-26 | P3 | 1 | — | PDTnhah |
-| US-27.22 | Add refresh button for balance screen | EPIC-27 | P3 | 1 | — | saltict |
-| US-27.23 | Re-check balance after withdrawing successfully | EPIC-27 | P3 | 1 | — | ThaoNguyen998 |
-| US-27.32 | Do not detect balance after reset wallet | EPIC-27 | P3 | 1 | — | PDTnhah |
-| US-27.38 | Move auto-detect balance to backend | EPIC-27 | P3 | 1 | — | saltict |
-| US-27.39 | Update API to detect user's balance | EPIC-27 | P3 | 1 | — | — |
-| US-27.42 | Update logic fetching Bitcoin balance | EPIC-27 | P3 | 1 | — | — |
 | US-28.21 | Transfer with account keep-alive checks & add transaction tip | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.23 | The transferable balance of the token on the Astar-EVM chain is incorrect on the Send Fund screen | EPIC-28 | P3 | 1 | — | nulllpc |
 | US-28.24 | Origin Chain Fee displayed is delayed | EPIC-28 | P3 | 1 | — | nulllpc |
@@ -2632,8 +2579,8 @@ _No stories_
 - 🟢 **Ready**: 14
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2059
+- ✅ **Done**: 2012
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 190
+- 🗑️ **Deprecated**: 184
 
 ⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

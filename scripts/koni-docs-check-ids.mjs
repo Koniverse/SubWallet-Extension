@@ -407,11 +407,35 @@ if (badTable.length) {
   console.log('    renders, with every cell after the break shifted one column over.\n');
 }
 
-if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length && !badLink.length && !badTable.length) {
+const badPlaceholder = [];
+
+// An unsubstituted template placeholder — `{U}`, `{T}`, `${...}` — renders as
+// literal braces and silently breaks the link or table it was standing in for.
+// Three shipped before the check existed, one of them a live issue reference.
+
+for (const file of targets) {
+  const r = rel(file);
+
+  fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
+    for (const [, tok] of line.matchAll(/\{([A-Z_][A-Z0-9_]*)\}/g)) {
+      badPlaceholder.push(`${r}:${i + 1} — {${tok}}`);
+    }
+  });
+}
+
+if (badPlaceholder.length) {
+  console.log(`  ✗ ${badPlaceholder.length} unsubstituted placeholder(s):\n`);
+  badPlaceholder.forEach((b) => console.log(`    ${b}`));
+  console.log('\n    A template variable that reached the page. It renders as literal braces');
+  console.log('    and whatever it stood for — usually a URL — is gone.\n');
+}
+
+if (!dangling.size && !badField.length && !badAnchor.length && !badVersion.length && !badLink.length && !badTable.length && !badPlaceholder.length) {
   console.log('  ✓ every ID named in the doc surface resolves');
   console.log('  ✓ every in-repo link resolves to a file, and to a heading when anchored');
   console.log('  ✓ no decision ships in a release older than itself');
   console.log('  ✓ every table row has as many cells as its header');
+  console.log('  ✓ no unsubstituted template placeholder reached the page');
   process.exit(0);
 }
 

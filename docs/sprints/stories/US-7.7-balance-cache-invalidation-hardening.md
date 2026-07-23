@@ -37,6 +37,11 @@ something. This is the balance-correctness hardening cluster that lets every oth
 home-screen story stop re-defending freshness: it owns the "the cached number is
 the right number" contract, not the rendering of it.
 
+## Status
+
+> **📋 backlog — all 3 rows below are open and none started.** Each is one of this story's
+> acceptance criteria, and no release delivers any of them.
+
 ## Background
 
 The home screen rides a cached-first read path: US-7.1 serves last-known balances
@@ -193,6 +198,26 @@ external dependency — calibrated identically to the sibling EPIC-4 hardening s
 
 _Hardening cluster — owns no FR; defends the balance freshness/composition contract.
 Fill `commit`, `version_shipped` and caveats when the hardening lands._
+
+## Incremental work, fixes & chores
+
+**3 tracker issues** make up this capability — the three its acceptance criteria name, one for one. All are **open**, all `In Backlog` on the board ([AGENTS.md](../../../AGENTS.md) rule 12).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#4337](https://github.com/Koniverse/SubWallet-Extension/issues/4337) | Listen for balance changes to better handle multi-step flows | 📋 backlog |
+| — | [#1583](https://github.com/Koniverse/SubWallet-Extension/issues/1583) | Calculate crowdloan data into the locked balance | 📋 backlog |
+| — | [#2410](https://github.com/Koniverse/SubWallet-Extension/issues/2410) | WebApp — still shows tokens after removing all accounts | 📋 backlog |
+
+> **The three issues this story's acceptance criteria name are rows now.** #4337, #1583 and #2410
+> are all **open, `In Backlog`, and were claimed by no ledger at all** — the generator's blind spot
+> for unstarted work ([§J](../../notes/2026-07-22.md#j-epic-34-maintenance--fiat-merged-into-epic-14)).
+> They were named in this story's prose since it was written and had never reached a table.
+>
+> **This is the mix rule 9 forbids, and the acceptance criteria decide which side leaves.** Every AC
+> here names an open issue, so the open scope stays and the three settled rows go to
+> [US-7.8](US-7.8-earlier-balance-cache-fixes.md)
+> ([AGENTS.md](../../../AGENTS.md) rule 9).
 
 ## Cross-references
 

@@ -36,6 +36,12 @@ chains — so that the daily-home screen answers "how much do I have" without th
 user switching accounts or networks. This story owns the read surface; the
 downstream balance-semantics and price stories render *into* it.
 
+## Status
+
+> **✅ done — shipped in 0.2.2.** All acceptance criteria are ticked and the 6 rows below are
+> settled (5 shipped, 1 closed not-planned). **The table is history, not a work list**
+> ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 This is the wallet's daily-home screen and the most-opened surface in the
@@ -137,6 +143,28 @@ price-feed integration sizes at 5 per the epic sizing guidance.
 ## Implementation notes
 
 Traced 2026-07-13 (US-21.2 straggler pass). Same first-delivery bullet as the engine story it reads from ([US-2.5](US-2.5-balance-detection-and-aggregation-engine.md)): **[0.2.2] — 2022-02-19**, "Added the feature to track the balances of multiple accounts in one wallet". This story owns the *read surface*: at the 0.2.2 cut, `Popup/Home/index.tsx` renders `<BalanceVal value={totalBalanceValue}>` from `useAccountBalance`, summing `convertedBalanceValue` over every shown network for every address behind `ALL_ACCOUNT_KEY` — one total across all accounts and chains. The all-accounts UI did not exist before 2022-02-11, so 0.2.1 (2022-02-10) could not have carried it. **0.2.2 is untagged**; all three commits verified contained in the earliest existing tag, `v0.2.5`.
+
+## Incremental work, fixes & chores
+
+**6 tracker issues** of incremental work landed on this capability — the portfolio total, its percentage change, the WebApp portfolio surface, and the balance-display defects behind them. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.36 | [#1802](https://github.com/Koniverse/SubWallet-Extension/issues/1802) | WebApp — wrong portfolio balance UI | ✅ done |
+| 1.1.36 | [#1843](https://github.com/Koniverse/SubWallet-Extension/issues/1843) | WebApp — implement Portfolio Statistic | ✅ done |
+| — | [#1166](https://github.com/Koniverse/SubWallet-Extension/issues/1166) | Upgrade UI — re-check the % increase/decrease of the total balance | ✅ done |
+| — | [#556](https://github.com/Koniverse/SubWallet-Extension/issues/556) | Bug showing balance on a very small balance | ✅ done |
+| — | [#3](https://github.com/Koniverse/SubWallet-Extension/issues/3) | Chrome extension not showing the correct balance for a Crust mainnet address | ✅ done |
+| — | [#2194](https://github.com/Koniverse/SubWallet-Extension/issues/2194) | Add a refresh button to the balance screen | ⏸ deprecated |
+
+> **#3 is issue number three.** *"Chrome extension wallet not showing correct balance of my crust
+> mainnet address"* — filed before this product had a hundred issues, and it is a balance-aggregation
+> defect, which is what this story owns.
+>
+> **#2194 was declined and #2381 shipped instead.** *"Add a refresh button"* closed `NOT_PLANNED`;
+> *"Add reload balance feature"* shipped in 1.1.29 and sits in
+> [US-7.7](US-7.7-balance-cache-invalidation-hardening.md). The request was answered by a different
+> design, not dropped.
 
 ## Cross-references
 

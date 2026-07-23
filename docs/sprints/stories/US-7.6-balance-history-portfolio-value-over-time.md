@@ -23,6 +23,11 @@ value-over-time chart of the whole portfolio, not a single asset — so that a h
 can see whether their net worth is up or down across a chosen range and understand
 the trend at a glance from the home screen.
 
+## Status
+
+> **📋 backlog — not started.** The single row below is **open**, no release delivers it, and none
+> of the acceptance criteria is ticked. It is the one unbuilt quarter of the #4186 chart programme.
+
 ## Background
 
 This is the one **forward / planned** capability in the balance epic (FR-73 is
@@ -122,6 +127,24 @@ planned balance-history feature; status stays `backlog` until scheduled. Tracked
 
 _Forward / planned story — authored ahead of implementation. Fill `commit`,
 `version_shipped` and implementation caveats when the feature lands._
+
+## Incremental work, fixes & chores
+
+**1 tracker issue** makes up this capability — the portfolio chart. It is **open** ([AGENTS.md](../../../AGENTS.md) rule 12).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#4121](https://github.com/Koniverse/SubWallet-Extension/issues/4121) | Support portfolio chart | 📋 backlog |
+
+> **#4121 was never in the ledger.** It is open and unstarted, so no CHANGELOG line or release
+> touched it — the generator's blind spot for unstarted work
+> ([§J](../../notes/2026-07-22.md#j-epic-34-maintenance--fiat-merged-into-epic-14)). It surfaced
+> through the [#4186](https://github.com/Koniverse/SubWallet-Extension/issues/4186) umbrella's child list.
+>
+> **Its three siblings all shipped.** #4122 and #4380 (price chart, extension and web) are `done` in
+> [US-7.4](US-7.4-real-time-token-price-and-per-asset-chart.md); #4266 (price history API) in
+> [US-7.5](US-7.5-price-history-ohlcv-chart-per-asset.md). The **portfolio** chart is the one part
+> of #4186 that did not get built.
 
 ## Cross-references
 

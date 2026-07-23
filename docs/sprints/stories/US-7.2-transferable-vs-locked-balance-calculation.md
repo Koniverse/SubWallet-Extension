@@ -35,6 +35,11 @@ amount and a **locked/frozen** amount, and display both correctly everywhere —
 the home screen and every send flow — so that a user always knows how much they
 can actually move and never tries to send funds that are reserved or frozen.
 
+## Status
+
+> **✅ done — shipped in 0.2.5.** All acceptance criteria are ticked and the 24 rows below are
+> settled (22 shipped, 2 closed not-planned/duplicate).
+
 ## Background
 
 A raw balance is not a spendable balance: Substrate accounts carry
@@ -124,6 +129,49 @@ story is **retroactive** — the capability already ships; `commit` /
 
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
+
+## Incremental work, fixes & chores
+
+**19 tracker issues** of incremental work landed on this capability — the calculation formula itself, per-chain balance handlers for six networks, the locked-balance display, and the validation the send flow depends on. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.7.5 | [#916](https://github.com/Koniverse/SubWallet-Extension/issues/916) | Update the get-balance function for Kusama | ✅ done |
+| 0.7.7 | [#902](https://github.com/Koniverse/SubWallet-Extension/issues/902) | Update balance logic for Equilibrium | ✅ done |
+| 0.7.8 | [#975](https://github.com/Koniverse/SubWallet-Extension/issues/975) | Update balance logic for Equilibrium (continued) | ✅ done |
+| 0.7.9 | [#981](https://github.com/Koniverse/SubWallet-Extension/issues/981) | Fix bug getting multiple balances for Equilibrium | ✅ done |
+| 1.0.5 | [#1360](https://github.com/Koniverse/SubWallet-Extension/issues/1360) | Re-check the get-balance function | ✅ done |
+| 1.0.6 | [#1428](https://github.com/Koniverse/SubWallet-Extension/issues/1428) | Re-check the get-balance function in some cases | ✅ done |
+| 1.0.11 | [#1459](https://github.com/Koniverse/SubWallet-Extension/issues/1459) | Re-check the case "Get balance error" | ✅ done |
+| 1.1.5 | [#1667](https://github.com/Koniverse/SubWallet-Extension/issues/1667) | Re-check validation when the sender available balance = 0 | ✅ done |
+| 1.1.36 | [#1679](https://github.com/Koniverse/SubWallet-Extension/issues/1679) | WebApp — update `useBalance` to compute common balance factors | ✅ done |
+| 1.1.52 | [#2416](https://github.com/Koniverse/SubWallet-Extension/issues/2416) | Update the balance service | ✅ done |
+| 1.2.14 | [#3189](https://github.com/Koniverse/SubWallet-Extension/issues/3189) | WebApp — shows incorrect available balance | ✅ done |
+| 1.2.15 | [#3312](https://github.com/Koniverse/SubWallet-Extension/issues/3312) | Fix bug calculating balance for the relay chain | ✅ done |
+| 1.2.27 | [#3481](https://github.com/Koniverse/SubWallet-Extension/issues/3481) | Update balance calculation for DeepBrainChain | ✅ done |
+| 1.3.17 | [#4032](https://github.com/Koniverse/SubWallet-Extension/issues/4032) | [Extension] cannot load the TAO balance | ✅ done |
+| 1.3.42 | [#4162](https://github.com/Koniverse/SubWallet-Extension/issues/4162) | Update the logic fetching the Bitcoin balance | ✅ done |
+| 1.3.68 | [#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708) | [Extension] Locked balance display | ✅ done |
+| — | [#4718](https://github.com/Koniverse/SubWallet-Extension/issues/4718) | Research locked balance display | ✅ done |
+| — | [#1167](https://github.com/Koniverse/SubWallet-Extension/issues/1167) | Add validation when the recipient does not have enough balance to stay alive | ✅ done |
+| — | [#3440](https://github.com/Koniverse/SubWallet-Extension/issues/3440) | Fix the balance calculation formula | ✅ done |
+| — | [#2418](https://github.com/Koniverse/SubWallet-Extension/issues/2418) | [Balance] [PSP] Convert `free` type from number to string | ✅ done |
+| — | [#4619](https://github.com/Koniverse/SubWallet-Extension/issues/4619) | Update the API for Bitcoin testnet balance display | ✅ done |
+| — | [#4455](https://github.com/Koniverse/SubWallet-Extension/issues/4455) | Extension — don't show a balance for the TON testnet | ✅ done |
+| — | [#4161](https://github.com/Koniverse/SubWallet-Extension/issues/4161) | Update the logic fetching the Bitcoin balance | ⏸ deprecated |
+| — | [#2367](https://github.com/Koniverse/SubWallet-Extension/issues/2367) | Re-check the balance after withdrawing successfully | ⏸ deprecated |
+
+> **The formula is the capability; the chains are the maintenance.** Six of these rows are one
+> network's balance handler — Kusama, Equilibrium (three times), the relay chain, DeepBrainChain,
+> Bittensor, Bitcoin, TON. Each new chain re-opens the same question: *what counts as transferable
+> here.*
+>
+> **#4161 and #4162 have identical titles**, *"Update logic fetching Bitcoin balance"*; #4161 closed
+> `DUPLICATE`, #4162 shipped in 1.3.42.
+>
+> **#4718 is research for #4708 and stays a row.** It is the one child #4708 has, and #4708 carries
+> its own 1.3.68 CHANGELOG line, so #4708 is a delivery that spawned a sub-task rather than an
+> umbrella ([AGENTS.md](../../../AGENTS.md) rule 10).
 
 ## Cross-references
 

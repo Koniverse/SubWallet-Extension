@@ -23,6 +23,11 @@ data with selectable time ranges, so that a user can review how an asset has mov
 over days/weeks/months directly inside the wallet rather than opening an external
 price site.
 
+## Status
+
+> **✅ done — shipped in 1.3.33.** All acceptance criteria are ticked and the 4 rows below are
+> settled.
+
 ## Background
 
 [US-7.4](US-7.4-real-time-token-price-and-per-asset-chart.md) shipped the live price
@@ -107,6 +112,25 @@ reconciliation.
 
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
+
+## Incremental work, fixes & chores
+
+**4 tracker issues** built this capability — the price-history API, its standardization, a currency-switch defect and a production-only failure. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.55 | [#4586](https://github.com/Koniverse/SubWallet-Extension/issues/4586) | Extension — incorrect price-history chart when changing currency | ✅ done |
+| 1.3.68 | [#4784](https://github.com/Koniverse/SubWallet-Extension/issues/4784) | Standardize the Price History module to the new standard | ✅ done |
+| — | [#4266](https://github.com/Koniverse/SubWallet-Extension/issues/4266) | Implement the price history API | ✅ done |
+| — | [#4977](https://github.com/Koniverse/SubWallet-Extension/issues/4977) | Price history API returns empty data in production but works in dev | ✅ done |
+
+> **#4266 was never in the ledger.** It is the API this whole capability reads, and it sat outside
+> the fold because no CHANGELOG line or release touched it — the same blind spot that hid the fiat
+> providers ([§J](../../notes/2026-07-22.md#j-epic-34-maintenance--fiat-merged-into-epic-14)). It
+> reached this table through the #4186 umbrella's child list.
+>
+> **#4977 is the sharpest row here**: the API returned empty data **in production while working in
+> dev**, which no local check would ever catch.
 
 ## Cross-references
 

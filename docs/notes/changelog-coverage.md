@@ -379,33 +379,33 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1639](https://github.com/Koniverse/SubWallet-Extension/issues/1639) | Update UI for notification (#1639) | 1.1.3 | 2023-07-21 | US-26.97 |
 | [#1644](https://github.com/Koniverse/SubWallet-Extension/issues/1644) | Support new language: Japanese (#1644) | 1.1.10 | 2023-08-26 | US-19.2 |
 | [#1684](https://github.com/Koniverse/SubWallet-Extension/issues/1684) | Improve lock UX (#1684) | 1.1.10 | 2023-08-26 | US-26.99 |
-| [#981](https://github.com/Koniverse/SubWallet-Extension/issues/981) | Fix bug getting multiple balances for Equilibrium (#981) | 0.7.9 | 2023-01-30 | US-27.10 |
-| [#1360](https://github.com/Koniverse/SubWallet-Extension/issues/1360) | Fixed bug get balance (#1360) | 1.0.5 | 2023-05-21 | US-27.13 |
-| [#1428](https://github.com/Koniverse/SubWallet-Extension/issues/1428) | Fix bug get balance when send token (#1428) | 1.0.6 | 2023-05-26 | US-27.14 |
-| [#1582](https://github.com/Koniverse/SubWallet-Extension/issues/1582) | Support show/hide balance (#1582) | 1.1.3 | 2023-07-21 | US-27.16 |
-| [#1667](https://github.com/Koniverse/SubWallet-Extension/issues/1667) | Fixed bug still send local token in case the native token balance = 0 (#1667) | 1.1.5 | 2023-07-29 | US-27.17 |
-| [#2381](https://github.com/Koniverse/SubWallet-Extension/issues/2381) | Add reload balance feature (#2381) | 1.1.29 | 2023-12-29 | US-27.24 |
-| [#2393](https://github.com/Koniverse/SubWallet-Extension/issues/2393) | Fixed enforcing the minimum miner tip 1 wei (#2393) | 1.3.30 | 2025-04-14 | US-27.25 |
-| [#2416](https://github.com/Koniverse/SubWallet-Extension/issues/2416) | Update balance service (#2416) | 1.1.52 | 2024-04-05 | US-27.26 |
-| [#2664](https://github.com/Koniverse/SubWallet-Extension/issues/2664) | Enable price-id online (#2664) | 1.1.41 | 2024-03-02 | US-27.28 |
-| [#2836](https://github.com/Koniverse/SubWallet-Extension/issues/2836) | Support auto detect balance for EVM (#2836) | 1.3.29 | 2025-04-08 | US-27.31 |
-| [#3183](https://github.com/Koniverse/SubWallet-Extension/issues/3183) | Update fallback API for SubWallet API (Price, Exchange rate) (#3183) | 1.2.15 | 2024-07-12 | US-27.33 |
-| [#3312](https://github.com/Koniverse/SubWallet-Extension/issues/3312) | Fix bug calculating balance for relaychain (#3312) | 1.2.15 | 2024-07-12 | US-27.35 |
-| [#3481](https://github.com/Koniverse/SubWallet-Extension/issues/3481) | Update balance calculation for DeepBrainChain (#3481) | 1.2.27 | 2024-08-22 | US-27.37 |
-| [#556](https://github.com/Koniverse/SubWallet-Extension/issues/556) | Fix bug showing balance on very small balance (#556) | 0.5.6 | 2022-08-24 | US-27.4 |
-| [#4032](https://github.com/Koniverse/SubWallet-Extension/issues/4032) | Unable to load TAO balance (#4032) | 1.3.17 | 2025-02-18 | US-27.40 |
-| [#4122](https://github.com/Koniverse/SubWallet-Extension/issues/4122) | Support price chart (#4122, #4266) | 1.3.33 | 2025-04-30 | US-27.41 |
-| [#4266](https://github.com/Koniverse/SubWallet-Extension/issues/4266) | Support price chart (#4122, #4266) | 1.3.33 | 2025-04-30 | US-27.41 |
-| [#4162](https://github.com/Koniverse/SubWallet-Extension/issues/4162) | Update logic fetching Bitcoin balance (#4162) | 1.3.42 | 2025-06-23 | US-27.43 |
-| [#4586](https://github.com/Koniverse/SubWallet-Extension/issues/4586) | Fixed bug Incorrect price history chart display when changing currency in popup mode (#4586) | 1.3.55 | 2025-09-05 | US-27.48 |
-| [#785](https://github.com/Koniverse/SubWallet-Extension/issues/785) | Update price for KBTC (#785) | 0.6.9 | 2022-11-04 | US-27.5 |
-| [#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708) | Locked Balance Display (#4708) | 1.3.68 | 2025-12-03 | US-27.50 |
-| [#4784](https://github.com/Koniverse/SubWallet-Extension/issues/4784) | Standardize the Module Price History according to the new standard (#4784) | 1.3.68 | 2025-12-03 | US-27.52 |
-| [#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987) | Alpha price calculation mismatch vs TaoStats (#4987) | 1.3.79 | 2026-05-21 | US-27.54 |
-| [#902](https://github.com/Koniverse/SubWallet-Extension/issues/902) | Update balance logic for Equilibrium (#902) | 0.7.7 | 2022-12-28 | US-27.6 |
-| [#916](https://github.com/Koniverse/SubWallet-Extension/issues/916) | Update get balance function for Kusama (#916) | 0.7.5 | 2022-12-15 | US-27.7 |
-| [#921](https://github.com/Koniverse/SubWallet-Extension/issues/921) | Update price for iBTC (#921) | 0.7.5 | 2022-12-15 | US-27.8 |
-| [#975](https://github.com/Koniverse/SubWallet-Extension/issues/975) | Update Equilibrium balance structure (#975) | 0.7.8 | 2023-01-19 | US-27.9 |
+| [#981](https://github.com/Koniverse/SubWallet-Extension/issues/981) | Fix bug getting multiple balances for Equilibrium (#981) | 0.7.9 | 2023-01-30 | US-7.2 |
+| [#1360](https://github.com/Koniverse/SubWallet-Extension/issues/1360) | Fixed bug get balance (#1360) | 1.0.5 | 2023-05-21 | US-7.2 |
+| [#1428](https://github.com/Koniverse/SubWallet-Extension/issues/1428) | Fix bug get balance when send token (#1428) | 1.0.6 | 2023-05-26 | US-7.2 |
+| [#1582](https://github.com/Koniverse/SubWallet-Extension/issues/1582) | Support show/hide balance (#1582) | 1.1.3 | 2023-07-21 | US-7.3 |
+| [#1667](https://github.com/Koniverse/SubWallet-Extension/issues/1667) | Fixed bug still send local token in case the native token balance = 0 (#1667) | 1.1.5 | 2023-07-29 | US-7.2 |
+| [#2381](https://github.com/Koniverse/SubWallet-Extension/issues/2381) | Add reload balance feature (#2381) | 1.1.29 | 2023-12-29 | US-7.7 |
+| [#2393](https://github.com/Koniverse/SubWallet-Extension/issues/2393) | Fixed enforcing the minimum miner tip 1 wei (#2393) | 1.3.30 | 2025-04-14 | US-7.4 |
+| [#2416](https://github.com/Koniverse/SubWallet-Extension/issues/2416) | Update balance service (#2416) | 1.1.52 | 2024-04-05 | US-7.2 |
+| [#2664](https://github.com/Koniverse/SubWallet-Extension/issues/2664) | Enable price-id online (#2664) | 1.1.41 | 2024-03-02 | US-7.4 |
+| [#2836](https://github.com/Koniverse/SubWallet-Extension/issues/2836) | Support auto detect balance for EVM (#2836) | 1.3.29 | 2025-04-08 | US-7.3 |
+| [#3183](https://github.com/Koniverse/SubWallet-Extension/issues/3183) | Update fallback API for SubWallet API (Price, Exchange rate) (#3183) | 1.2.15 | 2024-07-12 | US-7.4 |
+| [#3312](https://github.com/Koniverse/SubWallet-Extension/issues/3312) | Fix bug calculating balance for relaychain (#3312) | 1.2.15 | 2024-07-12 | US-7.2 |
+| [#3481](https://github.com/Koniverse/SubWallet-Extension/issues/3481) | Update balance calculation for DeepBrainChain (#3481) | 1.2.27 | 2024-08-22 | US-7.2 |
+| [#556](https://github.com/Koniverse/SubWallet-Extension/issues/556) | Fix bug showing balance on very small balance (#556) | 0.5.6 | 2022-08-24 | US-7.1 |
+| [#4032](https://github.com/Koniverse/SubWallet-Extension/issues/4032) | Unable to load TAO balance (#4032) | 1.3.17 | 2025-02-18 | US-7.2 |
+| [#4122](https://github.com/Koniverse/SubWallet-Extension/issues/4122) | Support price chart (#4122, #4266) | 1.3.33 | 2025-04-30 | US-7.4 |
+| [#4266](https://github.com/Koniverse/SubWallet-Extension/issues/4266) | Support price chart (#4122, #4266) | 1.3.33 | 2025-04-30 | US-7.5 |
+| [#4162](https://github.com/Koniverse/SubWallet-Extension/issues/4162) | Update logic fetching Bitcoin balance (#4162) | 1.3.42 | 2025-06-23 | US-7.2 |
+| [#4586](https://github.com/Koniverse/SubWallet-Extension/issues/4586) | Fixed bug Incorrect price history chart display when changing currency in popup mode (#4586) | 1.3.55 | 2025-09-05 | US-7.5 |
+| [#785](https://github.com/Koniverse/SubWallet-Extension/issues/785) | Update price for KBTC (#785) | 0.6.9 | 2022-11-04 | US-7.4 |
+| [#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708) | Locked Balance Display (#4708) | 1.3.68 | 2025-12-03 | US-7.2 |
+| [#4784](https://github.com/Koniverse/SubWallet-Extension/issues/4784) | Standardize the Module Price History according to the new standard (#4784) | 1.3.68 | 2025-12-03 | US-7.5 |
+| [#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987) | Alpha price calculation mismatch vs TaoStats (#4987) | 1.3.79 | 2026-05-21 | US-7.4 |
+| [#902](https://github.com/Koniverse/SubWallet-Extension/issues/902) | Update balance logic for Equilibrium (#902) | 0.7.7 | 2022-12-28 | US-7.2 |
+| [#916](https://github.com/Koniverse/SubWallet-Extension/issues/916) | Update get balance function for Kusama (#916) | 0.7.5 | 2022-12-15 | US-7.2 |
+| [#921](https://github.com/Koniverse/SubWallet-Extension/issues/921) | Update price for iBTC (#921) | 0.7.5 | 2022-12-15 | US-7.4 |
+| [#975](https://github.com/Koniverse/SubWallet-Extension/issues/975) | Update Equilibrium balance structure (#975) | 0.7.8 | 2023-01-19 | US-7.2 |
 | [#1950](https://github.com/Koniverse/SubWallet-Extension/issues/1950) | Update transfer function for Pendulum (#1950) | 1.1.14 | 2023-09-26 | US-28.101 |
 | [#2042](https://github.com/Koniverse/SubWallet-Extension/issues/2042) | Fixed bug transfer on Rococo (#2042) | 1.1.19 | 2023-10-26 | US-28.102 |
 | [#2079](https://github.com/Koniverse/SubWallet-Extension/issues/2079) | Fixed bug estimating fee on calculating max transferable (#2079) | 1.1.19 | 2023-10-26 | US-28.103 |

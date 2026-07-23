@@ -23,6 +23,11 @@ and shows them without manual import, while letting the user hide zero-balance
 tokens — so that the portfolio reflects real holdings on first open and stays
 uncluttered by dust and never-held assets.
 
+## Status
+
+> **✅ done — shipped in 1.0.2.** All acceptance criteria are ticked and the 8 rows below are
+> settled (5 shipped, 3 closed not-planned/duplicate).
+
 ## Background
 
 A multi-chain wallet tracks a large asset registry, but a user only cares about the
@@ -107,6 +112,29 @@ reconciliation.
 
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
+
+## Incremental work, fixes & chores
+
+**7 tracker issues** of incremental work landed on this capability — the show/hide-balance toggle, auto-detection and its improvement round, and two proposals to move detection to a backend. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.4.1 | [#212](https://github.com/Koniverse/SubWallet-Extension/issues/212) | The screen loads when clicking Show/Hide balance | ✅ done |
+| 1.1.3 | [#1582](https://github.com/Koniverse/SubWallet-Extension/issues/1582) | Support the show/hide balance feature | ✅ done |
+| 1.1.36 | [#1690](https://github.com/Koniverse/SubWallet-Extension/issues/1690) | WebApp — still shows the balance when the user selects hide balance | ✅ done |
+| 1.1.51 | [#2732](https://github.com/Koniverse/SubWallet-Extension/issues/2732) | Auto-detect balance | ✅ done |
+| 1.3.29 | [#2836](https://github.com/Koniverse/SubWallet-Extension/issues/2836) | Improve auto-detect balance | ✅ done |
+| — | [#2880](https://github.com/Koniverse/SubWallet-Extension/issues/2880) | Do not detect a balance after resetting the wallet | ⏸ deprecated |
+| — | [#3954](https://github.com/Koniverse/SubWallet-Extension/issues/3954) | Move auto-detect balance to the backend | ⏸ deprecated |
+| — | [#3991](https://github.com/Koniverse/SubWallet-Extension/issues/3991) | Update the API to detect a user's balance | ⏸ deprecated |
+
+> **Auto-detection was proposed for the backend twice and declined twice.** #3954 and #3991 both
+> closed without shipping — #3991 reads `DUPLICATE` on the tracker and **`Cancel` on the board**
+> ([AGENTS.md](../../../AGENTS.md) rule 12); either way it was not delivered. Detection is still
+> client-side.
+>
+> **#212 has no CHANGELOG line; 0.4.1 comes from its linked PR** ([#218](https://github.com/Koniverse/SubWallet-Extension/pull/218) merged), the third
+> evidence path ([AGENTS.md](../../../AGENTS.md) rule 1b-bis).
 
 ## Cross-references
 
