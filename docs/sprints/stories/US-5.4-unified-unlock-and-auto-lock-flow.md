@@ -122,8 +122,15 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **29 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-26, EPIC-28, EPIC-32, EPIC-36, EPIC-41.
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **9
+> ledgers still separate** finds **26 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-26, EPIC-28, EPIC-32, EPIC-41.
+>
+> **The hardware ledger's three candidates were all false positives**, and they are worth recording
+> as the shape of the error: `Unblock`, `block action`, `Block networks` — the heuristic matched
+> "lock" as a substring. None is a screen-lock issue; all three are Ledger action-blocking, now in
+> [US-16.6](US-16.6-ledger-signing-across-wallet-features.md) and
+> [US-16.7](US-16.7-generic-ledger-app-migration-and-metadata.md). The count fell 29 → 26 when the
+> hardware ledger folded on 2026-07-23 and **not one of its issues landed here**.
 > Treat that as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 04:19:35 UTC
-> Total stories: 2533
+> Last generated: 2026-07-23 05:42:56 UTC
+> Total stories: 2459
 
-## 📋 Backlog (280)
+## 📋 Backlog (273)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -27,6 +27,8 @@
 | US-14.3 | Additional on-ramp providers | EPIC-14 | P3 | 5 | — | — |
 | US-14.4 | Off-ramp flow improvements (improvement on US-14.2) | EPIC-14 | P3 | 1 | — | — |
 | US-15.5 | Web-app governance surface | EPIC-15 | P3 | 8 | — | — |
+| US-16.9 | Ledger connection & derivation improvements (improvement on US-16.5) | EPIC-16 | P3 | 3 | — | — |
+| US-16.10 | Ledger on the WebApp & Avail Space (improvement on US-16.5) | EPIC-16 | P3 | 2 | — | — |
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
@@ -193,15 +195,6 @@
 | US-33.65 | Improve experience when users wait to receive tokens after XCM | EPIC-33 | P3 | 1 | — | bluezdot |
 | US-33.82 | Extension - Add option transfer Max when bridge WETH: Polygon -> Ethereum | EPIC-33 | P3 | 1 | — | — |
 | US-33.96 | Extension - Improve XCM feature | EPIC-33 | P3 | 1 | — | bluezdot |
-| US-36.21 | Improve UX in case the feature is not supported for of Ledger account | EPIC-36 | P3 | 1 | — | — |
-| US-36.46 | Support account ledger import by JSON from another wallet | EPIC-36 | P3 | 1 | — | S2kael |
-| US-36.47 | WebApp - Add validate account in case sign transaction with Ledger account | EPIC-36 | P3 | 1 | — | frenkie-ng |
-| US-36.49 | Extension - Auto migrate account Ledger from the old app to the new app | EPIC-36 | P3 | 1 | — | — |
-| US-36.57 | Avail Space - Update content on Connect ledger screen | EPIC-36 | P3 | 1 | — | — |
-| US-36.59 | Extension - Implement custom derivation path when connect Ledger | EPIC-36 | P3 | 1 | — | — |
-| US-36.61 | Optimize swap pair selection | EPIC-36 | P3 | 1 | — | — |
-| US-36.64 | Avail Space - Support Avail Recovery Ledger app | EPIC-36 | P3 | 1 | — | — |
-| US-36.76 | Remove @polkadot/hw-ledger from ledger connector | EPIC-36 | P3 | 1 | — | Thiendekaco |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
 | US-4.13 | Bitcoin UTXO multi-asset transfer & custom fee | EPIC-4 | P1 | 5 | — | — |
 | US-4.16 | Cosmos ecosystem support | EPIC-4 | P1 | 5 | — | — |
@@ -361,7 +354,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (2012)
+## ✅ Done (1953)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -409,6 +402,11 @@
 | US-15.3 | Governance V1 (Democracy) display-only | EPIC-15 | P2 | 2 | sprint-2025-M12 | Thiendekaco |
 | US-16.1 | Ledger hardware-wallet signing | EPIC-16 | P2 | 5 | sprint-2022-M08 | S2kael |
 | US-16.2 | QR-based signing — Keystone & Polkadot Vault | EPIC-16 | P2 | 5 | sprint-2022-M08 | S2kael |
+| US-16.4 | Ledger network & app coverage | EPIC-16 | P3 | 3 | sprint-2025-M01 | — |
+| US-16.5 | Ledger connection & account discovery | EPIC-16 | P3 | 3 | sprint-2025-M09 | — |
+| US-16.6 | Ledger signing across wallet features | EPIC-16 | P3 | 3 | sprint-2025-M07 | — |
+| US-16.7 | Generic Ledger app — migration & runtime metadata | EPIC-16 | P3 | 5 | sprint-2025-M09 | — |
+| US-16.8 | Ledger asset-recovery tool (offline, out-of-repo) | EPIC-16 | P3 | 2 | sprint-2024-M02 | frenkie-ng |
 | US-17.1 | Proxy types & authority management | EPIC-17 | P2 | 5 | sprint-2026-M01 | Thiendekaco |
 | US-17.2 | Proxy signing (Sign Selector) + proxied-by display | EPIC-17 | P2 | 5 | sprint-2026-M01 | Thiendekaco |
 | US-18.1 | Multisig account creation (deterministic off-chain) & management | EPIC-18 | P2 | 3 | sprint-2026-M02 | bluezdot |
@@ -1886,70 +1884,6 @@
 | US-33.103 | Re-check logic approve token when perform XCM | EPIC-33 | P3 | 1 | sprint-2026-M06 | PDTnhah |
 | US-33.104 | WebApp - Update params for XCM transfer (Related to DOT/KSM XCM) | EPIC-33 | P3 | 1 | sprint-2025-M11 | Thiendekaco |
 | US-33.105 | Bridge native TAO <-> Subtensor EVM | EPIC-33 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-36.1 | Integrate with Keystone | EPIC-36 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-36.2 | Integration Ledger Acala account | EPIC-36 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-36.3 | Improve UX for on-ramp feature with Ledger Account | EPIC-36 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-36.4 | Keystone new UI request | EPIC-36 | P3 | 1 | sprint-2023-M04 | hieudd |
-| US-36.5 | Keystone - adding brand name | EPIC-36 | P3 | 1 | sprint-2022-M10 | hieudd |
-| US-36.6 | Add support for Acala on Ledger | EPIC-36 | P3 | 1 | sprint-2022-M11 | hieudd |
-| US-36.7 | Handle case attach and send asset for Ledger account with addess index #0 | EPIC-36 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-36.8 | Transaction has a bad signature with Ledger signature | EPIC-36 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-36.9 | Need to display address list by token that Ledger account supports when receiving Ledger account address with 'All accou | EPIC-36 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-36.10 | Add warning message in case of transferring xcm using Ledger account | EPIC-36 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-36.11 | Excluded Ledger account from the 'My Wallet' list when sending tokens that are not supported by the Ledger account | EPIC-36 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-36.12 | Add support Ledger with Aleph Zero network | EPIC-36 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-36.14 | Improved connection experience with Ledger | EPIC-36 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-36.16 | Support Ledger for Astar | EPIC-36 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-36.17 | Handle the case of signing transactions from dApp using a Ledger account | EPIC-36 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-36.18 | Support Ledger for more chains | EPIC-36 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-36.20 | WebApp - Update UI of the List account to connect Ledger device screen | EPIC-36 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-36.22 | Handle case connect extension with Ledger account | EPIC-36 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-36.23 | Fixed bug Get Ledger account addresses on incompatible networks | EPIC-36 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-36.24 | Implement offline tool to recover assets from Ledger | EPIC-36 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-36.25 | Support staking AZERO with Ledger | EPIC-36 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-36.27 | Add support for EWT token (Energy Web Chain) on Ledger | EPIC-36 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-36.28 | Support XCM for Ledger | EPIC-36 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-36.29 | WebApp - Do not show earning position of the Ledger EVM account | EPIC-36 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-36.30 | Improve UI for Ledger Account Recovery Tool | EPIC-36 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-36.31 | Fixed bug connect a Ledger device | EPIC-36 | P3 | 1 | sprint-2024-M03 | Thiendekaco |
-| US-36.32 | Re-check case send token on Acala-EVM with Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-36.33 | WebApp - Unable to scroll list account when connect a Ledger device | EPIC-36 | P3 | 1 | sprint-2024-M03 | Thiendekaco |
-| US-36.34 | Support connect Ledger device for Asset Hub | EPIC-36 | P3 | 1 | sprint-2024-M03 | Thiendekaco |
-| US-36.36 | Allows signing messages with Ledger substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-36.37 | Integrate Avail Ledger app | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-36.38 | Add Ledger support for A0 testnet | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-36.39 | Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M06 | S2kael |
-| US-36.41 | Add support Ledger for Polkadex | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-36.42 | Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account | EPIC-36 | P3 | 1 | sprint-2024-M06 | S2kael |
-| US-36.43 | WebApp - Review and support Polkadot Ledger app from Zondax for WebApp | EPIC-36 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-36.44 | Add validate account in case sign transaction with Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-36.45 | Allow to use Migration Polkadot App to attach Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-36.48 | Extension - Recheck and support Ledger for Avail | EPIC-36 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-36.50 | WebApp - Support Avail Ledger app | EPIC-36 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-36.51 | Support XCM for Ledger Polkadot generic app | EPIC-36 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-36.52 | WebApp - Allow to use Migration Polkadot App to attach Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M08 | Thiendekaco |
-| US-36.53 | Extension - Add validate for Solochain when receive, transfer with Generic ledger account | EPIC-36 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-36.54 | WebApp - Add validate for Solochain when receive, transfer with Generic ledger account | EPIC-36 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-36.55 | Unified account - Review and update for Ledger account | EPIC-36 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-36.56 | WebApp - Support XCM for Ledger Polkadot generic app | EPIC-36 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-36.58 | Support Generic ledger app for Vara network | EPIC-36 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-36.60 | Update Ledger support for chains with updated runtime | EPIC-36 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-36.62 | Support Avail Recovery app | EPIC-36 | P3 | 1 | sprint-2025-M01 | PDTnhah |
-| US-36.63 | Unblock when perform stake on Bifrost with ledger account | EPIC-36 | P3 | 1 | sprint-2025-M06 | Thiendekaco |
-| US-36.65 | Support Avail bridge when using Ledger Nano S+ | EPIC-36 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-36.67 | Update ledger-substrate-js library | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-36.68 | Integrate Polkadot Ledger App | EPIC-36 | P3 | 1 | sprint-2025-M05 | — |
-| US-36.69 | Re-check and update block action when stake with ledger account | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-36.70 | Extension - Update metadata for Ledger app | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-36.72 | Update ledger-substrate-js library (Round 2) | EPIC-36 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-36.73 | Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts | EPIC-36 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-36.74 | Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 | EPIC-36 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-36.75 | Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app | EPIC-36 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-36.77 | Extension - Update metadata runtime for Ledger app (Round 2) | EPIC-36 | P3 | 1 | sprint-2025-M09 | PDTnhah |
-| US-36.78 | [Extension] Update metadata runtime for Ledger app - Round 3 | EPIC-36 | P3 | 1 | sprint-2025-M10 | PDTnhah |
-| US-36.79 | [Extension] Update metadata runtime for Ledger app - Round 4 | EPIC-36 | P3 | 1 | sprint-2025-M11 | PDTnhah |
-| US-36.80 | [Extension] Update metadata runtime for Ledger app - Round 5 | EPIC-36 | P3 | 1 | sprint-2025-M12 | PDTnhah |
-| US-36.81 | Recheck Ledger signing on Bittensor network | EPIC-36 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -2382,7 +2316,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (184)
+## 🗑️ Deprecated (176)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2517,14 +2451,6 @@ _No stories_
 | US-33.64 | XCM version error on Pioneer | EPIC-33 | P3 | 1 | sprint-2024-M09 | bluezdot |
 | US-33.67 | Implement SnowBridge sdk to prevent asset loss | EPIC-33 | P3 | 1 | sprint-2025-M04 | S2kael |
 | US-33.99 | [Bug] Prevent bug transfer cross-chain due to Asset Hub Migration | EPIC-33 | P3 | 1 | — | bluezdot |
-| US-36.13 | An error when sign transaction from moonbeam app via Ledger | EPIC-36 | P3 | 1 | — | S2kael |
-| US-36.15 | Still show all token when standing All accounts mode in case there is only Ledger account in wallet | EPIC-36 | P3 | 1 | — | — |
-| US-36.19 | [Ledger] Support connect Ledger device for Centrifuge, Darwinia, Energy Web Chain | EPIC-36 | P3 | 1 | — | Quangdm-cdm |
-| US-36.26 | Support Ledger for Vara network | EPIC-36 | P3 | 1 | — | S2kael |
-| US-36.35 | Handle duplicate addresses when connecting Ledger accounts | EPIC-36 | P3 | 1 | — | Thiendekaco |
-| US-36.40 | Extension - Improve perform transaction with account Ledger of dApps utilizing both EVM and Substrate | EPIC-36 | P3 | 1 | sprint-2024-M07 | Thiendekaco |
-| US-36.66 | Check Polkadot Generic Ledger app for Creditcoin | EPIC-36 | P3 | 1 | sprint-2025-M05 | S2kael |
-| US-36.71 | Extension - Error when transfer USDC on Ethereum Sepolia with Ledger EVM | EPIC-36 | P3 | 1 | — | Thiendekaco |
 | US-41.3 | Intergrate Collab.Land for private channel in Discord | EPIC-41 | P3 | 1 | — | — |
 | US-41.21 | Get Data subtoken from Subquery: | EPIC-41 | P3 | 1 | — | — |
 | US-41.28 | Support txn Queueing | EPIC-41 | P3 | 1 | — | — |
@@ -2575,12 +2501,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 280
+- 📋 **Backlog**: 273
 - 🟢 **Ready**: 14
 - 🟡 **In Progress**: 32
 - 👀 **Review**: 11
-- ✅ **Done**: 2012
+- ✅ **Done**: 1953
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 184
+- 🗑️ **Deprecated**: 176
 
 ⚠️  **WIP limit exceeded**: 32 stories in-progress (limit: 3).

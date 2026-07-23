@@ -57,7 +57,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#150](https://github.com/Koniverse/SubWallet-Extension/issues/150) | Support interaction with other devices (Ledger and Parity Signer, Stylo...) for signature (#150) | 0.5.4 | 2022-08-05 | US-16.1 |
 | [#327](https://github.com/Koniverse/SubWallet-Extension/issues/327) | Fix can't sign & can't turn off popup Signing with Ledger account (#327) | 0.5.2 | 2022-07-22 | US-16.1 |
 | [#538](https://github.com/Koniverse/SubWallet-Extension/issues/538) | Integration Ledger EVM account (#538) | 1.0.9 | 2023-06-13 | US-16.1 |
-| [#2453](https://github.com/Koniverse/SubWallet-Extension/issues/2453) | Integrate Polkadot Ledger app from Zondax (#2453) | 1.2.11 | 2024-06-29 | US-16.1 |
+| [#2453](https://github.com/Koniverse/SubWallet-Extension/issues/2453) | Integrate Polkadot Ledger app from Zondax (#2453) | 1.2.11 | 2024-06-29 | US-16.7 |
 | [#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725) | Integrate Proxy Account Support (#4725) | 1.3.72 | 2026-01-14 | US-17.1 |
 | [#4942](https://github.com/Koniverse/SubWallet-Extension/issues/4942) | Improve Proxy account features (#4942) | 1.3.77 | 2026-04-09 | US-17.1 |
 | [#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855) | Support Multisig Account Phase 1 (#4855) | 1.3.74 | 2026-02-11 | US-18.1 |
@@ -917,39 +917,39 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | Add support for $NEER on Transak (#1317) | 1.0.4 | 2023-05-12 | US-14.1 |
 | [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | Support OpenGov (Phase 1) (#4678) | 1.3.70 | 2025-12-11 | US-15.1 |
 | [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-32.375 |
-| [#1454](https://github.com/Koniverse/SubWallet-Extension/issues/1454) | Excluded Ledger account from the "My Wallet" list when sending tokens that are not supported by the Ledger account (#1454) | 1.0.7 | 2023-06-01 | US-36.11 |
-| [#1565](https://github.com/Koniverse/SubWallet-Extension/issues/1565) | Add support Ledger with Aleph Zero network (#1565) | 1.0.12 | 2023-06-29 | US-36.12 |
-| [#1573](https://github.com/Koniverse/SubWallet-Extension/issues/1573) | Improved connection experience with Ledger (#1573) | 1.1.1 | 2023-07-06 | US-36.14 |
-| [#1814](https://github.com/Koniverse/SubWallet-Extension/issues/1814) | Support Ledger for Astar (#1814) | 1.1.11 | 2023-09-09 | US-36.16 |
-| [#1874](https://github.com/Koniverse/SubWallet-Extension/issues/1874) | Handle the case of signing transactions from dApp using a Ledger account (#1874) | 1.1.12 | 2023-09-15 | US-36.17 |
-| [#1942](https://github.com/Koniverse/SubWallet-Extension/issues/1942) | Support Ledger for more chains (#1942) | 1.1.15 | 2023-09-30 | US-36.18 |
-| [#564](https://github.com/Koniverse/SubWallet-Extension/issues/564) | Integration Ledger Acala account (#564) | 0.6.6 | 2022-09-30 | US-36.2 |
-| [#2075](https://github.com/Koniverse/SubWallet-Extension/issues/2075) | Fixed bug Get Ledger account addresses on incompatible networks (#2075) | 1.1.19 | 2023-10-26 | US-36.23 |
-| [#2219](https://github.com/Koniverse/SubWallet-Extension/issues/2219) | Support staking AZERO with Ledger (#2219) | 1.1.23 | 2023-11-24 | US-36.25 |
-| [#2608](https://github.com/Koniverse/SubWallet-Extension/issues/2608) | Fixed bug connect a Ledger device (#2608) | 1.1.45 | 2024-03-20 | US-36.31 |
-| [#2625](https://github.com/Koniverse/SubWallet-Extension/issues/2625) | Re-check case send token on Acala-EVM with Ledger account (#2625) | 1.1.39 | 2024-02-24 | US-36.32 |
-| [#2785](https://github.com/Koniverse/SubWallet-Extension/issues/2785) | Support connect Ledger device for Asset Hub (#2785) | 1.1.46 | 2024-03-22 | US-36.34 |
-| [#2982](https://github.com/Koniverse/SubWallet-Extension/issues/2982) | Integrate Avail Ledger app (#2982) | 1.2.22 | 2024-07-31 | US-36.37 |
-| [#3145](https://github.com/Koniverse/SubWallet-Extension/issues/3145) | Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account (#3145) | 1.2.5 | 2024-06-11 | US-36.39 |
-| [#3231](https://github.com/Koniverse/SubWallet-Extension/issues/3231) | Add support Ledger for Polkadex (#3231) | 1.2.16 | 2024-07-19 | US-36.41 |
-| [#3254](https://github.com/Koniverse/SubWallet-Extension/issues/3254) | Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account (#3254) | 1.2.11 | 2024-06-29 | US-36.42 |
-| [#3263](https://github.com/Koniverse/SubWallet-Extension/issues/3263) | Add validate account in case sign transaction with Ledger account (#3263) | 1.2.15 | 2024-07-12 | US-36.44 |
-| [#3307](https://github.com/Koniverse/SubWallet-Extension/issues/3307) | Allow to use Migration Polkadot App to attach Ledger account (#3307, #3402) | 1.2.24 | 2024-08-09 | US-36.45 |
-| [#3402](https://github.com/Koniverse/SubWallet-Extension/issues/3402) | Allow to use Migration Polkadot App to attach Ledger account (#3307, #3402) | 1.2.24 | 2024-08-09 | US-36.45 |
-| [#752](https://github.com/Koniverse/SubWallet-Extension/issues/752) | Keystone - adding brand name (#752) | 0.6.8 | 2022-10-31 | US-36.5 |
-| [#3458](https://github.com/Koniverse/SubWallet-Extension/issues/3458) | Support XCM for Ledger Polkadot generic app (#3458) | 1.2.29 | 2024-09-13 | US-36.51 |
-| [#3464](https://github.com/Koniverse/SubWallet-Extension/issues/3464) | Add validate for Solochain when receive, transfer with Generic ledger account (#3464) | 1.2.25 | 2024-08-17 | US-36.53 |
-| [#3835](https://github.com/Koniverse/SubWallet-Extension/issues/3835) | Support Generic ledger app for Vara network (#3835) | 1.3.9 | 2024-12-09 | US-36.58 |
-| [#3902](https://github.com/Koniverse/SubWallet-Extension/issues/3902) | Optimize swap pair selection (#3902) | 1.3.30 | 2025-04-14 | US-36.61 |
-| [#3915](https://github.com/Koniverse/SubWallet-Extension/issues/3915) | Support Avail Recovery app (#3915) | 1.3.12 | 2025-01-06 | US-36.62 |
-| [#3931](https://github.com/Koniverse/SubWallet-Extension/issues/3931) | Unblock when perform stake on Bifrost with ledger account (#3931) | 1.3.43 | 2025-06-26 | US-36.63 |
-| [#4365](https://github.com/Koniverse/SubWallet-Extension/issues/4365) | Update ledger-substrate-js library (#4365) | 1.3.46 | 2025-07-04 | US-36.67 |
-| [#4464](https://github.com/Koniverse/SubWallet-Extension/issues/4464) | Re-check and update block action when stake with ledger account (#4464) | 1.3.49 | 2025-07-28 | US-36.69 |
-| [#846](https://github.com/Koniverse/SubWallet-Extension/issues/846) | Handle case attach and send asset for Ledger account with addess index #0 (#846) | 0.7.5 | 2022-12-15 | US-36.7 |
-| [#4501](https://github.com/Koniverse/SubWallet-Extension/issues/4501) | Update ledger-substrate-js library (Round 2) (#4501) | 1.3.56 | 2025-09-11 | US-36.72 |
-| [#4531](https://github.com/Koniverse/SubWallet-Extension/issues/4531) | Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531) | 1.3.49 | 2025-07-28 | US-36.73 |
-| [#4592](https://github.com/Koniverse/SubWallet-Extension/issues/4592) | Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592) | 1.3.53 | 2025-08-12 | US-36.74 |
-| [#4645](https://github.com/Koniverse/SubWallet-Extension/issues/4645) | Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645) | 1.3.56 | 2025-09-11 | US-36.75 |
+| [#1454](https://github.com/Koniverse/SubWallet-Extension/issues/1454) | Excluded Ledger account from the "My Wallet" list when sending tokens that are not supported by the Ledger account (#1454) | 1.0.7 | 2023-06-01 | US-16.6 |
+| [#1565](https://github.com/Koniverse/SubWallet-Extension/issues/1565) | Add support Ledger with Aleph Zero network (#1565) | 1.0.12 | 2023-06-29 | US-16.4 |
+| [#1573](https://github.com/Koniverse/SubWallet-Extension/issues/1573) | Improved connection experience with Ledger (#1573) | 1.1.1 | 2023-07-06 | US-16.5 |
+| [#1814](https://github.com/Koniverse/SubWallet-Extension/issues/1814) | Support Ledger for Astar (#1814) | 1.1.11 | 2023-09-09 | US-16.4 |
+| [#1874](https://github.com/Koniverse/SubWallet-Extension/issues/1874) | Handle the case of signing transactions from dApp using a Ledger account (#1874) | 1.1.12 | 2023-09-15 | US-16.6 |
+| [#1942](https://github.com/Koniverse/SubWallet-Extension/issues/1942) | Support Ledger for more chains (#1942) | 1.1.15 | 2023-09-30 | US-16.4 |
+| [#564](https://github.com/Koniverse/SubWallet-Extension/issues/564) | Integration Ledger Acala account (#564) | 0.6.6 | 2022-09-30 | US-16.4 |
+| [#2075](https://github.com/Koniverse/SubWallet-Extension/issues/2075) | Fixed bug Get Ledger account addresses on incompatible networks (#2075) | 1.1.19 | 2023-10-26 | US-16.5 |
+| [#2219](https://github.com/Koniverse/SubWallet-Extension/issues/2219) | Support staking AZERO with Ledger (#2219) | 1.1.23 | 2023-11-24 | US-16.6 |
+| [#2608](https://github.com/Koniverse/SubWallet-Extension/issues/2608) | Fixed bug connect a Ledger device (#2608) | 1.1.45 | 2024-03-20 | US-16.5 |
+| [#2625](https://github.com/Koniverse/SubWallet-Extension/issues/2625) | Re-check case send token on Acala-EVM with Ledger account (#2625) | 1.1.39 | 2024-02-24 | US-16.6 |
+| [#2785](https://github.com/Koniverse/SubWallet-Extension/issues/2785) | Support connect Ledger device for Asset Hub (#2785) | 1.1.46 | 2024-03-22 | US-16.4 |
+| [#2982](https://github.com/Koniverse/SubWallet-Extension/issues/2982) | Integrate Avail Ledger app (#2982) | 1.2.22 | 2024-07-31 | US-16.4 |
+| [#3145](https://github.com/Koniverse/SubWallet-Extension/issues/3145) | Fixed bug Sign transaction failed for some tokens with Aleph Zero Ledger account (#3145) | 1.2.5 | 2024-06-11 | US-16.1 |
+| [#3231](https://github.com/Koniverse/SubWallet-Extension/issues/3231) | Add support Ledger for Polkadex (#3231) | 1.2.16 | 2024-07-19 | US-16.4 |
+| [#3254](https://github.com/Koniverse/SubWallet-Extension/issues/3254) | Fix bug Show incorrect screen when perform earning actions with Ledger's EVM account (#3254) | 1.2.11 | 2024-06-29 | US-16.6 |
+| [#3263](https://github.com/Koniverse/SubWallet-Extension/issues/3263) | Add validate account in case sign transaction with Ledger account (#3263) | 1.2.15 | 2024-07-12 | US-16.1 |
+| [#3307](https://github.com/Koniverse/SubWallet-Extension/issues/3307) | Allow to use Migration Polkadot App to attach Ledger account (#3307, #3402) | 1.2.24 | 2024-08-09 | US-16.7 |
+| [#3402](https://github.com/Koniverse/SubWallet-Extension/issues/3402) | Allow to use Migration Polkadot App to attach Ledger account (#3307, #3402) | 1.2.24 | 2024-08-09 | US-16.7 |
+| [#752](https://github.com/Koniverse/SubWallet-Extension/issues/752) | Keystone - adding brand name (#752) | 0.6.8 | 2022-10-31 | US-16.2 |
+| [#3458](https://github.com/Koniverse/SubWallet-Extension/issues/3458) | Support XCM for Ledger Polkadot generic app (#3458) | 1.2.29 | 2024-09-13 | US-16.6 |
+| [#3464](https://github.com/Koniverse/SubWallet-Extension/issues/3464) | Add validate for Solochain when receive, transfer with Generic ledger account (#3464) | 1.2.25 | 2024-08-17 | US-16.1 |
+| [#3835](https://github.com/Koniverse/SubWallet-Extension/issues/3835) | Support Generic ledger app for Vara network (#3835) | 1.3.9 | 2024-12-09 | US-16.4 |
+| [#3902](https://github.com/Koniverse/SubWallet-Extension/issues/3902) | Optimize swap pair selection (#3902) | 1.3.30 | 2025-04-14 | US-31.18 |
+| [#3915](https://github.com/Koniverse/SubWallet-Extension/issues/3915) | Support Avail Recovery app (#3915) | 1.3.12 | 2025-01-06 | US-16.4 |
+| [#3931](https://github.com/Koniverse/SubWallet-Extension/issues/3931) | Unblock when perform stake on Bifrost with ledger account (#3931) | 1.3.43 | 2025-06-26 | US-16.6 |
+| [#4365](https://github.com/Koniverse/SubWallet-Extension/issues/4365) | Update ledger-substrate-js library (#4365) | 1.3.46 | 2025-07-04 | US-16.7 |
+| [#4464](https://github.com/Koniverse/SubWallet-Extension/issues/4464) | Re-check and update block action when stake with ledger account (#4464) | 1.3.49 | 2025-07-28 | US-16.6 |
+| [#846](https://github.com/Koniverse/SubWallet-Extension/issues/846) | Handle case attach and send asset for Ledger account with addess index #0 (#846) | 0.7.5 | 2022-12-15 | US-16.5 |
+| [#4501](https://github.com/Koniverse/SubWallet-Extension/issues/4501) | Update ledger-substrate-js library (Round 2) (#4501) | 1.3.56 | 2025-09-11 | US-16.7 |
+| [#4531](https://github.com/Koniverse/SubWallet-Extension/issues/4531) | Block networks (Substrate & Ethereum) without runtime update for Ledger Substrate accounts (#4531) | 1.3.49 | 2025-07-28 | US-16.7 |
+| [#4592](https://github.com/Koniverse/SubWallet-Extension/issues/4592) | Fixed bug Unable to connect to Ledger apps via Ledger Nano X 2.5.0 & Ledger Nano S+ 1.4.0 (#4592) | 1.3.53 | 2025-08-12 | US-16.5 |
+| [#4645](https://github.com/Koniverse/SubWallet-Extension/issues/4645) | Fixed bug Unmatched address set when connecting via Ledger Polkadot app & Ledger Avail Recovery app (#4645) | 1.3.56 | 2025-09-11 | US-16.5 |
 | [#3468](https://github.com/Koniverse/SubWallet-Extension/issues/3468) | Improve condition for Marketing campaign (#3468) | 1.2.28 | 2024-09-04 | US-19.4 |
 | [#4403](https://github.com/Koniverse/SubWallet-Extension/issues/4403) | Fixed bug Error page when use marketing campaign (#4403) | 1.3.41 | 2025-06-11 | US-19.4 |
 | [#2000](https://github.com/Koniverse/SubWallet-Extension/issues/2000) | Support notification in browser and banner in app (#2000) | 1.1.18 | 2023-10-20 | US-19.8 |
