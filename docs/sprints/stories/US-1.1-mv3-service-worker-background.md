@@ -168,14 +168,14 @@ version reconciliation._
 | — | [#334](https://github.com/Koniverse/SubWallet-Extension/issues/334) | Make the wallet extension in Chrome persist its state | ✅ done |
 | — | [#2471](https://github.com/Koniverse/SubWallet-Extension/issues/2471) | Do not navigate to the Chrome store while the extension is disabled | ⏸️ deprecated |
 | 1.2.1 | [#2205](https://github.com/Koniverse/SubWallet-Extension/issues/2205) | Update extension to MV3 | ✅ done |
-| — | [#2681](https://github.com/Koniverse/SubWallet-Extension/issues/2681) | Extension — Improve MV3 | ✅ done |
+| 1.2.1 | [#2681](https://github.com/Koniverse/SubWallet-Extension/issues/2681) | Extension — Improve MV3 | ✅ done |
 | — | [#2949](https://github.com/Koniverse/SubWallet-Extension/issues/2949) | Can't fetch online resources on MV3 | ✅ done |
 | — | [#2951](https://github.com/Koniverse/SubWallet-Extension/issues/2951) | Update newest code into MV3 version | ✅ done |
 | — | [#2980](https://github.com/Koniverse/SubWallet-Extension/issues/2980) | Extension — Some errors appear on MV3 | ✅ done |
 | — | [#3045](https://github.com/Koniverse/SubWallet-Extension/issues/3045) | Extension — Follow-up MV3 version | ✅ done |
-| — | [#3060](https://github.com/Koniverse/SubWallet-Extension/issues/3060) | Extension — MV3 — Auto reset currency in case upgrade version | ✅ done |
+| 1.1.66 | [#3060](https://github.com/Koniverse/SubWallet-Extension/issues/3060) | Extension — MV3 — Auto reset currency in case upgrade version | ✅ done |
 | — | [#3066](https://github.com/Koniverse/SubWallet-Extension/issues/3066) | Extension — MV3 — Handle some errors on MV3 | ✅ done |
-| — | [#3109](https://github.com/Koniverse/SubWallet-Extension/issues/3109) | MV3 on Firefox | ✅ done |
+| 1.2.7 | [#3109](https://github.com/Koniverse/SubWallet-Extension/issues/3109) | MV3 on Firefox | ✅ done |
 | 1.2.2 | [#3146](https://github.com/Koniverse/SubWallet-Extension/issues/3146) | Extension — Fix some bugs related MV3 extension | ✅ done |
 | 1.2.4 | [#3144](https://github.com/Koniverse/SubWallet-Extension/issues/3144) | Extension — Update lock time of MV3 extension | ✅ done |
 | — | [#3330](https://github.com/Koniverse/SubWallet-Extension/issues/3330) | Re-test MV3 on Firefox | ✅ done |

@@ -226,6 +226,27 @@ release **by date**. Notating upstream versions in prose was tried and **rejecte
 number appears as a reference, a **verbatim CHANGELOG quote**, and a **git tag**, and rewriting
 the last two makes the quote false and the tag imaginary ([D106](docs/CONTEXT.md)).
 
+**1b-bis. A version has three evidence paths, and the third is the issue's linked PR.** The first
+two — a CHANGELOG line, then `git tag --contains` on a commit whose message names the issue — both
+fail when **the delivering PR is tagged with a sibling issue**. `#1130` *"disable the Buy token
+button"* has neither: the only `(#1130)` in git is **polkadot-js PR 1130 from 2022-08**, a lineage
+collision (rule 1b), and the real work rode PR `#1156`, titled `[Issue-1150]`. The tracker still
+knows, through the timeline's `ConnectedEvent`:
+
+```
+gh api graphql -f query='{repository(owner:"Koniverse",name:"SubWallet-Extension"){
+  issue(number:N){timelineItems(last:30,itemTypes:[CONNECTED_EVENT]){nodes{
+  ... on ConnectedEvent{subject{... on PullRequest{number merged}}}}}}}}'
+gh api repos/Koniverse/SubWallet-Extension/pulls/<PR> --jq .merge_commit_sha
+git tag --contains <sha> | sort -V | head -1
+```
+
+Swept over 158 rows reading `—`, this recovered **ten** releases the first two paths could not see.
+
+**A merged PR on an *open* issue is not a release.** It says work landed, not that the issue is
+delivered — `#4889` merged into 1.3.69 and stays open because the re-enable half never happened.
+Those rows keep `—`.
+
 **1c. `commit:` names what made the capability true — and a release bump made nothing true.**
 Three stories cited a `[CI Skip]` version-bump commit, because a string match on `0.2.1` found
 the **wrong lineage's** release commit. A bump commit is worse than a missing one: it *resolves*,

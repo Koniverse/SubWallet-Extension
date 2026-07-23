@@ -48,6 +48,11 @@ It materializes **no FR** — US-9.10 defends FR-85 / FR-89 / FR-92 and keeps th
 | — | [#3241](https://github.com/Koniverse/SubWallet-Extension/issues/3241) | WebApp — incorrect amount on the transaction confirmation for an NFT transfer | 📋 backlog |
 | — | [#4859](https://github.com/Koniverse/SubWallet-Extension/issues/4859) | Extension — improve validation when importing an NFT | 📋 backlog |
 
+> **#2124 has a merged PR ([#2142](https://github.com/Koniverse/SubWallet-Extension/pull/2142),
+> in `v1.1.36`) and is still open** — partial work landed and the error page was not fully fixed.
+> The `Shipped` cell stays `—`: a merged PR on an open issue says work happened, not that the issue
+> is delivered.
+
 ## Acceptance criteria
 
 - [ ] **AC-1** — Each defect above no longer reproduces on its reported surface, or the issue is closed with the reason recorded.

@@ -239,6 +239,11 @@ false-positive reports._
 | — | [#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889) | Extension — Phishing Detection screen shown on common websites | 🔁 follow up |
 | — | [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) | False positive: chaindrop.app flagged as phishing — a legitimate testnet faucet | 📋 backlog |
 
+> **#4889 has a merged PR ([#4890](https://github.com/Koniverse/SubWallet-Extension/pull/4890),
+> in `v1.3.69`) and is still open.** That release is the one that *turned ChainPatrol off*; the
+> issue stays open because re-enabling it — AC-4 — has not happened. **A merged PR on an open issue
+> is evidence that work landed, not that the issue is delivered**, so the `Shipped` cell stays `—`.
+>
 > **The four settled audit rounds that used to sit here moved to
 > [US-5.12](US-5.12-earlier-security-audit-rounds.md) on 2026-07-22.** They are prehistory: no
 > acceptance criterion of this story names them, and a table mixing them with the five open

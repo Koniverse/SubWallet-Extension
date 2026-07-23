@@ -181,7 +181,7 @@ Beyond the requirement above, **24 tracker issue(s)** of incremental work landed
 | 1.1.44 | [#2748](https://github.com/Koniverse/SubWallet-Extension/issues/2748) | Fixed bug error page on NFT details screen | ✅ done |
 | 1.3.3 | [#3791](https://github.com/Koniverse/SubWallet-Extension/issues/3791) | Fix bug show OG WUD BURN NFT Collection | ✅ done |
 | — | [#95](https://github.com/Koniverse/SubWallet-Extension/issues/95) | Display incorrect screen when click on “Back to Homepage” button in case Send NFT History has just been recorded on Subs | ✅ done |
-| — | [#97](https://github.com/Koniverse/SubWallet-Extension/issues/97) | Can't open or takes a long time to open the extension if I previously turned off the extension in the NFT tab ... | ✅ done |
+| 0.3.6 | [#97](https://github.com/Koniverse/SubWallet-Extension/issues/97) | Can't open or takes a long time to open the extension if I previously turned off the extension in the NFT tab ... | ✅ done |
 | — | [#1151](https://github.com/Koniverse/SubWallet-Extension/issues/1151) | Upgrade UI - Still show NFT when turning off the network | ✅ done |
 | — | [#1154](https://github.com/Koniverse/SubWallet-Extension/issues/1154) | Upgrade UI - Still shows NFT sent | ✅ done |
 | — | [#1258](https://github.com/Koniverse/SubWallet-Extension/issues/1258) | Show duplicate network enable message in the import token, import nft screen | ⏸ deprecated |
