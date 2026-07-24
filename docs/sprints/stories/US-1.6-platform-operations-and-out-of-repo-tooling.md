@@ -53,9 +53,10 @@ this extension does not carry a backend deploy or a support system, so the `Ship
 > **One row was here by mistake and is gone.** [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189)
 > *"Deploying Bittensor ecosystem features"* is **not** out-of-repo work: it is a cross-epic
 > umbrella over **six sub-issues that all shipped**, in releases 1.3.28 through 1.3.48. A title
-> heuristic read *"Deploying …"* as a deploy chore. It moved to
-> [US-32.373](US-32.373-deploying-bittensor-ecosystem-features.md) on 2026-07-22, and the six
-> child stories that named this story as their parent were repointed with it. **The test that
+> heuristic read *"Deploying …"* as a deploy chore. It moved to the earning maintenance ledger on
+> 2026-07-22, and when that ledger folded into [EPIC-12](../epics/EPIC-12.md) on 2026-07-24 it became
+> that epic's umbrella ([AGENTS.md](../../../AGENTS.md) rule 10); its earning children carry the work
+> in [US-12.6](US-12.6-bittensor-dtao-subnet-staking.md). **The test that
 > catches this class:** an out-of-repo issue has **no sub-issues in this tracker and no CHANGELOG
 > line** — `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues` returns empty for the
 > three that remain, and returned six for #4189.

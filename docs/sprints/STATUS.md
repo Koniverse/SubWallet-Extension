@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-24 08:37:22 UTC
-> Total stories: 1108
+> Last generated: 2026-07-24 09:13:04 UTC
+> Total stories: 752
 
-## 📋 Backlog (146)
+## 📋 Backlog (120)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -42,32 +42,6 @@
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
-| US-32.16 | Built-in staking for Dotsama layer2 dapps' tokens | EPIC-32 | P3 | 1 | — | hieudd |
-| US-32.73 | Supporting Fast unstake | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.90 | Support Stake Max | EPIC-32 | P3 | 1 | — | — |
-| US-32.102 | Still navigating to the stake action screens when there are no valid accounts | EPIC-32 | P3 | 1 | — | — |
-| US-32.151 | [Yield aggregator] Recheck Decimal separator character | EPIC-32 | P3 | 1 | — | Thiendekaco |
-| US-32.153 | Review and recheck filter criteria of the validator/collator/dApp | EPIC-32 | P3 | 1 | — | — |
-| US-32.164 | Filter condition resets when select sort by nominations on the first time opening the app | EPIC-32 | P3 | 1 | — | PDTnhah |
-| US-32.173 | Support VARA staking history | EPIC-32 | P3 | 1 | — | lw-cdm |
-| US-32.188 | Improve Earning content | EPIC-32 | P3 | 1 | — | PDTnhah |
-| US-32.205 | Update default validator selection for staking | EPIC-32 | P3 | 1 | — | bluezdot |
-| US-32.227 | Auto select earning validators | EPIC-32 | P3 | 1 | — | Quangdm-cdm |
-| US-32.230 | WebApp - Earning - Do not show instruction when Start earning(Specific account) | EPIC-32 | P3 | 1 | — | — |
-| US-32.247 | WebApp - Do not navigate to the Earning screen when opening from the Earning preview page in case the network is not ena | EPIC-32 | P3 | 1 | — | — |
-| US-32.249 | WebApp - Implement UI for staking compound feature | EPIC-32 | P3 | 1 | — | — |
-| US-32.268 | WebApp - Improve Earning feature | EPIC-32 | P3 | 1 | — | — |
-| US-32.275 | WebApp - Handle case click back button on the Start earning | EPIC-32 | P3 | 1 | — | — |
-| US-32.285 | WebApp - Cancel stake button is disabled even though this action is available | EPIC-32 | P3 | 1 | — | — |
-| US-32.302 | Extension - Update content for popup notice of need to unstake | EPIC-32 | P3 | 1 | — | — |
-| US-32.314 | Extension - Support Claim reward for Amplitude | EPIC-32 | P3 | 1 | — | — |
-| US-32.315 | Extension - Error auto reset data on validator field | EPIC-32 | P3 | 1 | — | — |
-| US-32.346 | Extension - Error when perform stake with MUSE network | EPIC-32 | P3 | 1 | — | — |
-| US-32.351 | [Ethereum] Add support for in-app TANSSI staking via Symbiotic's Restaking Protocol | EPIC-32 | P3 | 1 | — | — |
-| US-32.359 | Extension - Add logic validate in case minStake of wallet > minStake of validator | EPIC-32 | P3 | 1 | — | — |
-| US-32.362 | Improve UX for staking when one or more collators/validators staked are inactive | EPIC-32 | P3 | 1 | — | tunghp2002 |
-| US-32.365 | Extension - Do not display Withdraw button although available for withdrawal of the Direct nomination - Parachain | EPIC-32 | P3 | 1 | — | — |
-| US-32.371 | [ Extension ]  Able to scroll up /đown in account info in TAO direct nomination earnings | EPIC-32 | P3 | 1 | — | — |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
 | US-4.13 | Bitcoin UTXO multi-asset transfer & custom fee | EPIC-4 | P1 | 5 | — | — |
 | US-4.16 | Cosmos ecosystem support | EPIC-4 | P1 | 5 | — | — |
@@ -169,7 +143,7 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (27)
+## 🟡 In Progress (26)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -177,6 +151,7 @@
 | US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
 | US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
 | US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
+| US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
@@ -185,8 +160,6 @@
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
 | US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
-| US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
-| US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
@@ -201,21 +174,20 @@
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 | US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
 
-## 👀 Review (9)
+## 👀 Review (8)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-32.368 | [Refactor Earning] Remove Legacy `bonding` and move necessary utils to `earning-service` | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (849)
+## ✅ Done (543)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -258,6 +230,10 @@
 | US-12.8 | Earning-path simulation & step tracking | EPIC-12 | P1 | 5 | sprint-2024-M02 | nulllpc |
 | US-12.9 | XCM deposit routing into earning | EPIC-12 | P1 | 5 | sprint-2024-M02 | nulllpc |
 | US-12.15 | Earning term and condition display mechanism | EPIC-12 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
+| US-12.16 | Crowdloan contribution & portfolio | EPIC-12 | P3 | 3 | sprint-2022-M01 | — |
+| US-12.18 | Earning screens in the 1.0.2 UI rewrite | EPIC-12 | P3 | 1 | sprint-2023-M04 | — |
+| US-12.19 | Earning on the WebApp & Avail Space | EPIC-12 | P3 | 5 | sprint-2024-M01 | — |
+| US-12.20 | Earning rewards & APY accuracy (settled) | EPIC-12 | P2 | 3 | sprint-2024-M01 | — |
 | US-13.1 | XCM cross-chain parachain transfers (fee estimation + per-route toggle) | EPIC-13 | P1 | 8 | sprint-2022-M06 | saltict |
 | US-13.2 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | EPIC-13 | P1 | 5 | sprint-2024-M06 | nulllpc |
 | US-13.3 | Avail Bridge: Avail ↔ Ethereum | EPIC-13 | P2 | 5 | sprint-2024-M10 | bluezdot |
@@ -316,316 +292,6 @@
 | US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2022-M01 | barrutko |
 | US-3.10 | Account screens in the 1.0.2 UI rewrite | EPIC-3 | P3 | 1 | sprint-2023-M04 | — |
 | US-3.11 | Account on the WebApp & Avail Space | EPIC-3 | P3 | 5 | sprint-2024-M01 | — |
-| US-32.1 | Integrate Vara network | EPIC-32 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-32.2 | Staking Portfolio Management | EPIC-32 | P3 | 1 | sprint-2022-M03 | nulllpc |
-| US-32.3 | Integration with SubQuery & SubSquid to show Transactions History & Crowdloan Status and Staking Information | EPIC-32 | P3 | 1 | sprint-2022-M03 | saltict |
-| US-32.4 | Crowdloan Button in SubWallet | EPIC-32 | P3 | 1 | sprint-2023-M06 | — |
-| US-32.5 | Unable to load Staking in Brave Browser (waiting Subsquid API) | EPIC-32 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-32.6 | Add Moonbeam and Moonriver staking data | EPIC-32 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-32.7 | Support NFT/staking features for custom networks | EPIC-32 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-32.8 | Update usage of paraId, blockExplorer, crowdLoanUrl, coinGeckoKey from custom network | EPIC-32 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-32.9 | Stake Account displaying incorrect on the Staking action/Authorize Transaction screen | EPIC-32 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-32.10 | Not showing crowdloan data properly | EPIC-32 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-32.11 | Fix miscalculation of unstaking time | EPIC-32 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-32.12 | Add pool staking feature for DOT | EPIC-32 | P3 | 1 | sprint-2023-M04 | hieudd |
-| US-32.13 | HydraDX snakenet staking issue | EPIC-32 | P3 | 1 | sprint-2022-M07 | nulllpc |
-| US-32.14 | Improve UX for enter amount action on unstake screen when user clicks on unstake all | EPIC-32 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-32.15 | Discussion about the unstake-withdraw flow and feedback staking feature | EPIC-32 | P3 | 1 | sprint-2023-M06 | hieudd |
-| US-32.18 | Integrate Auto-Compound Staking Reward API for Turing Network | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-32.19 | Bug UI on the Authorize staking screen | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-32.20 | Fix some issues related to 'minimum stake' in cases stake more and unstake | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-32.21 | Fix staking data UI error | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-32.22 | Fix bug parsing Acala crowdloan data | EPIC-32 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-32.24 | Add staking for $CAPS and add support for Ternoa's testnet Alphanet | EPIC-32 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-32.25 | Infinite loading when user stake DOT | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-32.26 | Handle estimated fee error on NFT sending + staking | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-32.27 | Add support staking for Amplitude/Kilt | EPIC-32 | P3 | 1 | sprint-2022-M11 | hieudd |
-| US-32.28 | Add validatorCount to general staking info API | EPIC-32 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-32.29 | Support claim reward feature for QR Account | EPIC-32 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-32.30 | Do not show crowdloan status | EPIC-32 | P3 | 1 | sprint-2022-M10 | huukhai |
-| US-32.31 | Update staking returned data | EPIC-32 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-32.32 | Can't unstake, withdraw on parachain when using a QR signer account | EPIC-32 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-32.33 | Update the 'expected return' to staking for some chain | EPIC-32 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-32.34 | Infinite load when stake/unstake in the following cases | EPIC-32 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-32.35 | Error when use stake action on Turing Staging/ Turing network with QR signer account | EPIC-32 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-32.36 | Support staking for KMA (Calamari parachain) | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.37 | Number overflow error on staking feature | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.38 | Support staking for Shiden | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.39 | Fix other bug in case unstake | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.40 | Error withdrawing stake with slashing spans | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.41 | Minor bugs on staking | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.43 | Can not sign the Claim reward transaction with QR-signer account | EPIC-32 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-32.44 | Show incorrect screen when re-open the extension after staking successfully | EPIC-32 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-32.45 | Do not show message when staking record does not exist yet | EPIC-32 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-32.46 | Remove EVM crowdloan record | EPIC-32 | P3 | 1 | sprint-2022-M11 | saltict |
-| US-32.47 | Support claim staking reward for Amplitude | EPIC-32 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-32.48 | Do not unstake, withdrawal due to number conversion | EPIC-32 | P3 | 1 | sprint-2023-M06 | — |
-| US-32.49 | Fix bug don't show validator on the Amplitude network and update expected return | EPIC-32 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-32.50 | Fix showing incorrect Unclaim reward information on 'All Accounts' mode | EPIC-32 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-32.51 | Showing crowdloan contribution in case the network is not live yet | EPIC-32 | P3 | 1 | sprint-2022-M12 | saltict |
-| US-32.52 | Add support for $AZERO nomination pool staking (Aleph Zero) | EPIC-32 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-32.53 | Support more information for the in-app staking feature | EPIC-32 | P3 | 1 | sprint-2023-M05 | sokol142 |
-| US-32.55 | Fix duplicate crowdloan problems | EPIC-32 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-32.56 | Fix the staking validator's expected return for relaychain | EPIC-32 | P3 | 1 | sprint-2023-M02 | nulllpc |
-| US-32.57 | Upgrade UI - Screen Home / Staking | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.58 | Upgrade UI - Screen Home / Crowdloan | EPIC-32 | P3 | 1 | sprint-2023-M03 | Quangdm-cdm |
-| US-32.60 | Do not show the dApps list when staking for Shibuya Testnet | EPIC-32 | P3 | 1 | sprint-2023-M06 | — |
-| US-32.62 | Upgrade UI - Update background logic for staking | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.63 | Upgrade UI - Update logic auto enable chain for staking | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.64 | Fixed the bug in calculating Ternoa Staking APR | EPIC-32 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-32.65 | Upgrade UI - UI Bugs related to staking feature | EPIC-32 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-32.66 | Upgrade UI - Some issues related to the Staking feature | EPIC-32 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-32.67 | Optimize get staking performane with middleware service | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.68 | Can not select pool in case turning on network | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.69 | Don't show NFT, staking details on the first time accessing | EPIC-32 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-32.70 | Update fetching staking info with middleware service | EPIC-32 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-32.72 | Added support for 'Unstake Max' functionality | EPIC-32 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-32.76 | Fixed bug the address validator auto detect to Substrate address | EPIC-32 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-32.77 | Fixed bug get balance when import multi-account | EPIC-32 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-32.78 | Fix bug when stake | EPIC-32 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-32.79 | Fixed bug showing min pooled amount | EPIC-32 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-32.80 | Support auto-select validator/collator/dApp when click on 'auto-select' validator to nominate | EPIC-32 | P3 | 1 | sprint-2023-M05 | GeneGlsn |
-| US-32.81 | Fix bug show unclaim reward | EPIC-32 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-32.83 | Missing balance validation on pool bonding | EPIC-32 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-32.84 | Fixed bug Show incorrect earning reward status on All accounts mode | EPIC-32 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-32.85 | Optimized staking performance | EPIC-32 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-32.87 | Fixed the bug causing failure to stake more for a pool in cases where an unstake request was present | EPIC-32 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-32.89 | Fixed bugs on the Staking screens | EPIC-32 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-32.91 | Fixed bug Do not show validator on the Select validator screen in case turn on network when stake | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.92 | Update showing min stake value | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.93 | Implement reload button on the Staking screen | EPIC-32 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-32.94 | Add Staking Support For Pendulum | EPIC-32 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-32.95 | Updated the criteria's icon on the Sorting pool/validator/collator/dApp screen | EPIC-32 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-32.96 | Fixed bug Showing staking account on the Staking detail screen | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.97 | WebApp - Price on Crowdloans screen is incorrect | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.98 | WebApp - Bugs related to the Staking feature | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.99 | Fixed bug Do not reset selected validator when change token to stake | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.100 | Fixed bug showing staking APY | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.101 | Fixed bug Still show NFT and staking data when turn off all networks | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.103 | WebApp - Bug related to Staking feature | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.104 | Do not navigate to the NFT screen or Crowdloan screen | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.105 | Fixed bug Validator avatars are auto-generated continuously | EPIC-32 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-32.106 | Fixed bug showing token price for staking item (Calamari network) | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.107 | Research Liquid staking | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.108 | WebApp - Add tabs for Crowdloans, Staking, History | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.109 | [Yield aggregator] Implement interfaces and functions for info handling | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.110 | [Yield aggregator] Implement earning simulation | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.111 | [Yield aggregator] Implement path generator | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.112 | [Yield aggregator] Start earning page | EPIC-32 | P3 | 1 | sprint-2023-M10 | Quangdm-cdm |
-| US-32.113 | WebApp - Add sub-logo to staking list | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.114 | Fixed bug Do not show status of the crowd loans item (Acala) | EPIC-32 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-32.115 | WebApp - Show incorrect history in case change NFT to Staking | EPIC-32 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-32.116 | Review crowdloans feature | EPIC-32 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-32.117 | Support staking in app for Creditcoin | EPIC-32 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-32.118 | Support staking in-app for Astar EVM | EPIC-32 | P3 | 1 | sprint-2024-M08 | — |
-| US-32.119 | Fixed bug Show incorrect message when the minimum active stake is a real number | EPIC-32 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-32.120 | [Yield aggregator] Update UI/UX | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.121 | [Yield aggregator] Bugs related to Earning pool list | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.122 | [Yield aggregator] Bugs related to Staking calculator | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.123 | [Yield aggregator] Bugs related to Manage earnings | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.124 | [Yield aggregator] Bugs related to Earning action | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.125 | [Grab 100 MDOT] SRS for crowdloan page and earning page for Grab 100 MDOT | EPIC-32 | P3 | 1 | sprint-2023-M10 | Sokol142196 |
-| US-32.126 | [Grab 100 MDOT] Crowdloan page | EPIC-32 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-32.127 | [Grab 100 MDOT] Earning Page Demo | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.128 | [Yield aggregator] Update step's status | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.129 | [Yield aggregator] Bugs related to Staking information | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.130 | [Grab 100M DOT] Add the crowdloan unlock action and banner | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.131 | [Yield aggregator] Bugs related to the earning feature | EPIC-32 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-32.132 | [Yield aggregator] Add support for more XCM channels | EPIC-32 | P3 | 1 | sprint-2023-M12 | — |
-| US-32.133 | [Yield aggregator] Fix content for earning feature | EPIC-32 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-32.134 | [Yield aggregator] Update Exclusive reward tag | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.135 | Hide the AutoSelect validator/collator/dApp button if this method is not supported | EPIC-32 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-32.136 | Update crowdloan data | EPIC-32 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-32.137 | [Grab 100M DOT] Exclusive rewards calculation | EPIC-32 | P3 | 1 | sprint-2023-M11 | saltict |
-| US-32.138 | Update Crowdloan UI in home page | EPIC-32 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-32.139 | WebApp - Recheck logic calculate the Staking value on the Statistics | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-32.140 | [Yield aggregator] Update default unstaking for liquid staking | EPIC-32 | P3 | 1 | sprint-2024-M01 | — |
-| US-32.141 | [Yield Aggregator] Add some pools as coming soon | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.142 | [Yield Aggregator] Review estimated receivables on withdrawal screen | EPIC-32 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-32.143 | [Yield Aggregator] Add more pool | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-32.144 | [Grab 100M DOT] Show the unlocked crowdloan contribution | EPIC-32 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-32.145 | Do not subscribe the balance after XCM in the earning screen | EPIC-32 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-32.146 | [Yield aggregator] Incorrect earning pools display in case there is only 1 account type in All Accounts mode | EPIC-32 | P3 | 1 | sprint-2023-M11 | nulllpc |
-| US-32.147 | Fixed bug display dApp/pool/validator/collator name | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.148 | [Yield aggregator] Do not show Bifrost on list pool although network is connected | EPIC-32 | P3 | 1 | sprint-2023-M11 | nulllpc |
-| US-32.149 | Support nomination pool for Vara network | EPIC-32 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-32.150 | [Yield Aggregator] Setting swapping rate as high as possible | EPIC-32 | P3 | 1 | sprint-2023-M11 | nulllpc |
-| US-32.152 | Fixed bug chainStaking Metadata on Kusama | EPIC-32 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-32.154 | Support staking for Goldberg | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.155 | WebApp - Missing Centrifuge Crowdloan Result | EPIC-32 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-32.157 | WebApp - Hide the Exclusive rewards tag | EPIC-32 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-32.158 | Fixed bug missing crowdloan | EPIC-32 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-32.159 | Fixed bug showing staking rewards on Moonbeam | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.161 | Improve validator/pool selection UX | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.162 | Update staking for Westend | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.163 | Fixed bug show staking earning status on Creditcoin | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.165 | The default pool setting for Vara is SubWallet Official | EPIC-32 | P3 | 1 | sprint-2023-M12 | nguyenduythuc |
-| US-32.166 | Instruction for Staking feature on mobile app | EPIC-32 | P3 | 1 | sprint-2023-M12 | Quangdm-cdm |
-| US-32.167 | Update APY for Vara network | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.168 | Update showing estimated withdrawal time on staking | EPIC-32 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-32.169 | Update top nominators getting rewards | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.170 | Migrate `Staking` to `Earning` | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.171 | [WebApp] Group `Earning` to service | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.172 | Show incorrect earning status on All accounts mode | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-32.174 | Update API staking for Astar | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.176 | Add Azero Domains is default pool | EPIC-32 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-32.178 | Fix bug 'Invalid character' on earning | EPIC-32 | P3 | 1 | sprint-2023-M12 | nulllpc |
-| US-32.179 | Update Astar dapp staking v3 | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.180 | WebApp \| Extension - Handle the case of default untick checkbox Bond reward when Claim reward | EPIC-32 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-32.181 | Update 'undefined error' message when can not get staking metadata | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.182 | Support Euphrates earning pool | EPIC-32 | P3 | 1 | sprint-2024-M08 | — |
-| US-32.183 | Check some Polkadot staking info | EPIC-32 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-32.184 | Fixed bug Do not show banner on Crowdloans tab | EPIC-32 | P3 | 1 | sprint-2024-M01 | lw-cdm |
-| US-32.185 | Add support in-app staking for KREST | EPIC-32 | P3 | 1 | sprint-2024-M01 | bluezdot |
-| US-32.186 | Change 'Claim rewards' to 'Check rewards' for dApp staking | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.187 | WebApp - Update earning feature | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.189 | Improve Earning data subscription | EPIC-32 | P3 | 1 | sprint-2024-M01 | saltict |
-| US-32.190 | Support TAO in-app staking | EPIC-32 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-32.191 | Update Manta staking APY formula | EPIC-32 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-32.192 | Fix bug showing inconsistent earning status on extension and mobile | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-32.193 | [Extension] Update filter and emptylist for Earning Positions,  Earning Options, Earning Pools | EPIC-32 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-32.194 | Set up SubWallet validators | EPIC-32 | P3 | 1 | sprint-2025-M01 | tunghp2002 |
-| US-32.195 | Update Earning feature for Webapp | EPIC-32 | P3 | 1 | sprint-2024-M02 | lw-cdm |
-| US-32.196 | Error when perform liquid staking with Bifrost Polkadot | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-32.197 | Update unstaking request info for KREST, AMPE | EPIC-32 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-32.198 | Add popup want to user claim reward when Astar update dApp staking v3 | EPIC-32 | P3 | 1 | sprint-2024-M02 | Thiendekaco |
-| US-32.200 | User Flow - Staking Reward | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.201 | Update staking APY formula for relaychain | EPIC-32 | P3 | 1 | sprint-2024-M02 | bluezdot |
-| US-32.202 | Webapp - Update Earning Options screen | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.203 | Webapp - Update Earning Pools screen | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.204 | Webapp - Update Earning Positions screen | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.206 | Set pool default for Aleph Zero | EPIC-32 | P3 | 1 | sprint-2024-M02 | saltict |
-| US-32.207 | Fixed bug showing withdrawal time on un-staking | EPIC-32 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-32.208 | Update position and options actions for Astar Staking DApp | EPIC-32 | P3 | 1 | sprint-2024-M02 | lw-cdm |
-| US-32.209 | Fixed bug related to earning feature | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.210 | Add popup Introducing Earning feature | EPIC-32 | P3 | 1 | sprint-2024-M02 | lw-cdm |
-| US-32.211 | Fixed bug showing positions | EPIC-32 | P3 | 1 | sprint-2024-M02 | lw-cdm |
-| US-32.213 | Turn off popup remind claim rewards for dApp staking | EPIC-32 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-32.214 | Webapp - Update for staking reward | EPIC-32 | P3 | 1 | sprint-2024-M03 | lw-cdm |
-| US-32.215 | Update filtering out blocked validators | EPIC-32 | P3 | 1 | sprint-2024-M02 | bluezdot |
-| US-32.216 | Optimize Earning Performance Round 2 (Caching most of data) | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.218 | Extension - Bugs related to the earning feature (Round 3) | EPIC-32 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-32.219 | [Extension] Fix unstaking info for liquid staking on Bifrost | EPIC-32 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-32.221 | Fix bug related to Aleph Zero transfer and staking | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.223 | WebApp - Bug related to earning feature on WebApp (Round 2) | EPIC-32 | P3 | 1 | sprint-2024-M03 | lw-cdm |
-| US-32.224 | Update pool default for VARA | EPIC-32 | P3 | 1 | sprint-2024-M02 | saltict |
-| US-32.225 | Fixed bug related to earning feature | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.226 | Re-check case update data after performing actions (unstake, cancel unstake, withdraw) | EPIC-32 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-32.228 | Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-32.229 | WebApp - Bug related to earning feature on WebApp (Round 3) | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.232 | WebApp - Update TVS for earning feature | EPIC-32 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-32.233 | WebApp - Update earning preview screen | EPIC-32 | P3 | 1 | sprint-2024-M03 | lw-cdm |
-| US-32.234 | Fixed bug show earnings screen although back to home | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.235 | Disallow staking to collators/pools that maxed out member threshold | EPIC-32 | P3 | 1 | sprint-2024-M05 | bluezdot |
-| US-32.236 | Extension - Implement UI in case Disallow staking to collators/pools that maxed out member threshold | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.237 | WebApp - Bug related to the popup Recommended validators | EPIC-32 | P3 | 1 | sprint-2024-M03 | Quangdm-cdm |
-| US-32.238 | WebApp - Show Validator details pop up when navigating from the Staking Rewards page | EPIC-32 | P3 | 1 | sprint-2024-M04 | saltict |
-| US-32.239 | Fixed bug Error getting wrong validator address | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.240 | Support Auto compound for pool | EPIC-32 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-32.241 | Improve UX UI for earning feature | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.242 | Update withdraw time for parachain staking | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.243 | Update withdraw time for Parachain | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.245 | WebApp - Update UI for earning feature | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.246 | Update message when navigate user to the Astar portal to stake | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.248 | Extension - Implement UI for staking compound for Nomination pool | EPIC-32 | P3 | 1 | sprint-2024-M08 | Thiendekaco |
-| US-32.250 | Extension -  Hide 'Direct nomination' of the relaychain if available balance < min stake | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.251 | Fixed bug show minimum active stake | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.252 | WebApp - Re-check min active stake for Relaychain | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.253 | Fixed bug parsing Earning status for Nomination pool | EPIC-32 | P3 | 1 | sprint-2024-M04 | nulllpc |
-| US-32.254 | WebApp - Display list Recommended by label in Select pool screen | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.255 | Display list Recommended by label in Select pool screen | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.256 | Fix issue related to earning status | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.257 | Hide popup Introducing Earning feature | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.258 | Support staking for Avail Turing | EPIC-32 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-32.259 | Set default pool for Avail Turing | EPIC-32 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-32.261 | Fixed bug related to earning feature ( Round 5) | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.262 | Extension - Show incorrect available on Earning options | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-32.263 | Update Validator name/ Collator name | EPIC-32 | P3 | 1 | sprint-2024-M05 | bluezdot |
-| US-32.264 | Refactoring code earning service | EPIC-32 | P3 | 1 | sprint-2024-M06 | bluezdot |
-| US-32.265 | Fixed error auto reset data on Pool field | EPIC-32 | P3 | 1 | sprint-2024-M11 | S2kael |
-| US-32.266 | Do not show crowdloan data on the Check crowdloan result site | EPIC-32 | P3 | 1 | sprint-2025-M03 | — |
-| US-32.269 | Check Avail Turing staking APY | EPIC-32 | P3 | 1 | sprint-2024-M05 | bluezdot |
-| US-32.270 | WebApp - Error getting wrong validator address | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.271 | WebApp - Implement UI in case Disallow staking to collators/pools that maxed out member threshold | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.272 | Show nomination pool with block status | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.274 | [Extension] Fix earning data for update chain online | EPIC-32 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-32.276 | Update UI for Earning position details | EPIC-32 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-32.277 | WebApp - Remove Parallel liquid staking | EPIC-32 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-32.278 | Update some message related to earning feature | EPIC-32 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-32.279 | WebApp- Add portfolio for earning position | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-32.280 | Check error logs in earning feature | EPIC-32 | P3 | 1 | sprint-2024-M06 | bluezdot |
-| US-32.281 | WebApp - Show nomination pool with block status | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-32.286 | Staking rewards not being updated for injected accounts on webapp | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-32.287 | Improve the staking reward information retrieval | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-32.288 | Fix bug Show incorrect withdrawal information of the Bifrost liquid staking when all accounts mode | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-32.289 | WebApp - Re-check case totalStake < unstakeBalance | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-32.291 | Set default pool and default validator for Avail | EPIC-32 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-32.292 | WebApp -  Set default pool and default validator for Avail | EPIC-32 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-32.293 | WebApp - Do not show earning position for Bifrost liquid staking | EPIC-32 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-32.294 | Update balance calculation for nomination pool runtime update | EPIC-32 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-32.296 | Re-check validator display information on DENTnet network | EPIC-32 | P3 | 1 | sprint-2024-M09 | tunghp2002 |
-| US-32.297 | Add warning in case user earn for both nomination pool and direct | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-32.298 | Add Notice of need to unstake for users who are simultaneously staking for both Direct and Nomination Pool | EPIC-32 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-32.299 | Unified account - Fix bug related to Earning feature | EPIC-32 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-32.303 | WebApp - Add warning in case user earn for both nomination pool and direct | EPIC-32 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-32.304 | WebApp - Notice of need to unstake for users who are simultaneously staking for both Direct and Nomination Pool | EPIC-32 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-32.305 | Fix bug do not show lock balance in case account have Kusama nomination pool | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-32.306 | Fix bug display wrong APY for Polkadot staking option | EPIC-32 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-32.308 | Extension - Transaction has a bad signature when perform earning for Moonbase Alpha | EPIC-32 | P3 | 1 | sprint-2025-M01 | S2kael |
-| US-32.310 | Extension - Update message in case perform Liquid staking have XCM | EPIC-32 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-32.311 | Unified account - Bug related to Earning feature | EPIC-32 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-32.312 | Update content on unstake screen for some earning options | EPIC-32 | P3 | 1 | sprint-2024-M12 | tunghp2002 |
-| US-32.313 | Fix min stake for TAO(Bittensor) | EPIC-32 | P3 | 1 | sprint-2024-M10 | tunghp2002 |
-| US-32.316 | Show earning balances on token tab | EPIC-32 | P3 | 1 | sprint-2025-M03 | nulllpc |
-| US-32.317 | Fixed min amount on popup Pay attention in case there is not enough balance to stake | EPIC-32 | P3 | 1 | sprint-2025-M09 | tunghp2002 |
-| US-32.318 | Fix bug setup validator related maxCount | EPIC-32 | P3 | 1 | sprint-2025-M01 | tunghp2002 |
-| US-32.319 | Fixed bug Show incorrect pool/validator when earning on All accounts mode | EPIC-32 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
-| US-32.320 | Support staking for Mythos | EPIC-32 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-32.321 | Fix bug Do not show earning position for Bittensor | EPIC-32 | P3 | 1 | sprint-2025-M02 | tunghp2002 |
-| US-32.322 | Support dTAO staking | EPIC-32 | P3 | 1 | sprint-2025-M03 | tunghp2002 |
-| US-32.323 | Fix Bug when unstaking vDOT, vMANTA | EPIC-32 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-32.324 | Fixed bug related to subnet staking feature | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-32.325 | Support custom slippage for TAO subnet staking | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-32.326 | Extension - Bug when staking for Ternoa via dApp | EPIC-32 | P3 | 1 | sprint-2025-M04 | bluezdot |
-| US-32.327 | Update default Validator set | EPIC-32 | P3 | 1 | sprint-2025-M04 | nulllpc |
-| US-32.328 | Support Change validator feature | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
-| US-32.329 | Add APY information for TAO and dTao staking | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-32.330 | Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver | EPIC-32 | P3 | 1 | sprint-2025-M06 | PDTnhah |
-| US-32.333 | Fixed bug when stake for subnet | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-32.334 | Change TAO's position in Earning options | EPIC-32 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
-| US-32.335 | Stake TAO with Seamless Validator Switching | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
-| US-32.336 | Fixed bug navigating actions in Earning feature | EPIC-32 | P3 | 1 | sprint-2025-M06 | lw-cdm |
-| US-32.337 | Display On-Chain Identity for Validators | EPIC-32 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-32.338 | Add more space for Kusama Validator 02 | EPIC-32 | P3 | 1 | sprint-2025-M07 | anhntk54 |
-| US-32.339 | Extension - Add validate in case user earning both pool and direct nomination | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
-| US-32.340 | Fixed bug when stake/unstake with subnet staking | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
-| US-32.341 | Refactor TAO earning position logic | EPIC-32 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-32.342 | Update some UI for Change validator feature | EPIC-32 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-32.343 | Support Change validator for more chains | EPIC-32 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-32.344 | Update logo for subnet on Earning features | EPIC-32 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-32.345 | Extension - Check update runtime related to dual staking | EPIC-32 | P3 | 1 | sprint-2025-M07 | saltict |
-| US-32.347 | Update TAO staking fee | EPIC-32 | P3 | 1 | sprint-2025-M08 | tunghp2002 |
-| US-32.348 | Add support for in-app EWT staking | EPIC-32 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-32.349 | Fixed TAO's position in Earning options | EPIC-32 | P3 | 1 | sprint-2025-M09 | tunghp2002 |
-| US-32.350 | Add support for in-app TANSSI staking | EPIC-32 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-32.352 | [zkVerify Mainnet] Add support for in-app VFY staking | EPIC-32 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-32.353 | Fixed error when performing EWC staking | EPIC-32 | P3 | 1 | sprint-2025-M10 | tunghp2002 |
-| US-32.354 | Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version | EPIC-32 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-32.355 | Update Earning Info config for migrated chain after AHM | EPIC-32 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-32.356 | Fixed some UI bugs for migrated chain after AHM on Earning features | EPIC-32 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-32.357 | Fixed bug show Earning options for Kusama although AHM migrated | EPIC-32 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-32.358 | [zkVerify] Select SubWallet validators by default when staking VFY | EPIC-32 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-32.360 | Add Collator's APY for Tanssi Staking | EPIC-32 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-32.361 | Calculate exactly estimate fee for bridge step in liquid staking | EPIC-32 | P3 | 1 | sprint-2026-M05 | PDTnhah |
-| US-32.363 | Update altinputasset for some liquid staking | EPIC-32 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-32.364 | Support the newly updated Root staking feature \| Bittensor | EPIC-32 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
-| US-32.366 | [Bittensor] Background: Support new Root staking reward options | EPIC-32 | P3 | 1 | sprint-2026-M04 | tunghp2002 |
-| US-32.367 | [Bittensor] UI: Support new Root staking reward options | EPIC-32 | P3 | 1 | sprint-2026-M04 | tunghp2002 |
-| US-32.369 | Remove the Crowdloans tab | EPIC-32 | P3 | 1 | sprint-2026-M01 | frenkie-ng |
-| US-32.370 | Fix bug get Earning position parachain | EPIC-32 | P3 | 1 | sprint-2026-M01 | tunghp2002 |
-| US-32.373 | Deploying Bittensor ecosystem features | EPIC-32 | P3 | 1 | sprint-2025-M07 | tunghp2002 |
-| US-32.374 | Add icon info for DelegationItem | EPIC-32 | P3 | 1 | — | — |
-| US-32.375 | Add incrementDelegatorRewards call to Amplitude reward claiming | EPIC-32 | P3 | 1 | — | — |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -1073,33 +739,11 @@
 
 _No stories_
 
-## 🗑️ Deprecated (68)
+## 🗑️ Deprecated (46)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
-| US-32.17 | Support staking for cross-chain tokens inside parachains | EPIC-32 | P3 | 1 | — | hieudd |
-| US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-32.42 | Bug withdrawing GLMR stake | EPIC-32 | P3 | 1 | — | Sokol142196 |
-| US-32.54 | Update Claim reward feature for the Amplitude | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.59 | Can't cancel staking compound task | EPIC-32 | P3 | 1 | — | — |
-| US-32.61 | Review & update the 'Minimum stake' value | EPIC-32 | P3 | 1 | — | — |
-| US-32.71 | Cancel unstake does not match the selected request (Relay chain, dApp) | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.74 | Update fetch validator list from middleware service | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.75 | Handling caching for crowdloan | EPIC-32 | P3 | 1 | — | Sokol142196 |
-| US-32.82 | Add the warning message when perform stake | EPIC-32 | P3 | 1 | — | — |
-| US-32.86 | Re-check staking-related issues | EPIC-32 | P3 | 1 | — | — |
-| US-32.88 | Re-check Staking Max Bifrost Kusama | EPIC-32 | P3 | 1 | — | S2kael |
-| US-32.156 | Follow-up get metadataStaking for Bifrost testnet | EPIC-32 | P3 | 1 | — | Sokol142196 |
-| US-32.160 | Showing incorrect data in staking feature in some cases | EPIC-32 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-32.199 | Mobile - Add popup want to user claim reward when Astar update dApp staking v3 | EPIC-32 | P3 | 1 | — | — |
-| US-32.212 | Extension - Show log campaign unlock when click to any earning option to stake | EPIC-32 | P3 | 1 | — | saltict |
-| US-32.217 | Extension - Show incorrect balance in case earning have withdraw | EPIC-32 | P3 | 1 | — | — |
-| US-32.220 | Do not withdraw for Lending staking | EPIC-32 | P3 | 1 | — | PDTnhah |
-| US-32.244 | Support setting reward permission for nomination pool | EPIC-32 | P3 | 1 | — | bluezdot |
-| US-32.282 | Re-check and update earning for Edgware | EPIC-32 | P3 | 1 | — | nulllpc |
-| US-32.301 | Extension - Do not allow entering Amount without selecting an account in the Stake, Unstake screen | EPIC-32 | P3 | 1 | — | — |
-| US-32.307 | WebApp - Adjust showing/validating address on Earning actions | EPIC-32 | P3 | 1 | — | — |
 | US-41.3 | Intergrate Collab.Land for private channel in Discord | EPIC-41 | P3 | 1 | — | — |
 | US-41.21 | Get Data subtoken from Subquery: | EPIC-41 | P3 | 1 | — | — |
 | US-41.28 | Support txn Queueing | EPIC-41 | P3 | 1 | — | — |
@@ -1150,12 +794,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 146
+- 📋 **Backlog**: 120
 - 🟢 **Ready**: 9
-- 🟡 **In Progress**: 27
-- 👀 **Review**: 9
-- ✅ **Done**: 849
+- 🟡 **In Progress**: 26
+- 👀 **Review**: 8
+- ✅ **Done**: 543
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 68
+- 🗑️ **Deprecated**: 46
 
-⚠️  **WIP limit exceeded**: 27 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 26 stories in-progress (limit: 3).

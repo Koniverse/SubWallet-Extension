@@ -674,178 +674,178 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#4573](https://github.com/Koniverse/SubWallet-Extension/issues/4573) | Support for Bitcoin swap on ChainFlip (#4573) | 1.3.51 | 2025-07-31 | US-11.1 |
 | [#4581](https://github.com/Koniverse/SubWallet-Extension/issues/4581) | Update UX/UI when support Swap for Bitcoin on Chainflip (#4581) | 1.3.53 | 2025-08-12 | US-11.1 |
 | [#4593](https://github.com/Koniverse/SubWallet-Extension/issues/4593) | Support bridge tBTC (Ethereum) to tBTC (Hydration) via Snowbridge (#4593) | 1.3.54 | 2025-08-21 | US-11.2 |
-| [#11](https://github.com/Koniverse/SubWallet-Extension/issues/11) | Integrate Vara network (#11) | 1.0.5 | 2023-05-21 | US-32.1 |
-| [#375](https://github.com/Koniverse/SubWallet-Extension/issues/375) | Not showing crowdloan data properly (#375) | 0.4.7 | 2022-06-24 | US-32.10 |
-| [#1726](https://github.com/Koniverse/SubWallet-Extension/issues/1726) | Fixed bug showing staking APY (#1726) | 1.1.8 | 2023-08-12 | US-32.100 |
-| [#1728](https://github.com/Koniverse/SubWallet-Extension/issues/1728) | Fixed bug Still show NFT and staking data when turn off all networks (#1728) | 1.1.6 | 2023-08-04 | US-32.101 |
-| [#1757](https://github.com/Koniverse/SubWallet-Extension/issues/1757) | Fixed bug Validator avatars are auto-generated continuously (#1757) | 1.1.8 | 2023-08-12 | US-32.105 |
-| [#1766](https://github.com/Koniverse/SubWallet-Extension/issues/1766) | Fixed bug showing token price for staking item (Calamari network) (#1766) | 1.1.8 | 2023-08-12 | US-32.106 |
-| [#382](https://github.com/Koniverse/SubWallet-Extension/issues/382) | Fix miscalculation of unstaking time (#382) | 0.4.8 | 2022-06-25 | US-32.11 |
-| [#1860](https://github.com/Koniverse/SubWallet-Extension/issues/1860) | Fixed bug Do not show status of the crowd loans item (Acala) (#1860) | 1.1.13 | 2023-09-21 | US-32.114 |
-| [#1891](https://github.com/Koniverse/SubWallet-Extension/issues/1891) | Support staking in app for Creditcoin (#1891) | 1.1.11 | 2023-09-09 | US-32.117 |
-| [#1901](https://github.com/Koniverse/SubWallet-Extension/issues/1901) | Fixed bug Show incorrect message when the minimum active stake is a real number (#1901) | 1.1.12 | 2023-09-15 | US-32.119 |
-| [#2020](https://github.com/Koniverse/SubWallet-Extension/issues/2020) | Hide the AutoSelect validator/collator/dApp button if this method is not supported (#2020) | 1.1.20 | 2023-11-04 | US-32.135 |
-| [#2035](https://github.com/Koniverse/SubWallet-Extension/issues/2035) | Update crowdloan data (#2035) | 1.1.18 | 2023-10-20 | US-32.136 |
-| [#2130](https://github.com/Koniverse/SubWallet-Extension/issues/2130) | Fixed bug display dApp/pool/validator/collator name (#2130) | 1.1.25 | 2023-12-07 | US-32.147 |
-| [#2152](https://github.com/Koniverse/SubWallet-Extension/issues/2152) | Support nomination pool for Vara network (#2152) | 1.1.21 | 2023-11-08 | US-32.149 |
-| [#2162](https://github.com/Koniverse/SubWallet-Extension/issues/2162) | Fixed bug chainStaking Metadata on Kusama (#2162) | 1.1.22 | 2023-11-15 | US-32.152 |
-| [#2181](https://github.com/Koniverse/SubWallet-Extension/issues/2181) | Support staking for Goldberg (#2181) | 1.1.24 | 2023-12-01 | US-32.154 |
-| [#2199](https://github.com/Koniverse/SubWallet-Extension/issues/2199) | Fixed bug missing crowdloan (#2199) | 1.1.23 | 2023-11-24 | US-32.158 |
-| [#2213](https://github.com/Koniverse/SubWallet-Extension/issues/2213) | Fixed bug showing staking rewards on Moonbeam (#2213) | 1.1.24 | 2023-12-01 | US-32.159 |
-| [#2246](https://github.com/Koniverse/SubWallet-Extension/issues/2246) | Improve validator/pool selection UX (#2246) | 1.1.24 | 2023-12-01 | US-32.161 |
-| [#2277](https://github.com/Koniverse/SubWallet-Extension/issues/2277) | Fixed bug show staking earning status on Creditcoin (#2277) | 1.1.24 | 2023-12-01 | US-32.163 |
-| [#2291](https://github.com/Koniverse/SubWallet-Extension/issues/2291) | The default pool setting for Vara is SubWallet Official (#2291) | 1.1.24 | 2023-12-01 | US-32.165 |
-| [#2301](https://github.com/Koniverse/SubWallet-Extension/issues/2301) | Update APY for Vara network (#2301) | 1.1.25 | 2023-12-07 | US-32.167 |
-| [#2304](https://github.com/Koniverse/SubWallet-Extension/issues/2304) | Update showing estimated withdrawal time on staking (#2304) | 1.1.25 | 2023-12-07 | US-32.168 |
-| [#2324](https://github.com/Koniverse/SubWallet-Extension/issues/2324) | Update top nominators getting rewards (#2324) | 1.1.26 | 2023-12-16 | US-32.169 |
-| [#2370](https://github.com/Koniverse/SubWallet-Extension/issues/2370) | Update API staking for Astar (#2370) | 1.1.27 | 2023-12-20 | US-32.174 |
-| [#2385](https://github.com/Koniverse/SubWallet-Extension/issues/2385) | Add Azero Domains is default pool (#2385) | 1.1.27 | 2023-12-20 | US-32.176 |
-| [#520](https://github.com/Koniverse/SubWallet-Extension/issues/520) | Integrate Auto-Compound Staking Reward API for Turing Network (#520) | 0.6.6 | 2022-09-30 | US-32.18 |
-| [#2487](https://github.com/Koniverse/SubWallet-Extension/issues/2487) | Fixed bug Do not show banner on Crowdloans tab (#2487) | 1.1.32 | 2024-01-15 | US-32.184 |
-| [#2492](https://github.com/Koniverse/SubWallet-Extension/issues/2492) | Add support in-app staking for KREST (#2492) | 1.1.33 | 2024-01-23 | US-32.185 |
-| [#2497](https://github.com/Koniverse/SubWallet-Extension/issues/2497) | Change "Claim rewards" to "Check rewards" for dApp staking (#2497) | 1.1.34 | 2024-02-01 | US-32.186 |
-| [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505) | Support TAO in-app staking (#2505) | 1.3.2 | 2024-10-12 | US-32.190 |
-| [#2513](https://github.com/Koniverse/SubWallet-Extension/issues/2513) | Update Manta staking APY formula (#2513) | 1.1.42 | 2024-03-08 | US-32.191 |
-| [#2533](https://github.com/Koniverse/SubWallet-Extension/issues/2533) | Set up SubWallet validators (#2533) | 1.3.12 | 2025-01-06 | US-32.194 |
-| [#2544](https://github.com/Koniverse/SubWallet-Extension/issues/2544) | Update unstaking request info for KREST, AMPE (#2544) | 1.1.34 | 2024-02-01 | US-32.197 |
-| [#2545](https://github.com/Koniverse/SubWallet-Extension/issues/2545) | Add popup want to user claim reward when Astar update dApp staking v3 (#2545) | 1.1.34 | 2024-02-01 | US-32.198 |
-| [#555](https://github.com/Koniverse/SubWallet-Extension/issues/555) | Fix some issues related to "minimum stake" in cases stake more and unstake (#555) | 0.5.6 | 2022-08-24 | US-32.20 |
-| [#2563](https://github.com/Koniverse/SubWallet-Extension/issues/2563) | Update staking APY formula for relaychain (#2563) | 1.1.36 | 2024-02-06 | US-32.201 |
-| [#2578](https://github.com/Koniverse/SubWallet-Extension/issues/2578) | Set pool default for Aleph Zero (#2578) | 1.1.35 | 2024-02-02 | US-32.206 |
-| [#2581](https://github.com/Koniverse/SubWallet-Extension/issues/2581) | Fixed bug showing withdrawal time on un-staking (#2581) | 1.1.41 | 2024-03-02 | US-32.207 |
-| [#2594](https://github.com/Koniverse/SubWallet-Extension/issues/2594) | Update position and options actions for Astar Staking DApp (#2594) | 1.1.36 | 2024-02-06 | US-32.208 |
-| [#2598](https://github.com/Koniverse/SubWallet-Extension/issues/2598) | Fixed bug related to earning feature (#2598) | 1.1.39 | 2024-02-24 | US-32.209 |
-| [#567](https://github.com/Koniverse/SubWallet-Extension/issues/567) | Fix staking data UI error (#567) | 0.5.6 | 2022-08-24 | US-32.21 |
-| [#2599](https://github.com/Koniverse/SubWallet-Extension/issues/2599) | Add popup Introducing Earning feature (#2599) | 1.1.37 | 2024-02-07 | US-32.210 |
-| [#2612](https://github.com/Koniverse/SubWallet-Extension/issues/2612) | Fixed bug showing positions (#2612) | 1.1.39 | 2024-02-24 | US-32.211 |
-| [#2622](https://github.com/Koniverse/SubWallet-Extension/issues/2622) | Turn off popup remind claim rewards for dApp staking (#2622) | 1.1.39 | 2024-02-24 | US-32.213 |
-| [#2632](https://github.com/Koniverse/SubWallet-Extension/issues/2632) | Update filtering out blocked validators (#2632) | 1.1.39 | 2024-02-24 | US-32.215 |
-| [#2636](https://github.com/Koniverse/SubWallet-Extension/issues/2636) | Optimize Earning Performance Round 2 (Caching most of data) (#2636) | 1.1.41 | 2024-03-02 | US-32.216 |
-| [#568](https://github.com/Koniverse/SubWallet-Extension/issues/568) | Fix bug parsing Acala crowdloan data (#568) | 0.5.6 | 2022-08-24 | US-32.22 |
-| [#2655](https://github.com/Koniverse/SubWallet-Extension/issues/2655) | Fix bug related to Aleph Zero transfer and staking (#2655) | 1.1.57 | 2024-04-23 | US-32.221 |
-| [#2678](https://github.com/Koniverse/SubWallet-Extension/issues/2678) | Update pool default for VARA (#2678) | 1.1.40 | 2024-02-29 | US-32.224 |
-| [#2680](https://github.com/Koniverse/SubWallet-Extension/issues/2680) | Fixed bug related to earning feature (#2680) | 1.1.61 | 2024-05-02 | US-32.225 |
-| [#2682](https://github.com/Koniverse/SubWallet-Extension/issues/2682) | Re-check case update data after performing actions (unstake, cancel unstake, withdraw) (#2682) | 1.1.41 | 2024-03-02 | US-32.226 |
-| [#2703](https://github.com/Koniverse/SubWallet-Extension/issues/2703) | Adjust showing/validating address on Earning actions (#2703) | 1.2.29 | 2024-09-13 | US-32.228 |
+| [#11](https://github.com/Koniverse/SubWallet-Extension/issues/11) | Integrate Vara network (#11) | 1.0.5 | 2023-05-21 | US-12.16 |
+| [#375](https://github.com/Koniverse/SubWallet-Extension/issues/375) | Not showing crowdloan data properly (#375) | 0.4.7 | 2022-06-24 | US-12.16 |
+| [#1726](https://github.com/Koniverse/SubWallet-Extension/issues/1726) | Fixed bug showing staking APY (#1726) | 1.1.8 | 2023-08-12 | US-12.20 |
+| [#1728](https://github.com/Koniverse/SubWallet-Extension/issues/1728) | Fixed bug Still show NFT and staking data when turn off all networks (#1728) | 1.1.6 | 2023-08-04 | US-12.1 |
+| [#1757](https://github.com/Koniverse/SubWallet-Extension/issues/1757) | Fixed bug Validator avatars are auto-generated continuously (#1757) | 1.1.8 | 2023-08-12 | US-12.1 |
+| [#1766](https://github.com/Koniverse/SubWallet-Extension/issues/1766) | Fixed bug showing token price for staking item (Calamari network) (#1766) | 1.1.8 | 2023-08-12 | US-12.19 |
+| [#382](https://github.com/Koniverse/SubWallet-Extension/issues/382) | Fix miscalculation of unstaking time (#382) | 0.4.8 | 2022-06-25 | US-12.1 |
+| [#1860](https://github.com/Koniverse/SubWallet-Extension/issues/1860) | Fixed bug Do not show status of the crowd loans item (Acala) (#1860) | 1.1.13 | 2023-09-21 | US-12.16 |
+| [#1891](https://github.com/Koniverse/SubWallet-Extension/issues/1891) | Support staking in app for Creditcoin (#1891) | 1.1.11 | 2023-09-09 | US-12.1 |
+| [#1901](https://github.com/Koniverse/SubWallet-Extension/issues/1901) | Fixed bug Show incorrect message when the minimum active stake is a real number (#1901) | 1.1.12 | 2023-09-15 | US-12.1 |
+| [#2020](https://github.com/Koniverse/SubWallet-Extension/issues/2020) | Hide the AutoSelect validator/collator/dApp button if this method is not supported (#2020) | 1.1.20 | 2023-11-04 | US-12.3 |
+| [#2035](https://github.com/Koniverse/SubWallet-Extension/issues/2035) | Update crowdloan data (#2035) | 1.1.18 | 2023-10-20 | US-12.16 |
+| [#2130](https://github.com/Koniverse/SubWallet-Extension/issues/2130) | Fixed bug display dApp/pool/validator/collator name (#2130) | 1.1.25 | 2023-12-07 | US-12.2 |
+| [#2152](https://github.com/Koniverse/SubWallet-Extension/issues/2152) | Support nomination pool for Vara network (#2152) | 1.1.21 | 2023-11-08 | US-12.2 |
+| [#2162](https://github.com/Koniverse/SubWallet-Extension/issues/2162) | Fixed bug chainStaking Metadata on Kusama (#2162) | 1.1.22 | 2023-11-15 | US-12.1 |
+| [#2181](https://github.com/Koniverse/SubWallet-Extension/issues/2181) | Support staking for Goldberg (#2181) | 1.1.24 | 2023-12-01 | US-12.1 |
+| [#2199](https://github.com/Koniverse/SubWallet-Extension/issues/2199) | Fixed bug missing crowdloan (#2199) | 1.1.23 | 2023-11-24 | US-12.16 |
+| [#2213](https://github.com/Koniverse/SubWallet-Extension/issues/2213) | Fixed bug showing staking rewards on Moonbeam (#2213) | 1.1.24 | 2023-12-01 | US-12.20 |
+| [#2246](https://github.com/Koniverse/SubWallet-Extension/issues/2246) | Improve validator/pool selection UX (#2246) | 1.1.24 | 2023-12-01 | US-12.2 |
+| [#2277](https://github.com/Koniverse/SubWallet-Extension/issues/2277) | Fixed bug show staking earning status on Creditcoin (#2277) | 1.1.24 | 2023-12-01 | US-12.1 |
+| [#2291](https://github.com/Koniverse/SubWallet-Extension/issues/2291) | The default pool setting for Vara is SubWallet Official (#2291) | 1.1.24 | 2023-12-01 | US-12.2 |
+| [#2301](https://github.com/Koniverse/SubWallet-Extension/issues/2301) | Update APY for Vara network (#2301) | 1.1.25 | 2023-12-07 | US-12.20 |
+| [#2304](https://github.com/Koniverse/SubWallet-Extension/issues/2304) | Update showing estimated withdrawal time on staking (#2304) | 1.1.25 | 2023-12-07 | US-12.1 |
+| [#2324](https://github.com/Koniverse/SubWallet-Extension/issues/2324) | Update top nominators getting rewards (#2324) | 1.1.26 | 2023-12-16 | US-12.20 |
+| [#2370](https://github.com/Koniverse/SubWallet-Extension/issues/2370) | Update API staking for Astar (#2370) | 1.1.27 | 2023-12-20 | US-12.5 |
+| [#2385](https://github.com/Koniverse/SubWallet-Extension/issues/2385) | Add Azero Domains is default pool (#2385) | 1.1.27 | 2023-12-20 | US-12.2 |
+| [#520](https://github.com/Koniverse/SubWallet-Extension/issues/520) | Integrate Auto-Compound Staking Reward API for Turing Network (#520) | 0.6.6 | 2022-09-30 | US-12.20 |
+| [#2487](https://github.com/Koniverse/SubWallet-Extension/issues/2487) | Fixed bug Do not show banner on Crowdloans tab (#2487) | 1.1.32 | 2024-01-15 | US-12.16 |
+| [#2492](https://github.com/Koniverse/SubWallet-Extension/issues/2492) | Add support in-app staking for KREST (#2492) | 1.1.33 | 2024-01-23 | US-12.1 |
+| [#2497](https://github.com/Koniverse/SubWallet-Extension/issues/2497) | Change "Claim rewards" to "Check rewards" for dApp staking (#2497) | 1.1.34 | 2024-02-01 | US-12.5 |
+| [#2505](https://github.com/Koniverse/SubWallet-Extension/issues/2505) | Support TAO in-app staking (#2505) | 1.3.2 | 2024-10-12 | US-12.6 |
+| [#2513](https://github.com/Koniverse/SubWallet-Extension/issues/2513) | Update Manta staking APY formula (#2513) | 1.1.42 | 2024-03-08 | US-12.20 |
+| [#2533](https://github.com/Koniverse/SubWallet-Extension/issues/2533) | Set up SubWallet validators (#2533) | 1.3.12 | 2025-01-06 | US-12.1 |
+| [#2544](https://github.com/Koniverse/SubWallet-Extension/issues/2544) | Update unstaking request info for KREST, AMPE (#2544) | 1.1.34 | 2024-02-01 | US-12.1 |
+| [#2545](https://github.com/Koniverse/SubWallet-Extension/issues/2545) | Add popup want to user claim reward when Astar update dApp staking v3 (#2545) | 1.1.34 | 2024-02-01 | US-12.5 |
+| [#555](https://github.com/Koniverse/SubWallet-Extension/issues/555) | Fix some issues related to "minimum stake" in cases stake more and unstake (#555) | 0.5.6 | 2022-08-24 | US-12.1 |
+| [#2563](https://github.com/Koniverse/SubWallet-Extension/issues/2563) | Update staking APY formula for relaychain (#2563) | 1.1.36 | 2024-02-06 | US-12.20 |
+| [#2578](https://github.com/Koniverse/SubWallet-Extension/issues/2578) | Set pool default for Aleph Zero (#2578) | 1.1.35 | 2024-02-02 | US-12.2 |
+| [#2581](https://github.com/Koniverse/SubWallet-Extension/issues/2581) | Fixed bug showing withdrawal time on un-staking (#2581) | 1.1.41 | 2024-03-02 | US-12.1 |
+| [#2594](https://github.com/Koniverse/SubWallet-Extension/issues/2594) | Update position and options actions for Astar Staking DApp (#2594) | 1.1.36 | 2024-02-06 | US-12.5 |
+| [#2598](https://github.com/Koniverse/SubWallet-Extension/issues/2598) | Fixed bug related to earning feature (#2598) | 1.1.39 | 2024-02-24 | US-12.1 |
+| [#567](https://github.com/Koniverse/SubWallet-Extension/issues/567) | Fix staking data UI error (#567) | 0.5.6 | 2022-08-24 | US-12.1 |
+| [#2599](https://github.com/Koniverse/SubWallet-Extension/issues/2599) | Add popup Introducing Earning feature (#2599) | 1.1.37 | 2024-02-07 | US-12.1 |
+| [#2612](https://github.com/Koniverse/SubWallet-Extension/issues/2612) | Fixed bug showing positions (#2612) | 1.1.39 | 2024-02-24 | US-12.1 |
+| [#2622](https://github.com/Koniverse/SubWallet-Extension/issues/2622) | Turn off popup remind claim rewards for dApp staking (#2622) | 1.1.39 | 2024-02-24 | US-12.5 |
+| [#2632](https://github.com/Koniverse/SubWallet-Extension/issues/2632) | Update filtering out blocked validators (#2632) | 1.1.39 | 2024-02-24 | US-12.1 |
+| [#2636](https://github.com/Koniverse/SubWallet-Extension/issues/2636) | Optimize Earning Performance Round 2 (Caching most of data) (#2636) | 1.1.41 | 2024-03-02 | US-12.1 |
+| [#568](https://github.com/Koniverse/SubWallet-Extension/issues/568) | Fix bug parsing Acala crowdloan data (#568) | 0.5.6 | 2022-08-24 | US-12.16 |
+| [#2655](https://github.com/Koniverse/SubWallet-Extension/issues/2655) | Fix bug related to Aleph Zero transfer and staking (#2655) | 1.1.57 | 2024-04-23 | US-12.1 |
+| [#2678](https://github.com/Koniverse/SubWallet-Extension/issues/2678) | Update pool default for VARA (#2678) | 1.1.40 | 2024-02-29 | US-12.2 |
+| [#2680](https://github.com/Koniverse/SubWallet-Extension/issues/2680) | Fixed bug related to earning feature (#2680) | 1.1.61 | 2024-05-02 | US-12.1 |
+| [#2682](https://github.com/Koniverse/SubWallet-Extension/issues/2682) | Re-check case update data after performing actions (unstake, cancel unstake, withdraw) (#2682) | 1.1.41 | 2024-03-02 | US-12.1 |
+| [#2703](https://github.com/Koniverse/SubWallet-Extension/issues/2703) | Adjust showing/validating address on Earning actions (#2703) | 1.2.29 | 2024-09-13 | US-12.1 |
 | [#2781](https://github.com/Koniverse/SubWallet-Extension/issues/2781) | Support Mission Pool for Extension (#2781) | 1.1.46 | 2024-03-22 | US-19.7 |
-| [#2742](https://github.com/Koniverse/SubWallet-Extension/issues/2742) | Fixed bug show earnings screen although back to home (#2742) | 1.1.52 | 2024-04-05 | US-32.234 |
-| [#2743](https://github.com/Koniverse/SubWallet-Extension/issues/2743) | Disallow staking to collators/pools that maxed out member threshold (#2743, 2754) | 1.1.62 | 2024-05-08 | US-32.235 |
-| [#2821](https://github.com/Koniverse/SubWallet-Extension/issues/2821) | Fixed bug Error getting wrong validator address (#2821) | 1.1.62 | 2024-05-08 | US-32.239 |
-| [#636](https://github.com/Koniverse/SubWallet-Extension/issues/636) | Add staking for $CAPS and add support for Ternoa's testnet Alphanet (#636) | 0.6.6 | 2022-09-30 | US-32.24 |
-| [#2827](https://github.com/Koniverse/SubWallet-Extension/issues/2827) | Improve UX UI for earning feature (#2827) | 1.1.52 | 2024-04-05 | US-32.241 |
-| [#2829](https://github.com/Koniverse/SubWallet-Extension/issues/2829) | Update withdraw time for parachain staking (#2829) | 1.1.51 | 2024-04-02 | US-32.242 |
-| [#2830](https://github.com/Koniverse/SubWallet-Extension/issues/2830) | Update withdraw time for Parachain (#2830) | 1.1.56 | 2024-04-19 | US-32.243 |
-| [#2847](https://github.com/Koniverse/SubWallet-Extension/issues/2847) | Update message when navigate user to the Astar portal to stake (#2847) | 1.1.52 | 2024-04-05 | US-32.246 |
-| [#2889](https://github.com/Koniverse/SubWallet-Extension/issues/2889) | Fixed bug show minimum active stake (#2889) | 1.1.55 | 2024-04-14 | US-32.251 |
-| [#2937](https://github.com/Koniverse/SubWallet-Extension/issues/2937) | Fixed bug parsing Earning status for Nomination pool (#2937) | 1.1.56 | 2024-04-19 | US-32.253 |
-| [#2940](https://github.com/Koniverse/SubWallet-Extension/issues/2940) | Display list Recommended by label in Select pool screen (#2940) | 1.1.62 | 2024-05-08 | US-32.255 |
-| [#2941](https://github.com/Koniverse/SubWallet-Extension/issues/2941) | Fix issue related to earning status (#2941) | 1.1.57 | 2024-04-23 | US-32.256 |
-| [#2948](https://github.com/Koniverse/SubWallet-Extension/issues/2948) | Hide popup Introducing Earning feature (#2948) | 1.1.61 | 2024-05-02 | US-32.257 |
-| [#2963](https://github.com/Koniverse/SubWallet-Extension/issues/2963) | Support staking for Avail Turing (#2963) | 1.1.59 | 2024-04-25 | US-32.258 |
-| [#2971](https://github.com/Koniverse/SubWallet-Extension/issues/2971) | Set default pool for Avail Turing (#2971) | 1.1.60 | 2024-04-29 | US-32.259 |
-| [#648](https://github.com/Koniverse/SubWallet-Extension/issues/648) | Handle estimated fee error on NFT sending + staking (#648) | 0.6.5 | 2022-09-24 | US-32.26 |
-| [#2995](https://github.com/Koniverse/SubWallet-Extension/issues/2995) | Fixed bug related to earning feature ( Round 5) (#2995) | 1.2.6 | 2024-06-19 | US-32.261 |
-| [#2998](https://github.com/Koniverse/SubWallet-Extension/issues/2998) | Update Validator name/ Collator name (#2998) | 1.1.62 | 2024-05-08 | US-32.263 |
-| [#3000](https://github.com/Koniverse/SubWallet-Extension/issues/3000) | Refactoring code earning service (#3000) | 1.2.5 | 2024-06-11 | US-32.264 |
-| [#3001](https://github.com/Koniverse/SubWallet-Extension/issues/3001) | Fixed error auto reset data on Pool field (#3001) | 1.3.6 | 2024-11-07 | US-32.265 |
+| [#2742](https://github.com/Koniverse/SubWallet-Extension/issues/2742) | Fixed bug show earnings screen although back to home (#2742) | 1.1.52 | 2024-04-05 | US-12.8 |
+| [#2743](https://github.com/Koniverse/SubWallet-Extension/issues/2743) | Disallow staking to collators/pools that maxed out member threshold (#2743, 2754) | 1.1.62 | 2024-05-08 | US-12.3 |
+| [#2821](https://github.com/Koniverse/SubWallet-Extension/issues/2821) | Fixed bug Error getting wrong validator address (#2821) | 1.1.62 | 2024-05-08 | US-12.1 |
+| [#636](https://github.com/Koniverse/SubWallet-Extension/issues/636) | Add staking for $CAPS and add support for Ternoa's testnet Alphanet (#636) | 0.6.6 | 2022-09-30 | US-12.1 |
+| [#2827](https://github.com/Koniverse/SubWallet-Extension/issues/2827) | Improve UX UI for earning feature (#2827) | 1.1.52 | 2024-04-05 | US-12.1 |
+| [#2829](https://github.com/Koniverse/SubWallet-Extension/issues/2829) | Update withdraw time for parachain staking (#2829) | 1.1.51 | 2024-04-02 | US-12.3 |
+| [#2830](https://github.com/Koniverse/SubWallet-Extension/issues/2830) | Update withdraw time for Parachain (#2830) | 1.1.56 | 2024-04-19 | US-12.3 |
+| [#2847](https://github.com/Koniverse/SubWallet-Extension/issues/2847) | Update message when navigate user to the Astar portal to stake (#2847) | 1.1.52 | 2024-04-05 | US-12.5 |
+| [#2889](https://github.com/Koniverse/SubWallet-Extension/issues/2889) | Fixed bug show minimum active stake (#2889) | 1.1.55 | 2024-04-14 | US-12.1 |
+| [#2937](https://github.com/Koniverse/SubWallet-Extension/issues/2937) | Fixed bug parsing Earning status for Nomination pool (#2937) | 1.1.56 | 2024-04-19 | US-12.2 |
+| [#2940](https://github.com/Koniverse/SubWallet-Extension/issues/2940) | Display list Recommended by label in Select pool screen (#2940) | 1.1.62 | 2024-05-08 | US-12.2 |
+| [#2941](https://github.com/Koniverse/SubWallet-Extension/issues/2941) | Fix issue related to earning status (#2941) | 1.1.57 | 2024-04-23 | US-12.1 |
+| [#2948](https://github.com/Koniverse/SubWallet-Extension/issues/2948) | Hide popup Introducing Earning feature (#2948) | 1.1.61 | 2024-05-02 | US-12.1 |
+| [#2963](https://github.com/Koniverse/SubWallet-Extension/issues/2963) | Support staking for Avail Turing (#2963) | 1.1.59 | 2024-04-25 | US-12.1 |
+| [#2971](https://github.com/Koniverse/SubWallet-Extension/issues/2971) | Set default pool for Avail Turing (#2971) | 1.1.60 | 2024-04-29 | US-12.2 |
+| [#648](https://github.com/Koniverse/SubWallet-Extension/issues/648) | Handle estimated fee error on NFT sending + staking (#648) | 0.6.5 | 2022-09-24 | US-12.1 |
+| [#2995](https://github.com/Koniverse/SubWallet-Extension/issues/2995) | Fixed bug related to earning feature ( Round 5) (#2995) | 1.2.6 | 2024-06-19 | US-12.1 |
+| [#2998](https://github.com/Koniverse/SubWallet-Extension/issues/2998) | Update Validator name/ Collator name (#2998) | 1.1.62 | 2024-05-08 | US-12.3 |
+| [#3000](https://github.com/Koniverse/SubWallet-Extension/issues/3000) | Refactoring code earning service (#3000) | 1.2.5 | 2024-06-11 | US-12.1 |
+| [#3001](https://github.com/Koniverse/SubWallet-Extension/issues/3001) | Fixed error auto reset data on Pool field (#3001) | 1.3.6 | 2024-11-07 | US-12.2 |
 | [#3005](https://github.com/Koniverse/SubWallet-Extension/issues/3005) | Fixed bug Don't display network on Mission pool details (#3005) | 1.1.62 | 2024-05-08 | US-19.7 |
-| [#653](https://github.com/Koniverse/SubWallet-Extension/issues/653) | Add support staking for Amplitude/Kilt (#653) | 0.7.2 | 2022-11-19 | US-32.27 |
-| [#3043](https://github.com/Koniverse/SubWallet-Extension/issues/3043) | Show nomination pool with block status (#3043) | 1.2.6 | 2024-06-19 | US-32.272 |
-| [#3127](https://github.com/Koniverse/SubWallet-Extension/issues/3127) | Update UI for Earning position details (#3127) | 1.2.2 | 2024-05-30 | US-32.276 |
-| [#3150](https://github.com/Koniverse/SubWallet-Extension/issues/3150) | Update some message related to earning feature (#3150) | 1.2.4 | 2024-06-08 | US-32.278 |
-| [#3197](https://github.com/Koniverse/SubWallet-Extension/issues/3197) | Check error logs in earning feature (#3197) | 1.2.6 | 2024-06-19 | US-32.280 |
+| [#653](https://github.com/Koniverse/SubWallet-Extension/issues/653) | Add support staking for Amplitude/Kilt (#653) | 0.7.2 | 2022-11-19 | US-12.3 |
+| [#3043](https://github.com/Koniverse/SubWallet-Extension/issues/3043) | Show nomination pool with block status (#3043) | 1.2.6 | 2024-06-19 | US-12.2 |
+| [#3127](https://github.com/Koniverse/SubWallet-Extension/issues/3127) | Update UI for Earning position details (#3127) | 1.2.2 | 2024-05-30 | US-12.1 |
+| [#3150](https://github.com/Koniverse/SubWallet-Extension/issues/3150) | Update some message related to earning feature (#3150) | 1.2.4 | 2024-06-08 | US-12.1 |
+| [#3197](https://github.com/Koniverse/SubWallet-Extension/issues/3197) | Check error logs in earning feature (#3197) | 1.2.6 | 2024-06-19 | US-12.1 |
 | [#3289](https://github.com/Koniverse/SubWallet-Extension/issues/3289) | Fix bug Cannot read properties of undefined (reading 'filter') related to Mission pool (#3289) | 1.2.14 | 2024-07-09 | US-19.7 |
-| [#3326](https://github.com/Koniverse/SubWallet-Extension/issues/3326) | Improve the staking reward information retrieval (#3326) | 1.2.16 | 2024-07-19 | US-32.287 |
-| [#3327](https://github.com/Koniverse/SubWallet-Extension/issues/3327) | Fix bug Show incorrect withdrawal information of the Bifrost liquid staking when all accounts mode (#3327) | 1.2.22 | 2024-07-31 | US-32.288 |
-| [#690](https://github.com/Koniverse/SubWallet-Extension/issues/690) | Support claim reward feature for QR Account (#690) | 0.7.2 | 2022-11-19 | US-32.29 |
-| [#3365](https://github.com/Koniverse/SubWallet-Extension/issues/3365) | Set default pool and default validator for Avail (#3365) | 1.2.17 | 2024-07-22 | US-32.291 |
-| [#3443](https://github.com/Koniverse/SubWallet-Extension/issues/3443) | Update balance calculation for nomination pool runtime update (#3443) | 1.2.25 | 2024-08-17 | US-32.294 |
-| [#3477](https://github.com/Koniverse/SubWallet-Extension/issues/3477) | Add warning in case user earn for both nomination pool and direct (#3477) | 1.2.28 | 2024-09-04 | US-32.297 |
-| [#3484](https://github.com/Koniverse/SubWallet-Extension/issues/3484) | Add Notice of need to unstake for users who are simultaneously staking for both Direct and Nomination Pool (#3484) | 1.2.28 | 2024-09-04 | US-32.298 |
-| [#705](https://github.com/Koniverse/SubWallet-Extension/issues/705) | Do not show crowdloan status (#705) | 0.6.7 | 2022-10-22 | US-32.30 |
-| [#3579](https://github.com/Koniverse/SubWallet-Extension/issues/3579) | Fix bug do not show lock balance in case account have Kusama nomination pool (#3579) | 1.2.29 | 2024-09-13 | US-32.305 |
-| [#3601](https://github.com/Koniverse/SubWallet-Extension/issues/3601) | Fix bug display wrong APY for Polkadot staking option (#3601) | 1.2.29 | 2024-09-13 | US-32.306 |
-| [#3778](https://github.com/Koniverse/SubWallet-Extension/issues/3778) | Update content on unstake screen for some earning options (#3778) | 1.3.11 | 2024-12-23 | US-32.312 |
-| [#3788](https://github.com/Koniverse/SubWallet-Extension/issues/3788) | Fix min stake for TAO(Bittensor) (#3788) | 1.3.3 | 2024-10-16 | US-32.313 |
-| [#3930](https://github.com/Koniverse/SubWallet-Extension/issues/3930) | Fixed min amount on popup Pay attention in case there is not enough balance to stake (#3930) | 1.3.55 | 2025-09-05 | US-32.317 |
-| [#3971](https://github.com/Koniverse/SubWallet-Extension/issues/3971) | Fix bug setup validator related maxCount (#3971) | 1.3.13 | 2025-01-21 | US-32.318 |
-| [#3972](https://github.com/Koniverse/SubWallet-Extension/issues/3972) | Fixed bug Show incorrect pool/validator when earning on All accounts mode (#3972) | 1.3.56 | 2025-09-11 | US-32.319 |
-| [#717](https://github.com/Koniverse/SubWallet-Extension/issues/717) | Can't unstake, withdraw on parachain when using a QR signer account (#717) | 0.6.7 | 2022-10-22 | US-32.32 |
-| [#3984](https://github.com/Koniverse/SubWallet-Extension/issues/3984) | Support staking for Mythos (#3984) | 1.3.22 | 2025-03-04 | US-32.320 |
-| [#4006](https://github.com/Koniverse/SubWallet-Extension/issues/4006) | Fix bug Do not show earning position for Bittensor (#4006) | 1.3.15 | 2025-02-06 | US-32.321 |
-| [#4036](https://github.com/Koniverse/SubWallet-Extension/issues/4036) | Support dTAO staking (#4036) | 1.3.25 | 2025-03-24 | US-32.322 |
-| [#4054](https://github.com/Koniverse/SubWallet-Extension/issues/4054) | Fix Bug when unstaking vDOT, vMANTA (#4054) | 1.3.23 | 2025-03-05 | US-32.323 |
-| [#4140](https://github.com/Koniverse/SubWallet-Extension/issues/4140) | Fixed bug related to subnet staking feature (#4140) | 1.3.28 | 2025-04-02 | US-32.324 |
-| [#4145](https://github.com/Koniverse/SubWallet-Extension/issues/4145) | Support custom slippage for TAO subnet staking (#4145) | 1.3.30 | 2025-04-14 | US-32.325 |
-| [#4214](https://github.com/Koniverse/SubWallet-Extension/issues/4214) | Support Change validator feature (#4214) | 1.3.48 | 2025-07-21 | US-32.328 |
-| [#4217](https://github.com/Koniverse/SubWallet-Extension/issues/4217) | Add APY information for TAO and dTao staking (#4217) | 1.3.30 | 2025-04-14 | US-32.329 |
-| [#719](https://github.com/Koniverse/SubWallet-Extension/issues/719) | Update the "expected return" to staking for some chain (#719) | 0.6.8 | 2022-10-31 | US-32.33 |
-| [#4224](https://github.com/Koniverse/SubWallet-Extension/issues/4224) | Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver (#4224) | 1.3.43 | 2025-06-26 | US-32.330 |
-| [#4287](https://github.com/Koniverse/SubWallet-Extension/issues/4287) | Fixed bug when stake for subnet (#4287) | 1.3.32 | 2025-04-26 | US-32.333 |
-| [#4290](https://github.com/Koniverse/SubWallet-Extension/issues/4290) | Change TAO's position in Earning options (#4290) | 1.3.32 | 2025-04-26 | US-32.334 |
-| [#4359](https://github.com/Koniverse/SubWallet-Extension/issues/4359) | Stake TAO with Seamless Validator Switching (#4359) | 1.3.48 | 2025-07-21 | US-32.335 |
-| [#4441](https://github.com/Koniverse/SubWallet-Extension/issues/4441) | Fixed bug navigating actions in Earning feature (#4441) | 1.3.41 | 2025-06-11 | US-32.336 |
-| [#4449](https://github.com/Koniverse/SubWallet-Extension/issues/4449) | Display On-Chain Identity for Validators (#4449) | 1.3.49 | 2025-07-28 | US-32.337 |
-| [#724](https://github.com/Koniverse/SubWallet-Extension/issues/724) | Infinite load when stake/unstake in the following cases (#724) | 0.6.8 | 2022-10-31 | US-32.34 |
-| [#4510](https://github.com/Koniverse/SubWallet-Extension/issues/4510) | Fixed bug when stake/unstake with subnet staking (#4510) | 1.3.48 | 2025-07-21 | US-32.340 |
-| [#4520](https://github.com/Koniverse/SubWallet-Extension/issues/4520) | Refactor TAO earning position logic (#4520) | 1.3.52 | 2025-08-07 | US-32.341 |
-| [#4539](https://github.com/Koniverse/SubWallet-Extension/issues/4539) | Update some UI for Change validator feature (#4539) | 1.3.53 | 2025-08-12 | US-32.342 |
-| [#4540](https://github.com/Koniverse/SubWallet-Extension/issues/4540) | Support Change validator for more chains (#4540) | 1.3.54 | 2025-08-21 | US-32.343 |
-| [#4551](https://github.com/Koniverse/SubWallet-Extension/issues/4551) | Update logo for subnet on Earning features (#4551, #4626) | 1.3.54 | 2025-08-21 | US-32.344 |
-| [#4626](https://github.com/Koniverse/SubWallet-Extension/issues/4626) | Update logo for subnet on Earning features (#4551, #4626) | 1.3.54 | 2025-08-21 | US-32.344 |
-| [#4604](https://github.com/Koniverse/SubWallet-Extension/issues/4604) | Update TAO staking fee (#4604) | 1.3.54 | 2025-08-21 | US-32.347 |
-| [#4638](https://github.com/Koniverse/SubWallet-Extension/issues/4638) | Add support for in-app EWT staking (#4638) | 1.3.57 | 2025-09-17 | US-32.348 |
-| [#4654](https://github.com/Koniverse/SubWallet-Extension/issues/4654) | Fixed TAO's position in Earning options (#4654) | 1.3.56 | 2025-09-11 | US-32.349 |
-| [#743](https://github.com/Koniverse/SubWallet-Extension/issues/743) | Error when use stake action on Turing Staging/ Turing network with QR signer account (#743) | 0.7.2 | 2022-11-19 | US-32.35 |
-| [#4666](https://github.com/Koniverse/SubWallet-Extension/issues/4666) | Add support for in-app TANSSI staking (#4666) | 1.3.63 | 2025-10-23 | US-32.350 |
-| [#4688](https://github.com/Koniverse/SubWallet-Extension/issues/4688) | [zkVerify Mainnet] Add support for in-app VFY staking (#4688) | 1.3.60 | 2025-10-02 | US-32.352 |
-| [#4694](https://github.com/Koniverse/SubWallet-Extension/issues/4694) | Fixed error when performing EWC staking (#4694) | 1.3.60 | 2025-10-02 | US-32.353 |
-| [#4731](https://github.com/Koniverse/SubWallet-Extension/issues/4731) | Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731) | 1.3.61 | 2025-10-04 | US-32.354 |
-| [#4752](https://github.com/Koniverse/SubWallet-Extension/issues/4752) | Update Earning Info config for migrated chain after AHM (#4752) | 1.3.63 | 2025-10-23 | US-32.355 |
-| [#4754](https://github.com/Koniverse/SubWallet-Extension/issues/4754) | Fixed some UI bugs for migrated chain after AHM on Earning features (#4754) | 1.3.62 | 2025-10-10 | US-32.356 |
-| [#4763](https://github.com/Koniverse/SubWallet-Extension/issues/4763) | Fixed bug show Earning options for Kusama although AHM migrated (#4763) | 1.3.62 | 2025-10-10 | US-32.357 |
-| [#755](https://github.com/Koniverse/SubWallet-Extension/issues/755) | Support staking for KMA (Calamari parachain) (#755) | 0.6.9 | 2022-11-04 | US-32.36 |
-| [#4795](https://github.com/Koniverse/SubWallet-Extension/issues/4795) | Add Collator's APY for Tanssi Staking (#4795) | 1.3.65 | 2025-11-06 | US-32.360 |
-| [#4803](https://github.com/Koniverse/SubWallet-Extension/issues/4803) | Calculate exactly estimate fee for bridge step in liquid staking (#4803) | 1.3.78 | 2026-05-14 | US-32.361 |
-| [#4813](https://github.com/Koniverse/SubWallet-Extension/issues/4813) | Update altinputasset for some liquid staking (#4813) | 1.3.65 | 2025-11-06 | US-32.363 |
-| [#4829](https://github.com/Koniverse/SubWallet-Extension/issues/4829) | Support the newly updated Root staking feature \| Bittensor (#4829) | 1.3.76 | 2026-03-20 | US-32.364 |
-| [#4920](https://github.com/Koniverse/SubWallet-Extension/issues/4920) | Remove the Crowdloans tab (#4920) | 1.3.73 | 2026-01-22 | US-32.369 |
-| [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950) | Fix bug get Earning position parachain (#4950) | 1.3.73 | 2026-01-22 | US-32.370 |
-| [#801](https://github.com/Koniverse/SubWallet-Extension/issues/801) | Support staking for Shiden (#801) | 0.7.2 | 2022-11-19 | US-32.38 |
-| [#804](https://github.com/Koniverse/SubWallet-Extension/issues/804) | Fix other bug in case unstake (#804) | 0.7.3 | 2022-11-25 | US-32.39 |
-| [#809](https://github.com/Koniverse/SubWallet-Extension/issues/809) | Error withdrawing stake with slashing spans (#809) | 0.7.2 | 2022-11-19 | US-32.40 |
-| [#824](https://github.com/Koniverse/SubWallet-Extension/issues/824) | Minor bugs on staking (#824) | 0.7.2 | 2022-11-19 | US-32.41 |
-| [#838](https://github.com/Koniverse/SubWallet-Extension/issues/838) | Can not sign the Claim reward transaction with QR-signer account (#838) | 0.7.2 | 2022-11-19 | US-32.43 |
-| [#845](https://github.com/Koniverse/SubWallet-Extension/issues/845) | Show incorrect screen when re-open the extension after staking successfully (#845) | 0.7.3 | 2022-11-25 | US-32.44 |
-| [#849](https://github.com/Koniverse/SubWallet-Extension/issues/849) | Do not show message when staking record does not exist yet (#849) | 0.7.3 | 2022-11-25 | US-32.45 |
-| [#865](https://github.com/Koniverse/SubWallet-Extension/issues/865) | Remove EVM crowdloan record (#865) | 0.7.3 | 2022-11-25 | US-32.46 |
-| [#867](https://github.com/Koniverse/SubWallet-Extension/issues/867) | Support claim staking reward for Amplitude (#867) | 0.7.4 | 2022-12-04 | US-32.47 |
-| [#884](https://github.com/Koniverse/SubWallet-Extension/issues/884) | Fix bug don't show validator on the Amplitude network and update expected return (#884) | 0.7.4 | 2022-12-04 | US-32.49 |
-| [#907](https://github.com/Koniverse/SubWallet-Extension/issues/907) | Fix showing incorrect Unclaim reward information on "All Accounts" mode (#907) | 0.7.5 | 2022-12-15 | US-32.50 |
-| [#932](https://github.com/Koniverse/SubWallet-Extension/issues/932) | Showing crowdloan contribution in case the network is not live yet (#932) | 0.7.6 | 2022-12-17 | US-32.51 |
-| [#933](https://github.com/Koniverse/SubWallet-Extension/issues/933) | Add support for $AZERO nomination pool staking (Aleph Zero) (#933) | 0.7.6 | 2022-12-17 | US-32.52 |
-| [#991](https://github.com/Koniverse/SubWallet-Extension/issues/991) | Fix duplicate crowdloan problems (#991) | 0.8.1 | 2023-02-03 | US-32.55 |
-| [#997](https://github.com/Koniverse/SubWallet-Extension/issues/997) | Fix the staking validator's expected return for relaychain (#997) | 0.8.1 | 2023-02-03 | US-32.56 |
-| [#104](https://github.com/Koniverse/SubWallet-Extension/issues/104) | Add Moonbeam and Moonriver staking data (#104) | 0.4.2 | 2022-05-20 | US-32.6 |
-| [#1108](https://github.com/Koniverse/SubWallet-Extension/issues/1108) | Fixed the bug in calculating Ternoa Staking APR (#1108) | 1.0.7 | 2023-06-01 | US-32.64 |
-| [#1263](https://github.com/Koniverse/SubWallet-Extension/issues/1263) | Update fetching staking info with middleware service (#1263) | 1.0.3 | 2023-05-06 | US-32.70 |
-| [#1311](https://github.com/Koniverse/SubWallet-Extension/issues/1311) | Added support for "Unstake Max" functionality (#1311) | 1.0.7 | 2023-06-01 | US-32.72 |
-| [#1346](https://github.com/Koniverse/SubWallet-Extension/issues/1346) | Fixed bug the address validator auto detect to Substrate address (#1346) | 1.0.5 | 2023-05-21 | US-32.76 |
-| [#1353](https://github.com/Koniverse/SubWallet-Extension/issues/1353) | Fixed bug get balance when import multi-account (#1353) | 1.0.5 | 2023-05-21 | US-32.77 |
-| [#1392](https://github.com/Koniverse/SubWallet-Extension/issues/1392) | Fix bug when stake (#1392) | 1.0.6 | 2023-05-26 | US-32.78 |
-| [#1396](https://github.com/Koniverse/SubWallet-Extension/issues/1396) | Fixed bug showing min pooled amount (#1396) | 1.0.5 | 2023-05-21 | US-32.79 |
-| [#1432](https://github.com/Koniverse/SubWallet-Extension/issues/1432) | Fix bug show unclaim reward (#1432) | 1.0.6 | 2023-05-26 | US-32.81 |
-| [#1456](https://github.com/Koniverse/SubWallet-Extension/issues/1456) | Fixed bug Show incorrect earning reward status on All accounts mode (#1456) | 1.1.2 | 2023-07-14 | US-32.84 |
-| [#1461](https://github.com/Koniverse/SubWallet-Extension/issues/1461) | Optimized staking performance (#1461) | 1.0.7 | 2023-06-01 | US-32.85 |
-| [#1470](https://github.com/Koniverse/SubWallet-Extension/issues/1470) | Fixed the bug causing failure to stake more for a pool in cases where an unstake request was present (#1470) | 1.0.7 | 2023-06-01 | US-32.87 |
-| [#1475](https://github.com/Koniverse/SubWallet-Extension/issues/1475) | Fixed bugs on the Staking screens (#1475) | 1.1.1 | 2023-07-06 | US-32.89 |
-| [#1496](https://github.com/Koniverse/SubWallet-Extension/issues/1496) | Fixed bug Do not show validator on the Select validator screen in case turn on network when stake (#1496) | 1.1.6 | 2023-08-04 | US-32.91 |
-| [#1537](https://github.com/Koniverse/SubWallet-Extension/issues/1537) | Update showing min stake value (#1537) | 1.1.6 | 2023-08-04 | US-32.92 |
-| [#1545](https://github.com/Koniverse/SubWallet-Extension/issues/1545) | Implement reload button on the Staking screen (#1545) | 1.1.2 | 2023-07-14 | US-32.93 |
-| [#1595](https://github.com/Koniverse/SubWallet-Extension/issues/1595) | Add Staking Support For Pendulum (#1595) | 1.1.2 | 2023-07-14 | US-32.94 |
-| [#1634](https://github.com/Koniverse/SubWallet-Extension/issues/1634) | Updated the criteria's icon on the Sorting pool/validator/collator/dApp screen (#1634) | 1.1.2 | 2023-07-14 | US-32.95 |
-| [#1643](https://github.com/Koniverse/SubWallet-Extension/issues/1643) | Fixed bug Showing staking account on the Staking detail screen (#1643) | 1.1.6 | 2023-08-04 | US-32.96 |
-| [#1721](https://github.com/Koniverse/SubWallet-Extension/issues/1721) | Fixed bug Do not reset selected validator when change token to stake (#1721) | 1.1.6 | 2023-08-04 | US-32.99 |
+| [#3326](https://github.com/Koniverse/SubWallet-Extension/issues/3326) | Improve the staking reward information retrieval (#3326) | 1.2.16 | 2024-07-19 | US-12.20 |
+| [#3327](https://github.com/Koniverse/SubWallet-Extension/issues/3327) | Fix bug Show incorrect withdrawal information of the Bifrost liquid staking when all accounts mode (#3327) | 1.2.22 | 2024-07-31 | US-12.4 |
+| [#690](https://github.com/Koniverse/SubWallet-Extension/issues/690) | Support claim reward feature for QR Account (#690) | 0.7.2 | 2022-11-19 | US-12.20 |
+| [#3365](https://github.com/Koniverse/SubWallet-Extension/issues/3365) | Set default pool and default validator for Avail (#3365) | 1.2.17 | 2024-07-22 | US-12.2 |
+| [#3443](https://github.com/Koniverse/SubWallet-Extension/issues/3443) | Update balance calculation for nomination pool runtime update (#3443) | 1.2.25 | 2024-08-17 | US-12.2 |
+| [#3477](https://github.com/Koniverse/SubWallet-Extension/issues/3477) | Add warning in case user earn for both nomination pool and direct (#3477) | 1.2.28 | 2024-09-04 | US-12.2 |
+| [#3484](https://github.com/Koniverse/SubWallet-Extension/issues/3484) | Add Notice of need to unstake for users who are simultaneously staking for both Direct and Nomination Pool (#3484) | 1.2.28 | 2024-09-04 | US-12.2 |
+| [#705](https://github.com/Koniverse/SubWallet-Extension/issues/705) | Do not show crowdloan status (#705) | 0.6.7 | 2022-10-22 | US-12.16 |
+| [#3579](https://github.com/Koniverse/SubWallet-Extension/issues/3579) | Fix bug do not show lock balance in case account have Kusama nomination pool (#3579) | 1.2.29 | 2024-09-13 | US-12.2 |
+| [#3601](https://github.com/Koniverse/SubWallet-Extension/issues/3601) | Fix bug display wrong APY for Polkadot staking option (#3601) | 1.2.29 | 2024-09-13 | US-12.20 |
+| [#3778](https://github.com/Koniverse/SubWallet-Extension/issues/3778) | Update content on unstake screen for some earning options (#3778) | 1.3.11 | 2024-12-23 | US-12.1 |
+| [#3788](https://github.com/Koniverse/SubWallet-Extension/issues/3788) | Fix min stake for TAO(Bittensor) (#3788) | 1.3.3 | 2024-10-16 | US-12.6 |
+| [#3930](https://github.com/Koniverse/SubWallet-Extension/issues/3930) | Fixed min amount on popup Pay attention in case there is not enough balance to stake (#3930) | 1.3.55 | 2025-09-05 | US-12.1 |
+| [#3971](https://github.com/Koniverse/SubWallet-Extension/issues/3971) | Fix bug setup validator related maxCount (#3971) | 1.3.13 | 2025-01-21 | US-12.1 |
+| [#3972](https://github.com/Koniverse/SubWallet-Extension/issues/3972) | Fixed bug Show incorrect pool/validator when earning on All accounts mode (#3972) | 1.3.56 | 2025-09-11 | US-12.2 |
+| [#717](https://github.com/Koniverse/SubWallet-Extension/issues/717) | Can't unstake, withdraw on parachain when using a QR signer account (#717) | 0.6.7 | 2022-10-22 | US-12.1 |
+| [#3984](https://github.com/Koniverse/SubWallet-Extension/issues/3984) | Support staking for Mythos (#3984) | 1.3.22 | 2025-03-04 | US-12.3 |
+| [#4006](https://github.com/Koniverse/SubWallet-Extension/issues/4006) | Fix bug Do not show earning position for Bittensor (#4006) | 1.3.15 | 2025-02-06 | US-12.6 |
+| [#4036](https://github.com/Koniverse/SubWallet-Extension/issues/4036) | Support dTAO staking (#4036) | 1.3.25 | 2025-03-24 | US-12.6 |
+| [#4054](https://github.com/Koniverse/SubWallet-Extension/issues/4054) | Fix Bug when unstaking vDOT, vMANTA (#4054) | 1.3.23 | 2025-03-05 | US-12.1 |
+| [#4140](https://github.com/Koniverse/SubWallet-Extension/issues/4140) | Fixed bug related to subnet staking feature (#4140) | 1.3.28 | 2025-04-02 | US-12.6 |
+| [#4145](https://github.com/Koniverse/SubWallet-Extension/issues/4145) | Support custom slippage for TAO subnet staking (#4145) | 1.3.30 | 2025-04-14 | US-12.6 |
+| [#4214](https://github.com/Koniverse/SubWallet-Extension/issues/4214) | Support Change validator feature (#4214) | 1.3.48 | 2025-07-21 | US-12.1 |
+| [#4217](https://github.com/Koniverse/SubWallet-Extension/issues/4217) | Add APY information for TAO and dTao staking (#4217) | 1.3.30 | 2025-04-14 | US-12.6 |
+| [#719](https://github.com/Koniverse/SubWallet-Extension/issues/719) | Update the "expected return" to staking for some chain (#719) | 0.6.8 | 2022-10-31 | US-12.1 |
+| [#4224](https://github.com/Koniverse/SubWallet-Extension/issues/4224) | Fixed bug when perform stake on Moonbase/Moonbeam/Moonriver (#4224) | 1.3.43 | 2025-06-26 | US-12.1 |
+| [#4287](https://github.com/Koniverse/SubWallet-Extension/issues/4287) | Fixed bug when stake for subnet (#4287) | 1.3.32 | 2025-04-26 | US-12.6 |
+| [#4290](https://github.com/Koniverse/SubWallet-Extension/issues/4290) | Change TAO's position in Earning options (#4290) | 1.3.32 | 2025-04-26 | US-12.6 |
+| [#4359](https://github.com/Koniverse/SubWallet-Extension/issues/4359) | Stake TAO with Seamless Validator Switching (#4359) | 1.3.48 | 2025-07-21 | US-12.6 |
+| [#4441](https://github.com/Koniverse/SubWallet-Extension/issues/4441) | Fixed bug navigating actions in Earning feature (#4441) | 1.3.41 | 2025-06-11 | US-12.1 |
+| [#4449](https://github.com/Koniverse/SubWallet-Extension/issues/4449) | Display On-Chain Identity for Validators (#4449) | 1.3.49 | 2025-07-28 | US-12.1 |
+| [#724](https://github.com/Koniverse/SubWallet-Extension/issues/724) | Infinite load when stake/unstake in the following cases (#724) | 0.6.8 | 2022-10-31 | US-12.1 |
+| [#4510](https://github.com/Koniverse/SubWallet-Extension/issues/4510) | Fixed bug when stake/unstake with subnet staking (#4510) | 1.3.48 | 2025-07-21 | US-12.6 |
+| [#4520](https://github.com/Koniverse/SubWallet-Extension/issues/4520) | Refactor TAO earning position logic (#4520) | 1.3.52 | 2025-08-07 | US-12.6 |
+| [#4539](https://github.com/Koniverse/SubWallet-Extension/issues/4539) | Update some UI for Change validator feature (#4539) | 1.3.53 | 2025-08-12 | US-12.1 |
+| [#4540](https://github.com/Koniverse/SubWallet-Extension/issues/4540) | Support Change validator for more chains (#4540) | 1.3.54 | 2025-08-21 | US-12.1 |
+| [#4551](https://github.com/Koniverse/SubWallet-Extension/issues/4551) | Update logo for subnet on Earning features (#4551, #4626) | 1.3.54 | 2025-08-21 | US-12.6 |
+| [#4626](https://github.com/Koniverse/SubWallet-Extension/issues/4626) | Update logo for subnet on Earning features (#4551, #4626) | 1.3.54 | 2025-08-21 | US-12.6 |
+| [#4604](https://github.com/Koniverse/SubWallet-Extension/issues/4604) | Update TAO staking fee (#4604) | 1.3.54 | 2025-08-21 | US-12.6 |
+| [#4638](https://github.com/Koniverse/SubWallet-Extension/issues/4638) | Add support for in-app EWT staking (#4638) | 1.3.57 | 2025-09-17 | US-12.1 |
+| [#4654](https://github.com/Koniverse/SubWallet-Extension/issues/4654) | Fixed TAO's position in Earning options (#4654) | 1.3.56 | 2025-09-11 | US-12.6 |
+| [#743](https://github.com/Koniverse/SubWallet-Extension/issues/743) | Error when use stake action on Turing Staging/ Turing network with QR signer account (#743) | 0.7.2 | 2022-11-19 | US-12.1 |
+| [#4666](https://github.com/Koniverse/SubWallet-Extension/issues/4666) | Add support for in-app TANSSI staking (#4666) | 1.3.63 | 2025-10-23 | US-12.1 |
+| [#4688](https://github.com/Koniverse/SubWallet-Extension/issues/4688) | [zkVerify Mainnet] Add support for in-app VFY staking (#4688) | 1.3.60 | 2025-10-02 | US-12.1 |
+| [#4694](https://github.com/Koniverse/SubWallet-Extension/issues/4694) | Fixed error when performing EWC staking (#4694) | 1.3.60 | 2025-10-02 | US-12.1 |
+| [#4731](https://github.com/Koniverse/SubWallet-Extension/issues/4731) | Fixed crash in EarningPositions when asset is undefined (read property 'decimals' of undefined) in case update version (#4731) | 1.3.61 | 2025-10-04 | US-12.1 |
+| [#4752](https://github.com/Koniverse/SubWallet-Extension/issues/4752) | Update Earning Info config for migrated chain after AHM (#4752) | 1.3.63 | 2025-10-23 | US-12.1 |
+| [#4754](https://github.com/Koniverse/SubWallet-Extension/issues/4754) | Fixed some UI bugs for migrated chain after AHM on Earning features (#4754) | 1.3.62 | 2025-10-10 | US-12.1 |
+| [#4763](https://github.com/Koniverse/SubWallet-Extension/issues/4763) | Fixed bug show Earning options for Kusama although AHM migrated (#4763) | 1.3.62 | 2025-10-10 | US-12.1 |
+| [#755](https://github.com/Koniverse/SubWallet-Extension/issues/755) | Support staking for KMA (Calamari parachain) (#755) | 0.6.9 | 2022-11-04 | US-12.1 |
+| [#4795](https://github.com/Koniverse/SubWallet-Extension/issues/4795) | Add Collator's APY for Tanssi Staking (#4795) | 1.3.65 | 2025-11-06 | US-12.3 |
+| [#4803](https://github.com/Koniverse/SubWallet-Extension/issues/4803) | Calculate exactly estimate fee for bridge step in liquid staking (#4803) | 1.3.78 | 2026-05-14 | US-12.4 |
+| [#4813](https://github.com/Koniverse/SubWallet-Extension/issues/4813) | Update altinputasset for some liquid staking (#4813) | 1.3.65 | 2025-11-06 | US-12.4 |
+| [#4829](https://github.com/Koniverse/SubWallet-Extension/issues/4829) | Support the newly updated Root staking feature \| Bittensor (#4829) | 1.3.76 | 2026-03-20 | US-12.6 |
+| [#4920](https://github.com/Koniverse/SubWallet-Extension/issues/4920) | Remove the Crowdloans tab (#4920) | 1.3.73 | 2026-01-22 | US-12.16 |
+| [#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950) | Fix bug get Earning position parachain (#4950) | 1.3.73 | 2026-01-22 | US-12.1 |
+| [#801](https://github.com/Koniverse/SubWallet-Extension/issues/801) | Support staking for Shiden (#801) | 0.7.2 | 2022-11-19 | US-12.1 |
+| [#804](https://github.com/Koniverse/SubWallet-Extension/issues/804) | Fix other bug in case unstake (#804) | 0.7.3 | 2022-11-25 | US-12.1 |
+| [#809](https://github.com/Koniverse/SubWallet-Extension/issues/809) | Error withdrawing stake with slashing spans (#809) | 0.7.2 | 2022-11-19 | US-12.1 |
+| [#824](https://github.com/Koniverse/SubWallet-Extension/issues/824) | Minor bugs on staking (#824) | 0.7.2 | 2022-11-19 | US-12.1 |
+| [#838](https://github.com/Koniverse/SubWallet-Extension/issues/838) | Can not sign the Claim reward transaction with QR-signer account (#838) | 0.7.2 | 2022-11-19 | US-12.20 |
+| [#845](https://github.com/Koniverse/SubWallet-Extension/issues/845) | Show incorrect screen when re-open the extension after staking successfully (#845) | 0.7.3 | 2022-11-25 | US-12.1 |
+| [#849](https://github.com/Koniverse/SubWallet-Extension/issues/849) | Do not show message when staking record does not exist yet (#849) | 0.7.3 | 2022-11-25 | US-12.1 |
+| [#865](https://github.com/Koniverse/SubWallet-Extension/issues/865) | Remove EVM crowdloan record (#865) | 0.7.3 | 2022-11-25 | US-12.16 |
+| [#867](https://github.com/Koniverse/SubWallet-Extension/issues/867) | Support claim staking reward for Amplitude (#867) | 0.7.4 | 2022-12-04 | US-12.3 |
+| [#884](https://github.com/Koniverse/SubWallet-Extension/issues/884) | Fix bug don't show validator on the Amplitude network and update expected return (#884) | 0.7.4 | 2022-12-04 | US-12.3 |
+| [#907](https://github.com/Koniverse/SubWallet-Extension/issues/907) | Fix showing incorrect Unclaim reward information on "All Accounts" mode (#907) | 0.7.5 | 2022-12-15 | US-12.20 |
+| [#932](https://github.com/Koniverse/SubWallet-Extension/issues/932) | Showing crowdloan contribution in case the network is not live yet (#932) | 0.7.6 | 2022-12-17 | US-12.16 |
+| [#933](https://github.com/Koniverse/SubWallet-Extension/issues/933) | Add support for $AZERO nomination pool staking (Aleph Zero) (#933) | 0.7.6 | 2022-12-17 | US-12.2 |
+| [#991](https://github.com/Koniverse/SubWallet-Extension/issues/991) | Fix duplicate crowdloan problems (#991) | 0.8.1 | 2023-02-03 | US-12.16 |
+| [#997](https://github.com/Koniverse/SubWallet-Extension/issues/997) | Fix the staking validator's expected return for relaychain (#997) | 0.8.1 | 2023-02-03 | US-12.1 |
+| [#104](https://github.com/Koniverse/SubWallet-Extension/issues/104) | Add Moonbeam and Moonriver staking data (#104) | 0.4.2 | 2022-05-20 | US-12.1 |
+| [#1108](https://github.com/Koniverse/SubWallet-Extension/issues/1108) | Fixed the bug in calculating Ternoa Staking APR (#1108) | 1.0.7 | 2023-06-01 | US-12.20 |
+| [#1263](https://github.com/Koniverse/SubWallet-Extension/issues/1263) | Update fetching staking info with middleware service (#1263) | 1.0.3 | 2023-05-06 | US-12.1 |
+| [#1311](https://github.com/Koniverse/SubWallet-Extension/issues/1311) | Added support for "Unstake Max" functionality (#1311) | 1.0.7 | 2023-06-01 | US-12.1 |
+| [#1346](https://github.com/Koniverse/SubWallet-Extension/issues/1346) | Fixed bug the address validator auto detect to Substrate address (#1346) | 1.0.5 | 2023-05-21 | US-12.1 |
+| [#1353](https://github.com/Koniverse/SubWallet-Extension/issues/1353) | Fixed bug get balance when import multi-account (#1353) | 1.0.5 | 2023-05-21 | US-12.1 |
+| [#1392](https://github.com/Koniverse/SubWallet-Extension/issues/1392) | Fix bug when stake (#1392) | 1.0.6 | 2023-05-26 | US-12.3 |
+| [#1396](https://github.com/Koniverse/SubWallet-Extension/issues/1396) | Fixed bug showing min pooled amount (#1396) | 1.0.5 | 2023-05-21 | US-12.2 |
+| [#1432](https://github.com/Koniverse/SubWallet-Extension/issues/1432) | Fix bug show unclaim reward (#1432) | 1.0.6 | 2023-05-26 | US-12.20 |
+| [#1456](https://github.com/Koniverse/SubWallet-Extension/issues/1456) | Fixed bug Show incorrect earning reward status on All accounts mode (#1456) | 1.1.2 | 2023-07-14 | US-12.20 |
+| [#1461](https://github.com/Koniverse/SubWallet-Extension/issues/1461) | Optimized staking performance (#1461) | 1.0.7 | 2023-06-01 | US-12.1 |
+| [#1470](https://github.com/Koniverse/SubWallet-Extension/issues/1470) | Fixed the bug causing failure to stake more for a pool in cases where an unstake request was present (#1470) | 1.0.7 | 2023-06-01 | US-12.2 |
+| [#1475](https://github.com/Koniverse/SubWallet-Extension/issues/1475) | Fixed bugs on the Staking screens (#1475) | 1.1.1 | 2023-07-06 | US-12.1 |
+| [#1496](https://github.com/Koniverse/SubWallet-Extension/issues/1496) | Fixed bug Do not show validator on the Select validator screen in case turn on network when stake (#1496) | 1.1.6 | 2023-08-04 | US-12.1 |
+| [#1537](https://github.com/Koniverse/SubWallet-Extension/issues/1537) | Update showing min stake value (#1537) | 1.1.6 | 2023-08-04 | US-12.1 |
+| [#1545](https://github.com/Koniverse/SubWallet-Extension/issues/1545) | Implement reload button on the Staking screen (#1545) | 1.1.2 | 2023-07-14 | US-12.1 |
+| [#1595](https://github.com/Koniverse/SubWallet-Extension/issues/1595) | Add Staking Support For Pendulum (#1595) | 1.1.2 | 2023-07-14 | US-12.1 |
+| [#1634](https://github.com/Koniverse/SubWallet-Extension/issues/1634) | Updated the criteria's icon on the Sorting pool/validator/collator/dApp screen (#1634) | 1.1.2 | 2023-07-14 | US-12.2 |
+| [#1643](https://github.com/Koniverse/SubWallet-Extension/issues/1643) | Fixed bug Showing staking account on the Staking detail screen (#1643) | 1.1.6 | 2023-08-04 | US-12.2 |
+| [#1721](https://github.com/Koniverse/SubWallet-Extension/issues/1721) | Fixed bug Do not reset selected validator when change token to stake (#1721) | 1.1.6 | 2023-08-04 | US-12.1 |
 | [#411](https://github.com/Koniverse/SubWallet-Extension/issues/411) | Update XCM transfer support for Relaychain to Parachains (#411) | 0.5.5 | 2022-08-11 | US-13.1 |
 | [#4787](https://github.com/Koniverse/SubWallet-Extension/issues/4787) | Update params for XCM transfer - Related to DOT/KSM XCM (#4787) | 1.3.63 | 2025-10-23 | US-13.16 |
 | [#4822](https://github.com/Koniverse/SubWallet-Extension/issues/4822) | Re-enable Cross-chain transfer related to Relay-chain (#4822) | 1.3.66 | 2025-11-07 | US-13.16 |
@@ -916,7 +916,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1084](https://github.com/Koniverse/SubWallet-Extension/issues/1084) | Integrate Banxa for fiat on-ramp (#1084) | 1.1.6 | 2023-08-04 | US-14.1 |
 | [#1317](https://github.com/Koniverse/SubWallet-Extension/issues/1317) | Add support for $NEER on Transak (#1317) | 1.0.4 | 2023-05-12 | US-14.1 |
 | [#4678](https://github.com/Koniverse/SubWallet-Extension/issues/4678) | Support OpenGov (Phase 1) (#4678) | 1.3.70 | 2025-12-11 | US-15.1 |
-| [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-32.375 |
+| [#914](https://github.com/Koniverse/SubWallet-Extension/issues/914) | Add incrementDelegatorRewards call to Amplitude reward claiming (#914) | 0.7.5 | 2022-12-15 | US-12.3 |
 | [#1454](https://github.com/Koniverse/SubWallet-Extension/issues/1454) | Excluded Ledger account from the "My Wallet" list when sending tokens that are not supported by the Ledger account (#1454) | 1.0.7 | 2023-06-01 | US-16.6 |
 | [#1565](https://github.com/Koniverse/SubWallet-Extension/issues/1565) | Add support Ledger with Aleph Zero network (#1565) | 1.0.12 | 2023-06-29 | US-16.4 |
 | [#1573](https://github.com/Koniverse/SubWallet-Extension/issues/1573) | Improved connection experience with Ledger (#1573) | 1.1.1 | 2023-07-06 | US-16.5 |

@@ -177,6 +177,19 @@ power, not yield — owned by EPIC-15).
 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) | Earning reward & APY-accuracy hardening | Keep reward/APY figures accurate across every pool type | 📋 backlog | — |
 | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning performance & cache hardening | Keep the earning surface fast, memory-bounded and cache-fresh across many pools | 📋 backlog | — |
 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | Earning term & condition display | Display earning T&Cs before user commits to a staking/earning position | ✅ done | 1.3.83 |
+| [US-12.16](../stories/US-12.16-crowdloan-contribution-and-portfolio.md) | Crowdloan contribution & portfolio | A retired feature's whole arc — contribute, show, and remove | ✅ done | 1.3.73 |
+| [US-12.17](../stories/US-12.17-open-earning-improvements.md) | Open earning improvements | The open earning work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-12.18](../stories/US-12.18-earning-screens-in-the-1-0-2-rewrite.md) | Earning screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite | ✅ done | 1.0.2 |
+| [US-12.19](../stories/US-12.19-earning-on-the-webapp-and-avail-space.md) | Earning on the WebApp & Avail Space | Staking / earning / crowdloan on the non-extension surfaces | ✅ done | 1.2.26 |
+| [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |
+
+> **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
+> incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**
+> folded in from the former one-issue-per-story maintenance ledger on 2026-07-24
+> ([note](../../notes/2026-07-24.md#e-epic-32-maintenance--earning-merged-into-epic-12)): 245 onto the
+> capability stories US-12.1 … US-12.8, 115 into these five (24 crowdloan, 39 WebApp, 6 rewrite, 18
+> rewards, 28 open), and the remaining 1 is the umbrella below that owns no row. The FR map above is
+> unchanged; the requirement set is still 12 FRs (FR-114 … FR-125).
 
 > US-12.10/12/13 forward; US-12.12 (FR-125) is **planned** — its Enjin / Phala /
 > xx batch is forward; the shipped Mythos / Tanssi / Amplitude / Energy native
@@ -187,6 +200,23 @@ power, not yield — owned by EPIC-15).
 > NFR-20, NFR-21) and absorbs the perf/stale-cache cluster around issues #2615,
 > #2749 and #3328 — note #2615 is a performance + removed-account stale-cache
 > issue and homes in US-12.14, not the accuracy story.
+
+## Umbrella issues owned by this epic
+
+One tracker issue here has children and no CHANGELOG line of its own. It is **the epic's**, not any
+story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would double-count
+the work its children already carry.
+
+| Issue | Title | Children | Where the children are |
+|---|---|---|---|
+| [#4189](https://github.com/Koniverse/SubWallet-Extension/issues/4189) | Deploying Bittensor ecosystem features | 6 (3 in this ledger) | the 3 in-ledger children (#4140, #4145, #4359) in [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md); the other three are cross-epic |
+
+> **#4189 is a cross-epic umbrella** — a title heuristic once read *"Deploying …"* as an out-of-repo
+> deploy chore, but it is the Bittensor rollout. Its earning children (#4140, #4145, #4359) carry the
+> dTAO-staking work in [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md); its dTAO-**token**
+> children (#4150, #4151) are network/token work now in [EPIC-4](EPIC-4.md), and one (#4358) is fiat
+> on-ramp, now [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md). This ledger owns the
+> umbrella by plurality; no story repeats it as a row.
 
 ## Object map & user-story interactions
 
