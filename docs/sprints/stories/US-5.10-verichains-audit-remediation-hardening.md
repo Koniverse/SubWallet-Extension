@@ -13,7 +13,7 @@ depends_on: [US-5.1, US-5.2]
 assignee: frenkie-ng
 commit:
 created: 2026-06-12
-updated: 2026-07-22
+updated: 2026-07-24
 ---
 
 ## Goal
@@ -32,9 +32,11 @@ warning when it is real.
 > **🚧 in-progress — the rows below are settled, this story's own work is not.** The table records
 > 4 audit rounds that opened 2022–2024 and all closed by 2025-10. The remediation this story actually owns lives in its
 > **acceptance criteria**, and **none of the 6 is ticked**: the UX-bounty findings (AC-1, #4471),
-> secret hygiene (AC-2, #4929), WebApp hardening (AC-3, #4959) and re-enabling phishing detection
-> (AC-4, #4889 / #4998) are all open. **The table is history; the acceptance criteria decide the
-> status** — which is why a page of `✅ done` rows sits above a story that is not done.
+> secret hygiene (AC-2, #4929) and WebApp hardening (AC-3, #4959) are all open. **AC-4 still fails**
+> even though #4998 (chaindrop.app) closed `COMPLETED` on 2026-07-24 — the criterion names
+> *both* false positives and #4889 (youtube.com) is still `Follow Up`, so one of the two it asserts
+> still reproduces. **The table is history; the acceptance criteria decide the status** — which is
+> why a page of `✅ done` rows sits above a story that is not done.
 
 ### How it got here — 2026-07-22 (corrects the 2026-07-15 sync)
 
@@ -60,6 +62,20 @@ warning when it is real.
 > **`sprint` also moved, `sprint-2026-W28` → `sprint-2026-W30`.** W28 closed on 2026-07-12; a story
 > in flight cannot sit in a window that ended ten days ago. W30 (2026-07-20 → 07-26) is the open
 > window. Only `status` / `sprint` / `updated` changed; Goal, AC and reasoning below are untouched.
+
+### #4998 closed — 2026-07-24
+
+> One of the five anchors moved since the 2026-07-22 re-read above:
+> [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) closed **COMPLETED** at
+> 02:26 UTC on 2026-07-24. Its Projects board column still reads **`Ready to build`** — a stale
+> card nobody moved, not a `Cancel`, so the tracker wins and the row is `✅ done`
+> ([AGENTS.md](../../../AGENTS.md) rule 12; the same shape as #4980 in the hardware fold). No
+> CHANGELOG line, commit or merged PR names it, so `Shipped` stays `—` ([D106](../../CONTEXT.md#d106-commit-names-what-made-the-capability-true--a-release-bump-made-nothing-true)).
+>
+> **The story stays `in-progress` and no AC is ticked.** #4998 is the chaindrop.app half of AC-4;
+> the youtube.com half ([#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889)) is
+> still open, and AC-4 asserts *both* legitimate origins stop false-positiving — so closing one
+> does not tick it. Four of the five anchors are still open (#4471, #4929, #4959, #4889).
 
 ## Background
 
@@ -229,7 +245,7 @@ false-positive reports._
 
 ## Incremental work, fixes & chores
 
-**5 tracker issues** make up this capability — the findings its acceptance criteria name, one for one. All are **open**; the `Status` column is the Projects board's ([AGENTS.md](../../../AGENTS.md) rule 12).
+**5 tracker issues** make up this capability — the findings its acceptance criteria name, one for one. Four are **open** and #4998 closed `COMPLETED` on 2026-07-24; the `Status` column is the Projects board's ([AGENTS.md](../../../AGENTS.md) rule 12).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -237,8 +253,13 @@ false-positive reports._
 | — | [#4929](https://github.com/Koniverse/SubWallet-Extension/issues/4929) | Security check: all API keys are open, not in `.env` config | 📋 backlog |
 | — | [#4959](https://github.com/Koniverse/SubWallet-Extension/issues/4959) | [WebApp] Fix reverse tabnabbing & implement a Content Security Policy | 👀 review |
 | — | [#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889) | Extension — Phishing Detection screen shown on common websites | 🔁 follow up |
-| — | [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) | False positive: chaindrop.app flagged as phishing — a legitimate testnet faucet | 📋 backlog |
+| — | [#4998](https://github.com/Koniverse/SubWallet-Extension/issues/4998) | False positive: chaindrop.app flagged as phishing — a legitimate testnet faucet | ✅ done |
 
+> **#4998 is closed `COMPLETED` with a stale `Ready to build` board column**, so it reads `✅ done`
+> ([AGENTS.md](../../../AGENTS.md) rule 12) — but its `Shipped` cell stays `—`: no CHANGELOG line,
+> commit or merged PR names it. It closes the chaindrop.app false positive; **AC-4 still fails**
+> because it also names #4889 (youtube.com), which is open.
+>
 > **#4889 has a merged PR ([#4890](https://github.com/Koniverse/SubWallet-Extension/pull/4890),
 > in `v1.3.69`) and is still open.** That release is the one that *turned ChainPatrol off*; the
 > issue stays open because re-enabling it — AC-4 — has not happened. **A merged PR on an open issue
