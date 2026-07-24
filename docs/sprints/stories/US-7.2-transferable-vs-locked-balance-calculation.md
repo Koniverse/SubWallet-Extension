@@ -132,7 +132,7 @@ and any implementation caveats during version reconciliation._
 
 ## Incremental work, fixes & chores
 
-**19 tracker issues** of incremental work landed on this capability — the calculation formula itself, per-chain balance handlers for six networks, the locked-balance display, and the validation the send flow depends on. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
+**22 tracker issues** of incremental work landed on this capability — the calculation formula itself, per-chain balance handlers for six networks, the locked-balance display, and the validation the send flow depends on. Folded in from the former one-issue-per-story maintenance ledger (2026-07-22).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -160,6 +160,9 @@ and any implementation caveats during version reconciliation._
 | — | [#4455](https://github.com/Koniverse/SubWallet-Extension/issues/4455) | Extension — don't show a balance for the TON testnet | ✅ done |
 | — | [#4161](https://github.com/Koniverse/SubWallet-Extension/issues/4161) | Update the logic fetching the Bitcoin balance | ⏸ deprecated |
 | — | [#2367](https://github.com/Koniverse/SubWallet-Extension/issues/2367) | Re-check the balance after withdrawing successfully | ⏸ deprecated |
+| 1.2.3 | [#2118](https://github.com/Koniverse/SubWallet-Extension/issues/2118) | Update the transferable balance calculation formula | ✅ done |
+| 1.2.4 | [#3166](https://github.com/Koniverse/SubWallet-Extension/issues/3166) | Update the transferable formula for system pallet v1 | ✅ done |
+| — | [#3246](https://github.com/Koniverse/SubWallet-Extension/issues/3246) | Update the transferable balance calculation for other pallets | ⏸ deprecated |
 
 > **The formula is the capability; the chains are the maintenance.** Six of these rows are one
 > network's balance handler — Kusama, Equilibrium (three times), the relay chain, DeepBrainChain,
@@ -168,6 +171,17 @@ and any implementation caveats during version reconciliation._
 >
 > **#4161 and #4162 have identical titles**, *"Update logic fetching Bitcoin balance"*; #4161 closed
 > `DUPLICATE`, #4162 shipped in 1.3.42.
+>
+> **Three rows arrived through the Transactions ledger, not the Portfolio one.** #2118 (*"update the
+> transferable balance calculation formula"*, 1.2.3), #3166 (*"…for system pallet v1"*, 1.2.4) and
+> #3246 (*"…for other pallets"*, closed `NOT_PLANNED`) were filed as transaction issues because that
+> is where a wrong transferable balance is felt — in the send form. They are the **formula**, which
+> is this story's, so they were routed here when the Transactions ledger folded on 2026-07-24
+> ([note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)). The
+> send flow's *use* of the number is [US-8.15](US-8.15-transfer-max-and-available-balance.md).
+>
+> **#3246 is the unfinished third of that sequence.** The formula was fixed for the balances pallet
+> and then for system pallet v1; extending it to the remaining pallets closed `NOT_PLANNED`.
 >
 > **#4718 is research for #4708 and stays a row.** It is the one child #4708 has, and #4708 carries
 > its own 1.3.68 CHANGELOG line, so #4708 is a delivery that spawned a sub-task rather than an

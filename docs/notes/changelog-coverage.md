@@ -406,95 +406,95 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#916](https://github.com/Koniverse/SubWallet-Extension/issues/916) | Update get balance function for Kusama (#916) | 0.7.5 | 2022-12-15 | US-7.2 |
 | [#921](https://github.com/Koniverse/SubWallet-Extension/issues/921) | Update price for iBTC (#921) | 0.7.5 | 2022-12-15 | US-7.4 |
 | [#975](https://github.com/Koniverse/SubWallet-Extension/issues/975) | Update Equilibrium balance structure (#975) | 0.7.8 | 2023-01-19 | US-7.2 |
-| [#1950](https://github.com/Koniverse/SubWallet-Extension/issues/1950) | Update transfer function for Pendulum (#1950) | 1.1.14 | 2023-09-26 | US-28.101 |
-| [#2042](https://github.com/Koniverse/SubWallet-Extension/issues/2042) | Fixed bug transfer on Rococo (#2042) | 1.1.19 | 2023-10-26 | US-28.102 |
-| [#2079](https://github.com/Koniverse/SubWallet-Extension/issues/2079) | Fixed bug estimating fee on calculating max transferable (#2079) | 1.1.19 | 2023-10-26 | US-28.103 |
-| [#2146](https://github.com/Koniverse/SubWallet-Extension/issues/2146) | Fixed bug undefined is not an object when perform transaction (#2146) | 1.1.21 | 2023-11-08 | US-28.106 |
-| [#2255](https://github.com/Koniverse/SubWallet-Extension/issues/2255) | Fixed bug error submitting transaction on Astar EVM (#2255) | 1.1.24 | 2023-12-01 | US-28.109 |
-| [#2336](https://github.com/Koniverse/SubWallet-Extension/issues/2336) | Check fee estimation on EVM networks (#2336) | 1.1.36 | 2024-02-06 | US-28.111 |
-| [#2412](https://github.com/Koniverse/SubWallet-Extension/issues/2412) | Hot fix bug estimating EVM transaction fee (#2412) | 1.1.30 | 2024-01-05 | US-28.113 |
-| [#2606](https://github.com/Koniverse/SubWallet-Extension/issues/2606) | Update estimating EVM transaction fee for Energy Web Chain (#2606) | 1.1.38 | 2024-02-17 | US-28.116 |
-| [#2613](https://github.com/Koniverse/SubWallet-Extension/issues/2613) | Show duplicate transaction history when transfer local token (#2613) | 1.2.2 | 2024-05-30 | US-28.117 |
-| [#2628](https://github.com/Koniverse/SubWallet-Extension/issues/2628) | Adjust showing/validating address on Send fund (#2628) | 1.1.39 | 2024-02-24 | US-28.119 |
-| [#271](https://github.com/Koniverse/SubWallet-Extension/issues/271) | Fix balance showing incorrect in Send Fund screen in case create/forget acc successfully (#271) | 0.5.4 | 2022-08-05 | US-28.12 |
-| [#2641](https://github.com/Koniverse/SubWallet-Extension/issues/2641) | Extension - Re-check transaction failed in case transfer max with balance = ED (#2641) | 1.3.80 | 2026-06-02 | US-28.120 |
-| [#2649](https://github.com/Koniverse/SubWallet-Extension/issues/2649) | Support Send crash log feature (#2649) | 1.1.41 | 2024-03-02 | US-28.122 |
-| [#2659](https://github.com/Koniverse/SubWallet-Extension/issues/2659) | Update transaction result screen (#2659) | 1.1.42 | 2024-03-08 | US-28.123 |
-| [#2670](https://github.com/Koniverse/SubWallet-Extension/issues/2670) | Improve EVM network fee (#2670) | 1.1.41 | 2024-03-02 | US-28.124 |
-| [#282](https://github.com/Koniverse/SubWallet-Extension/issues/282) | Fix when select aUSD (Acala) to transfer (#282) | 0.4.2 | 2022-05-20 | US-28.13 |
-| [#2783](https://github.com/Koniverse/SubWallet-Extension/issues/2783) | Do not allow send to empty account (Native token balance = 0) (#2783) | 1.2.25 | 2024-08-17 | US-28.133 |
-| [#2793](https://github.com/Koniverse/SubWallet-Extension/issues/2793) | Handle case slow getting max transferable cause wrong amount when submit max transfer (#2793) | 1.1.49 | 2024-03-26 | US-28.134 |
-| [#2795](https://github.com/Koniverse/SubWallet-Extension/issues/2795) | Fix send fund error (#2795) | 1.1.48 | 2024-03-25 | US-28.135 |
-| [#2798](https://github.com/Koniverse/SubWallet-Extension/issues/2798) | Check transfer logic that can potentially affect ED (#2798) | 1.1.49 | 2024-03-26 | US-28.136 |
-| [#283](https://github.com/Koniverse/SubWallet-Extension/issues/283) | Fix the balance display incorrect after transfer Sub-token successfully (#283) | 0.4.2 | 2022-05-20 | US-28.14 |
-| [#2852](https://github.com/Koniverse/SubWallet-Extension/issues/2852) | Support GRC-20 token (#2852, #3067) | 1.1.66 | 2024-05-21 | US-28.140 |
-| [#3067](https://github.com/Koniverse/SubWallet-Extension/issues/3067) | Support GRC-20 token (#2852, #3067) | 1.1.66 | 2024-05-21 | US-28.140 |
-| [#2873](https://github.com/Koniverse/SubWallet-Extension/issues/2873) | Add warning message for cross chain transfer to an exchange (CEX) (#2873) | 1.1.55 | 2024-04-14 | US-28.141 |
-| [#2955](https://github.com/Koniverse/SubWallet-Extension/issues/2955) | Fixed bug Do not show transaction history in case sender account is null (#2955) | 1.1.58 | 2024-04-24 | US-28.144 |
-| [#3041](https://github.com/Koniverse/SubWallet-Extension/issues/3041) | Fixed bug when transferring PSP22 token (#3041) | 1.1.65 | 2024-05-16 | US-28.146 |
-| [#3095](https://github.com/Koniverse/SubWallet-Extension/issues/3095) | Support transfer between PAH - KAH (#3095) | 1.2.6 | 2024-06-19 | US-28.148 |
-| [#3166](https://github.com/Koniverse/SubWallet-Extension/issues/3166) | Update transferable formula for system pallet v1 (#3166) | 1.2.4 | 2024-06-08 | US-28.151 |
-| [#3452](https://github.com/Koniverse/SubWallet-Extension/issues/3452) | Fix UI bug on the Transfer screen (#3452) | 1.2.28 | 2024-09-04 | US-28.155 |
-| [#3590](https://github.com/Koniverse/SubWallet-Extension/issues/3590) | Support paying fee with non-native tokens on Asset Hub (#3590) | 1.3.18 | 2025-02-20 | US-28.163 |
-| [#3632](https://github.com/Koniverse/SubWallet-Extension/issues/3632) | Rounded value parameter send in EVM transaction request (#3632) | 1.3.66 | 2025-11-07 | US-28.165 |
-| [#3653](https://github.com/Koniverse/SubWallet-Extension/issues/3653) | Fix bug do not show balance (#3653) | 1.2.30 | 2024-09-20 | US-28.167 |
-| [#3658](https://github.com/Koniverse/SubWallet-Extension/issues/3658) | Allow customizing fee for substrate/evm transactions (#3658) | 1.3.24 | 2025-03-18 | US-28.168 |
-| [#296](https://github.com/Koniverse/SubWallet-Extension/issues/296) | Bug happens when viewing Transaction History after Delete token (#296) | 0.4.3 | 2022-05-31 | US-28.17 |
-| [#3711](https://github.com/Koniverse/SubWallet-Extension/issues/3711) | Hot fix handle API status (#3711) | 1.2.32 | 2024-10-01 | US-28.170 |
-| [#3852](https://github.com/Koniverse/SubWallet-Extension/issues/3852) | Re-check transaction on Polkadot Asset Hub (#3852) | 1.3.7 | 2024-11-23 | US-28.171 |
-| [#3861](https://github.com/Koniverse/SubWallet-Extension/issues/3861) | Fix errors when making transactions on Tangle mainnet (#3861) | 1.3.11 | 2024-12-23 | US-28.173 |
-| [#3896](https://github.com/Koniverse/SubWallet-Extension/issues/3896) | Unable to transfer local token on Bifrost (#3896) | 1.3.10 | 2024-12-12 | US-28.176 |
-| [#310](https://github.com/Koniverse/SubWallet-Extension/issues/310) | Fix bug happens on Send Fund/Donate screen when Delete Custom Network (#310) | 0.5.3 | 2022-07-29 | US-28.18 |
-| [#4045](https://github.com/Koniverse/SubWallet-Extension/issues/4045) | Support custom fee token when sending token on Hydration (#4045) | 1.3.24 | 2025-03-18 | US-28.182 |
-| [#4065](https://github.com/Koniverse/SubWallet-Extension/issues/4065) | Fixed some bug for customizing fee for substrate/evm transactions features (#4065) | 1.3.55 | 2025-09-05 | US-28.183 |
-| [#4072](https://github.com/Koniverse/SubWallet-Extension/issues/4072) | Fixed bug Unable to detect domains name when transfer (#4072) | 1.3.53 | 2025-08-12 | US-28.184 |
-| [#4263](https://github.com/Koniverse/SubWallet-Extension/issues/4263) | Support transfer for Bitcoin (#4263) | 1.3.42 | 2025-06-23 | US-28.187 |
-| [#4314](https://github.com/Koniverse/SubWallet-Extension/issues/4314) | Update Paraspell's fee calculation API (#4314), | 1.3.40 | 2025-05-30 | US-28.188 |
-| [#4461](https://github.com/Koniverse/SubWallet-Extension/issues/4461) | Fixed bug when custom priority fee for EVM (#4461) | 1.3.53 | 2025-08-12 | US-28.191 |
-| [#4462](https://github.com/Koniverse/SubWallet-Extension/issues/4462) | Fixed bug Show incorrect amount when transfer max (#4462) | 1.3.58 | 2025-09-19 | US-28.192 |
-| [#4486](https://github.com/Koniverse/SubWallet-Extension/issues/4486) | Fixed error validate receive address when transferring MYTH (Mythos) (#4486) | 1.3.45 | 2025-07-01 | US-28.193 |
-| [#4559](https://github.com/Koniverse/SubWallet-Extension/issues/4559) | Update logic for rpc that don't support custom fee on EVM system (#4559) | 1.3.53 | 2025-08-12 | US-28.194 |
-| [#4585](https://github.com/Koniverse/SubWallet-Extension/issues/4585) | Hide icon Edit fee with some networks not supported (#4585) | 1.3.53 | 2025-08-12 | US-28.195 |
-| [#4652](https://github.com/Koniverse/SubWallet-Extension/issues/4652) | Fixed missing "Edit Fee" button / Improve fee loading UI (#4652) | 1.3.62 | 2025-10-10 | US-28.196 |
-| [#4706](https://github.com/Koniverse/SubWallet-Extension/issues/4706) | Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706) | 1.3.62 | 2025-10-10 | US-28.197 |
-| [#4716](https://github.com/Koniverse/SubWallet-Extension/issues/4716) | Configure gas limit & max gas fee for Energy Web Chain (#4716) | 1.3.67 | 2025-11-13 | US-28.198 |
-| [#32](https://github.com/Koniverse/SubWallet-Extension/issues/32) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-28.2 |
-| [#118](https://github.com/Koniverse/SubWallet-Extension/issues/118) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-28.2 |
-| [#143](https://github.com/Koniverse/SubWallet-Extension/issues/143) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-28.2 |
-| [#4900](https://github.com/Koniverse/SubWallet-Extension/issues/4900) | Support Transfer Alpha Token (#4900) | 1.3.78 | 2026-05-14 | US-28.200 |
-| [#4954](https://github.com/Koniverse/SubWallet-Extension/issues/4954) | Turn off warning popup for transfers between PAH <> KAH (#4954) | 1.3.77 | 2026-04-09 | US-28.201 |
-| [#393](https://github.com/Koniverse/SubWallet-Extension/issues/393) | Improve the UX for contracts transaction with EVM provider (#393) | 0.5.2 | 2022-07-22 | US-28.25 |
-| [#454](https://github.com/Koniverse/SubWallet-Extension/issues/454) | Add support for transaction history on Astar EVM (#454) | 0.5.5 | 2022-08-11 | US-28.26 |
-| [#472](https://github.com/Koniverse/SubWallet-Extension/issues/472) | Support cross chain transfer: aUSD (#472) | 0.5.4 | 2022-08-05 | US-28.27 |
-| [#576](https://github.com/Koniverse/SubWallet-Extension/issues/576) | Fix showing incorrect transferable balance for PRING token (#576) | 0.5.7 | 2022-09-06 | US-28.32 |
-| [#584](https://github.com/Koniverse/SubWallet-Extension/issues/584) | Fix bug can't view transaction history of Moonbase Alpha network (#584) | 0.5.7 | 2022-09-06 | US-28.33 |
-| [#665](https://github.com/Koniverse/SubWallet-Extension/issues/665) | Support transfer BIT token on Pioneer Network (#665) | 0.6.5 | 2022-09-24 | US-28.34 |
-| [#681](https://github.com/Koniverse/SubWallet-Extension/issues/681) | Change transfer warning when the account cannot be reaped (#681) | 0.6.6 | 2022-09-30 | US-28.35 |
-| [#827](https://github.com/Koniverse/SubWallet-Extension/issues/827) | Show incorrect the transfer result on the transaction history screen (#827) | 0.7.2 | 2022-11-19 | US-28.38 |
-| [#874](https://github.com/Koniverse/SubWallet-Extension/issues/874) | Add the warning message for invalid Amount input cases (for send fund feature) (#874) | 0.7.7 | 2022-12-28 | US-28.40 |
-| [#984](https://github.com/Koniverse/SubWallet-Extension/issues/984) | Add support send EQ token (#984) | 0.8.1 | 2023-02-03 | US-28.44 |
-| [#1254](https://github.com/Koniverse/SubWallet-Extension/issues/1254) | Improve transaction UX (#1254) | 1.0.3 | 2023-05-06 | US-28.61 |
-| [#1361](https://github.com/Koniverse/SubWallet-Extension/issues/1361) | Add more search criteria (#1361) | 1.0.5 | 2023-05-21 | US-28.67 |
-| [#1381](https://github.com/Koniverse/SubWallet-Extension/issues/1381) | Add support view on browser for some chain (#1381) | 1.0.5 | 2023-05-21 | US-28.68 |
-| [#1385](https://github.com/Koniverse/SubWallet-Extension/issues/1385) | Update notification in case transaction time out (#1385) | 1.0.8 | 2023-06-08 | US-28.69 |
-| [#1411](https://github.com/Koniverse/SubWallet-Extension/issues/1411) | Fixed bug Do not get transaction history in case the wallet have multi-account (#1411) | 1.0.9 | 2023-06-13 | US-28.70 |
-| [#1418](https://github.com/Koniverse/SubWallet-Extension/issues/1418) | Update QR code style for transaction with QR-signer account (#1418) | 1.1.2 | 2023-07-14 | US-28.71 |
-| [#1449](https://github.com/Koniverse/SubWallet-Extension/issues/1449) | Review and support send fund for more token (#1449) | 1.0.9 | 2023-06-13 | US-28.73 |
-| [#1451](https://github.com/Koniverse/SubWallet-Extension/issues/1451) | Fixed the bug causing an error page when sending tokens on a custom network (#1451) | 1.0.7 | 2023-06-01 | US-28.74 |
-| [#1458](https://github.com/Koniverse/SubWallet-Extension/issues/1458) | Added validation for the scenario "Transfer Max local token. (#1458) | 1.0.7 | 2023-06-01 | US-28.75 |
-| [#1460](https://github.com/Koniverse/SubWallet-Extension/issues/1460) | Resolved bugs related to sending funds on some tokens after running script tests (#1460) | 1.0.7 | 2023-06-01 | US-28.76 |
-| [#1474](https://github.com/Koniverse/SubWallet-Extension/issues/1474) | Optimize decode contract in transaction (#1474) | 1.0.9 | 2023-06-13 | US-28.77 |
-| [#1479](https://github.com/Koniverse/SubWallet-Extension/issues/1479) | Add validate for case: the transaction amount is too small to keep the destination account alive (#1479) | 1.0.8 | 2023-06-08 | US-28.78 |
-| [#1482](https://github.com/Koniverse/SubWallet-Extension/issues/1482) | Optimized the requirement to enable tokens in the Transaction Screen (#1482) | 1.0.7 | 2023-06-01 | US-28.79 |
-| [#1492](https://github.com/Koniverse/SubWallet-Extension/issues/1492) | Fixed bug send fund ERC20 token on Polygon (#1492) | 1.0.8 | 2023-06-08 | US-28.80 |
-| [#1509](https://github.com/Koniverse/SubWallet-Extension/issues/1509) | Update the new send fund screen (#1509) | 1.0.9 | 2023-06-13 | US-28.81 |
-| [#1514](https://github.com/Koniverse/SubWallet-Extension/issues/1514) | Fixed bug Show duplicate token on receive list when search custom token (#1514) | 1.0.9 | 2023-06-13 | US-28.83 |
-| [#1522](https://github.com/Koniverse/SubWallet-Extension/issues/1522) | Fixed bug Do not transfer BNC token on the Bifrost Polkadot (#1522) | 1.0.9 | 2023-06-13 | US-28.84 |
-| [#1531](https://github.com/Koniverse/SubWallet-Extension/issues/1531) | Update Receive icon to Copy icon on Homepage screen (#1531) | 1.0.10 | 2023-06-17 | US-28.85 |
-| [#1555](https://github.com/Koniverse/SubWallet-Extension/issues/1555) | Save entered transaction information when closing and reopening the extension (#1555) | 1.1.10 | 2023-08-26 | US-28.87 |
-| [#1654](https://github.com/Koniverse/SubWallet-Extension/issues/1654) | Fixed bug Show incorrect transaction time on the history screen (#1654) | 1.1.3 | 2023-07-21 | US-28.89 |
-| [#1657](https://github.com/Koniverse/SubWallet-Extension/issues/1657) | Fixed bug Do not validate amount of the recipient address in case send token (#1657) | 1.1.3 | 2023-07-21 | US-28.90 |
-| [#1872](https://github.com/Koniverse/SubWallet-Extension/issues/1872) | Allow paste Amount to send (#1872) | 1.1.13 | 2023-09-21 | US-28.96 |
+| [#1949](https://github.com/Koniverse/SubWallet-Extension/issues/1949) | Update transfer function for Pendulum (#1950 — the bullet cites the PR, not issue #1949) | 1.1.14 | 2023-09-26 | US-8.1 |
+| [#2042](https://github.com/Koniverse/SubWallet-Extension/issues/2042) | Fixed bug transfer on Rococo (#2042) | 1.1.19 | 2023-10-26 | US-8.1 |
+| [#2079](https://github.com/Koniverse/SubWallet-Extension/issues/2079) | Fixed bug estimating fee on calculating max transferable (#2079) | 1.1.19 | 2023-10-26 | US-8.15 |
+| [#2146](https://github.com/Koniverse/SubWallet-Extension/issues/2146) | Fixed bug undefined is not an object when perform transaction (#2146) | 1.1.21 | 2023-11-08 | US-8.1 |
+| [#2255](https://github.com/Koniverse/SubWallet-Extension/issues/2255) | Fixed bug error submitting transaction on Astar EVM (#2255) | 1.1.24 | 2023-12-01 | US-8.16 |
+| [#2336](https://github.com/Koniverse/SubWallet-Extension/issues/2336) | Check fee estimation on EVM networks (#2336) | 1.1.36 | 2024-02-06 | US-8.16 |
+| [#2412](https://github.com/Koniverse/SubWallet-Extension/issues/2412) | Hot fix bug estimating EVM transaction fee (#2412) | 1.1.30 | 2024-01-05 | US-8.16 |
+| [#2606](https://github.com/Koniverse/SubWallet-Extension/issues/2606) | Update estimating EVM transaction fee for Energy Web Chain (#2606) | 1.1.38 | 2024-02-17 | US-8.16 |
+| [#2613](https://github.com/Koniverse/SubWallet-Extension/issues/2613) | Show duplicate transaction history when transfer local token (#2613) | 1.2.2 | 2024-05-30 | US-8.5 |
+| [#2628](https://github.com/Koniverse/SubWallet-Extension/issues/2628) | Adjust showing/validating address on Send fund (#2628) | 1.1.39 | 2024-02-24 | US-8.14 |
+| [#271](https://github.com/Koniverse/SubWallet-Extension/issues/271) | Fix balance showing incorrect in Send Fund screen in case create/forget acc successfully (#271) | 0.5.4 | 2022-08-05 | US-8.14 |
+| [#2641](https://github.com/Koniverse/SubWallet-Extension/issues/2641) | Extension - Re-check transaction failed in case transfer max with balance = ED (#2641) | 1.3.80 | 2026-06-02 | US-8.15 |
+| [#2649](https://github.com/Koniverse/SubWallet-Extension/issues/2649) | Support Send crash log feature (#2649) | 1.1.41 | 2024-03-02 | US-8.1 |
+| [#2659](https://github.com/Koniverse/SubWallet-Extension/issues/2659) | Update transaction result screen (#2659) | 1.1.42 | 2024-03-08 | US-8.1 |
+| [#2670](https://github.com/Koniverse/SubWallet-Extension/issues/2670) | Improve EVM network fee (#2670) | 1.1.41 | 2024-03-02 | US-8.16 |
+| [#282](https://github.com/Koniverse/SubWallet-Extension/issues/282) | Fix when select aUSD (Acala) to transfer (#282) | 0.4.2 | 2022-05-20 | US-8.1 |
+| [#2783](https://github.com/Koniverse/SubWallet-Extension/issues/2783) | Do not allow send to empty account (Native token balance = 0) (#2783) | 1.2.25 | 2024-08-17 | US-8.7 |
+| [#2793](https://github.com/Koniverse/SubWallet-Extension/issues/2793) | Handle case slow getting max transferable cause wrong amount when submit max transfer (#2793) | 1.1.49 | 2024-03-26 | US-8.15 |
+| [#2795](https://github.com/Koniverse/SubWallet-Extension/issues/2795) | Fix send fund error (#2795) | 1.1.48 | 2024-03-25 | US-8.15 |
+| [#2798](https://github.com/Koniverse/SubWallet-Extension/issues/2798) | Check transfer logic that can potentially affect ED (#2798) | 1.1.49 | 2024-03-26 | US-8.7 |
+| [#283](https://github.com/Koniverse/SubWallet-Extension/issues/283) | Fix the balance display incorrect after transfer Sub-token successfully (#283) | 0.4.2 | 2022-05-20 | US-8.15 |
+| [#2852](https://github.com/Koniverse/SubWallet-Extension/issues/2852) | Support GRC-20 token (#2852, #3067) | 1.1.66 | 2024-05-21 | US-8.1 |
+| [#3067](https://github.com/Koniverse/SubWallet-Extension/issues/3067) | Support GRC-20 token (#2852, #3067) | 1.1.66 | 2024-05-21 | US-8.1 |
+| [#2873](https://github.com/Koniverse/SubWallet-Extension/issues/2873) | Add warning message for cross chain transfer to an exchange (CEX) (#2873) | 1.1.55 | 2024-04-14 | US-8.14 |
+| [#2955](https://github.com/Koniverse/SubWallet-Extension/issues/2955) | Fixed bug Do not show transaction history in case sender account is null (#2955) | 1.1.58 | 2024-04-24 | US-8.5 |
+| [#3041](https://github.com/Koniverse/SubWallet-Extension/issues/3041) | Fixed bug when transferring PSP22 token (#3041) | 1.1.65 | 2024-05-16 | US-8.1 |
+| [#3095](https://github.com/Koniverse/SubWallet-Extension/issues/3095) | Support transfer between PAH - KAH (#3095) | 1.2.6 | 2024-06-19 | US-8.1 |
+| [#3166](https://github.com/Koniverse/SubWallet-Extension/issues/3166) | Update transferable formula for system pallet v1 (#3166) | 1.2.4 | 2024-06-08 | US-7.2 |
+| [#3452](https://github.com/Koniverse/SubWallet-Extension/issues/3452) | Fix UI bug on the Transfer screen (#3452) | 1.2.28 | 2024-09-04 | US-8.1 |
+| [#3590](https://github.com/Koniverse/SubWallet-Extension/issues/3590) | Support paying fee with non-native tokens on Asset Hub (#3590) | 1.3.18 | 2025-02-20 | US-8.4 |
+| [#3632](https://github.com/Koniverse/SubWallet-Extension/issues/3632) | Rounded value parameter send in EVM transaction request (#3632) | 1.3.66 | 2025-11-07 | US-8.16 |
+| [#3653](https://github.com/Koniverse/SubWallet-Extension/issues/3653) | Fix bug do not show balance (#3653) | 1.2.30 | 2024-09-20 | US-8.14 |
+| [#3658](https://github.com/Koniverse/SubWallet-Extension/issues/3658) | Allow customizing fee for substrate/evm transactions (#3658) | 1.3.24 | 2025-03-18 | US-8.3 |
+| [#296](https://github.com/Koniverse/SubWallet-Extension/issues/296) | Bug happens when viewing Transaction History after Delete token (#296) | 0.4.3 | 2022-05-31 | US-8.5 |
+| [#3711](https://github.com/Koniverse/SubWallet-Extension/issues/3711) | Hot fix handle API status (#3711) | 1.2.32 | 2024-10-01 | US-8.1 |
+| [#3852](https://github.com/Koniverse/SubWallet-Extension/issues/3852) | Re-check transaction on Polkadot Asset Hub (#3852) | 1.3.7 | 2024-11-23 | US-8.1 |
+| [#3861](https://github.com/Koniverse/SubWallet-Extension/issues/3861) | Fix errors when making transactions on Tangle mainnet (#3861) | 1.3.11 | 2024-12-23 | US-8.1 |
+| [#3896](https://github.com/Koniverse/SubWallet-Extension/issues/3896) | Unable to transfer local token on Bifrost (#3896) | 1.3.10 | 2024-12-12 | US-8.1 |
+| [#310](https://github.com/Koniverse/SubWallet-Extension/issues/310) | Fix bug happens on Send Fund/Donate screen when Delete Custom Network (#310) | 0.5.3 | 2022-07-29 | US-8.1 |
+| [#4045](https://github.com/Koniverse/SubWallet-Extension/issues/4045) | Support custom fee token when sending token on Hydration (#4045) | 1.3.24 | 2025-03-18 | US-8.4 |
+| [#4065](https://github.com/Koniverse/SubWallet-Extension/issues/4065) | Fixed some bug for customizing fee for substrate/evm transactions features (#4065) | 1.3.55 | 2025-09-05 | US-8.3 |
+| [#4072](https://github.com/Koniverse/SubWallet-Extension/issues/4072) | Fixed bug Unable to detect domains name when transfer (#4072) | 1.3.53 | 2025-08-12 | US-8.14 |
+| [#4263](https://github.com/Koniverse/SubWallet-Extension/issues/4263) | Support transfer for Bitcoin (#4263) | 1.3.42 | 2025-06-23 | US-8.1 |
+| [#4314](https://github.com/Koniverse/SubWallet-Extension/issues/4314) | Update Paraspell's fee calculation API (#4314), | 1.3.40 | 2025-05-30 | US-8.16 |
+| [#4461](https://github.com/Koniverse/SubWallet-Extension/issues/4461) | Fixed bug when custom priority fee for EVM (#4461) | 1.3.53 | 2025-08-12 | US-8.3 |
+| [#4462](https://github.com/Koniverse/SubWallet-Extension/issues/4462) | Fixed bug Show incorrect amount when transfer max (#4462) | 1.3.58 | 2025-09-19 | US-8.15 |
+| [#4486](https://github.com/Koniverse/SubWallet-Extension/issues/4486) | Fixed error validate receive address when transferring MYTH (Mythos) (#4486) | 1.3.45 | 2025-07-01 | US-8.2 |
+| [#4559](https://github.com/Koniverse/SubWallet-Extension/issues/4559) | Update logic for rpc that don't support custom fee on EVM system (#4559) | 1.3.53 | 2025-08-12 | US-8.3 |
+| [#4585](https://github.com/Koniverse/SubWallet-Extension/issues/4585) | Hide icon Edit fee with some networks not supported (#4585) | 1.3.53 | 2025-08-12 | US-8.3 |
+| [#4652](https://github.com/Koniverse/SubWallet-Extension/issues/4652) | Fixed missing "Edit Fee" button / Improve fee loading UI (#4652) | 1.3.62 | 2025-10-10 | US-8.3 |
+| [#4706](https://github.com/Koniverse/SubWallet-Extension/issues/4706) | Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano (#4706) | 1.3.62 | 2025-10-10 | US-8.14 |
+| [#4716](https://github.com/Koniverse/SubWallet-Extension/issues/4716) | Configure gas limit & max gas fee for Energy Web Chain (#4716) | 1.3.67 | 2025-11-13 | US-8.3 |
+| [#32](https://github.com/Koniverse/SubWallet-Extension/issues/32) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-8.1 |
+| [#118](https://github.com/Koniverse/SubWallet-Extension/issues/118) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-8.1 |
+| [#143](https://github.com/Koniverse/SubWallet-Extension/issues/143) | Implement new Send Fund UI with support send tokens, send EVM assets (#32, #143, #118) | 0.4.1 | 2022-05-11 | US-8.1 |
+| [#4900](https://github.com/Koniverse/SubWallet-Extension/issues/4900) | Support Transfer Alpha Token (#4900) | 1.3.78 | 2026-05-14 | US-8.1 |
+| [#4954](https://github.com/Koniverse/SubWallet-Extension/issues/4954) | Turn off warning popup for transfers between PAH <> KAH (#4954) | 1.3.77 | 2026-04-09 | US-8.1 |
+| [#393](https://github.com/Koniverse/SubWallet-Extension/issues/393) | Improve the UX for contracts transaction with EVM provider (#393) | 0.5.2 | 2022-07-22 | US-8.1 |
+| [#454](https://github.com/Koniverse/SubWallet-Extension/issues/454) | Add support for transaction history on Astar EVM (#454) | 0.5.5 | 2022-08-11 | US-8.5 |
+| [#472](https://github.com/Koniverse/SubWallet-Extension/issues/472) | Support cross chain transfer: aUSD (#472) | 0.5.4 | 2022-08-05 | US-8.1 |
+| [#576](https://github.com/Koniverse/SubWallet-Extension/issues/576) | Fix showing incorrect transferable balance for PRING token (#576) | 0.5.7 | 2022-09-06 | US-8.15 |
+| [#584](https://github.com/Koniverse/SubWallet-Extension/issues/584) | Fix bug can't view transaction history of Moonbase Alpha network (#584) | 0.5.7 | 2022-09-06 | US-8.5 |
+| [#665](https://github.com/Koniverse/SubWallet-Extension/issues/665) | Support transfer BIT token on Pioneer Network (#665) | 0.6.5 | 2022-09-24 | US-8.1 |
+| [#681](https://github.com/Koniverse/SubWallet-Extension/issues/681) | Change transfer warning when the account cannot be reaped (#681) | 0.6.6 | 2022-09-30 | US-8.7 |
+| [#827](https://github.com/Koniverse/SubWallet-Extension/issues/827) | Show incorrect the transfer result on the transaction history screen (#827) | 0.7.2 | 2022-11-19 | US-8.5 |
+| [#874](https://github.com/Koniverse/SubWallet-Extension/issues/874) | Add the warning message for invalid Amount input cases (for send fund feature) (#874) | 0.7.7 | 2022-12-28 | US-8.7 |
+| [#984](https://github.com/Koniverse/SubWallet-Extension/issues/984) | Add support send EQ token (#984) | 0.8.1 | 2023-02-03 | US-8.1 |
+| [#1254](https://github.com/Koniverse/SubWallet-Extension/issues/1254) | Improve transaction UX (#1254) | 1.0.3 | 2023-05-06 | US-8.1 |
+| [#1361](https://github.com/Koniverse/SubWallet-Extension/issues/1361) | Add more search criteria (#1361) | 1.0.5 | 2023-05-21 | US-8.16 |
+| [#1381](https://github.com/Koniverse/SubWallet-Extension/issues/1381) | Add support view on browser for some chain (#1381) | 1.0.5 | 2023-05-21 | US-8.5 |
+| [#1385](https://github.com/Koniverse/SubWallet-Extension/issues/1385) | Update notification in case transaction time out (#1385) | 1.0.8 | 2023-06-08 | US-8.1 |
+| [#1411](https://github.com/Koniverse/SubWallet-Extension/issues/1411) | Fixed bug Do not get transaction history in case the wallet have multi-account (#1411) | 1.0.9 | 2023-06-13 | US-8.5 |
+| [#1418](https://github.com/Koniverse/SubWallet-Extension/issues/1418) | Update QR code style for transaction with QR-signer account (#1418) | 1.1.2 | 2023-07-14 | US-8.1 |
+| [#1449](https://github.com/Koniverse/SubWallet-Extension/issues/1449) | Review and support send fund for more token (#1449) | 1.0.9 | 2023-06-13 | US-8.1 |
+| [#1451](https://github.com/Koniverse/SubWallet-Extension/issues/1451) | Fixed the bug causing an error page when sending tokens on a custom network (#1451) | 1.0.7 | 2023-06-01 | US-8.1 |
+| [#1458](https://github.com/Koniverse/SubWallet-Extension/issues/1458) | Added validation for the scenario "Transfer Max local token. (#1458) | 1.0.7 | 2023-06-01 | US-8.15 |
+| [#1460](https://github.com/Koniverse/SubWallet-Extension/issues/1460) | Resolved bugs related to sending funds on some tokens after running script tests (#1460) | 1.0.7 | 2023-06-01 | US-8.1 |
+| [#1474](https://github.com/Koniverse/SubWallet-Extension/issues/1474) | Optimize decode contract in transaction (#1474) | 1.0.9 | 2023-06-13 | US-8.16 |
+| [#1479](https://github.com/Koniverse/SubWallet-Extension/issues/1479) | Add validate for case: the transaction amount is too small to keep the destination account alive (#1479) | 1.0.8 | 2023-06-08 | US-8.7 |
+| [#1482](https://github.com/Koniverse/SubWallet-Extension/issues/1482) | Optimized the requirement to enable tokens in the Transaction Screen (#1482) | 1.0.7 | 2023-06-01 | US-8.1 |
+| [#1492](https://github.com/Koniverse/SubWallet-Extension/issues/1492) | Fixed bug send fund ERC20 token on Polygon (#1492) | 1.0.8 | 2023-06-08 | US-8.1 |
+| [#1509](https://github.com/Koniverse/SubWallet-Extension/issues/1509) | Update the new send fund screen (#1509) | 1.0.9 | 2023-06-13 | US-8.14 |
+| [#1514](https://github.com/Koniverse/SubWallet-Extension/issues/1514) | Fixed bug Show duplicate token on receive list when search custom token (#1514) | 1.0.9 | 2023-06-13 | US-8.2 |
+| [#1522](https://github.com/Koniverse/SubWallet-Extension/issues/1522) | Fixed bug Do not transfer BNC token on the Bifrost Polkadot (#1522) | 1.0.9 | 2023-06-13 | US-8.1 |
+| [#1531](https://github.com/Koniverse/SubWallet-Extension/issues/1531) | Update Receive icon to Copy icon on Homepage screen (#1531) | 1.0.10 | 2023-06-17 | US-8.2 |
+| [#1555](https://github.com/Koniverse/SubWallet-Extension/issues/1555) | Save entered transaction information when closing and reopening the extension (#1555) | 1.1.10 | 2023-08-26 | US-8.14 |
+| [#1654](https://github.com/Koniverse/SubWallet-Extension/issues/1654) | Fixed bug Show incorrect transaction time on the history screen (#1654) | 1.1.3 | 2023-07-21 | US-8.5 |
+| [#1657](https://github.com/Koniverse/SubWallet-Extension/issues/1657) | Fixed bug Do not validate amount of the recipient address in case send token (#1657) | 1.1.3 | 2023-07-21 | US-8.7 |
+| [#1872](https://github.com/Koniverse/SubWallet-Extension/issues/1872) | Allow paste Amount to send (#1872) | 1.1.13 | 2023-09-21 | US-8.14 |
 | [#12](https://github.com/Koniverse/SubWallet-Extension/issues/12) | Integrate Snow EVM network (#12) | 1.0.5 | 2023-05-21 | US-9.3 |
 | [#3762](https://github.com/Koniverse/SubWallet-Extension/issues/3762) | Fixed bug send NFT on Ethereum network (#3762) | 1.3.9 | 2024-12-09 | US-9.5 |
 | [#3791](https://github.com/Koniverse/SubWallet-Extension/issues/3791) | Fix bug show OG WUD BURN NFT Collection (#3791) | 1.3.3 | 2024-10-16 | US-9.10 |

@@ -24,6 +24,11 @@ keep a native-token balance just for gas, so that a user with only stablecoins c
 still transact. This removes the "you have funds but can't move them because you
 have no native token" trap.
 
+## Status
+
+> **✅ done — shipped in 1.3.18.** All acceptance criteria are ticked and the 4 rows below are
+> settled, 3 with a release.
+
 ## Background
 
 Paying fees in a non-native asset is a chain-feature integration, not a generic
@@ -113,8 +118,30 @@ backfilled during version reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**4 tracker issues** — 3 with a release, 1 delivered with no line naming it. Folded in from the
+former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.1.55 | [#2895](https://github.com/Koniverse/SubWallet-Extension/issues/2895) | WebApp - Allow selecting token to pay transaction fee on HydraDX | ✅ done |
+| 1.3.18 | [#3590](https://github.com/Koniverse/SubWallet-Extension/issues/3590) | Support paying fee with non-native tokens on Asset Hub | ✅ done |
+| 1.3.24 | [#4045](https://github.com/Koniverse/SubWallet-Extension/issues/4045) | Support custom fee token when sending token on Hydradx | ✅ done |
+| — | [#2959](https://github.com/Koniverse/SubWallet-Extension/issues/2959) | WebApp - Implement UI for selecting token to pay transaction fee on HydraDX | ✅ done |
+
+> **The WebApp got there first.** #2959 implemented the fee-token selection UI and #2895 allowed
+> selecting a fee token on HydraDX — both WebApp, both in the 1.1.x window — while the extension's
+> Asset Hub support (#3590) landed in 1.3.18 and Hydration (#4045) in 1.3.24. The surface with the
+> looser release cadence is where this capability was tried out.
+>
+> **The open continuation is Hollar** ([#4709](https://github.com/Koniverse/SubWallet-Extension/issues/4709)),
+> tracked in [US-11.17](US-11.17-swap-coverage-expansion.md) because it arrived through the swap
+> tracker — the same fee-token question reaching a different queue.
+
 ## Cross-references
 
 - [PRD FR-77](../../PRD.md#functional-requirements)
 - [Epic EPIC-8](../epics/EPIC-8.md)
 - [US-8.3](US-8.3-custom-fee-and-tip.md)
+- [consolidation note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)

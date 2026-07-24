@@ -24,6 +24,11 @@ that falls below the ED is *reaped* and its remaining dust (and any dependent
 on-chain state) is lost. The guard turns a silent fund-loss footgun into an
 explicit, acknowledged decision.
 
+## Status
+
+> **✅ done — shipped in 0.2.5.** All acceptance criteria are ticked and the 8 rows below are
+> settled: 7 delivered, 1 closed without shipping.
+
 ## Background
 
 The existential deposit is a Substrate-specific safety threshold: an account whose
@@ -109,8 +114,34 @@ backfilled during version reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**8 tracker issues** — 6 with a release, 1 delivered with no line naming it, 1 closed without
+shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.6.6 | [#681](https://github.com/Koniverse/SubWallet-Extension/issues/681) | Change transfer warning when the account cannot be reaped | ✅ done |
+| 0.7.7 | [#874](https://github.com/Koniverse/SubWallet-Extension/issues/874) | Add the warning message for invalid Amount input cases (for send fund feature) | ✅ done |
+| 1.0.8 | [#1479](https://github.com/Koniverse/SubWallet-Extension/issues/1479) | Add validate for case: the transaction amount is too small to keep the destination account alive | ✅ done |
+| 1.1.3 | [#1657](https://github.com/Koniverse/SubWallet-Extension/issues/1657) | Do not validate amount of the recipient address when send on-chain | ✅ done |
+| 1.1.49 | [#2798](https://github.com/Koniverse/SubWallet-Extension/issues/2798) | Check transfer logic that can potentially affect ED | ✅ done |
+| 1.2.25 | [#2783](https://github.com/Koniverse/SubWallet-Extension/issues/2783) | Do not allow send to empty account (Native token balance = 0) on Asset Hub | ✅ done |
+| — | [#64](https://github.com/Koniverse/SubWallet-Extension/issues/64) | Still showing warning message not enough balance in case of network transfer | ✅ done |
+| — | [#3473](https://github.com/Koniverse/SubWallet-Extension/issues/3473) | Extension - Improve block transfer to empty account | ⏸ deprecated |
+
+> **The guard is asked in two directions and both are here.** #681 and #1479 protect the *sender*
+> from dropping below the existential deposit; #2783 (*"do not allow sending to an empty account"*)
+> and #3473 protect the *recipient* from receiving an amount too small to exist. #2798 —
+> *"check transfer logic that can potentially affect ED"* — is the audit of both.
+>
+> **#3473 closed without shipping**: *"improve block transfer to empty account"*. Blocking is a
+> blunt guard, and softening it was proposed and not taken — which is why the block is still what
+> the user meets.
+
 ## Cross-references
 
 - [PRD FR-80](../../PRD.md#functional-requirements)
 - [Epic EPIC-8](../epics/EPIC-8.md)
 - [US-8.1](US-8.1-send-native-and-fungible-tokens.md)
+- [consolidation note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)

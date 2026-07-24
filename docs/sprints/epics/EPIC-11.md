@@ -146,7 +146,9 @@ double-count work its children already carry.
 > it, and it is a reminder that **an umbrella's area is the area of its children, not of whoever
 > filed it**. Its one genuinely unowned child,
 > [#4434](https://github.com/Koniverse/SubWallet-Extension/issues/4434) — *"Optimize request
-> handling in the SendFund form"* — is transaction work; **flag for the EPIC-28 fold.**
+> handling in the SendFund form"* — is transaction work, and when the Transactions ledger folded on
+> 2026-07-24 it became a row in
+> [US-8.14](../stories/US-8.14-send-fund-form-and-recipient-validation.md).
 >
 > **Eleven sub-issue links in this area point at things that are not children.** Across #4389,
 > #4495, #4496, #4573, #4724, #4733 and #4791, GitHub's sub-issue list contains #75, #79, #87, #89,

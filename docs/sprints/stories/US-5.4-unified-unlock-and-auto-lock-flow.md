@@ -122,8 +122,11 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **9
-> ledgers still separate** finds **23 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-28, EPIC-32, EPIC-41.
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **5
+> ledgers still separate** finds **23 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-32, EPIC-41.
+>
+> **The transactions ledger held none of them.** It folded on 2026-07-24 with 200 issues and not one
+> title matched — a whole area of the tracker that never touches the lock state.
 >
 > **The hardware ledger's three candidates were all false positives**, and they are worth recording
 > as the shape of the error: `Unblock`, `block action`, `Block networks` — the heuristic matched

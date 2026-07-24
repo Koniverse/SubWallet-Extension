@@ -20,7 +20,7 @@ arch_ref:
   - AD-24
   - AD-25
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-07-24
 ---
 
 ## Goal
@@ -138,7 +138,41 @@ their own epics.
 | [US-8.11](../stories/US-8.11-export-transaction-history.md) | Export transaction history | Export the transaction history to a file (planned) | 📋 backlog | — |
 | [US-8.12](../stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) | Fee/BigInt & gas-estimation hardening | Fix fee-estimation accuracy, non-native fee payment, ED/BigInt transfer-max/all edges, and error surfacing (#4649/#4552/#2643/#4936/#4043/#3314/#4985/#3240) | 📋 backlog | — |
 | [US-8.13](../stories/US-8.13-payload-decode-error-handling.md) | Payload decode error handling | Show a user-facing error instead of crashing when a transaction payload cannot be decoded | ✅ done | 1.3.82 |
+| [US-8.14](../stories/US-8.14-send-fund-form-and-recipient-validation.md) | Send-fund form & recipient validation | The recipient field, the amount field, and the balance beside them | ✅ done | 1.3.62 |
+| [US-8.15](../stories/US-8.15-transfer-max-and-available-balance.md) | Transfer-max & available-balance edges | How much can actually leave — seven attempts at one number | ✅ done | 1.3.80 |
+| [US-8.16](../stories/US-8.16-evm-fee-and-gas-estimation.md) | EVM fee & gas estimation | The wallet guessing a fee, as opposed to the user choosing one | ✅ done | 1.3.66 |
+| [US-8.17](../stories/US-8.17-transaction-screens-in-the-1-0-2-rewrite.md) | Transaction screens in the 1.0.2 UI rewrite | This epic's 11 rows of a 71-row programme that has no parent issue | ✅ done | 1.0.2 |
+| [US-8.18](../stories/US-8.18-webapp-transaction-surface.md) | WebApp transaction surface | Confirming, cancelling and scanning where there is no popup | ✅ done | 1.1.62 |
+| [US-8.19](../stories/US-8.19-unified-account-transaction-migration.md) | Unified-account transaction migration | Eight issues, one release, zero stragglers | ✅ done | 1.3.1 |
+| [US-8.20](../stories/US-8.20-open-transaction-improvements.md) | Open transaction improvements | Address validation round 2, more history types, the fee service nobody built | 🚧 in-progress | — |
 
+> **US-8.14 … US-8.20 carry no FR.** They hold the incremental work, fixes and chores that landed on
+> this epic — **212 tracker issues**, folded in from the former one-issue-per-story maintenance
+> ledger on 2026-07-24
+> ([note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)). The FR
+> map above is unchanged.
+>
+> **[US-8.1](../stories/US-8.1-send-native-and-fungible-tokens.md) alone took 59 of them** — two
+> thirds naming a chain or a token — while [US-8.2](../stories/US-8.2-receive-qr-and-copyable-address.md)
+> (receive) took three. Sending is where cross-chain cost lands; receiving an address does not change
+> when a chain is added.
+>
+> **This epic owns one umbrella:**
+> [#4371](https://github.com/Koniverse/SubWallet-Extension/issues/4371) — *"Custom fee token"*, closed,
+> three children (#3590, #4045, #3658) all rows in
+> [US-8.3](../stories/US-8.3-custom-fee-and-tip.md) and
+> [US-8.4](../stories/US-8.4-pay-fees-with-non-native-token.md). It carries no CHANGELOG line of its
+> own, so it belongs to the epic rather than to a story ([AGENTS.md](../../../AGENTS.md) rule 10).
+> **[#4486](https://github.com/Koniverse/SubWallet-Extension/issues/4486) is not an umbrella** despite
+> having a child — it carries two CHANGELOG lines of its own (a fix and a hot fix), so it is a
+> delivery that spawned a sub-task and stays a row.
+>
+> **Two issues left this epic in the fold**: #3857 (*"unable to send funds out of Polkadot Vault"*)
+> to [US-16.11](../stories/US-16.11-qr-device-signing-defects.md), paying a debt EPIC-16 recorded on
+> 2026-07-23; and the three transferable-balance **formula** issues (#2118, #3166, #3246) to
+> [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md), which already owns that
+> calculation.
+>
 > US-8.1..8.11 each materialize one FR (FR-74..84); US-8.12 is the epic's
 > bug/iteration (hardening) cluster and owns no FR — it defends the fee / BigInt /
 > gas-estimation *correctness* of the FR surfaces they harden (FR-76 / FR-77 / FR-80) —

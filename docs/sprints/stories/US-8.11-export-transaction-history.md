@@ -23,6 +23,11 @@ reporting, or personal record-keeping — so that the wallet's history is portab
 and not trapped inside the extension. This is the one **forward-looking** story in
 the epic: the rest of EPIC-8 is shipped, this one is planned.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** The single row below is **open on the tracker** and no
+> acceptance criterion is ticked. `commit` and `version_shipped` stay empty until it ships.
+
 ## Background
 
 Transaction history is currently view-only inside the wallet
@@ -109,9 +114,22 @@ Materializes [FR-84](../../PRD.md#functional-requirements). Tracked by
 _Planned story (FR-84) — authored forward. Fill `commit` / `version_shipped` on
 ship._
 
+## Incremental work, fixes & chores
+
+**1 tracker issue.** It was named in this story's prose from the day it was written and held no row —
+scope asserted in prose and provable in none ([AGENTS.md](../../../AGENTS.md) rule 9). Added 2026-07-24.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#4124](https://github.com/Koniverse/SubWallet-Extension/issues/4124) | Allow export transaction history | 📋 backlog |
+
+> **FR-84 is the only unshipped FR in this epic**, and #4124 is the only issue behind it. Every
+> other requirement here — send, receive, fee, history, ED, signing, approval — is `✅ shipped`.
+
 ## Cross-references
 
 - [PRD FR-84](../../PRD.md#functional-requirements)
 - [Epic EPIC-8](../epics/EPIC-8.md)
 - [US-8.5](US-8.5-on-chain-transaction-history.md)
 - [Roadmap issue #4124](https://github.com/Koniverse/SubWallet-Extension/issues/4124) — Allow export transaction history
+- [consolidation note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)

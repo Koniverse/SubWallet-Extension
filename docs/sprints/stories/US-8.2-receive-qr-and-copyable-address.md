@@ -24,6 +24,15 @@ counterparty can send to the correct chain without the user pasting the wrong
 format. This is the read side of the money-movement surface: no transaction, but
 the same correctness bar (right address for the right ecosystem) as a send.
 
+## Status
+
+> **✅ done — shipped in 0.2.5.** All acceptance criteria are ticked and the 3 rows below are
+> settled, every one with a release. Two open receive-screen improvements
+> ([#3072](https://github.com/Koniverse/SubWallet-Extension/issues/3072),
+> [#4041](https://github.com/Koniverse/SubWallet-Extension/issues/4041)) are in
+> [US-8.20](US-8.20-open-transaction-improvements.md) — a `done` story may not carry an open row
+> ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Background
 
 Receive looks trivial but is a correctness surface: a Substrate address, an EVM
@@ -105,8 +114,28 @@ backfilled during version reconciliation.
 
 Traced 2026-07-13 (US-21.2 straggler pass) — **this one is a documented compromise, read the caveat.** The CHANGELOG announces Receive in the founding release ([0.0.1] "Receive and send fund"), but 0.0.1's recorded release commit `0d78ecaf7e` **has no QR-of-address anywhere in its tree** — and it is provably an *ancestor* of the receive code (`git merge-base --is-ancestor 0d78ecaf7e 9a9b3b284c` → 0), so no commit set can ever be contained in it. Per this project's "code wins" rule the honest anchor is **0.2.5**, the earliest release with a verifiable anchor (tag `v0.2.5` + release commit `e72795334c`) whose tree provably contains the surface (`packages/extension-koni-ui/src/components/AccountQrModal.tsx`). Code chain: `9a9b3b284c` (2022-01-21) is the first QR-of-address in the repo (`react-qr-code` + `CopyToClipboard` + `reformatAddress` for the ecosystem's format); `935d9ef04e` renamed it `AccountQrModal`; `d3eb15347b` wired the Receive button on Home. **Caveat:** the true first ship is almost certainly 0.1.0 or 0.2.1 — both are commit-less *and* tagless in the early Koni block, so neither can be verified; 0.2.5 is the earliest provable release, not necessarily the first one.
 
+## Incremental work, fixes & chores
+
+**3 tracker issues**, all with a release. Folded in from the former one-issue-per-story maintenance
+ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.0.9 | [#1514](https://github.com/Koniverse/SubWallet-Extension/issues/1514) | Show duplicate token on receive list when search custom token | ✅ done |
+| 1.0.10 | [#1531](https://github.com/Koniverse/SubWallet-Extension/issues/1531) | Update Receive icon to Copy icon on Homepage screen | ✅ done |
+| 1.3.45 | [#4486](https://github.com/Koniverse/SubWallet-Extension/issues/4486) | Extension - Error validate receive address when transferring MYTH(Mythos) | ✅ done |
+
+> **Receive generated three rows against send's fifty-nine.** Showing an address and a QR code does
+> not change when a chain is added — the address format is the account's, not the transfer's. The
+> asymmetry is the clearest measure in this epic of where cross-chain cost actually lands.
+>
+> **#4486 is the exception that proves it**: *"error validating the receive address when transferring
+> MYTH (Mythos)"* — a receive-address defect that only appears **inside a transfer**. It is the one
+> receive row created by a chain, and it needed a hotfix line as well as a release line.
+
 ## Cross-references
 
 - [PRD FR-75](../../PRD.md#functional-requirements)
 - [Epic EPIC-8](../epics/EPIC-8.md)
 - [US-8.1](US-8.1-send-native-and-fungible-tokens.md)
+- [consolidation note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)

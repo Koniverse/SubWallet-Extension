@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-23 11:14:26 UTC
-> Total stories: 2091
+> Last generated: 2026-07-24 03:32:07 UTC
+> Total stories: 1899
 
-## 📋 Backlog (241)
+## 📋 Backlog (224)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -95,23 +95,6 @@
 | US-24.317 | Extension - Improve Filter To token Based on Selected From token ( Round 2) | EPIC-24 | P3 | 1 | — | Quangdm-cdm |
 | US-24.318 | Extension – Bundling Extension Code for Mobile Wallet App Integration | EPIC-24 | P3 | 1 | — | — |
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
-| US-28.86 | Re-check case send Max on some tokens | EPIC-28 | P3 | 1 | — | S2kael |
-| US-28.99 | Handle the case of transfer Max for some tokens | EPIC-28 | P3 | 1 | — | — |
-| US-28.108 | WebApp - Update more transaction history types | EPIC-28 | P3 | 1 | — | lw-cdm |
-| US-28.115 | Add popup to show message 'Sakura unable to transfer all' | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.118 | Implement new fee service | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.121 | Extension - Adjust showing/validating address on Send fund (Round 2) | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.128 | Extension - Handle the case of scan address of Polkadot vault when transfer | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.147 | Extension - Do not show QR code when receive address | EPIC-28 | P3 | 1 | — | — |
-| US-28.158 | Unified account - Consider moving transaction warnings to background | EPIC-28 | P3 | 1 | — | lw-cdm |
-| US-28.160 | Extension - Adjust showing/validating address on History transaction screen | EPIC-28 | P3 | 1 | — | — |
-| US-28.175 | Increase weight on PSP token transfer | EPIC-28 | P3 | 1 | — | tunghp2002 |
-| US-28.177 | Extension - Improve History transaction | EPIC-28 | P3 | 1 | — | — |
-| US-28.178 | Extension - Updated the error message when perform transaction | EPIC-28 | P3 | 1 | — | — |
-| US-28.180 | Extension - Show address TON on list recent in case transfer token Substrate | EPIC-28 | P3 | 1 | — | — |
-| US-28.181 | Extension - Improve show well-known tokens on top when Receive token | EPIC-28 | P3 | 1 | — | — |
-| US-28.185 | Extension - Add validate receipient address  when transfer | EPIC-28 | P3 | 1 | — | — |
-| US-28.190 | [Transaction] Ensure proper initialization when navigating via direct link | EPIC-28 | P3 | 1 | — | — |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
 | US-30.94 | WebApp - Implement Wallet Connect like DApp | EPIC-30 | P3 | 1 | — | — |
@@ -267,7 +250,7 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (24)
+## 🟡 In Progress (25)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -276,12 +259,12 @@
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
 | US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
+| US-16.11 | QR-device signing defects (improvement on US-16.2) | EPIC-16 | P3 | 2 | — | — |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
 | US-23.222 | WebApp - Wallet account injection feature (related to unified account feature) | EPIC-23 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
-| US-28.172 | Unable to send funds out of Polkadot Vault | EPIC-28 | P3 | 1 | sprint-2026-W28 | AndyT-51 |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
@@ -295,6 +278,7 @@
 | US-41.444 | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.496 | WebApp - Update the latest code 1.3.83 | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
+| US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
 
 ## 👀 Review (11)
 
@@ -312,7 +296,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1658)
+## ✅ Done (1497)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -884,173 +868,6 @@
 | US-24.339 | Unable to turn network when no add correct API key | EPIC-24 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
 | US-24.340 | Update ParaSpell API integration to v1 | EPIC-24 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
 | US-24.341 | Add support for USDC & stEWT | EPIC-24 | P3 | 1 | sprint-2026-M01 | nulllpc |
-| US-28.1 | Send/Receive substrate based chain assets | EPIC-28 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-28.2 | Implement new Send Fund UI with support send tokens, send EVM assets | EPIC-28 | P3 | 1 | sprint-2022-M05 | saltict |
-| US-28.3 | Check the Send Fund Full Balance screen | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.4 | Check transaction processing speed with Tip and without Tip | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.5 | Duplicate account in Send Fund suggestions list when pasting address | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.6 | Update the experience while on the Transaction History screen but switch to 'All account' | EPIC-28 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-28.7 | Still showing warning message not enough balance in case of network transfer | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.8 | Wrong Send Fund unit displayed when switching network | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.9 | PHA token transfer successfully but the extension infinity loading | EPIC-28 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-28.10 | Integrate new send asset flow with custom networks feature | EPIC-28 | P3 | 1 | sprint-2022-M05 | lw-cdm |
-| US-28.11 | Add support transfer Bifrost sub token | EPIC-28 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-28.12 | Fix balance showing incorrect in Send Fund screen in case create/forget acc successfully | EPIC-28 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-28.13 | Fix when select aUSD (Acala) to transfer | EPIC-28 | P3 | 1 | sprint-2022-M05 | lw-cdm |
-| US-28.14 | Fix the balance display incorrect after transfer Sub-token successfully | EPIC-28 | P3 | 1 | sprint-2022-M05 | — |
-| US-28.15 | Support transfer balance for the Custom Network | EPIC-28 | P3 | 1 | sprint-2022-M05 | lw-cdm |
-| US-28.16 | Support transferring native token when adding custom network | EPIC-28 | P3 | 1 | sprint-2022-M05 | lw-cdm |
-| US-28.17 | Bug happens when viewing Transaction History after Delete token | EPIC-28 | P3 | 1 | sprint-2022-M05 | lw-cdm |
-| US-28.18 | Fix bug happens on Send Fund/Donate screen when Delete Custom Network | EPIC-28 | P3 | 1 | sprint-2022-M07 | S2kael |
-| US-28.19 | Migrate Transaction History for Custom Network in case Merging networks from older version to a newer version | EPIC-28 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-28.20 | Function for perform transferring using web3.js | EPIC-28 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-28.22 | Can't send token INTERBNC (Kintsugi)/taiKSM (Karura), USDC (Karura) | EPIC-28 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-28.25 | Improve the UX for contracts transaction with EVM provider | EPIC-28 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-28.26 | Add support for transaction history on Astar EVM | EPIC-28 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-28.27 | Support cross chain transfer: aUSD | EPIC-28 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-28.28 | Do not migrate transaction history of the Substrate Account in case update version extension | EPIC-28 | P3 | 1 | sprint-2022-M07 | huukhai |
-| US-28.29 | Can't send ASTR (Astar) token | EPIC-28 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-28.30 | Review SubQuery Transaction History | EPIC-28 | P3 | 1 | sprint-2022-M10 | huukhai |
-| US-28.31 | Support send fund for sub-token on some chain | EPIC-28 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-28.32 | Fix showing incorrect transferable balance for PRING token | EPIC-28 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-28.33 | Fix bug can't view transaction history of Moonbase Alpha network | EPIC-28 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-28.34 | Support transfer BIT token on Pioneer Network | EPIC-28 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-28.35 | Change transfer warning when the account cannot be reaped | EPIC-28 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-28.36 | Fix balance validating when transferring token | EPIC-28 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-28.37 | Do not show fee on the transaction | EPIC-28 | P3 | 1 | sprint-2022-M11 | saltict |
-| US-28.38 | Show incorrect the transfer result on the transaction history screen | EPIC-28 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-28.39 | [Substrate] Update function parse transaction | EPIC-28 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-28.40 | Add the warning message for invalid Amount input cases (for send fund feature) | EPIC-28 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-28.41 | Review and re-design the whole transaction history feature | EPIC-28 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-28.42 | Show incorrect transferable balance of the Origin Account in case change token | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.43 | Upgrade Background & UI - Handle All Transaction | EPIC-28 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-28.44 | Add support send EQ token | EPIC-28 | P3 | 1 | sprint-2023-M02 | nulllpc |
-| US-28.45 | Upgrade UI - Screen Transactions | EPIC-28 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-28.47 | Upgrade UI - Receive Token Screen | EPIC-28 | P3 | 1 | sprint-2023-M03 | Quangdm-cdm |
-| US-28.49 | Upgrade UI - Update for Transaction Types | EPIC-28 | P3 | 1 | sprint-2023-M03 | saltict |
-| US-28.50 | Upgrade UI - Add Components for Transaction Screens | EPIC-28 | P3 | 1 | sprint-2023-M04 | Quangdm-cdm |
-| US-28.52 | Upgrade UI - Bugs related to the send tokens feature | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.53 | Upgrade UI - Show incorrect Amount when user transfer all in case the remaining balance < ED | EPIC-28 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-28.54 | Add loading to free balance in send fund screen | EPIC-28 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-28.55 | Upgrade UI - Re-check validate amount must be equals when transfer | EPIC-28 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-28.56 | Review and improve send max in transaction screens | EPIC-28 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-28.57 | Send multiple transactions | EPIC-28 | P3 | 1 | sprint-2025-M01 | saltict |
-| US-28.58 | An error occurs when send some token (DOT (Genshiro), xcUNIT (Moonbase)) | EPIC-28 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-28.59 | An error occurred while viewing transaction history | EPIC-28 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-28.61 | Improve transaction UX | EPIC-28 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-28.62 | Update message when insufficient funds for gas to send token in case the estimated fee is not obtained | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.64 | Can not send EVM Transaction from DApps | EPIC-28 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-28.65 | A pending transaction frenzy can lead to duplicate transactions being created within the same session. | EPIC-28 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-28.66 | Detect from from for transaction history type evm.execute | EPIC-28 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-28.67 | Add more search criteria | EPIC-28 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-28.68 | Add support view on browser for some chain | EPIC-28 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-28.69 | Update notification in case transaction time out | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.70 | Fixed bug Do not get transaction history in case the wallet have multi-account | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.71 | Update QR code style for transaction with QR-signer account | EPIC-28 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-28.72 | Improve case Transfer Max | EPIC-28 | P3 | 1 | sprint-2024-M09 | — |
-| US-28.73 | Review and support send fund for more token | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.74 | Fixed the bug causing an error page when sending tokens on a custom network | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.75 | Added validation for the scenario 'Transfer Max local token. | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.76 | Resolved bugs related to sending funds on some tokens after running script tests | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.77 | Optimize decode contract in transaction | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.78 | Add validate for case: the transaction amount is too small to keep the destination account alive | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.79 | Optimized the requirement to enable tokens in the Transaction Screen | EPIC-28 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-28.80 | Fixed bug send fund ERC20 token on Polygon | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.81 | Update the new send fund screen | EPIC-28 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-28.82 | Re-check all transaction on Westend | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.83 | Fixed bug Show duplicate token on receive list when search custom token | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.84 | Fixed bug Do not transfer BNC token on the Bifrost Polkadot | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.85 | Update Receive icon to Copy icon on Homepage screen | EPIC-28 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-28.87 | Save entered transaction information when closing and reopening the extension | EPIC-28 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-28.89 | Fixed bug Show incorrect transaction time on the history screen | EPIC-28 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-28.90 | Fixed bug Do not validate amount of the recipient address in case send token | EPIC-28 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-28.92 | WebApp - Bugs related to Send token feature | EPIC-28 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-28.93 | WebApp - Can not back to the previous screen when cancel transaction | EPIC-28 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-28.94 | WebApp - Do not show title screen of the confirmation transaction | EPIC-28 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-28.95 | Re-check the service to get the transaction history | EPIC-28 | P3 | 1 | sprint-2023-M11 | lw-cdm |
-| US-28.96 | Allow paste Amount to send | EPIC-28 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-28.97 | WebApp - Do not show confirmation after performing any transaction with extension account | EPIC-28 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-28.98 | WebApp - Don't view transaction details and confirmation via QR code | EPIC-28 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-28.100 | Update entered address on the transaction confirmation | EPIC-28 | P3 | 1 | sprint-2024-M09 | saltict |
-| US-28.101 | Update transfer function for Pendulum | EPIC-28 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-28.102 | Fixed bug transfer on Rococo | EPIC-28 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-28.103 | Fixed bug estimating fee on calculating max transferable | EPIC-28 | P3 | 1 | sprint-2023-M10 | nulllpc |
-| US-28.105 | Update transferable balance calculation formula | EPIC-28 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-28.106 | Fixed bug undefined is not an object when perform transaction | EPIC-28 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-28.109 | Fixed bug error submitting transaction on Astar EVM | EPIC-28 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-28.110 | Follow case send EVM transaction error due to gas fee calculation | EPIC-28 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-28.111 | Check fee estimation on EVM networks | EPIC-28 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-28.112 | WebApp - Do not Go to camera setting screen when click on Scan button on the Transfer screen | EPIC-28 | P3 | 1 | sprint-2023-M12 | Thiendekaco |
-| US-28.113 | Hot fix bug estimating EVM transaction fee | EPIC-28 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-28.114 | Bug can not send fund on Moonbeam with Polkadot Vault account | EPIC-28 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-28.116 | Update estimating EVM transaction fee for Energy Web Chain | EPIC-28 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-28.117 | Show duplicate transaction history when transfer local token | EPIC-28 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-28.119 | Adjust showing/validating address on Send fund | EPIC-28 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-28.120 | Extension - Re-check transaction failed in case transfer max with balance = ED | EPIC-28 | P3 | 1 | sprint-2026-M06 | PDTnhah |
-| US-28.122 | Support Send crash log feature | EPIC-28 | P3 | 1 | sprint-2024-M03 | Quangdm-cdm |
-| US-28.123 | Update transaction result screen | EPIC-28 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-28.124 | Improve EVM network fee | EPIC-28 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-28.125 | [Hotfix] Temporary disable transfer on NUUM token | EPIC-28 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-28.127 | WebApp - Update transaction result screen | EPIC-28 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-28.129 | Support transferring Unique NFTs | EPIC-28 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-28.131 | WebApp - Send crash log feature | EPIC-28 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-28.132 | Check transfer not being submitted on Polimec | EPIC-28 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-28.133 | Do not allow send to empty account (Native token balance = 0) | EPIC-28 | P3 | 1 | sprint-2024-M08 | bluezdot |
-| US-28.134 | Handle case slow getting max transferable cause wrong amount when submit max transfer | EPIC-28 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-28.135 | Fix send fund error | EPIC-28 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-28.136 | Check transfer logic that can potentially affect ED | EPIC-28 | P3 | 1 | sprint-2024-M03 | nulllpc |
-| US-28.137 | WebApp - Disable submit button when getting max transferable | EPIC-28 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-28.138 | WebApp - Add message to warn about asset loss when click Transfer Max | EPIC-28 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-28.139 | Wrong transferable balance | EPIC-28 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-28.140 | Support GRC-20 token | EPIC-28 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-28.141 | Add warning message for cross chain transfer to an exchange (CEX) | EPIC-28 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-28.142 | WebApp - Allow selecting token to pay transaction fee on HydraDX | EPIC-28 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-28.143 | WebApp - Add warning message for cross chain transfer to an exchange (CEX) | EPIC-28 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-28.144 | Fixed bug Do not show transaction history in case sender account is null | EPIC-28 | P3 | 1 | sprint-2024-M04 | S2kael |
-| US-28.145 | WebApp - Implement UI for selecting token to pay transaction fee on HydraDX | EPIC-28 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-28.146 | Fixed bug when transferring PSP22 token | EPIC-28 | P3 | 1 | sprint-2024-M05 | bluezdot |
-| US-28.148 | Support transfer between PAH - KAH | EPIC-28 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-28.149 | [Extension] Update subscription for `evmWatchTransactionRequest` request | EPIC-28 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-28.150 | WebApp - Show duplicate transaction history when transfer local token | EPIC-28 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-28.151 | Update transferable formula for system pallet v1 | EPIC-28 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-28.153 | Update transfer UI to support unified account | EPIC-28 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-28.154 | Support transfer on TON | EPIC-28 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-28.155 | Fix UI bug on the Transfer screen | EPIC-28 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-28.157 | Unified account - Implement fee selection UI | EPIC-28 | P3 | 1 | sprint-2024-M09 | lw-cdm |
-| US-28.159 | Unified account - Update UI for transaction history and confirmation screen | EPIC-28 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-28.161 | Unified account - Some UI bugs for Send TON | EPIC-28 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-28.162 | Unified account - Bug transfer TON is failed | EPIC-28 | P3 | 1 | sprint-2024-M10 | bluezdot |
-| US-28.163 | Support paying fee with non-native tokens on Asset Hub | EPIC-28 | P3 | 1 | sprint-2025-M02 | bluezdot |
-| US-28.164 | Unified account - Improve validation check when clicking the Transfer button on Send token screen | EPIC-28 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-28.165 | Rounded value parameter send in EVM transaction request | EPIC-28 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-28.166 | Unified account - Improve UX on Send fund screen | EPIC-28 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-28.167 | Fix bug do not show balance | EPIC-28 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-28.168 | Allow customizing fee for substrate/evm transactions | EPIC-28 | P3 | 1 | sprint-2025-M03 | S2kael |
-| US-28.169 | Unified account - Bug when transfer transaction for EVM account | EPIC-28 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-28.170 | Hot fix handle API status | EPIC-28 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-28.171 | Re-check transaction on Polkadot Asset Hub | EPIC-28 | P3 | 1 | sprint-2024-M11 | S2kael |
-| US-28.173 | Fix errors when making transactions on Tangle mainnet | EPIC-28 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-28.174 | Support transfer ADA and Cardano Native Assets (CIP-26) | EPIC-28 | P3 | 1 | sprint-2025-M01 | bluezdot |
-| US-28.176 | Unable to transfer local token on Bifrost | EPIC-28 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-28.179 | Webapp - Transaction related to unified account | EPIC-28 | P3 | 1 | sprint-2025-M02 | frenkie-ng |
-| US-28.182 | Support custom fee token when sending token on Hydration | EPIC-28 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-28.183 | Fixed some bug for customizing fee for substrate/evm transactions features | EPIC-28 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
-| US-28.184 | Fixed bug Unable to detect domains name when transfer | EPIC-28 | P3 | 1 | sprint-2025-M08 | PDTnhah |
-| US-28.186 | Error when send transaction on Autonomys | EPIC-28 | P3 | 1 | sprint-2025-M07 | S2kael |
-| US-28.187 | Support transfer for Bitcoin | EPIC-28 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-28.188 | Update Paraspell's fee calculation API (#4314), | EPIC-28 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-28.189 | Custom fee token | EPIC-28 | P3 | 1 | sprint-2025-M05 | S2kael |
-| US-28.191 | Fixed bug when custom priority fee for EVM | EPIC-28 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
-| US-28.192 | Fixed bug Show incorrect amount when transfer max | EPIC-28 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
-| US-28.193 | Fixed error validate receive address when transferring MYTH (Mythos) | EPIC-28 | P3 | 1 | sprint-2025-M07 | bluezdot |
-| US-28.194 | Update logic for rpc that don't support custom fee on EVM system | EPIC-28 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
-| US-28.195 | Hide icon Edit fee with some networks not supported | EPIC-28 | P3 | 1 | sprint-2025-M08 | frenkie-ng |
-| US-28.196 | Fixed missing 'Edit Fee' button / Improve fee loading UI | EPIC-28 | P3 | 1 | sprint-2025-M10 | frenkie-ng |
-| US-28.197 | Fixed bug don't show toast message validate in case input amount < 1 when transfer Cardano | EPIC-28 | P3 | 1 | sprint-2025-M10 | frenkie-ng |
-| US-28.198 | Configure gas limit & max gas fee for Energy Web Chain | EPIC-28 | P3 | 1 | sprint-2025-M11 | tunghp2002 |
-| US-28.199 | [Extension] Refactor Available Balance logic for different transaction types | EPIC-28 | P3 | 1 | sprint-2026-M07 | tunghp2002 |
-| US-28.200 | Support Transfer Alpha Token | EPIC-28 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-28.201 | Turn off warning popup for transfers between PAH <> KAH | EPIC-28 | P3 | 1 | sprint-2026-M04 | PDTnhah |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | sprint-2022-M01 | jacogr |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | sprint-2022-M03 | Quangdm-cdm |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | sprint-2025-M12 | bluezdot |
@@ -1965,6 +1782,12 @@
 | US-8.9 | Multi-step / one-sign signing | EPIC-8 | P1 | 5 | sprint-2025-M02 | bluezdot |
 | US-8.10 | Token spending-approval confirmation | EPIC-8 | P1 | 3 | sprint-2024-M02 | S2kael |
 | US-8.13 | Payload decode error handling — graceful degradation instead of crash | EPIC-8 | P1 | 2 | sprint-2026-M07 | tunghp2002 |
+| US-8.14 | Send-fund form & recipient validation | EPIC-8 | P3 | 3 | sprint-2025-M10 | — |
+| US-8.15 | Transfer-max & available-balance edges | EPIC-8 | P3 | 3 | sprint-2026-M06 | — |
+| US-8.16 | EVM fee & gas estimation | EPIC-8 | P3 | 3 | sprint-2025-M11 | — |
+| US-8.17 | Transaction screens in the 1.0.2 UI rewrite | EPIC-8 | P3 | 3 | sprint-2023-M04 | — |
+| US-8.18 | WebApp transaction surface | EPIC-8 | P3 | 2 | sprint-2024-M05 | — |
+| US-8.19 | Unified-account transaction migration | EPIC-8 | P3 | 3 | sprint-2024-M10 | — |
 | US-9.1 | Substrate NFT display (RMRK / Unique / PSP-34) | EPIC-9 | P1 | 5 | sprint-2022-M10 | nulllpc |
 | US-9.2 | Nested / bundled NFT display | EPIC-9 | P1 | 3 | sprint-2026-M06 | frenkie-ng |
 | US-9.3 | EVM NFT display (ERC-721) | EPIC-9 | P1 | 3 | sprint-2022-M04 | nulllpc |
@@ -1979,7 +1802,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (145)
+## 🗑️ Deprecated (130)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -2025,21 +1848,6 @@ _No stories_
 | US-24.323 | Support Minting DOT and POAP at Token2049 | EPIC-24 | P3 | 1 | — | bluezdot |
 | US-24.326 | [WebApp / Network detail] - Unable to open network detail screen when clicking first time on edit button of network | EPIC-24 | P3 | 1 | — | lw-cdm |
 | US-24.342 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-24 | P3 | 1 | — | anhntk54 |
-| US-28.21 | Transfer with account keep-alive checks & add transaction tip | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.23 | The transferable balance of the token on the Astar-EVM chain is incorrect on the Send Fund screen | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.24 | Origin Chain Fee displayed is delayed | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.46 | Transactions Screen | EPIC-28 | P3 | 1 | — | — |
-| US-28.48 | Implement new transaction logic in background | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.51 | Upgrade UI - Auto write history for any transaction | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.60 | Incorrect transaction fee display | EPIC-28 | P3 | 1 | — | anhntk54 |
-| US-28.63 | Check the Transaction History status in the following case | EPIC-28 | P3 | 1 | — | — |
-| US-28.88 | Support Zk Assets transaction | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.91 | Show fee = NaN in the EVM execute transaction | EPIC-28 | P3 | 1 | — | S2kael |
-| US-28.104 | Local transaction history display is missing | EPIC-28 | P3 | 1 | — | — |
-| US-28.107 | Handle error when get balance on transaction screen | EPIC-28 | P3 | 1 | — | S2kael |
-| US-28.126 | WebApp - Adjust showing/validating address when transfer assets | EPIC-28 | P3 | 1 | — | saltict |
-| US-28.152 | Update transferable balance calculation for other pallets | EPIC-28 | P3 | 1 | — | nulllpc |
-| US-28.156 | Extension - Improve block transfer to empty account | EPIC-28 | P3 | 1 | — | — |
 | US-30.11 | Support Multi-Sign | EPIC-30 | P3 | 1 | — | saltict |
 | US-30.17 | Get an existential deposit warning when doing a sign transactions | EPIC-30 | P3 | 1 | — | lw-cdm |
 | US-30.29 | Classify connected/cancelled/rejected status for the connect to the DApps | EPIC-30 | P3 | 1 | — | — |
@@ -2133,12 +1941,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 241
+- 📋 **Backlog**: 224
 - 🟢 **Ready**: 12
-- 🟡 **In Progress**: 24
+- 🟡 **In Progress**: 25
 - 👀 **Review**: 11
-- ✅ **Done**: 1658
+- ✅ **Done**: 1497
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 145
+- 🗑️ **Deprecated**: 130
 
-⚠️  **WIP limit exceeded**: 24 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 25 stories in-progress (limit: 3).

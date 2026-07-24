@@ -32,6 +32,12 @@ equals the ED, and transactions that fail with no actionable error. Its value: a
 user reads an accurate fee, can pay it (native or non-native), can empty an account
 down to the ED, and — when something does go wrong — is told why.
 
+## Status
+
+> **📋 backlog — nothing here has shipped.** All 8 rows below are **open on the tracker** and no
+> acceptance criterion is ticked. `commit`, `sprint` and `version_shipped` stay empty until work
+> lands in a release.
+
 ## Background
 
 This is the **bug / iteration (hardening) cluster** for EPIC-8. It defends the
@@ -237,6 +243,32 @@ _Retroactive / ongoing hardening cluster — much already shipped incrementally 
 send surface. Fill `commit`, `version_shipped` and caveats during version
 reconciliation; the story stays open to absorb later fee/amount/ED fixes._
 
+## Incremental work, fixes & chores
+
+**8 tracker issues** — the exact eight this story's own title enumerates. **Every one of them was
+named in the title and in the epic's story table, and held no row** until 2026-07-24: the scope was
+asserted in prose and provable nowhere ([AGENTS.md](../../../AGENTS.md) rule 9).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#2643](https://github.com/Koniverse/SubWallet-Extension/issues/2643) | Extension - Re-check estimated fee in case network disconnect | 📋 backlog |
+| — | [#3240](https://github.com/Koniverse/SubWallet-Extension/issues/3240) | Transfer failed, but there is no specific error message | 📋 backlog |
+| — | [#3314](https://github.com/Koniverse/SubWallet-Extension/issues/3314) | Re-check Transfer all function in case Transferable = ED | 📋 backlog |
+| — | [#4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043) | Extension - Fix bug related to paying fee with non-native tokens | 🟡 ready |
+| — | [#4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552) | Extension - Re-check logic estimated fee when using the paying fee with non-native tokens feature (PAH network) | 🟡 ready |
+| — | [#4649](https://github.com/Koniverse/SubWallet-Extension/issues/4649) | Extension - Re-check display estimated fee for substrate/evm transactions on Transfer/Transfer confirmation screen | 📋 backlog |
+| — | [#4936](https://github.com/Koniverse/SubWallet-Extension/issues/4936) | Extension - Update display fee in swap, earning | 📋 backlog |
+| — | [#4985](https://github.com/Koniverse/SubWallet-Extension/issues/4985) | WebApp - Transaction failed in case transfer max with balance = ED | 📋 backlog |
+
+> **Five of the eight are the estimated fee being wrong or unexplained**: #4649 (display), #4552
+> (logic), #2643 (re-check), #4936 (display in swap), #4043 (paying fees). The settled half of this
+> question is [US-8.16](US-8.16-evm-fee-and-gas-estimation.md), which closed sixteen fee issues
+> across eleven releases — and the open half is still five wide.
+>
+> **#3240 is the one that matters most to a user**: *"transfer failed, but there is no specific
+> error"*. A failed transfer with no reason is the worst outcome this epic can produce, and it has
+> been open since 2024.
+
 ## Cross-references
 
 - [Epic EPIC-8](../epics/EPIC-8.md)
@@ -245,3 +277,4 @@ reconciliation; the story stays open to absorb later fee/amount/ED fixes._
 - [US-8.4](US-8.4-pay-fees-with-non-native-token.md)
 - [US-8.7](US-8.7-existential-deposit-safety-guard.md)
 - [Issue #4043](https://github.com/Koniverse/SubWallet-Extension/issues/4043) · [#4552](https://github.com/Koniverse/SubWallet-Extension/issues/4552) · [#4649](https://github.com/Koniverse/SubWallet-Extension/issues/4649) · [#4936](https://github.com/Koniverse/SubWallet-Extension/issues/4936) · [#2643](https://github.com/Koniverse/SubWallet-Extension/issues/2643) · [#3314](https://github.com/Koniverse/SubWallet-Extension/issues/3314) · [#4985](https://github.com/Koniverse/SubWallet-Extension/issues/4985) · [#3240](https://github.com/Koniverse/SubWallet-Extension/issues/3240)
+- [consolidation note](../../notes/2026-07-24.md#a-epic-28-maintenance--transactions-merged-into-epic-8)
