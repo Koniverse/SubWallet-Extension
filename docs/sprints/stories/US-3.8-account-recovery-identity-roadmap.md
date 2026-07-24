@@ -25,6 +25,12 @@ account becomes a portable, delegable identity rather than just a key. This is a
 **roadmap placeholder** that reserves the FR numbering and records the intended
 shape; none of it ships yet.
 
+## Status
+
+> **📋 backlog — roadmap; nothing here has shipped.** The 2 rows below are both closed
+> **not-planned** — early recovery attempts the tracker abandoned, which is exactly what a roadmap
+> with no delivery looks like from the issue side.
+
 ## Background
 
 This story is a **forward / planned roadmap bundle** — all three FRs are
@@ -157,6 +163,22 @@ _Forward / roadmap story — nothing shipped. FR-28/29/30 are `📋 planned`. Wh
 scheduled, split this bundle into per-FR implementation stories, author the new
 AD entries in CONTEXT.md, and recalibrate this bundle's points down._
 
+## Incremental work, fixes & chores
+
+**2 tracker issues** landed on account recovery — 0 with a release, both closed without shipping.
+Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#549](https://github.com/Koniverse/SubWallet-Extension/issues/549) | Recovery account | ⏸ deprecated |
+| — | [#722](https://github.com/Koniverse/SubWallet-Extension/issues/722) | Recovery account | ⏸ deprecated |
+
+> **Both rows are the same abandoned idea.** #549 and #722 are each titled *"Recovery account"*, both
+> closed not-planned. Account recovery has never shipped, and the tracker agrees — the only issues it
+> ever had were closed without a plan. The roadmap's one live thread,
+> [#661](https://github.com/Koniverse/SubWallet-Extension/issues/661) (Web3Auth social recovery), is
+> still open in [US-3.12](US-3.12-open-account-improvements.md).
+
 ## Cross-references
 
 - [PRD FR-28](../../PRD.md#functional-requirements), [PRD FR-29](../../PRD.md#functional-requirements), [PRD FR-30](../../PRD.md#functional-requirements)
@@ -166,3 +188,4 @@ AD entries in CONTEXT.md, and recalibrate this bundle's points down._
 - [#1210](https://github.com/Koniverse/SubWallet-Extension/issues/1210)
 - [#618](https://github.com/Koniverse/SubWallet-Extension/issues/618)
 - [#3277](https://github.com/Koniverse/SubWallet-Extension/issues/3277)
+- [consolidation note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)

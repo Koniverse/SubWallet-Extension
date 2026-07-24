@@ -76,89 +76,89 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#911](https://github.com/Koniverse/SubWallet-Extension/issues/911) | Add support for Astar, Shiden Light Client (#911) | 0.7.7 | 2022-12-28 | US-21.2 |
 | [#4163](https://github.com/Koniverse/SubWallet-Extension/issues/4163) | Update chain-list stable v0.2.103 (#4163) | 1.3.31 | 2025-04-18 | US-1.3 |
 | [#1995](https://github.com/Koniverse/SubWallet-Extension/issues/1995) | Fixed bug IPFS in Firefox browser (#1995) | 1.1.18 | 2023-10-20 | US-9.13 |
-| [#1910](https://github.com/Koniverse/SubWallet-Extension/issues/1910) | Fixed bug Do not auto-lock after imported multiple account (#1910) | 1.1.13 | 2023-09-21 | US-23.109 |
-| [#1919](https://github.com/Koniverse/SubWallet-Extension/issues/1919) | Fixed bug Do not show selected account (#1919) | 1.1.13 | 2023-09-21 | US-23.111 |
-| [#1946](https://github.com/Koniverse/SubWallet-Extension/issues/1946) | Add “Token Name” to the token screens (#1946) | 1.1.20 | 2023-11-04 | US-23.114 |
-| [#2039](https://github.com/Koniverse/SubWallet-Extension/issues/2039) | Update message on the Create on account screen (#2039) | 1.1.18 | 2023-10-20 | US-23.116 |
-| [#2100](https://github.com/Koniverse/SubWallet-Extension/issues/2100) | Fixed bug in case save file when create new account, export account (#2100) | 1.1.20 | 2023-11-04 | US-23.117 |
-| [#2114](https://github.com/Koniverse/SubWallet-Extension/issues/2114) | Show Copy and QR code when hover account (#2114) | 1.1.26 | 2023-12-16 | US-23.118 |
-| [#88](https://github.com/Koniverse/SubWallet-Extension/issues/88) | Improved import JSON file from Polkadot {.js}: Single Account and All Account (Issue #88 & #90) | 0.3.1 | 2022-04-05 | US-23.12 |
-| [#90](https://github.com/Koniverse/SubWallet-Extension/issues/90) | Improved import JSON file from Polkadot {.js}: Single Account and All Account (Issue #88 & #90) | 0.3.1 | 2022-04-05 | US-23.12 |
-| [#2223](https://github.com/Koniverse/SubWallet-Extension/issues/2223) | Update new way to fetch transaction history (#2223) | 1.1.24 | 2023-12-01 | US-23.121 |
-| [#2318](https://github.com/Koniverse/SubWallet-Extension/issues/2318) | Sort the Current account on top in the Account selector (#2318) | 1.1.27 | 2023-12-20 | US-23.124 |
-| [#2323](https://github.com/Koniverse/SubWallet-Extension/issues/2323) | Fixed bug show incorrect balance on All account mode when switch account (#2323) | 1.1.26 | 2023-12-16 | US-23.125 |
-| [#2352](https://github.com/Koniverse/SubWallet-Extension/issues/2352) | Fixed bug Do not show token when standing on All accounts mode in case token does not get balance (#2352) | 1.2.29 | 2024-09-13 | US-23.128 |
-| [#2390](https://github.com/Koniverse/SubWallet-Extension/issues/2390) | Fixed bug Do not detect phishing page in case have no account in wallet (#2390) | 1.1.31 | 2024-01-11 | US-23.130 |
-| [#2429](https://github.com/Koniverse/SubWallet-Extension/issues/2429) | Fixed bug Do not display the account in the account details tab in case the entire account balance is locked (#2429) | 1.1.30 | 2024-01-05 | US-23.133 |
-| [#2472](https://github.com/Koniverse/SubWallet-Extension/issues/2472) | Auto import EVM network with source from online resources (#2472) | 1.1.33 | 2024-01-23 | US-23.134 |
-| [#2518](https://github.com/Koniverse/SubWallet-Extension/issues/2518) | Fixed bug Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported (#2518) | 1.1.34 | 2024-02-01 | US-23.136 |
-| [#2616](https://github.com/Koniverse/SubWallet-Extension/issues/2616) | Fixed bug show incorrect token in case the wallet has only 1 account type (#2616) | 1.1.39 | 2024-02-24 | US-23.137 |
-| [#2709](https://github.com/Koniverse/SubWallet-Extension/issues/2709) | Handle case displayed account with specific network (#2709) | 1.2.1 | 2024-05-28 | US-23.140 |
-| [#2819](https://github.com/Koniverse/SubWallet-Extension/issues/2819) | Support Export all accounts feature (#2819) | 1.1.55 | 2024-04-14 | US-23.143 |
+| [#1910](https://github.com/Koniverse/SubWallet-Extension/issues/1910) | Fixed bug Do not auto-lock after imported multiple account (#1910) | 1.1.13 | 2023-09-21 | US-3.2 |
+| [#1919](https://github.com/Koniverse/SubWallet-Extension/issues/1919) | Fixed bug Do not show selected account (#1919) | 1.1.13 | 2023-09-21 | US-3.11 |
+| [#1946](https://github.com/Koniverse/SubWallet-Extension/issues/1946) | Add “Token Name” to the token screens (#1946) | 1.1.20 | 2023-11-04 | US-3.2 |
+| [#2039](https://github.com/Koniverse/SubWallet-Extension/issues/2039) | Update message on the Create on account screen (#2039) | 1.1.18 | 2023-10-20 | US-3.1 |
+| [#2100](https://github.com/Koniverse/SubWallet-Extension/issues/2100) | Fixed bug in case save file when create new account, export account (#2100) | 1.1.20 | 2023-11-04 | US-3.11 |
+| [#2114](https://github.com/Koniverse/SubWallet-Extension/issues/2114) | Show Copy and QR code when hover account (#2114) | 1.1.26 | 2023-12-16 | US-3.4 |
+| [#88](https://github.com/Koniverse/SubWallet-Extension/issues/88) | Improved import JSON file from Polkadot {.js}: Single Account and All Account (Issue #88 & #90) | 0.3.1 | 2022-04-05 | US-3.3 |
+| [#90](https://github.com/Koniverse/SubWallet-Extension/issues/90) | Improved import JSON file from Polkadot {.js}: Single Account and All Account (Issue #88 & #90) | 0.3.1 | 2022-04-05 | US-3.3 |
+| [#2223](https://github.com/Koniverse/SubWallet-Extension/issues/2223) | Update new way to fetch transaction history (#2223) | 1.1.24 | 2023-12-01 | US-3.4 |
+| [#2318](https://github.com/Koniverse/SubWallet-Extension/issues/2318) | Sort the Current account on top in the Account selector (#2318) | 1.1.27 | 2023-12-20 | US-3.4 |
+| [#2323](https://github.com/Koniverse/SubWallet-Extension/issues/2323) | Fixed bug show incorrect balance on All account mode when switch account (#2323) | 1.1.26 | 2023-12-16 | US-3.2 |
+| [#2352](https://github.com/Koniverse/SubWallet-Extension/issues/2352) | Fixed bug Do not show token when standing on All accounts mode in case token does not get balance (#2352) | 1.2.29 | 2024-09-13 | US-3.4 |
+| [#2390](https://github.com/Koniverse/SubWallet-Extension/issues/2390) | Fixed bug Do not detect phishing page in case have no account in wallet (#2390) | 1.1.31 | 2024-01-11 | US-3.4 |
+| [#2429](https://github.com/Koniverse/SubWallet-Extension/issues/2429) | Fixed bug Do not display the account in the account details tab in case the entire account balance is locked (#2429) | 1.1.30 | 2024-01-05 | US-3.4 |
+| [#2472](https://github.com/Koniverse/SubWallet-Extension/issues/2472) | Auto import EVM network with source from online resources (#2472) | 1.1.33 | 2024-01-23 | US-3.2 |
+| [#2518](https://github.com/Koniverse/SubWallet-Extension/issues/2518) | Fixed bug Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported (#2518) | 1.1.34 | 2024-02-01 | US-3.2 |
+| [#2616](https://github.com/Koniverse/SubWallet-Extension/issues/2616) | Fixed bug show incorrect token in case the wallet has only 1 account type (#2616) | 1.1.39 | 2024-02-24 | US-3.4 |
+| [#2709](https://github.com/Koniverse/SubWallet-Extension/issues/2709) | Handle case displayed account with specific network (#2709) | 1.2.1 | 2024-05-28 | US-3.4 |
+| [#2819](https://github.com/Koniverse/SubWallet-Extension/issues/2819) | Support Export all accounts feature (#2819) | 1.1.55 | 2024-04-14 | US-3.4 |
 | [#3050](https://github.com/Koniverse/SubWallet-Extension/issues/3050) | Add popup remind backup account (popup hiển thị ngay khi mở trình duyệt) (#3050) | 1.1.68 | 2024-05-25 | US-19.1 |
-| [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054) | Fix bug Show blank screen when attach account (#3054) | 1.2.22 | 2024-07-31 | US-23.148 |
-| [#3090](https://github.com/Koniverse/SubWallet-Extension/issues/3090) | Add highlight button Export multi account when navigate to select account screen (#3090, #3108) | 1.1.68 | 2024-05-25 | US-23.150 |
-| [#3108](https://github.com/Koniverse/SubWallet-Extension/issues/3108) | Support MV3 on Firefox (#3108) | 1.2.7 | 2024-06-20 | US-23.152 |
-| [#3148](https://github.com/Koniverse/SubWallet-Extension/issues/3148) | Fix bug do not show root screen after remove account (#3148) | 1.2.22 | 2024-07-31 | US-23.154 |
+| [#3054](https://github.com/Koniverse/SubWallet-Extension/issues/3054) | Fix bug Show blank screen when attach account (#3054) | 1.2.22 | 2024-07-31 | US-3.5 |
+| [#3090](https://github.com/Koniverse/SubWallet-Extension/issues/3090) | Add highlight button Export multi account when navigate to select account screen (#3090, #3108) | 1.1.68 | 2024-05-25 | US-3.4 |
+| [#3108](https://github.com/Koniverse/SubWallet-Extension/issues/3108) | Support MV3 on Firefox (#3108) | 1.2.7 | 2024-06-20 | US-3.4 |
+| [#3148](https://github.com/Koniverse/SubWallet-Extension/issues/3148) | Fix bug do not show root screen after remove account (#3148) | 1.2.22 | 2024-07-31 | US-3.4 |
 | [#3198](https://github.com/Koniverse/SubWallet-Extension/issues/3198) | Hide the popup Remind backup seed phrase (#3198) | 1.2.6 | 2024-06-19 | US-19.1 |
-| [#3283](https://github.com/Koniverse/SubWallet-Extension/issues/3283) | Fix bug Do not show account to get address when stand on All accounts mode (#3283) | 1.2.13 | 2024-07-05 | US-23.157 |
-| [#120](https://github.com/Koniverse/SubWallet-Extension/issues/120) | Fix network list is incorrect in case importing an account from seed phrase when there is no account yet (issue #120) | 0.3.4 | 2022-04-16 | US-23.16 |
-| [#145](https://github.com/Koniverse/SubWallet-Extension/issues/145) | Fix account balance still gets calculating from test net (#145) | 0.5.2 | 2022-07-22 | US-23.18 |
-| [#3636](https://github.com/Koniverse/SubWallet-Extension/issues/3636) | Allow importing assets on Asset Hub (#3636) | 1.3.4 | 2024-10-28 | US-23.188 |
-| [#3643](https://github.com/Koniverse/SubWallet-Extension/issues/3643) | Fix bug Can't import JSON file containing Unified account (#3643) | 1.2.31 | 2024-09-28 | US-23.191 |
-| [#192](https://github.com/Koniverse/SubWallet-Extension/issues/192) | Fix extension error when entering Substrate's seed phrase but selecting EVM account (#192) | 0.4.1 | 2022-05-11 | US-23.20 |
-| [#3721](https://github.com/Koniverse/SubWallet-Extension/issues/3721) | Fixed bug Do not show token (#3721) | 1.3.5 | 2024-10-31 | US-23.203 |
-| [#3732](https://github.com/Koniverse/SubWallet-Extension/issues/3732) | Fix bug Do not show watch-only account on History (#3732) | 1.3.3 | 2024-10-16 | US-23.207 |
-| [#3751](https://github.com/Koniverse/SubWallet-Extension/issues/3751) | Support export for Derived account (#3751) | 1.3.2 | 2024-10-12 | US-23.208 |
-| [#3752](https://github.com/Koniverse/SubWallet-Extension/issues/3752) | Update address for TON testnet in the token detail screen on All accounts mode (#3752) | 1.3.2 | 2024-10-12 | US-23.209 |
-| [#198](https://github.com/Koniverse/SubWallet-Extension/issues/198) | Add option allow accept all website on create account screen (#198) | 0.4.1 | 2022-05-11 | US-23.21 |
-| [#3755](https://github.com/Koniverse/SubWallet-Extension/issues/3755) | Improve UI related to Account selector screen (#3755, #3772)) | 1.3.2 | 2024-10-12 | US-23.210 |
-| [#3772](https://github.com/Koniverse/SubWallet-Extension/issues/3772) | Improve UI related to Account selector screen (#3755, #3772)) | 1.3.2 | 2024-10-12 | US-23.210 |
-| [#3926](https://github.com/Koniverse/SubWallet-Extension/issues/3926) | Support Migrate account feature (#3926, #4016) | 1.3.23 | 2025-03-05 | US-23.216 |
-| [#4016](https://github.com/Koniverse/SubWallet-Extension/issues/4016) | Support Migrate account feature (#3926, #4016) | 1.3.23 | 2025-03-05 | US-23.216 |
-| [#208](https://github.com/Koniverse/SubWallet-Extension/issues/208) | Improve import Private key feature (#208) | 0.4.2 | 2022-05-20 | US-23.22 |
-| [#4031](https://github.com/Koniverse/SubWallet-Extension/issues/4031) | Fixed bug Can't import JSON file(from Migrate account) on store version (#4031) | 1.3.53 | 2025-08-12 | US-23.224 |
-| [#4094](https://github.com/Koniverse/SubWallet-Extension/issues/4094) | Improvements unified account after Bitcoin supported (#4094) | 1.3.42 | 2025-06-23 | US-23.227 |
-| [#4168](https://github.com/Koniverse/SubWallet-Extension/issues/4168) | Support Bitcoin account (#4168) | 1.3.42 | 2025-06-23 | US-23.227 |
-| [#223](https://github.com/Koniverse/SubWallet-Extension/issues/223) | Add Clover EVM Network (#223) | 0.5.3 | 2022-07-29 | US-23.23 |
-| [#4200](https://github.com/Koniverse/SubWallet-Extension/issues/4200) | Support Bitcoin for new unified account (#4200) | 1.3.42 | 2025-06-23 | US-23.231 |
-| [#4201](https://github.com/Koniverse/SubWallet-Extension/issues/4201) | Migrate unifed account to support Bitcoin (#4201) | 1.3.42 | 2025-06-23 | US-23.232 |
-| [#4228](https://github.com/Koniverse/SubWallet-Extension/issues/4228) | Support watch-only account for Bitcoin (#4228) | 1.3.42 | 2025-06-23 | US-23.236 |
-| [#4261](https://github.com/Koniverse/SubWallet-Extension/issues/4261) | Support bitcoin derivation with unified account (#4261) | 1.3.42 | 2025-06-23 | US-23.237 |
-| [#4262](https://github.com/Koniverse/SubWallet-Extension/issues/4262) | Support import/export Bitcoin account (#4262) | 1.3.42 | 2025-06-23 | US-23.238 |
-| [#254](https://github.com/Koniverse/SubWallet-Extension/issues/254) | Add feature to allow first-time users to import their Metamask private keys (#254) | 0.5.5 | 2022-08-11 | US-23.24 |
-| [#4332](https://github.com/Koniverse/SubWallet-Extension/issues/4332) | Fixed bug related to price chart for derivation token (#4332, #4344) | 1.3.35 | 2025-05-09 | US-23.241 |
-| [#4344](https://github.com/Koniverse/SubWallet-Extension/issues/4344) | Fixed bug related to price chart for derivation token (#4332, #4344) | 1.3.35 | 2025-05-09 | US-23.241 |
-| [#4565](https://github.com/Koniverse/SubWallet-Extension/issues/4565) | Fixed bug Can not import Json Account from Polkadot{.js} extension (#4565) | 1.3.53 | 2025-08-12 | US-23.243 |
-| [#4620](https://github.com/Koniverse/SubWallet-Extension/issues/4620) | Fixed automatically adding suffix to account name (#4620) | 1.3.56 | 2025-09-11 | US-23.244 |
-| [#4735](https://github.com/Koniverse/SubWallet-Extension/issues/4735) | Hide copy/QR content for relay chain addresses (AssetHub migration) (#4735) | 1.3.61 | 2025-10-04 | US-23.247 |
-| [#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762) | Support Import from Trust Wallet to SubWallet (#4762) | 1.3.71 | 2025-12-29 | US-23.249 |
-| [#266](https://github.com/Koniverse/SubWallet-Extension/issues/266) | Other defects related to Import EVM Tokens (#266) | 0.4.3 | 2022-05-31 | US-23.25 |
-| [#336](https://github.com/Koniverse/SubWallet-Extension/issues/336) | Fix copy account anytime user click on Manage Account icon (#336) | 0.5.2 | 2022-07-22 | US-23.29 |
-| [#354](https://github.com/Koniverse/SubWallet-Extension/issues/354) | Fix do not show avatar account (#354, #457) | 0.5.2 | 2022-07-22 | US-23.30 |
-| [#457](https://github.com/Koniverse/SubWallet-Extension/issues/457) | Fix do not show avatar account (#354, #457) | 0.5.2 | 2022-07-22 | US-23.30 |
-| [#394](https://github.com/Koniverse/SubWallet-Extension/issues/394) | Fix bug can not scan QR (#394) | 0.4.9 | 2022-07-02 | US-23.32 |
-| [#425](https://github.com/Koniverse/SubWallet-Extension/issues/425) | Add select acc screen when the user in All Account mode to show address (#425) | 0.5.2 | 2022-07-22 | US-23.33 |
-| [#709](https://github.com/Koniverse/SubWallet-Extension/issues/709) | Support export account via QR (#709) | 0.6.7 | 2022-10-22 | US-23.45 |
-| [#757](https://github.com/Koniverse/SubWallet-Extension/issues/757) | Support ReadOnly account (#757) | 0.7.2 | 2022-11-19 | US-23.47 |
-| [#885](https://github.com/Koniverse/SubWallet-Extension/issues/885) | Fix bug don't show the Export account screen when visit it from the get wallet address screen (#885) | 0.7.4 | 2022-12-04 | US-23.49 |
-| [#949](https://github.com/Koniverse/SubWallet-Extension/issues/949) | Update "readonly account" to "read-only account" (#949) | 0.7.7 | 2022-12-28 | US-23.52 |
-| [#1118](https://github.com/Koniverse/SubWallet-Extension/issues/1118) | Fix bug importing PSP22 tokens (#1118) | 0.8.4 | 2023-03-31 | US-23.60 |
-| [#1253](https://github.com/Koniverse/SubWallet-Extension/issues/1253) | Fixed bug QR scanner not found (#1253) | 1.1.2 | 2023-07-14 | US-23.70 |
-| [#1314](https://github.com/Koniverse/SubWallet-Extension/issues/1314) | Still allows importing tokens without Decimal, Symbol (#1314) | 1.0.4 | 2023-05-12 | US-23.71 |
-| [#1329](https://github.com/Koniverse/SubWallet-Extension/issues/1329) | Handling the case of importing multiple accounts using a JSON file when an account already exists (#1329) | 1.0.4 | 2023-05-12 | US-23.72 |
-| [#1350](https://github.com/Koniverse/SubWallet-Extension/issues/1350) | Fixed Deprecate nominator controller accounts on some chains (#1350) | 1.1.2 | 2023-07-14 | US-23.73 |
-| [#1389](https://github.com/Koniverse/SubWallet-Extension/issues/1389) | Update the style of the QR code (#1389) | 1.0.5 | 2023-05-21 | US-23.74 |
-| [#1395](https://github.com/Koniverse/SubWallet-Extension/issues/1395) | Fixed bug import private key (#1395) | 1.0.5 | 2023-05-21 | US-23.75 |
-| [#1401](https://github.com/Koniverse/SubWallet-Extension/issues/1401) | Handle case access camera setting when have no account on the wallet (#1401) | 1.0.5 | 2023-05-21 | US-23.76 |
-| [#1490](https://github.com/Koniverse/SubWallet-Extension/issues/1490) | Fixed bug Do not Apply master password in case import multi account but file json have information "IsMasterPassword" (#1490) | 1.0.8 | 2023-06-08 | US-23.79 |
-| [#1500](https://github.com/Koniverse/SubWallet-Extension/issues/1500) | Fixed bug automatically activate tokens based on account balance (#1500) | 1.1.23 | 2023-11-24 | US-23.80 |
-| [#1560](https://github.com/Koniverse/SubWallet-Extension/issues/1560) | Allow user download seed phrase file (#1560) | 1.0.11 | 2023-06-24 | US-23.81 |
+| [#3283](https://github.com/Koniverse/SubWallet-Extension/issues/3283) | Fix bug Do not show account to get address when stand on All accounts mode (#3283) | 1.2.13 | 2024-07-05 | US-3.4 |
+| [#120](https://github.com/Koniverse/SubWallet-Extension/issues/120) | Fix network list is incorrect in case importing an account from seed phrase when there is no account yet (issue #120) | 0.3.4 | 2022-04-16 | US-3.2 |
+| [#145](https://github.com/Koniverse/SubWallet-Extension/issues/145) | Fix account balance still gets calculating from test net (#145) | 0.5.2 | 2022-07-22 | US-3.4 |
+| [#3636](https://github.com/Koniverse/SubWallet-Extension/issues/3636) | Allow importing assets on Asset Hub (#3636) | 1.3.4 | 2024-10-28 | US-3.2 |
+| [#3643](https://github.com/Koniverse/SubWallet-Extension/issues/3643) | Fix bug Can't import JSON file containing Unified account (#3643) | 1.2.31 | 2024-09-28 | US-3.5 |
+| [#192](https://github.com/Koniverse/SubWallet-Extension/issues/192) | Fix extension error when entering Substrate's seed phrase but selecting EVM account (#192) | 0.4.1 | 2022-05-11 | US-3.2 |
+| [#3721](https://github.com/Koniverse/SubWallet-Extension/issues/3721) | Fixed bug Do not show token (#3721) | 1.3.5 | 2024-10-31 | US-3.4 |
+| [#3732](https://github.com/Koniverse/SubWallet-Extension/issues/3732) | Fix bug Do not show watch-only account on History (#3732) | 1.3.3 | 2024-10-16 | US-3.6 |
+| [#3751](https://github.com/Koniverse/SubWallet-Extension/issues/3751) | Support export for Derived account (#3751) | 1.3.2 | 2024-10-12 | US-3.7 |
+| [#3752](https://github.com/Koniverse/SubWallet-Extension/issues/3752) | Update address for TON testnet in the token detail screen on All accounts mode (#3752) | 1.3.2 | 2024-10-12 | US-3.4 |
+| [#198](https://github.com/Koniverse/SubWallet-Extension/issues/198) | Add option allow accept all website on create account screen (#198) | 0.4.1 | 2022-05-11 | US-3.1 |
+| [#3755](https://github.com/Koniverse/SubWallet-Extension/issues/3755) | Improve UI related to Account selector screen (#3755, #3772)) | 1.3.2 | 2024-10-12 | US-3.4 |
+| [#3772](https://github.com/Koniverse/SubWallet-Extension/issues/3772) | Improve UI related to Account selector screen (#3755, #3772)) | 1.3.2 | 2024-10-12 | US-3.4 |
+| [#3926](https://github.com/Koniverse/SubWallet-Extension/issues/3926) | Support Migrate account feature (#3926, #4016) | 1.3.23 | 2025-03-05 | US-3.5 |
+| [#4016](https://github.com/Koniverse/SubWallet-Extension/issues/4016) | Support Migrate account feature (#3926, #4016) | 1.3.23 | 2025-03-05 | US-3.5 |
+| [#208](https://github.com/Koniverse/SubWallet-Extension/issues/208) | Improve import Private key feature (#208) | 0.4.2 | 2022-05-20 | US-3.2 |
+| [#4031](https://github.com/Koniverse/SubWallet-Extension/issues/4031) | Fixed bug Can't import JSON file(from Migrate account) on store version (#4031) | 1.3.53 | 2025-08-12 | US-3.5 |
+| [#4094](https://github.com/Koniverse/SubWallet-Extension/issues/4094) | Improvements unified account after Bitcoin supported (#4094) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#4168](https://github.com/Koniverse/SubWallet-Extension/issues/4168) | Support Bitcoin account (#4168) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#223](https://github.com/Koniverse/SubWallet-Extension/issues/223) | Add Clover EVM Network (#223) | 0.5.3 | 2022-07-29 | US-3.5 |
+| [#4200](https://github.com/Koniverse/SubWallet-Extension/issues/4200) | Support Bitcoin for new unified account (#4200) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#4201](https://github.com/Koniverse/SubWallet-Extension/issues/4201) | Migrate unifed account to support Bitcoin (#4201) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#4228](https://github.com/Koniverse/SubWallet-Extension/issues/4228) | Support watch-only account for Bitcoin (#4228) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#4261](https://github.com/Koniverse/SubWallet-Extension/issues/4261) | Support bitcoin derivation with unified account (#4261) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#4262](https://github.com/Koniverse/SubWallet-Extension/issues/4262) | Support import/export Bitcoin account (#4262) | 1.3.42 | 2025-06-23 | US-3.5 |
+| [#254](https://github.com/Koniverse/SubWallet-Extension/issues/254) | Add feature to allow first-time users to import their Metamask private keys (#254) | 0.5.5 | 2022-08-11 | US-3.2 |
+| [#4332](https://github.com/Koniverse/SubWallet-Extension/issues/4332) | Fixed bug related to price chart for derivation token (#4332, #4344) | 1.3.35 | 2025-05-09 | US-3.7 |
+| [#4344](https://github.com/Koniverse/SubWallet-Extension/issues/4344) | Fixed bug related to price chart for derivation token (#4332, #4344) | 1.3.35 | 2025-05-09 | US-3.7 |
+| [#4565](https://github.com/Koniverse/SubWallet-Extension/issues/4565) | Fixed bug Can not import Json Account from Polkadot{.js} extension (#4565) | 1.3.53 | 2025-08-12 | US-3.3 |
+| [#4620](https://github.com/Koniverse/SubWallet-Extension/issues/4620) | Fixed automatically adding suffix to account name (#4620) | 1.3.56 | 2025-09-11 | US-3.4 |
+| [#4735](https://github.com/Koniverse/SubWallet-Extension/issues/4735) | Hide copy/QR content for relay chain addresses (AssetHub migration) (#4735) | 1.3.61 | 2025-10-04 | US-3.4 |
+| [#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762) | Support Import from Trust Wallet to SubWallet (#4762) | 1.3.71 | 2025-12-29 | US-3.3 |
+| [#266](https://github.com/Koniverse/SubWallet-Extension/issues/266) | Other defects related to Import EVM Tokens (#266) | 0.4.3 | 2022-05-31 | US-3.2 |
+| [#336](https://github.com/Koniverse/SubWallet-Extension/issues/336) | Fix copy account anytime user click on Manage Account icon (#336) | 0.5.2 | 2022-07-22 | US-3.4 |
+| [#354](https://github.com/Koniverse/SubWallet-Extension/issues/354) | Fix do not show avatar account (#354, #457) | 0.5.2 | 2022-07-22 | US-3.4 |
+| [#457](https://github.com/Koniverse/SubWallet-Extension/issues/457) | Fix do not show avatar account (#354, #457) | 0.5.2 | 2022-07-22 | US-3.4 |
+| [#394](https://github.com/Koniverse/SubWallet-Extension/issues/394) | Fix bug can not scan QR (#394) | 0.4.9 | 2022-07-02 | US-3.3 |
+| [#425](https://github.com/Koniverse/SubWallet-Extension/issues/425) | Add select acc screen when the user in All Account mode to show address (#425) | 0.5.2 | 2022-07-22 | US-3.4 |
+| [#709](https://github.com/Koniverse/SubWallet-Extension/issues/709) | Support export account via QR (#709) | 0.6.7 | 2022-10-22 | US-3.4 |
+| [#757](https://github.com/Koniverse/SubWallet-Extension/issues/757) | Support ReadOnly account (#757) | 0.7.2 | 2022-11-19 | US-3.6 |
+| [#885](https://github.com/Koniverse/SubWallet-Extension/issues/885) | Fix bug don't show the Export account screen when visit it from the get wallet address screen (#885) | 0.7.4 | 2022-12-04 | US-3.4 |
+| [#949](https://github.com/Koniverse/SubWallet-Extension/issues/949) | Update "readonly account" to "read-only account" (#949) | 0.7.7 | 2022-12-28 | US-3.6 |
+| [#1118](https://github.com/Koniverse/SubWallet-Extension/issues/1118) | Fix bug importing PSP22 tokens (#1118) | 0.8.4 | 2023-03-31 | US-3.2 |
+| [#1253](https://github.com/Koniverse/SubWallet-Extension/issues/1253) | Fixed bug QR scanner not found (#1253) | 1.1.2 | 2023-07-14 | US-3.3 |
+| [#1314](https://github.com/Koniverse/SubWallet-Extension/issues/1314) | Still allows importing tokens without Decimal, Symbol (#1314) | 1.0.4 | 2023-05-12 | US-3.2 |
+| [#1329](https://github.com/Koniverse/SubWallet-Extension/issues/1329) | Handling the case of importing multiple accounts using a JSON file when an account already exists (#1329) | 1.0.4 | 2023-05-12 | US-3.3 |
+| [#1350](https://github.com/Koniverse/SubWallet-Extension/issues/1350) | Fixed Deprecate nominator controller accounts on some chains (#1350) | 1.1.2 | 2023-07-14 | US-3.4 |
+| [#1389](https://github.com/Koniverse/SubWallet-Extension/issues/1389) | Update the style of the QR code (#1389) | 1.0.5 | 2023-05-21 | US-3.3 |
+| [#1395](https://github.com/Koniverse/SubWallet-Extension/issues/1395) | Fixed bug import private key (#1395) | 1.0.5 | 2023-05-21 | US-3.2 |
+| [#1401](https://github.com/Koniverse/SubWallet-Extension/issues/1401) | Handle case access camera setting when have no account on the wallet (#1401) | 1.0.5 | 2023-05-21 | US-3.3 |
+| [#1490](https://github.com/Koniverse/SubWallet-Extension/issues/1490) | Fixed bug Do not Apply master password in case import multi account but file json have information "IsMasterPassword" (#1490) | 1.0.8 | 2023-06-08 | US-3.3 |
+| [#1500](https://github.com/Koniverse/SubWallet-Extension/issues/1500) | Fixed bug automatically activate tokens based on account balance (#1500) | 1.1.23 | 2023-11-24 | US-3.11 |
+| [#1560](https://github.com/Koniverse/SubWallet-Extension/issues/1560) | Allow user download seed phrase file (#1560) | 1.0.11 | 2023-06-24 | US-3.2 |
 | [#1630](https://github.com/Koniverse/SubWallet-Extension/issues/1630) | Support language: Vietnamese, Chinese (#1630) | 1.1.2 | 2023-07-14 | US-19.2 |
 | [#1640](https://github.com/Koniverse/SubWallet-Extension/issues/1640) | Support multi-language for messages returned from the background (round 1) (#1640) | 1.1.10 | 2023-08-26 | US-19.2 |
 | [#1658](https://github.com/Koniverse/SubWallet-Extension/issues/1658) | Support new language: Russia (#1658) | 1.1.11 | 2023-09-09 | US-19.2 |
-| [#1731](https://github.com/Koniverse/SubWallet-Extension/issues/1731) | Fixed bug Still show history of the removed account (#1731) | 1.1.6 | 2023-08-04 | US-23.93 |
-| [#1750](https://github.com/Koniverse/SubWallet-Extension/issues/1750) | Integrate Azero domain (#1750) | 1.1.8 | 2023-08-12 | US-23.98 |
+| [#1731](https://github.com/Koniverse/SubWallet-Extension/issues/1731) | Fixed bug Still show history of the removed account (#1731) | 1.1.6 | 2023-08-04 | US-3.4 |
+| [#1750](https://github.com/Koniverse/SubWallet-Extension/issues/1750) | Integrate Azero domain (#1750) | 1.1.8 | 2023-08-12 | US-3.6 |
 | [#909](https://github.com/Koniverse/SubWallet-Extension/issues/909) | Add the missing networks in Kusama & Parachain group (#909) | 0.7.6 | 2022-12-17 | US-24.100 |
 | [#910](https://github.com/Koniverse/SubWallet-Extension/issues/910) | Add the missing networks in Live Networks group (#910) | 0.7.6 | 2022-12-17 | US-24.101 |
 | [#928](https://github.com/Koniverse/SubWallet-Extension/issues/928) | Integrate $TFA token into SubWallet(#928) | 0.7.6 | 2022-12-17 | US-24.103 |

@@ -133,11 +133,42 @@ policy belongs to EPIC-5 (security) and signing/submission to EPIC-8
 | [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | Account derivation: custom path & child accounts | Custom + auto-index derived accounts | ✅ done | 0.24.1 |
 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | Account recovery & identity (roadmap) | Social recovery, session keys, DID (planned) | 📋 backlog | — |
 | [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | Unified → Solo account split | Split a unified account back into per-chain solo accounts (FR-23, forward) | 📋 backlog | — |
+| [US-3.10](../stories/US-3.10-account-screens-in-the-1-0-2-rewrite.md) | Account screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — list / add / export / select screens | ✅ done | 1.0.2 |
+| [US-3.11](../stories/US-3.11-account-on-the-webapp-and-avail-space.md) | Account on the WebApp & Avail Space | Create / import / attach / derive / manage on the non-extension surfaces | ✅ done | 1.2.26 |
+| [US-3.12](../stories/US-3.12-open-account-improvements.md) | Open account improvements | The open account work no `done` story can carry (rule 9) | 🚧 in-progress | — |
 
-> All eight stories (US-3.1–3.8) are authored and linked above — sizes follow
-> scope. The `📋 backlog` status is the Stream-B story-planning state; shipped
-> state still lives in the [PRD](../../PRD.md#functional-requirements), and `done` + `version_shipped` are
-> backfilled in version reconciliation.
+> The FR-bearing stories are US-3.1–3.9 above — sizes follow scope. The `📋 backlog` status is the
+> Stream-B story-planning state; shipped state still lives in the [PRD](../../PRD.md#functional-requirements),
+> and `done` + `version_shipped` are backfilled in version reconciliation.
+>
+> **US-3.10 … US-3.12 carry no FR.** They hold the incremental work, fixes and chores that landed on
+> this epic's capabilities — **245 tracker issues** folded in from the former one-issue-per-story
+> maintenance ledger on 2026-07-24
+> ([note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)): 174 onto the
+> capability stories US-3.1 … US-3.8, 69 into these three (8 rewrite, 37 WebApp, 24 open), and the
+> remaining 2 are umbrellas below that own no row. The FR map above is unchanged; the requirement set
+> is still 18 FRs and nine stories.
+
+## Umbrella issues owned by this epic
+
+Two tracker issues here have children and no CHANGELOG line of their own. They are **the epic's**, not
+any story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would
+double-count the work its children already carry.
+
+| Issue | Title | Children | Where the children are |
+|---|---|---|---|
+| [#4184](https://github.com/Koniverse/SubWallet-Extension/issues/4184) | Develop Unified Account Feature | 54 (34 in this ledger) | all 34 in-ledger children in [US-3.5](../stories/US-3.5-the-unified-account-model.md) |
+| [#4205](https://github.com/Koniverse/SubWallet-Extension/issues/4205) | Extension — Update unified account for Firefox browser | 5 (3 in this ledger) | the 3 open in-ledger children (#4206, #3811, #3337) in [US-3.12](../stories/US-3.12-open-account-improvements.md) |
+
+> **#4184 is the largest programme in the account history** — 54 sub-issues, no delivery line of its
+> own; the *"Unified account — …"* rounds through v1.2.30–1.2.32 are its children, and they carry the
+> work in [US-3.5](../stories/US-3.5-the-unified-account-model.md). **#4205 is itself open**, so it is
+> both an umbrella (children, no line) and unfinished; its children are open too and sit in the
+> catch-all [US-3.12](../stories/US-3.12-open-account-improvements.md). Note the contrast with
+> [#4168](https://github.com/Koniverse/SubWallet-Extension/issues/4168) (*"Support Bitcoin account"*)
+> and [#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762) (*"Support Import from
+> Trust Wallet"*): both have children **and** a CHANGELOG line, so they delivered a headline
+> capability and keep their own row (in US-3.5 and US-3.3 respectively) rather than becoming umbrellas.
 
 ## Object map & user-story interactions
 

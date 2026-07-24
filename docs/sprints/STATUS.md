@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-24 04:13:07 UTC
-> Total stories: 1688
+> Last generated: 2026-07-24 05:26:58 UTC
+> Total stories: 1446
 
-## 📋 Backlog (201)
+## 📋 Backlog (179)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -40,28 +40,6 @@
 | US-19.13 | Avail Space mission pool improvement (improvement on US-19.7) | EPIC-19 | P3 | 1 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-23.44 | Integrate with Web3 Auth solution => Users can manage their wallets with social accounts | EPIC-23 | P3 | 1 | — | hieudd |
-| US-23.54 | Integrate the phishing website/account list flagged by Polkadot Alliance | EPIC-23 | P3 | 1 | — | S2kael |
-| US-23.77 | Do not select image on the Scan QR screen when user standing on popup view on the Firefox browser | EPIC-23 | P3 | 1 | — | frenkie-ng |
-| US-23.123 | Do not show popup import/attach account | EPIC-23 | P3 | 1 | — | Thiendekaco |
-| US-23.126 | Enable swiping functionality for item selection in the account selector on the mobile screen of the web app | EPIC-23 | P3 | 1 | — | — |
-| US-23.139 | WebApp - Show incorrect token in case the wallet has only 1 account type | EPIC-23 | P3 | 1 | — | frenkie-ng |
-| US-23.141 | Export all data | EPIC-23 | P3 | 1 | — | saltict |
-| US-23.145 | Extension - Improve UI for export all account | EPIC-23 | P3 | 1 | — | — |
-| US-23.151 | Extension - Still show QR code when change from specific account to All accounts mode | EPIC-23 | P3 | 1 | — | frenkie-ng |
-| US-23.156 | Support import Substrate account by private key | EPIC-23 | P3 | 1 | — | nulllpc |
-| US-23.159 | Extension - Handle case when create account on Firefox | EPIC-23 | P3 | 1 | — | Thiendekaco |
-| US-23.189 | Unified account - Improve UI with feedback | EPIC-23 | P3 | 1 | — | Quangdm-cdm |
-| US-23.192 | Unified account - Improve Change Wallet address for TON feature | EPIC-23 | P3 | 1 | — | — |
-| US-23.212 | Extension - Bug related Unified account on Firefox browser | EPIC-23 | P3 | 1 | — | frenkie-ng |
-| US-23.215 | Invalid bip39 mnemonic specified | EPIC-23 | P3 | 1 | — | — |
-| US-23.225 | Extension - Re-display the duplicate account name popup on Tokens screen even though have already manipulated that popup | EPIC-23 | P3 | 1 | — | — |
-| US-23.233 | Extension - Update unified account for Firefox browser | EPIC-23 | P3 | 1 | — | — |
-| US-23.235 | Extension - Fix some bugs for reset account/eraser all features | EPIC-23 | P3 | 1 | — | — |
-| US-23.239 | Extension - Added support for export method for Unified accounts | EPIC-23 | P3 | 1 | — | — |
-| US-23.250 | Extension - “Invalid QR Code” When Importing Account via QR | EPIC-23 | P3 | 1 | — | — |
-| US-23.251 | Extension - Bug about migrating to unified account | EPIC-23 | P3 | 1 | — | — |
-| US-23.253 | Extension - Bug about export account when account is imported from json file and normal account | EPIC-23 | P3 | 1 | — | tunghp2002 |
 | US-24.17 | Integrate with Kilt Protocol | EPIC-24 | P3 | 1 | — | tunghp2002 |
 | US-24.68 | Create PR for the Starlay team to integrate SubWallet | EPIC-24 | P3 | 1 | — | hieudd |
 | US-24.94 | Integrate wallet-to-wallet message solution from Gear Technologies | EPIC-24 | P3 | 1 | — | hieudd |
@@ -210,14 +188,13 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (11)
+## 🟢 Ready (10)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W28 | S2kael |
-| US-23.245 | Extension - Error can't derive F2 TON solo account | EPIC-23 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-24.338 | Extension - Update chain-list stable v0.2.124 | EPIC-24 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
@@ -241,8 +218,8 @@
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
-| US-23.222 | WebApp - Wallet account injection feature (related to unified account feature) | EPIC-23 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
+| US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
@@ -258,14 +235,13 @@
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 | US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
 
-## 👀 Review (10)
+## 👀 Review (9)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-23.234 | Extension - Verify the latest Unified Accounts build on Firefox | EPIC-23 | P3 | 1 | sprint-2026-W28 | — |
 | US-32.368 | [Refactor Earning] Remove Legacy `bonding` and move necessary utils to `earning-service` | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
@@ -273,7 +249,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1330)
+## ✅ Done (1134)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -365,204 +341,6 @@
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-23.1 | Show balance for all account in Wallet | EPIC-23 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-23.2 | [v0.2.8] Still showing Back to home button when switching tabs, Switch account | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.3 | Don't navigate to Get Started screen when Forget account is out | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.4 | Check the case export Seed in the Create Account screen on Firefox browser (popup form) | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.5 | Incorrect account information at Expand screen when switching account in popup screen | EPIC-23 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-23.6 | Automatically rename the account according to the previous switch account | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.7 | Avatar All Account does not update when changing from collapse (popup) | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.8 | [v0.2.8] Not resetting Network in Import Account screen | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.9 | Incorrect Network display in Import Account screen | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.10 | Automatically rename EVM account after successful creation | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.11 | Add custom avatar feature for All accounts | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.12 | Improved import JSON file from Polkadot {.js}: Single Account and All Account (Issue #88 & #90) | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.14 | Can't restore account when the previous .json file is invalid | EPIC-23 | P3 | 1 | sprint-2022-M04 | S2kael |
-| US-23.15 | Does not automatically turn off Forget Account screen | EPIC-23 | P3 | 1 | sprint-2022-M04 | S2kael |
-| US-23.16 | Fix network list is incorrect in case importing an account from seed phrase when there is no account yet | EPIC-23 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-23.17 | Master password for all account | EPIC-23 | P3 | 1 | sprint-2022-M10 | saltict |
-| US-23.18 | Fix account balance still gets calculating from test net | EPIC-23 | P3 | 1 | sprint-2022-M07 | lw-cdm |
-| US-23.19 | Update default avatar for all account | EPIC-23 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-23.20 | Fix extension error when entering Substrate's seed phrase but selecting EVM account | EPIC-23 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-23.21 | Add option allow accept all website on create account screen | EPIC-23 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-23.22 | Improve import Private key feature | EPIC-23 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-23.23 | Add Clover EVM Network | EPIC-23 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-23.24 | Add feature to allow first-time users to import their Metamask private keys | EPIC-23 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-23.25 | Other defects related to Import EVM Tokens | EPIC-23 | P3 | 1 | sprint-2022-M05 | nulllpc |
-| US-23.26 | Not showing SubWallet account on Polkadot.js.org/app | EPIC-23 | P3 | 1 | sprint-2022-M05 | saltict |
-| US-23.27 | QR display / QR Scan | EPIC-23 | P3 | 1 | sprint-2022-M06 | S2kael |
-| US-23.28 | Build communication structure (via QR) (request between UI and background) | EPIC-23 | P3 | 1 | sprint-2022-M06 | S2kael |
-| US-23.29 | Fix copy account anytime user click on Manage Account icon | EPIC-23 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-23.30 | Fix do not show avatar account | EPIC-23 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-23.31 | The sort order of the account list is not fixed | EPIC-23 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-23.32 | Fix bug can not scan QR | EPIC-23 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-23.33 | Add select acc screen when the user in All Account mode to show address | EPIC-23 | P3 | 1 | sprint-2022-M07 | S2kael |
-| US-23.34 | Improve keyring for EVM | EPIC-23 | P3 | 1 | sprint-2022-M09 | saltict |
-| US-23.35 | UX of current account with EVM Provider | EPIC-23 | P3 | 1 | sprint-2023-M06 | hieudd |
-| US-23.36 | Wrong balance with all accounts | EPIC-23 | P3 | 1 | sprint-2022-M07 | — |
-| US-23.37 | Allow select camera in QR screen and avoid camera open anytime open extension | EPIC-23 | P3 | 1 | sprint-2023-M04 | — |
-| US-23.38 | Show this icon on All Accounts | EPIC-23 | P3 | 1 | sprint-2022-M07 | — |
-| US-23.39 | Export seed phrase for Substrate Account | EPIC-23 | P3 | 1 | sprint-2023-M04 | — |
-| US-23.40 | Notification for important infomation | EPIC-23 | P3 | 1 | sprint-2023-M06 | — |
-| US-23.41 | Token information is overwritten when importing another token with the same name | EPIC-23 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-23.43 | Export Account via QR | EPIC-23 | P3 | 1 | sprint-2023-M04 | — |
-| US-23.45 | Support export account via QR | EPIC-23 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-23.47 | Support ReadOnly account | EPIC-23 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-23.48 | SubWallet 'Polkadot Relay Chain' derivation path | EPIC-23 | P3 | 1 | sprint-2022-M12 | nulllpc |
-| US-23.49 | Fix bug don't show the Export account screen when visit it from the get wallet address screen | EPIC-23 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-23.50 | Update keyring | EPIC-23 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-23.52 | Update 'readonly account' to 'read-only account' | EPIC-23 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-23.55 | Upgrade UI - Screen Account / List | EPIC-23 | P3 | 1 | sprint-2023-M03 | Quangdm-cdm |
-| US-23.56 | Upgrade UI - Screen Account / Add | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.57 | Upgrade UI - Screen Account / Export | EPIC-23 | P3 | 1 | sprint-2023-M03 | S2kael |
-| US-23.58 | Upgrade UI - Modal Select Account | EPIC-23 | P3 | 1 | sprint-2023-M04 | Quangdm-cdm |
-| US-23.59 | Make Polkadot.js App like in a white list to support EVM Accounts | EPIC-23 | P3 | 1 | sprint-2024-M09 | saltict |
-| US-23.60 | Fix bug importing PSP22 tokens | EPIC-23 | P3 | 1 | sprint-2023-M03 | nulllpc |
-| US-23.61 | UpgradeUI - Show counter of accounts to which the master password needs to be applied is incorrect | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.63 | Upgrade UI - Handling the case where the user chooses the bet action when no account is supported | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.64 | Upgrade UI - Implement Withdraw feature for the 'All accounts' mode | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.65 | Upgrade UI - Handle case forget all account | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.66 | Support master account | EPIC-23 | P3 | 1 | sprint-2024-M09 | nulllpc |
-| US-23.67 | Block export Private key with Substrate due to not supporting import | EPIC-23 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-23.68 | Incorrect total number of account in Manage website access screen when upgrade version | EPIC-23 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-23.69 | The list of accounts that can withdraw is incorrect when viewing in All accounts mode | EPIC-23 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-23.70 | Fixed bug QR scanner not found | EPIC-23 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-23.71 | Still allows importing tokens without Decimal, Symbol | EPIC-23 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-23.72 | Handling the case of importing multiple accounts using a JSON file when an account already exists | EPIC-23 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-23.73 | Fixed Deprecate nominator controller accounts on some chains | EPIC-23 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-23.74 | Update the style of the QR code | EPIC-23 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-23.75 | Fixed bug import private key | EPIC-23 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-23.76 | Handle case access camera setting when have no account on the wallet | EPIC-23 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-23.78 | Export message list | EPIC-23 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-23.79 | Fixed bug Do not Apply master password in case import multi account but file json have information 'IsMasterPassword' | EPIC-23 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-23.80 | Fixed bug automatically activate tokens based on account balance | EPIC-23 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-23.81 | Allow user download seed phrase file | EPIC-23 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-23.87 | WebApp - Show incorrect locked balance of the account | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.88 | WebApp - Show incorrect the current account | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.89 | WebApp - Do not import account by private key starting without 0x | EPIC-23 | P3 | 1 | sprint-2023-M07 | lw-cdm |
-| US-23.90 | WebApp - UI bugs related to Add/Import/Attach account features | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.91 | WebApp - UI bugs on the Account Detail screens | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.92 | WebApp - Do not import token | EPIC-23 | P3 | 1 | sprint-2023-M07 | lw-cdm |
-| US-23.93 | Fixed bug Still show history of the removed account | EPIC-23 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-23.94 | WebApp - Bug related to search network, account on header | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.96 | WebApp - Show incorrect screen after import multi account by JSON file successfully | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.97 | WebApp - Do not generate new seed phrase | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.98 | Integrate Azero domain | EPIC-23 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-23.99 | WebApp - Need to creating a new seed phrase when reopening create a new account | EPIC-23 | P3 | 1 | sprint-2023-M11 | — |
-| US-23.100 | WebApp - Bug when removing the account in case the wallet has 1 account | EPIC-23 | P3 | 1 | sprint-2023-M08 | saltict |
-| US-23.101 | WebApp - Do not show Select Import an account | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.102 | The 'All Accounts' option is not showing first in the list of accounts in Firefox browser | EPIC-23 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-23.103 | WebApp - UI bug on the Select account screen | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.104 | WebApp - Showing multiple popup select account | EPIC-23 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-23.105 | WebApp - Incorrect navigation when remove all accounts | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.106 | WebApp - Incorrect navigation in case of attaching a watch-only account on first use of Web App | EPIC-23 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-23.107 | WebApp - Do not derive account in case below | EPIC-23 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-23.108 | WebApp - Change appear of manage network and account selector from popover to modal | EPIC-23 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-23.109 | Fixed bug Do not auto-lock after imported multiple account | EPIC-23 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-23.110 | WebApp - Update UI for import account by seed phrase and import account by private key | EPIC-23 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-23.111 | Fixed bug Do not show selected account | EPIC-23 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-23.112 | WebApp - Create incorrect account in case change account type when create account | EPIC-23 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-23.113 | WebApp - Show incorrect seed phrase when create new account | EPIC-23 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-23.114 | Add “Token Name” to the token screens | EPIC-23 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-23.115 | WebApp - Navigate incorrect in case back to Import account | EPIC-23 | P3 | 1 | sprint-2023-M12 | Thiendekaco |
-| US-23.116 | Update message on the Create on account screen | EPIC-23 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-23.117 | Fixed bug in case save file when create new account, export account | EPIC-23 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-23.118 | Show Copy and QR code when hover account | EPIC-23 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-23.119 | WebApp  - Update neway to fetch history data of an account | EPIC-23 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-23.120 | WebApp - Error page in case enable config Camera access for QR on local | EPIC-23 | P3 | 1 | sprint-2023-M12 | Thiendekaco |
-| US-23.121 | Update new way to fetch transaction history | EPIC-23 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-23.122 | Recheck automatically activate tokens based on account balance (round 2) | EPIC-23 | P3 | 1 | sprint-2025-M11 | PDTnhah |
-| US-23.124 | Sort the Current account on top in the Account selector | EPIC-23 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-23.125 | Fixed bug show incorrect balance on All account mode when switch account | EPIC-23 | P3 | 1 | sprint-2023-M12 | saltict |
-| US-23.127 | Re-check case reload token list after remove account successfully | EPIC-23 | P3 | 1 | sprint-2024-M09 | — |
-| US-23.128 | Fixed bug Do not show token when standing on All accounts mode in case token does not get balance | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.129 | Unable to export account when input valid master password | EPIC-23 | P3 | 1 | sprint-2024-M01 | S2kael |
-| US-23.130 | Fixed bug Do not detect phishing page in case have no account in wallet | EPIC-23 | P3 | 1 | sprint-2024-M01 | saltict |
-| US-23.131 | Keyring for Bitcoin | EPIC-23 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-23.133 | Fixed bug Do not display the account in the account details tab in case the entire account balance is locked | EPIC-23 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-23.134 | Auto import EVM network with source from online resources | EPIC-23 | P3 | 1 | sprint-2024-M01 | saltict |
-| US-23.136 | Fixed bug Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported | EPIC-23 | P3 | 1 | sprint-2024-M02 | lw-cdm |
-| US-23.137 | Fixed bug show incorrect token in case the wallet has only 1 account type | EPIC-23 | P3 | 1 | sprint-2024-M02 | saltict |
-| US-23.138 | [Extension] Add export multiple accounts | EPIC-23 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-23.140 | Handle case displayed account with specific network | EPIC-23 | P3 | 1 | sprint-2024-M05 | saltict |
-| US-23.143 | Support Export all accounts feature | EPIC-23 | P3 | 1 | sprint-2024-M04 | frenkie-ng |
-| US-23.144 | WebApp - Implement UI for export multi-account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.148 | Fix bug Show blank screen when attach account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.150 | Add highlight button Export multi account when navigate to select account screen | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-23.152 | Support MV3 on Firefox | EPIC-23 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-23.153 | Extension - MV3 - Still show icon ZK mode on Export account screen in case upgrade version MV2 -> MV3 | EPIC-23 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-23.154 | Fix bug do not show root screen after remove account | EPIC-23 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-23.157 | Fix bug Do not show account to get address when stand on All accounts mode | EPIC-23 | P3 | 1 | sprint-2024-M07 | lw-cdm |
-| US-23.160 | Integrate unified account | EPIC-23 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-23.161 | Update UI to support unified account | EPIC-23 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-23.163 | Fix UI bugs for Unified account | EPIC-23 | P3 | 1 | sprint-2024-M08 | Thiendekaco |
-| US-23.164 | Unified account - Filter chains, tokens and features for account types | EPIC-23 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-23.165 | [Unified-Account] Add logic search account on address input | EPIC-23 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-23.166 | Unified account  - Update export/import logic | EPIC-23 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-23.167 | WebApp - UI bug in case import by seed phrase | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-23.168 | Fix UI bugs for Unified account (round 2) | EPIC-23 | P3 | 1 | sprint-2024-M08 | lw-cdm |
-| US-23.169 | Unified account - Add validate unique for Account Name | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.172 | Unified-account - Add feature to switch WalletContract version for ton | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.173 | Unified account - Update Address Input component | EPIC-23 | P3 | 1 | sprint-2024-M09 | lw-cdm |
-| US-23.174 | Unified account - Update export/import UI | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.175 | Unified account - Fix bug validating recipient address | EPIC-23 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-23.176 | Unified account - Implement advanced address detection | EPIC-23 | P3 | 1 | sprint-2024-M09 | lw-cdm |
-| US-23.177 | Unified account - Review performance in app | EPIC-23 | P3 | 1 | sprint-2024-M09 | nulllpc |
-| US-23.178 | Unified account - Fix bug releated to Import/Export account | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.179 | Unified account - Implement Customize derivation path feature | EPIC-23 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-23.180 | Unified account - Update the latest code | EPIC-23 | P3 | 1 | sprint-2024-M09 | lw-cdm |
-| US-23.181 | Unified account - Fix some UI bugs | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.182 | Unified account - Improve auto-add suffix for duplicate account name (SubWallet add suffix) in case upgrade version | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.183 | Unified account - Can't export multi account | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.184 | Unified account - Update UI for import account feature | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.185 | Unified account - Update content | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.187 | Unified account - Support save contact for TON address | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.188 | Allow importing assets on Asset Hub | EPIC-23 | P3 | 1 | sprint-2024-M10 | PDTnhah |
-| US-23.190 | Unified account - Update content for some features | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-23.191 | Fix bug Can't import JSON file containing Unified account | EPIC-23 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-23.193 | Unified account - Show avatar for address with TON token | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.194 | Unified account - Update the latest code (v1.2.30) | EPIC-23 | P3 | 1 | sprint-2024-M09 | lw-cdm |
-| US-23.195 | Unified account - Improve some UI phrase 1 | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.196 | Unified account - Show derivation information for derived account | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-23.197 | Review keyring package | EPIC-23 | P3 | 1 | sprint-2024-M09 | nulllpc |
-| US-23.198 | Unified account - Update for TON account | EPIC-23 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-23.199 | Unified account - Do not update address when change Address version for TON Solo account | EPIC-23 | P3 | 1 | sprint-2024-M10 | frenkie-ng |
-| US-23.200 | Unified account - Improve derive account feature | EPIC-23 | P3 | 1 | sprint-2024-M10 | — |
-| US-23.201 | Unified account - Update the latest code v1.2.31 | EPIC-23 | P3 | 1 | sprint-2024-M10 | lw-cdm |
-| US-23.203 | Fixed bug Do not show token | EPIC-23 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-23.204 | Unified account - Final test for features related to account | EPIC-23 | P3 | 1 | sprint-2024-M10 | haiyenvu23 |
-| US-23.205 | Unified account - Final test some features | EPIC-23 | P3 | 1 | sprint-2024-M10 | ThaoNguyen998 |
-| US-23.206 | Unified account - Update the latest code v1.2.32 | EPIC-23 | P3 | 1 | sprint-2024-M10 | lw-cdm |
-| US-23.207 | Fix bug Do not show watch-only account on History | EPIC-23 | P3 | 1 | sprint-2024-M10 | Quangdm-cdm |
-| US-23.208 | Support export for Derived account | EPIC-23 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-23.209 | Update address for TON testnet in the token detail screen on All accounts mode | EPIC-23 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-23.210 | Improve UI related to Account selector screen (#3755, #3772)) | EPIC-23 | P3 | 1 | sprint-2024-M10 | Quangdm-cdm |
-| US-23.211 | Extension - Retest unified account on Firefox browser | EPIC-23 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-23.213 | Update BA doc for Unified account | EPIC-23 | P3 | 1 | sprint-2025-M08 | Sokol142196 |
-| US-23.216 | Support Migrate account feature | EPIC-23 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-23.217 | Fix UI bug for Cardano unified account | EPIC-23 | P3 | 1 | sprint-2024-M12 | lw-cdm |
-| US-23.218 | WebApp - Overview of the WebApp update supporting unified accounts | EPIC-23 | P3 | 1 | sprint-2025-M01 | lw-cdm |
-| US-23.219 | WebApp - prepare for Unified account feature | EPIC-23 | P3 | 1 | sprint-2025-M01 | lw-cdm |
-| US-23.220 | Webapp - Manage unified account | EPIC-23 | P3 | 1 | sprint-2025-M02 | frenkie-ng |
-| US-23.221 | Webapp - Other features related to unifed account feature | EPIC-23 | P3 | 1 | sprint-2025-M02 | frenkie-ng |
-| US-23.224 | Fixed bug Can't import JSON file(from Migrate account) on store version | EPIC-23 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-23.226 | WebApp - Bug when update Unified account | EPIC-23 | P3 | 1 | sprint-2025-M03 | lw-cdm |
-| US-23.227 | Improvements unified account after Bitcoin supported | EPIC-23 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-23.229 | Support Bitcoin account | EPIC-23 | P3 | 1 | sprint-2025-M06 | saltict |
-| US-23.230 | Develop Unified Account Feature | EPIC-23 | P3 | 1 | sprint-2025-M03 | hieudd |
-| US-23.231 | Support Bitcoin for new unified account | EPIC-23 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-23.232 | Migrate unifed account to support Bitcoin | EPIC-23 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-23.236 | Support watch-only account for Bitcoin | EPIC-23 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-23.237 | Support bitcoin derivation with unified account | EPIC-23 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-23.238 | Support import/export Bitcoin account | EPIC-23 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-23.241 | Fixed bug related to price chart for derivation token | EPIC-23 | P3 | 1 | sprint-2025-M05 | lw-cdm |
-| US-23.242 | Unable to show balance for Cardano account | EPIC-23 | P3 | 1 | sprint-2025-M07 | saltict |
-| US-23.243 | Fixed bug Can not import Json Account from Polkadot{.js} extension | EPIC-23 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-23.244 | Fixed automatically adding suffix to account name | EPIC-23 | P3 | 1 | sprint-2025-M09 | frenkie-ng |
-| US-23.246 | Extension - Improve filter account type by token support for that type in all features | EPIC-23 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-23.247 | Hide copy/QR content for relay chain addresses (AssetHub migration) | EPIC-23 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-23.248 | [WebApp] Hide copy/QR content for relay chain addresses (AssetHub migration) | EPIC-23 | P3 | 1 | sprint-2025-M10 | Thiendekaco |
-| US-23.249 | Support Import from Trust Wallet to SubWallet | EPIC-23 | P3 | 1 | sprint-2025-M12 | bluezdot |
 | US-24.1 | Show balance for substrate based chain assets | EPIC-24 | P3 | 1 | sprint-2022-M03 | lw-cdm |
 | US-24.2 | Integrate all parachains assets in to SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
 | US-24.3 | Integrate Dotsama ecosystem testnets: Rococo, Westend | EPIC-24 | P3 | 1 | sprint-2022-M03 | lw-cdm |
@@ -857,6 +635,8 @@
 | US-3.5 | The Unified Account model | EPIC-3 | P1 | 8 | sprint-2024-M10 | saltict |
 | US-3.6 | Watch-only accounts & address book | EPIC-3 | P2 | 3 | sprint-2023-M04 | saltict |
 | US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2022-M01 | barrutko |
+| US-3.10 | Account screens in the 1.0.2 UI rewrite | EPIC-3 | P3 | 1 | sprint-2023-M04 | — |
+| US-3.11 | Account on the WebApp & Avail Space | EPIC-3 | P3 | 5 | sprint-2024-M01 | — |
 | US-32.1 | Integrate Vara network | EPIC-32 | P3 | 1 | sprint-2023-M05 | saltict |
 | US-32.2 | Staking Portfolio Management | EPIC-32 | P3 | 1 | sprint-2022-M03 | nulllpc |
 | US-32.3 | Integration with SubQuery & SubSquid to show Transactions History & Crowdloan Status and Staking Information | EPIC-32 | P3 | 1 | sprint-2022-M03 | saltict |
@@ -1612,33 +1392,11 @@
 
 _No stories_
 
-## 🗑️ Deprecated (109)
+## 🗑️ Deprecated (87)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
-| US-23.13 | Auto Import account from Polkadot js wallet to SubWallet | EPIC-23 | P3 | 1 | — | vantrong291 |
-| US-23.42 | Recovery account | EPIC-23 | P3 | 1 | — | saltict |
-| US-23.46 | Recovery account | EPIC-23 | P3 | 1 | — | saltict |
-| US-23.51 | Allow custom path when deriving account after implementing master account feature | EPIC-23 | P3 | 1 | — | S2kael |
-| US-23.53 | Improve keyring for other network | EPIC-23 | P3 | 1 | — | — |
-| US-23.62 | Support import Substrate account by private key | EPIC-23 | P3 | 1 | — | saltict |
-| US-23.82 | Still showing all tokens when in All accounts mode in case the wallet has only 1 account type | EPIC-23 | P3 | 1 | — | S2kael |
-| US-23.85 | Support QR for ZkAssets | EPIC-23 | P3 | 1 | — | nulllpc |
-| US-23.95 | WebApp - Error page in case Import by Json on firefox | EPIC-23 | P3 | 1 | — | nulllpc |
-| US-23.135 | Ui bug when account address is long | EPIC-23 | P3 | 1 | — | — |
-| US-23.142 | Extension - Implement UI for export all accounts feature | EPIC-23 | P3 | 1 | — | lw-cdm |
-| US-23.146 | Block attach account Polkadot vault for network Moonbeam, Moonriver, Moonbase | EPIC-23 | P3 | 1 | — | nulllpc |
-| US-23.149 | WebApp - QR code of the receiving address is lost | EPIC-23 | P3 | 1 | sprint-2024-M12 | frenkie-ng |
-| US-23.158 | [Bug] Import custom EVM Rpc | EPIC-23 | P3 | 1 | — | bluezdot |
-| US-23.162 | Fix bug do not show root screen after remove account (round 2) | EPIC-23 | P3 | 1 | — | frenkie-ng |
-| US-23.170 | Unified account - Add logic to choose account type (unified/solo) when import by seed phrase (discuss more for UX) | EPIC-23 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-23.171 | Checklist and Testing for Unified account: Create, Import... | EPIC-23 | P3 | 1 | — | ThaoNguyen998 |
-| US-23.202 | Migrate unified account feature | EPIC-23 | P3 | 1 | — | — |
-| US-23.214 | Extension - Unable to open extension when update version in case wallet has multi-account | EPIC-23 | P3 | 1 | — | — |
-| US-23.223 | Re-check performance for migrate account features | EPIC-23 | P3 | 1 | — | lw-cdm |
-| US-23.228 | Extension - Error don't show token when perform Reset account | EPIC-23 | P3 | 1 | — | — |
-| US-23.252 | Extension - No automatic history switching when changing accounts in The Global Account Switcher (at the top) | EPIC-23 | P3 | 1 | — | — |
 | US-24.7 | Integrate in to popular web 2.0 CMS and Ecommerce: WordPress, Shopify & Merchize | EPIC-24 | P3 | 1 | — | — |
 | US-24.33 | The Sub-token doesn't occasionally display on Chain | EPIC-24 | P3 | 1 | — | — |
 | US-24.34 | Custom Network for Providers URL support both Substrate Chain & EVM Chain | EPIC-24 | P3 | 1 | — | — |
@@ -1730,12 +1488,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 201
-- 🟢 **Ready**: 11
+- 📋 **Backlog**: 179
+- 🟢 **Ready**: 10
 - 🟡 **In Progress**: 27
-- 👀 **Review**: 10
-- ✅ **Done**: 1330
+- 👀 **Review**: 9
+- ✅ **Done**: 1134
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 109
+- 🗑️ **Deprecated**: 87
 
 ⚠️  **WIP limit exceeded**: 27 stories in-progress (limit: 3).

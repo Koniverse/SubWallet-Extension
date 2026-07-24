@@ -122,8 +122,8 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **5
-> ledgers still separate** finds **23 issues** mentioning "unlock" / "lock", sitting in EPIC-23, EPIC-24, EPIC-32, EPIC-41.
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
+> ledgers still separate** finds **18 issues** mentioning "unlock" / "lock", sitting in EPIC-24, EPIC-32, EPIC-41.
 >
 > **The transactions ledger held none of them.** It folded on 2026-07-24 with 200 issues and not one
 > title matched — a whole area of the tracker that never touches the lock state.
@@ -140,8 +140,17 @@ That ledger held only 13 issues and they were almost all phishing.
 > (*"improve lock UX"*, 1.1.10) into [US-6.12](US-6.12-early-ux-iteration.md). The lock **flow** is
 > this story's; the **screens that show it** are EPIC-6's — a distinction a title scan cannot make.
 >
+> **The account ledger's five were all false positives or account-flow, and none landed here either.**
+> When the account ledger folded on 2026-07-24: #1207 (*"Block export Private key"*) and #3022 (*"Block attach
+> account"*) matched *"lock"* as a substring of *"Block"*; #1680 is a *"locked balance"* (staking, not
+> screen-lock); #2429 is an account-details display bug; and #1910 (*"auto lock after import multi
+> account"*) is the one genuine lock touch — it went to
+> [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md) as import-flow work, not the lock
+> policy this story owns.
+>
 > The count fell 29 → 26 when the hardware ledger folded on 2026-07-23, then 26 → 23 when the UI
-> ledger folded the same day, and **not one of those six issues landed here**.
+> ledger folded the same day, then 23 → 18 when the account ledger folded on 2026-07-24 — and **not one
+> of those eleven issues landed here**.
 > Treat the remainder as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

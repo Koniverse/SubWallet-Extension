@@ -122,8 +122,16 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **14 issues** mentioning "master password" / "password", sitting in EPIC-23, EPIC-41. (The dApp ledger's three matches — #72, #737, #871 — were about remembering a password in the signing flow, not the master-password policy, and folded on 2026-07-24 into [US-10.8](US-10.8-arbitrary-message-signing.md).)
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
+> ledgers still separate** finds **10 issues** mentioning "master password" / "password", sitting in EPIC-41. (The dApp ledger's three matches — #72, #737, #871 — were about remembering a password in the signing flow, not the master-password policy, and folded on 2026-07-24 into [US-10.8](US-10.8-arbitrary-message-signing.md).)
+>
+> **The Account ledger's four went to account stories, not here.** When it folded on 2026-07-24, #144
+> (*"master password for all account"*) and #2376 (*"export when input valid master password"*) landed
+> in [US-3.4](US-3.4-export-keys-multi-account-management.md), #1490 (apply-master-password-on-import)
+> in [US-3.3](US-3.3-import-account-via-json-qr-trust-wallet.md), and #1139 (the 1.0.2 rewrite's
+> master-password counter) in [US-3.10](US-3.10-account-screens-in-the-1-0-2-rewrite.md). Each is a
+> *screen that shows the password flow*, not the policy this story owns — the same boundary the count
+> above cannot see.
 >
 > **The UI ledger's six went to UI stories, not here.** When it folded on 2026-07-23, #1012, #1193
 > (the 1.0.2 rewrite's master-password screens) landed in

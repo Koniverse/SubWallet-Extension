@@ -24,6 +24,11 @@ index and keeping a per-parent derived-account list — so that one seed organiz
 into as many deterministic sub-accounts as they need, all recoverable from that
 single backup.
 
+## Status
+
+> **✅ done — shipped in 0.2.1.** All 4 acceptance criteria are ticked and the 3 rows below are
+> settled — all delivered.
+
 ## Background
 
 This story extends the Unified Account model
@@ -155,9 +160,26 @@ tag (`git merge-base --is-ancestor`; 0.2.1 itself is untagged, so v0.2.5 is its 
 _Retroactive story — capability already shipped. Fill `commit`,
 `version_shipped` and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**3 tracker issues** landed on account derivation — 2 with a release, 1 delivered with no line
+naming it. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.2 | [#3751](https://github.com/Koniverse/SubWallet-Extension/issues/3751) | Extension - Support export for Derived account | ✅ done |
+| 1.3.35 | [#4332](https://github.com/Koniverse/SubWallet-Extension/issues/4332) | Extension - Do not show price chart for derivation token | ✅ done |
+| — | [#861](https://github.com/Koniverse/SubWallet-Extension/issues/861) | SubWallet "Polkadot Relay Chain" derivation path | ✅ done |
+
+> **Three rows, and none is a derivation-math bug.** #861 is a path string, #3751 exports a derived
+> account, #4332 hides the price chart for a derivation token. Deterministic derivation (AD-11) either
+> reproduces the address or it doesn't; what generates maintenance is the *surface* around a derived
+> account, not the derivation.
+
 ## Cross-references
 
 - [PRD FR-26](../../PRD.md#functional-requirements), [PRD FR-27](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.1](US-3.1-create-a-new-wallet-via-seed-phrase.md)
 - [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md)
+- [consolidation note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)

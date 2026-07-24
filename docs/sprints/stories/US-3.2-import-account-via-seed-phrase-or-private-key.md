@@ -22,6 +22,11 @@ A user migrating from another wallet can bring an existing account in by its
 12/24-word seed phrase or by a raw private key — so that they keep control of
 funds they already hold without creating a new key.
 
+## Status
+
+> **✅ done — shipped in 0.2.8.** All 4 acceptance criteria are ticked and the 24 rows below are
+> settled: 21 delivered, 3 closed without shipping.
+
 ## Background
 
 The two secret-based import paths. A seed import reconstructs a full
@@ -106,8 +111,53 @@ already shipped; `commit` / `version_shipped` backfilled in reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`, `version_shipped`
 and caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**24 tracker issues** landed on account import — 16 with a release, 5 delivered with no line naming
+them, 3 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger
+(2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.4 | [#120](https://github.com/Koniverse/SubWallet-Extension/issues/120) | The Network list is incorrect in case importing an account from seed phase when there is no account yet | ✅ done |
+| 0.4.1 | [#192](https://github.com/Koniverse/SubWallet-Extension/issues/192) | Extension error when entering Substrate's seed phrase but selecting EVM account | ✅ done |
+| 0.4.2 | [#208](https://github.com/Koniverse/SubWallet-Extension/issues/208) | Improve import Private key feature | ✅ done |
+| 0.4.3 | [#266](https://github.com/Koniverse/SubWallet-Extension/issues/266) | Other defects related to Import EVM Tokens | ✅ done |
+| 0.5.5 | [#254](https://github.com/Koniverse/SubWallet-Extension/issues/254) | Add feature to allow first-time users to import their Metamask private keys | ✅ done |
+| 0.8.4 | [#1118](https://github.com/Koniverse/SubWallet-Extension/issues/1118) | Fix bug importing PSP22 tokens | ✅ done |
+| 1.0.4 | [#1314](https://github.com/Koniverse/SubWallet-Extension/issues/1314) | Still allows importing tokens without Decimal, Symbol | ✅ done |
+| 1.0.5 | [#1395](https://github.com/Koniverse/SubWallet-Extension/issues/1395) | Do not import private key when exported from MetaMask | ✅ done |
+| 1.0.11 | [#1560](https://github.com/Koniverse/SubWallet-Extension/issues/1560) | Allow user download seed phrase file | ✅ done |
+| 1.1.13 | [#1910](https://github.com/Koniverse/SubWallet-Extension/issues/1910) | Handle the case of auto lock after import multi account | ✅ done |
+| 1.1.20 | [#1946](https://github.com/Koniverse/SubWallet-Extension/issues/1946) | Add "Token Name" to the Token Details and Import Token screen | ✅ done |
+| 1.1.26 | [#2323](https://github.com/Koniverse/SubWallet-Extension/issues/2323) | Re-check case show incorrect balance on All accounts mode when switch account or import account | ✅ done |
+| 1.1.33 | [#2472](https://github.com/Koniverse/SubWallet-Extension/issues/2472) | Auto import EVM network with source from online resources | ✅ done |
+| 1.1.34 | [#2518](https://github.com/Koniverse/SubWallet-Extension/issues/2518) | Show incorrect tokens on the balance screen in case an account with the type 'ed25519' is imported | ✅ done |
+| 1.1.36 | [#1207](https://github.com/Koniverse/SubWallet-Extension/issues/1207) | Block export Private key with Substrate due to not supporting import | ✅ done |
+| 1.3.4 | [#3636](https://github.com/Koniverse/SubWallet-Extension/issues/3636) | Allow importing assets on Asset Hub | ✅ done |
+| — | [#75](https://github.com/Koniverse/SubWallet-Extension/issues/75) | [v0.2.8] Not resetting Network in Import Account screen | ✅ done |
+| — | [#76](https://github.com/Koniverse/SubWallet-Extension/issues/76) | Incorrect Network display in Import Account screen | ✅ done |
+| — | [#89](https://github.com/Koniverse/SubWallet-Extension/issues/89) | Auto Import account from Polkadot js wallet to SubWallet | ⏸ deprecated |
+| — | [#484](https://github.com/Koniverse/SubWallet-Extension/issues/484) | Export seed phrase for Substrate Account | ✅ done |
+| — | [#495](https://github.com/Koniverse/SubWallet-Extension/issues/495) | Notification for important infomation | ✅ done |
+| — | [#511](https://github.com/Koniverse/SubWallet-Extension/issues/511) | Token information is overwritten when importing another token with the same name | ✅ done |
+| — | [#1142](https://github.com/Koniverse/SubWallet-Extension/issues/1142) | Support import Substrate account by private key | ⏸ deprecated |
+| — | [#3318](https://github.com/Koniverse/SubWallet-Extension/issues/3318) | [Bug] Import custom EVM Rpc | ⏸ deprecated |
+
+> **The import *screen* is shared with tokens, and the generator filed a token sub-cluster here.**
+> #266, #511, #1118, #1314, #1946, #2472 and #3636 are token / RPC imports that surface on the same
+> screen an account is imported from — they materialize no account FR and belong to
+> [EPIC-4](../epics/EPIC-4.md)'s territory, kept here because that is the screen whose history they
+> are. The account-import bugs proper are network-reset and validation: #75, #76, #120, #192.
+>
+> **"Import a Substrate account by private key" is filed twice.** #1142 was closed not-planned; the
+> same request reappears as #3213, still open in
+> [US-3.12](US-3.12-open-account-improvements.md) — a capability the wallet has been asked for twice
+> and shipped neither time.
+
 ## Cross-references
 
 - [PRD FR-14](../../PRD.md#functional-requirements), [PRD FR-15](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.1](US-3.1-create-a-new-wallet-via-seed-phrase.md)
+- [consolidation note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)

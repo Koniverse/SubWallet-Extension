@@ -113,8 +113,16 @@ _Retroactive story — capability already shipped (v1.1.10, issue #1798). Fill
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **21 issues** mentioning "seed phrase" / "private key", sitting in EPIC-23, EPIC-41. (The dApp ledger's one match, #358, was a false positive — an EVM auto-connect checkbox, not seed-input safety — and folded on 2026-07-24 without landing here.)
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
+> ledgers still separate** finds **5 issues** mentioning "seed phrase" / "private key", sitting in EPIC-41. (The dApp ledger's one match, #358, was a false positive — an EVM auto-connect checkbox, not seed-input safety — and folded on 2026-07-24 without landing here.)
+>
+> **The account ledger's sixteen were all import/export, not input safety.** When the account ledger
+> folded on 2026-07-24, its "seed phrase" / "private key" matches — #192, #208, #254, #484, #1142, #1207, #1395,
+> #1560, #3509 and six WebApp rows — were the *account import and export* capability
+> ([US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md),
+> [US-3.11](US-3.11-account-on-the-webapp-and-avail-space.md)), which *handle* seed/key material;
+> this story owns the *safety of the input field* (no clipboard leak, no shoulder-surf). A title scan
+> cannot tell "import a private key" from "protect the private-key field" — none landed here.
 > Treat that as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

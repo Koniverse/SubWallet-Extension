@@ -23,6 +23,11 @@ flow — generate a 12/24-word seed, set a master password, confirm the backup �
 so that they immediately hold addresses across all five ecosystems from a single
 seed only they control.
 
+## Status
+
+> **✅ done — shipped in 0.2.1.** All 4 acceptance criteria are ticked and the 7 rows below are
+> settled: 6 delivered, 1 closed without shipping.
+
 ## Background
 
 This is the top of the activation funnel and the first place the non-custodial
@@ -134,8 +139,31 @@ which is what [US-21.2](US-21.2-history-backfill.md) verifies these commits agai
 found the wrong lineage. `commit:` names what made the capability true
 ([CONTEXT D106](../../CONTEXT.md)).
 
+## Incremental work, fixes & chores
+
+**7 tracker issues** landed on wallet creation and the keyring beneath it — 3 with a release, 3
+delivered with no line naming them, 1 closed without shipping. Folded in from the former
+one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.4.1 | [#198](https://github.com/Koniverse/SubWallet-Extension/issues/198) | Option allow on all accepted website on create account screen | ✅ done |
+| 1.0.2 | [#904](https://github.com/Koniverse/SubWallet-Extension/issues/904) | Update keyring | ✅ done |
+| 1.1.18 | [#2039](https://github.com/Koniverse/SubWallet-Extension/issues/2039) | Update message on the Create one account | ✅ done |
+| — | [#55](https://github.com/Koniverse/SubWallet-Extension/issues/55) | Check the case export Seed in the Create Account screen on Firefox browser (popup form) | ✅ done |
+| — | [#433](https://github.com/Koniverse/SubWallet-Extension/issues/433) | Improve keyring for EVM | ✅ done |
+| — | [#957](https://github.com/Koniverse/SubWallet-Extension/issues/957) | Improve keyring for other network | ⏸ deprecated |
+| — | [#3697](https://github.com/Koniverse/SubWallet-Extension/issues/3697) | Review keyring package | ✅ done |
+
+> **Four of the seven rows are the keyring, not the create screen.** #433 (improve the keyring for
+> EVM), #957 (for other networks), #904 (update the keyring), #3697 (review the keyring package). The
+> background keyring (AD-04) is the foundation every account type derives from; widening it to a new
+> curve is what lets a whole ecosystem exist at all — so it generates more maintenance than the
+> create screen, which contributed only #55, #198 and #2039.
+
 ## Cross-references
 
 - [PRD FR-13](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md)
+- [consolidation note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)

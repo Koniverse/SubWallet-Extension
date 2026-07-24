@@ -23,6 +23,11 @@ private key, and can save and label the recipient addresses they send to most �
 so that they can track wallets they don't control and stop pasting raw addresses
 every time they transfer.
 
+## Status
+
+> **✅ done — shipped in 1.0.2.** All 4 acceptance criteria are ticked and the 4 rows below are
+> settled — all delivered.
+
 ## Background
 
 Both capabilities in this story are **keyless** — they store addresses, never
@@ -114,9 +119,27 @@ reconciliation.
 _Retroactive story — capability already shipped. Fill `commit`,
 `version_shipped` and any implementation caveats during version reconciliation._
 
+## Incremental work, fixes & chores
+
+**4 tracker issues** landed on watch-only accounts and the address book — all 4 with a release.
+Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.7.2 | [#757](https://github.com/Koniverse/SubWallet-Extension/issues/757) | Support ReadOnly account | ✅ done |
+| 0.7.7 | [#949](https://github.com/Koniverse/SubWallet-Extension/issues/949) | Update "readonly account" to "read-only account" | ✅ done |
+| 1.1.8 | [#1750](https://github.com/Koniverse/SubWallet-Extension/issues/1750) | Support account domain name | ✅ done |
+| 1.3.3 | [#3732](https://github.com/Koniverse/SubWallet-Extension/issues/3732) | Extension - Do not show watch-only account on History (All account mode) | ✅ done |
+
+> **The tidiest story in the epic — a read-only account has no key to leak and no signing to break.**
+> #757 is the feature itself; #949 is a copy-edit (*"readonly"* → *"read-only"*); #1750 adds account
+> domain names; #3732 keeps watch-only accounts out of the All-accounts history. Four rows, no defect
+> in the security-relevant path.
+
 ## Cross-references
 
 - [PRD FR-24](../../PRD.md#functional-requirements), [PRD FR-25](../../PRD.md#functional-requirements)
 - [Epic EPIC-3](../epics/EPIC-3.md)
 - [US-3.1](US-3.1-create-a-new-wallet-via-seed-phrase.md)
 - [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md)
+- [consolidation note](../../notes/2026-07-24.md#c-epic-23-maintenance--account-merged-into-epic-3)
