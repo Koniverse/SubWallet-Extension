@@ -122,8 +122,8 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
-> ledgers still separate** finds **18 issues** mentioning "unlock" / "lock", sitting in EPIC-24, EPIC-32, EPIC-41.
+> **This capability's history is not empty — it is not yet folded.** A title scan of the **2
+> ledgers still separate** finds **17 issues** mentioning "unlock" / "lock", sitting in EPIC-32, EPIC-41.
 >
 > **The transactions ledger held none of them.** It folded on 2026-07-24 with 200 issues and not one
 > title matched — a whole area of the tracker that never touches the lock state.
@@ -149,8 +149,10 @@ That ledger held only 13 issues and they were almost all phishing.
 > policy this story owns.
 >
 > The count fell 29 → 26 when the hardware ledger folded on 2026-07-23, then 26 → 23 when the UI
-> ledger folded the same day, then 23 → 18 when the account ledger folded on 2026-07-24 — and **not one
-> of those eleven issues landed here**.
+> ledger folded the same day, then 23 → 18 when the account ledger folded on 2026-07-24, then 18 → 17
+> when the network & token ledger folded the same day — its one *"lock"* title, #2185 (*"pooled assets
+> are not included in locked balance"*), is a balance bug, not screen-lock. **Not one of those twelve
+> issues landed here.**
 > Treat the remainder as an **upper bound, not a count**: routing there is a title heuristic
 > ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
 > so some will belong elsewhere once read. Which of them land here is decided when those ledgers

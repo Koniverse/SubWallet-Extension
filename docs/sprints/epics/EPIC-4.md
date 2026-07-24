@@ -197,10 +197,41 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.18](../stories/US-4.18-chain-abstraction-sdk.md) | Chain-abstraction SDK (developer-facing) | Package multi-chain logic as a service for external dApp teams | 📋 backlog | — |
 | [US-4.19](../stories/US-4.19-account-abstraction-standards.md) | Account-abstraction standards (4337/7702/7683) | ERC-4337 / EIP-7702 / EIP-7683 account-abstraction & intents | 📋 backlog | — |
 | [US-4.20](../stories/US-4.20-ai-defai-features.md) | AI / DeFAI features | AI agent + AI-assisted swap/earn/transfer with chain-abstraction UX | 📋 backlog | — |
-| [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration hardening | Keep chains/assets visible and endpoints correct through the Asset Hub migration | 📋 backlog | — |
-| [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC & endpoint-management hardening | Accurate connectivity, endpoint fallback/retry, custom-RPC validation (#4216) | 📋 backlog | — |
-| [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin-API path hardening | Bitcoin indexer timeouts/retries/provider-drift behind the backend proxy | 📋 backlog | — |
+| [US-4.21](../stories/US-4.21-asset-hub-migration-hardening.md) | Asset Hub migration hardening | Keep chains/assets visible and endpoints correct through the Asset Hub migration | 👀 review | — |
+| [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC & endpoint-management hardening | Accurate connectivity, endpoint fallback/retry, custom-RPC validation (#4216) | 👀 review | — |
+| [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin-API path hardening | Bitcoin indexer timeouts/retries/provider-drift behind the backend proxy | 👀 review | — |
 | [US-4.24](../stories/US-4.24-remove-polygon-zkevm.md) | Remove Polygon zkEVM | Remove Polygon zkEVM network support and update chainlist/domain config | ✅ done | 1.3.82 |
+| [US-4.25](../stories/US-4.25-open-network-and-token-improvements.md) | Open network & token improvements | The open network/token work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-4.26](../stories/US-4.26-network-and-token-screens-in-the-1-0-2-rewrite.md) | Network & token screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — Settings/Networks, token list, logos | ✅ done | 1.0.2 |
+| [US-4.27](../stories/US-4.27-network-and-token-on-the-webapp-and-avail-space.md) | Network & token on the WebApp & Avail Space | Manage networks / tokens on the non-extension surfaces | ✅ done | 1.2.14 |
+
+> **US-4.25 … US-4.27 carry no FR**, and neither do the hardening stories US-4.21 … US-4.23. They hold
+> the incremental work, fixes and chores that landed on this epic's capabilities — **341 tracker
+> issues** folded in from the former one-issue-per-story maintenance ledger on 2026-07-24
+> ([note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)): 274
+> onto the capability stories US-4.1 … US-4.12, 2 onto the RPC-hardening anchor US-4.22, 60 into the
+> three new stories (9 rewrite, 20 WebApp, 31 open), 2 sent cross-epic to
+> [US-13.14](../stories/US-13.14-xcm-fee-dry-run-and-validation.md) (ParaSpell / XCM routing), and the
+> remaining 3 are umbrellas below that own no row. The FR map above is unchanged; the requirement set
+> is still 21 FRs (FR-31 … FR-51) across the FR-bearing stories US-4.1 … US-4.20.
+
+## Umbrella issues owned by this epic
+
+Three tracker issues here have children and no CHANGELOG line of their own. They are **the epic's**,
+not any story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would
+double-count the work its children already carry.
+
+| Issue | Title | Children | Where the children are |
+|---|---|---|---|
+| [#4187](https://github.com/Koniverse/SubWallet-Extension/issues/4187) | Asset Hub Migration | 17 (6 in this ledger) | the 6 in-ledger children (#3714, #3710, #4522, #4170, #4790, #4354) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md), beside the rest of the migration |
+| [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | Update chain-list stable v0.2.124 | 6 (1 in this ledger) | the one in-ledger child (#301) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) |
+| [#4567](https://github.com/Koniverse/SubWallet-Extension/issues/4567) | Improve "Filter To token based on From token" (Round 2) | 1 (0 in this ledger) | its only child (#98) is out of this area; the Round-1 delivery #4468 keeps its own row in [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) |
+
+> **The chain-list release train has both shapes.** #4861 … #4730 (*"Update chain-list stable
+> v0.2.118 … v0.2.123"*) each shipped a CHANGELOG line and keep their rows in
+> [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md); only #4935 (v0.2.124) has
+> no line yet and is the umbrella. The distinction is the line, not the children — the same rule that
+> keeps #4606 (*"ParaSpell V4"*) a row rather than an umbrella even though it, too, has sub-issues.
 
 ## Object map & user-story interactions
 

@@ -22,6 +22,11 @@ A user can use Ethereum mainnet, the major L2s, and EVM-compatible parachains
 from the same wallet — balances, accounts and transactions — so EVM is a
 first-class ecosystem alongside Substrate.
 
+## Status
+
+> **✅ done — shipped in 0.3.1.** All acceptance criteria are ticked and the 9 rows below are
+> settled — all delivered.
+
 ## Background
 
 EVM is the second core ecosystem. Each EVM chain (Ethereum mainnet, Base,
@@ -106,6 +111,27 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `0c2496445d, d25d55138f, 8c243ea1be` verified contained in the v0.3.1 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**9 tracker issues** landed on EVM network support — 6 with a release, 3 delivered with no line naming them. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.3.3 | [#136](https://github.com/Koniverse/SubWallet-Extension/issues/136) | Intergate Shiden - EVM networks for get balance and ERC20 tokens | ✅ done |
+| 0.3.6 | [#201](https://github.com/Koniverse/SubWallet-Extension/issues/201) | Support ERC20 tokens for Moonfit on Moonbase.... | ✅ done |
+| 0.4.2 | [#186](https://github.com/Koniverse/SubWallet-Extension/issues/186) | Add Astar EVM tokens | ✅ done |
+| 0.5.2 | [#405](https://github.com/Koniverse/SubWallet-Extension/issues/405) | Add networks Pangolin EVM and Crab EVM | ✅ done |
+| 0.5.3 | [#490](https://github.com/Koniverse/SubWallet-Extension/issues/490) | Bug adding default EVM token after deleting it | ✅ done |
+| 1.3.29 | [#4022](https://github.com/Koniverse/SubWallet-Extension/issues/4022) | Extension - Re-check validating recipient balance when sending local token for EVM | ✅ done |
+| — | [#21](https://github.com/Koniverse/SubWallet-Extension/issues/21) | Integration EVM assets: $GLMR, $MOVR, $DEV | ✅ done |
+| — | [#176](https://github.com/Koniverse/SubWallet-Extension/issues/176) | Add some Moonbeam EVM Assets: | ✅ done |
+| — | [#787](https://github.com/Koniverse/SubWallet-Extension/issues/787) | Support more EVM Networks | ✅ done |
+
+> **EVM support is compatibility work, not new chains.** The rows are about being treated like
+> MetaMask by EVM dApps and tooling — `isEthereum` flags, chain-id handling, EVM parachain quirks —
+> the API-object side of the same compatibility the dApp epic earns from the connector side.
+
 ## Cross-references
 
 - [PRD FR-36](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.1](US-4.1-add-remove-networks-and-custom-rpc.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

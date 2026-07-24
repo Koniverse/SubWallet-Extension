@@ -159,173 +159,173 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#1658](https://github.com/Koniverse/SubWallet-Extension/issues/1658) | Support new language: Russia (#1658) | 1.1.11 | 2023-09-09 | US-19.2 |
 | [#1731](https://github.com/Koniverse/SubWallet-Extension/issues/1731) | Fixed bug Still show history of the removed account (#1731) | 1.1.6 | 2023-08-04 | US-3.4 |
 | [#1750](https://github.com/Koniverse/SubWallet-Extension/issues/1750) | Integrate Azero domain (#1750) | 1.1.8 | 2023-08-12 | US-3.6 |
-| [#909](https://github.com/Koniverse/SubWallet-Extension/issues/909) | Add the missing networks in Kusama & Parachain group (#909) | 0.7.6 | 2022-12-17 | US-24.100 |
-| [#910](https://github.com/Koniverse/SubWallet-Extension/issues/910) | Add the missing networks in Live Networks group (#910) | 0.7.6 | 2022-12-17 | US-24.101 |
-| [#928](https://github.com/Koniverse/SubWallet-Extension/issues/928) | Integrate $TFA token into SubWallet(#928) | 0.7.6 | 2022-12-17 | US-24.103 |
-| [#936](https://github.com/Koniverse/SubWallet-Extension/issues/936) | Update default endpoint for Basilisk, HydraDX (#936) | 0.7.6 | 2022-12-17 | US-24.104 |
-| [#951](https://github.com/Koniverse/SubWallet-Extension/issues/951) | Update APR for Turing Network (#951) | 0.7.7 | 2022-12-28 | US-24.107 |
-| [#977](https://github.com/Koniverse/SubWallet-Extension/issues/977) | Update networks endpoint (#977) | 0.7.8 | 2023-01-19 | US-24.108 |
-| [#1032](https://github.com/Koniverse/SubWallet-Extension/issues/1032) | Update Token's logo of the Equilibrium (#1032) | 0.8.2 | 2023-03-15 | US-24.112 |
-| [#1086](https://github.com/Koniverse/SubWallet-Extension/issues/1086) | Temporarily hide Kintsugi in the Origin Chain list (#1086) | 0.8.2 | 2023-03-15 | US-24.114 |
-| [#1098](https://github.com/Koniverse/SubWallet-Extension/issues/1098) | Equilibrium logo update (#1098) | 0.8.3 | 2023-03-29 | US-24.115 |
-| [#1273](https://github.com/Koniverse/SubWallet-Extension/issues/1273) | Update get chain, assets logo direct from @subwallet/chain-list package (#1273) | 1.0.3 | 2023-05-06 | US-24.132 |
-| [#1348](https://github.com/Koniverse/SubWallet-Extension/issues/1348) | Update URL explorer for Subspace networks (#1348) | 1.0.5 | 2023-05-21 | US-24.139 |
-| [#117](https://github.com/Koniverse/SubWallet-Extension/issues/117) | Update stable coin tokens and others in some networks (issue #117,#170) | 0.3.4 | 2022-04-16 | US-24.14 |
-| [#170](https://github.com/Koniverse/SubWallet-Extension/issues/170) | Update stable coin tokens and others in some networks (issue #117,#170) | 0.3.4 | 2022-04-16 | US-24.14 |
-| [#1355](https://github.com/Koniverse/SubWallet-Extension/issues/1355) | Fixed bug show the WND balance (#1355) | 1.0.5 | 2023-05-21 | US-24.140 |
-| [#1429](https://github.com/Koniverse/SubWallet-Extension/issues/1429) | Update APR for some chain (#1429) | 1.0.6 | 2023-05-26 | US-24.147 |
-| [#1444](https://github.com/Koniverse/SubWallet-Extension/issues/1444) | Support sort token by value (#1444) | 1.1.3 | 2023-07-21 | US-24.149 |
-| [#1511](https://github.com/Koniverse/SubWallet-Extension/issues/1511) | Fix bug detecting on-chain attributes for WASM NFTs (#1511) | 1.0.11 | 2023-06-24 | US-24.151 |
-| [#1519](https://github.com/Koniverse/SubWallet-Extension/issues/1519) | Update chain-list (#1519) | 1.0.9 | 2023-06-13 | US-24.152 |
-| [#1525](https://github.com/Koniverse/SubWallet-Extension/issues/1525) | Support viewing ZK tokens on Manta (#1525) | 1.1.1 | 2023-07-06 | US-24.153 |
-| [#1541](https://github.com/Koniverse/SubWallet-Extension/issues/1541) | Update `@subwallet/chain-list@0.2.1` (#1541): | 1.0.10 | 2023-06-17 | US-24.156 |
-| [#1620](https://github.com/Koniverse/SubWallet-Extension/issues/1620) | Update chainlist (#1620) | 1.1.2 | 2023-07-14 | US-24.158 |
-| [#1633](https://github.com/Koniverse/SubWallet-Extension/issues/1633) | Fixed bug does not synchronize the configuration of the network and the token (#1633) | 1.1.5 | 2023-07-29 | US-24.159 |
-| [#136](https://github.com/Koniverse/SubWallet-Extension/issues/136) | Support get Shiden balance and tokens (issue #136) | 0.3.3 | 2022-04-08 | US-24.16 |
-| [#1715](https://github.com/Koniverse/SubWallet-Extension/issues/1715) | Update chain list (#1715) | 1.1.6 | 2023-08-04 | US-24.161 |
-| [#1752](https://github.com/Koniverse/SubWallet-Extension/issues/1752) | Fixed bug showing Minimum active value on the network detail screen (#1752) | 1.1.8 | 2023-08-12 | US-24.164 |
-| [#1777](https://github.com/Koniverse/SubWallet-Extension/issues/1777) | Update chain list (#1777) | 1.1.8 | 2023-08-12 | US-24.165 |
-| [#1791](https://github.com/Koniverse/SubWallet-Extension/issues/1791) | Update the default logo (#1791) | 1.1.24 | 2023-12-01 | US-24.167 |
-| [#1821](https://github.com/Koniverse/SubWallet-Extension/issues/1821) | Update chain-list (#1821) | 1.1.9 | 2023-08-22 | US-24.171 |
-| [#1861](https://github.com/Koniverse/SubWallet-Extension/issues/1861) | Update chain list (#1861) | 1.1.11 | 2023-09-09 | US-24.174 |
-| [#1866](https://github.com/Koniverse/SubWallet-Extension/issues/1866) | Fixed bug The network address displayed is incorrect (#1866) | 1.1.11 | 2023-09-09 | US-24.175 |
-| [#1896](https://github.com/Koniverse/SubWallet-Extension/issues/1896) | Update chain list (#1896) | 1.1.12 | 2023-09-15 | US-24.176 |
-| [#1939](https://github.com/Koniverse/SubWallet-Extension/issues/1939) | Improve network and asset subscription (#1939) | 1.1.14 | 2023-09-26 | US-24.178 |
-| [#1947](https://github.com/Koniverse/SubWallet-Extension/issues/1947) | Update token’s logo retrieval mechanism (#1947) | 1.1.15 | 2023-09-30 | US-24.179 |
-| [#1982](https://github.com/Koniverse/SubWallet-Extension/issues/1982) | Add support for the sub0 2023 Biodiversity NFT Collection (#1982) | 1.1.16 | 2023-10-07 | US-24.180 |
-| [#1997](https://github.com/Koniverse/SubWallet-Extension/issues/1997) | Support show balance detail by account on All accounts mode (#1997) | 1.1.24 | 2023-12-01 | US-24.181 |
-| [#2019](https://github.com/Koniverse/SubWallet-Extension/issues/2019) | The default Vara network is enabled (#2019) | 1.1.17 | 2023-10-17 | US-24.183 |
-| [#2104](https://github.com/Koniverse/SubWallet-Extension/issues/2104) | Fixed UI bug when scrolling on the Token detail screen (#2104) | 1.1.20 | 2023-11-04 | US-24.184 |
-| [#2154](https://github.com/Koniverse/SubWallet-Extension/issues/2154) | Fixed bug Can’t get balance of the ENJ token (#2154) | 1.1.22 | 2023-11-15 | US-24.186 |
-| [#2158](https://github.com/Koniverse/SubWallet-Extension/issues/2158) | Fixed bug still show token of the inactive network (#2158) | 1.1.21 | 2023-11-08 | US-24.187 |
-| [#2198](https://github.com/Koniverse/SubWallet-Extension/issues/2198) | Update chain-list (#2198) | 1.1.23 | 2023-11-24 | US-24.189 |
-| [#174](https://github.com/Koniverse/SubWallet-Extension/issues/174) | Integrate Genshiro & Equilibrium (#174) | 0.4.2 | 2022-05-20 | US-24.19 |
-| [#2201](https://github.com/Koniverse/SubWallet-Extension/issues/2201) | Fixed UI bug show balance in the Token details screen (#2201) | 1.1.27 | 2023-12-20 | US-24.190 |
-| [#2293](https://github.com/Koniverse/SubWallet-Extension/issues/2293) | Update RPC for some chains (#2293) | 1.1.24 | 2023-12-01 | US-24.193 |
-| [#2287](https://github.com/Koniverse/SubWallet-Extension/issues/2287) | Add block explorer for Creditcoin (#2287) | 1.1.24 | 2023-12-01 | US-24.195 |
-| [#2302](https://github.com/Koniverse/SubWallet-Extension/issues/2302) | Update chain list (#2302) | 1.1.25 | 2023-12-07 | US-24.196 |
-| [#2329](https://github.com/Koniverse/SubWallet-Extension/issues/2329) | Update chain-list (#2329) | 1.1.26 | 2023-12-16 | US-24.197 |
-| [#2339](https://github.com/Koniverse/SubWallet-Extension/issues/2339) | Sort token by balance (#2339) | 1.3.29 | 2025-04-08 | US-24.198 |
-| [#2340](https://github.com/Koniverse/SubWallet-Extension/issues/2340) | Update token details screen (#2340) | 1.1.29 | 2023-12-29 | US-24.199 |
-| [#2368](https://github.com/Koniverse/SubWallet-Extension/issues/2368) | Update chain-list (#2368) | 1.1.27 | 2023-12-20 | US-24.200 |
-| [#2404](https://github.com/Koniverse/SubWallet-Extension/issues/2404) | Add support Polimec (#2404) | 1.1.28 | 2023-12-25 | US-24.202 |
-| [#2425](https://github.com/Koniverse/SubWallet-Extension/issues/2425) | Remove some RPC on Polkadot and Kusama (#2425) | 1.1.29 | 2023-12-29 | US-24.203 |
-| [#2452](https://github.com/Koniverse/SubWallet-Extension/issues/2452) | Fixed bug Show custom network on the token list when nominate (#2452) | 1.1.31 | 2024-01-11 | US-24.204 |
-| [#2509](https://github.com/Koniverse/SubWallet-Extension/issues/2509) | Fixed some UI bug (#2509) | 1.1.38 | 2024-02-17 | US-24.209 |
-| [#180](https://github.com/Koniverse/SubWallet-Extension/issues/180) | Fix some network in wrong group (issue #180) | 0.3.4 | 2022-04-16 | US-24.21 |
-| [#2540](https://github.com/Koniverse/SubWallet-Extension/issues/2540) | Fixed bug not showing GENS token from Genshiro (#2540) | 1.1.34 | 2024-02-01 | US-24.210 |
-| [#2550](https://github.com/Koniverse/SubWallet-Extension/issues/2550) | Optimize performance by separate chain status and chain state (#2550) | 1.1.41 | 2024-03-02 | US-24.211 |
-| [#2585](https://github.com/Koniverse/SubWallet-Extension/issues/2585) | Support NFT and Send token on Continuum network (#2585) | 1.1.41 | 2024-03-02 | US-24.213 |
-| [#2609](https://github.com/Koniverse/SubWallet-Extension/issues/2609) | Update IPFS domain for NFTs from Unique network (#2609) | 1.1.39 | 2024-02-24 | US-24.216 |
-| [#185](https://github.com/Koniverse/SubWallet-Extension/issues/185) | Integrate aUSD and USDT on Bifrost (#185) | 0.5.6 | 2022-08-24 | US-24.22 |
-| [#2771](https://github.com/Koniverse/SubWallet-Extension/issues/2771) | Update chain-list 0.2.45 (#2771) | 1.1.45 | 2024-03-20 | US-24.221 |
-| [#2791](https://github.com/Koniverse/SubWallet-Extension/issues/2791) | Fixed bug Do not show balance in case standing on History list to search token (#2791) | 1.1.50 | 2024-03-28 | US-24.222 |
-| [#2799](https://github.com/Koniverse/SubWallet-Extension/issues/2799) | Fixed bug Error parsing token balance for frozen asset on Asset Hub (#2799) | 1.1.49 | 2024-03-26 | US-24.223 |
-| [#2805](https://github.com/Koniverse/SubWallet-Extension/issues/2805) | Update chain-list (#2805) | 1.1.50 | 2024-03-28 | US-24.225 |
-| [#2851](https://github.com/Koniverse/SubWallet-Extension/issues/2851) | Update chain-list (#2851) | 1.1.52 | 2024-04-05 | US-24.229 |
-| [#186](https://github.com/Koniverse/SubWallet-Extension/issues/186) | Add more Astar EVM tokens (#186) | 0.4.2 | 2022-05-20 | US-24.23 |
-| [#2885](https://github.com/Koniverse/SubWallet-Extension/issues/2885) | Fixed bug fetching balance with Enjin Relay Chain (#2885) | 1.1.53 | 2024-04-08 | US-24.230 |
-| [#2890](https://github.com/Koniverse/SubWallet-Extension/issues/2890) | Update chain-list (#2890) | 1.1.55 | 2024-04-14 | US-24.231 |
-| [#2934](https://github.com/Koniverse/SubWallet-Extension/issues/2934) | Support NFTs on Asset Hub (#2934) | 1.1.56 | 2024-04-19 | US-24.234 |
-| [#2947](https://github.com/Koniverse/SubWallet-Extension/issues/2947) | Update chain-list (#2947) | 1.1.58 | 2024-04-24 | US-24.235 |
-| [#2966](https://github.com/Koniverse/SubWallet-Extension/issues/2966) | Add support Mythos chain (#2966) | 1.1.60 | 2024-04-29 | US-24.237 |
-| [#3037](https://github.com/Koniverse/SubWallet-Extension/issues/3037) | Fixed bug Network's status show incorrect (#3037) | 1.1.63 | 2024-05-09 | US-24.240 |
-| [#3053](https://github.com/Koniverse/SubWallet-Extension/issues/3053) | Add the "View on explorer" button on the Token details screen (#3053) | 1.2.4 | 2024-06-08 | US-24.241 |
-| [#3075](https://github.com/Koniverse/SubWallet-Extension/issues/3075) | Remove the logic that differentiates between Native tokens and Local tokens in case show sub-logo (#3075) | 1.2.2 | 2024-05-30 | US-24.242 |
-| [#3084](https://github.com/Koniverse/SubWallet-Extension/issues/3084) | Fix bug integrating chain online (#3084) | 1.1.67 | 2024-05-22 | US-24.243 |
-| [#3101](https://github.com/Koniverse/SubWallet-Extension/issues/3101) | Fix bug missing custom tokens on applying online patch (#3101) | 1.1.68 | 2024-05-25 | US-24.246 |
-| [#193](https://github.com/Koniverse/SubWallet-Extension/issues/193) | Update logo of $CHRWNA, $CHAO (#193,#195) | 0.4.1 | 2022-05-11 | US-24.25 |
-| [#195](https://github.com/Koniverse/SubWallet-Extension/issues/195) | Update logo of $CHRWNA, $CHAO (#193,#195) | 0.4.1 | 2022-05-11 | US-24.25 |
-| [#3268](https://github.com/Koniverse/SubWallet-Extension/issues/3268) | Change token type from GRC-20 to VFT (#3268) | 1.2.13 | 2024-07-05 | US-24.250 |
-| [#3270](https://github.com/Koniverse/SubWallet-Extension/issues/3270) | Update Vara token sdk version (#3270) | 1.2.16 | 2024-07-19 | US-24.251 |
-| [#3305](https://github.com/Koniverse/SubWallet-Extension/issues/3305) | Move step shorten metadata and calculate metadataHash to client (#3305) | 1.2.16 | 2024-07-19 | US-24.255 |
-| [#201](https://github.com/Koniverse/SubWallet-Extension/issues/201) | Support ERC20 tokens of Moonfit on Moonbase (#201) | 0.3.6 | 2022-04-22 | US-24.26 |
-| [#3612](https://github.com/Koniverse/SubWallet-Extension/issues/3612) | Fix bug not showing balance of VFT tokens (#3612) | 1.2.30 | 2024-09-20 | US-24.263 |
-| [#3710](https://github.com/Koniverse/SubWallet-Extension/issues/3710) | Support Asset Hub migration (#3710) | 1.3.46 | 2025-07-04 | US-24.265 |
-| [#3713](https://github.com/Koniverse/SubWallet-Extension/issues/3713) | Fixed bug validating recipient balance when sending Substrate token (#3713) | 1.3.9 | 2024-12-09 | US-24.266 |
-| [#3718](https://github.com/Koniverse/SubWallet-Extension/issues/3718) | Add infobox about Wallet version for TON token (#3718) | 1.3.2 | 2024-10-12 | US-24.268 |
-| [#203](https://github.com/Koniverse/SubWallet-Extension/issues/203) | Update Centrifuge Parachain info (#203) | 0.4.1 | 2022-05-11 | US-24.27 |
-| [#3747](https://github.com/Koniverse/SubWallet-Extension/issues/3747) | Update Network details screen for TON (#3747) | 1.3.3 | 2024-10-16 | US-24.271 |
-| [#3756](https://github.com/Koniverse/SubWallet-Extension/issues/3756) | Improve UI related to Select token screen (#3756) | 1.3.2 | 2024-10-12 | US-24.272 |
-| [#3786](https://github.com/Koniverse/SubWallet-Extension/issues/3786) | Fixed bug Can't reset data when search on select token popup (#3786) | 1.3.24 | 2025-03-18 | US-24.273 |
-| [#3816](https://github.com/Koniverse/SubWallet-Extension/issues/3816) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-24.274 |
-| [#3924](https://github.com/Koniverse/SubWallet-Extension/issues/3924) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-24.274 |
-| [#3925](https://github.com/Koniverse/SubWallet-Extension/issues/3925) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-24.274 |
-| [#3942](https://github.com/Koniverse/SubWallet-Extension/issues/3942) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-24.274 |
-| [#3864](https://github.com/Koniverse/SubWallet-Extension/issues/3864) | Unified address format integration (#3864) | 1.3.23 | 2025-03-05 | US-24.276 |
-| [#3920](https://github.com/Koniverse/SubWallet-Extension/issues/3920) | Show well-known tokens on top (#3920) | 1.3.17 | 2025-02-18 | US-24.281 |
-| [#3958](https://github.com/Koniverse/SubWallet-Extension/issues/3958) | Re-enable search token feature (#3958) | 1.3.13 | 2025-01-21 | US-24.283 |
-| [#3960](https://github.com/Koniverse/SubWallet-Extension/issues/3960) | Improve token enabling (#3960) | 1.3.31 | 2025-04-18 | US-24.284 |
-| [#4013](https://github.com/Koniverse/SubWallet-Extension/issues/4013) | Update for patch chain (#4013) | 1.3.54 | 2025-08-21 | US-24.286 |
-| [#4037](https://github.com/Koniverse/SubWallet-Extension/issues/4037) | Auto update metadata for substrate chain (#4037) | 1.3.24 | 2025-03-18 | US-24.288 |
-| [#4081](https://github.com/Koniverse/SubWallet-Extension/issues/4081) | Show value of derivative token relative to the origin tokens (#4081) | 1.3.28 | 2025-04-02 | US-24.289 |
-| [#4085](https://github.com/Koniverse/SubWallet-Extension/issues/4085) | Integrate Meld All in One Wizard (#4085) | 1.3.25 | 2025-03-24 | US-24.290 |
-| [#4086](https://github.com/Koniverse/SubWallet-Extension/issues/4086) | Fixed bug integrating Wagmi into SubWallet (#4086) | 1.3.25 | 2025-03-24 | US-24.291 |
-| [#4150](https://github.com/Koniverse/SubWallet-Extension/issues/4150) | Display dTAO balance like another token (#4150) | 1.3.28 | 2025-04-02 | US-24.294 |
-| [#4151](https://github.com/Koniverse/SubWallet-Extension/issues/4151) | Add dTAO token (#4151) | 1.3.28 | 2025-04-02 | US-24.295 |
-| [#4198](https://github.com/Koniverse/SubWallet-Extension/issues/4198) | Update for Meld on-ramp (#4198) | 1.3.29 | 2025-04-08 | US-24.298 |
-| [#4241](https://github.com/Koniverse/SubWallet-Extension/issues/4241) | Fixed bug Wrong Price Impact When Swapping on PAH (#4241) | 1.3.40 | 2025-05-30 | US-24.299 |
-| [#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247) | Improve token enabling (Round 2) (#4247) | 1.3.71 | 2025-12-29 | US-24.300 |
-| [#4297](https://github.com/Koniverse/SubWallet-Extension/issues/4297) | Review address/chain/token handling for Bitcoin support (#4297) | 1.3.42 | 2025-06-23 | US-24.302 |
-| [#4316](https://github.com/Koniverse/SubWallet-Extension/issues/4316) | Improve UI after Bitcoin integration (#4316) | 1.3.42 | 2025-06-23 | US-24.304 |
-| [#4412](https://github.com/Koniverse/SubWallet-Extension/issues/4412) | Fixed some UI bugs after Bitcoin integration (#4412, #4425) | 1.3.42 | 2025-06-23 | US-24.308 |
-| [#4425](https://github.com/Koniverse/SubWallet-Extension/issues/4425) | Fixed some UI bugs after Bitcoin integration (#4412, #4425) | 1.3.42 | 2025-06-23 | US-24.308 |
-| [#4413](https://github.com/Koniverse/SubWallet-Extension/issues/4413) | Fixed bug show Moonbeam local token balance (#4413) | 1.3.41 | 2025-06-11 | US-24.309 |
-| [#301](https://github.com/Koniverse/SubWallet-Extension/issues/301) | Integrate SubSpace Token (#301) | 0.4.3 | 2022-05-31 | US-24.31 |
-| [#4468](https://github.com/Koniverse/SubWallet-Extension/issues/4468) | Filter "To token" Based on Selected "From token" - Round 1 (#4468) | 1.3.49 | 2025-07-28 | US-24.311 |
-| [#4475](https://github.com/Koniverse/SubWallet-Extension/issues/4475) | Turn off default enabled tokens (#4475) | 1.3.48 | 2025-07-21 | US-24.312 |
-| [#4481](https://github.com/Koniverse/SubWallet-Extension/issues/4481) | Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481) | 1.3.47 | 2025-07-11 | US-24.313 |
-| [#4522](https://github.com/Koniverse/SubWallet-Extension/issues/4522) | Fixed bug Cannot withdraw on Westend Asset Hub (#4522) | 1.3.48 | 2025-07-21 | US-24.314 |
-| [#4525](https://github.com/Koniverse/SubWallet-Extension/issues/4525) | Fixed bug auto-enable chain for popular tokens (#4525) | 1.3.48 | 2025-07-21 | US-24.315 |
-| [#4542](https://github.com/Koniverse/SubWallet-Extension/issues/4542) | Improve detect assets & optimize enabled tokens on EVM chains (#4542) | 1.3.65 | 2025-11-06 | US-24.316 |
-| [#4278](https://github.com/Koniverse/SubWallet-Extension/issues/4278) | Extension - Support display destination fee for transfer XCM (#4278) | 1.3.78 | 2026-05-14 | US-24.319 |
-| [#4606](https://github.com/Koniverse/SubWallet-Extension/issues/4606) | Migrate to ParaSpell V4 & Update asset metadata (#4606) | 1.3.55 | 2025-09-05 | US-24.319 |
-| [#4730](https://github.com/Koniverse/SubWallet-Extension/issues/4730) | Update chain-list stable v0.2.118 (#4730): | 1.3.62 | 2025-10-10 | US-24.324 |
-| [#4767](https://github.com/Koniverse/SubWallet-Extension/issues/4767) | Update chain-list stable v0.2.119 (#4767) | 1.3.63 | 2025-10-23 | US-24.327 |
-| [#4790](https://github.com/Koniverse/SubWallet-Extension/issues/4790) | Polkadot Asset Hub Migration (#4790) | 1.3.64 | 2025-10-31 | US-24.328 |
-| [#4797](https://github.com/Koniverse/SubWallet-Extension/issues/4797) | Update chain-list stable v0.2.120 (#4797): | 1.3.64 | 2025-10-31 | US-24.330 |
-| [#4812](https://github.com/Koniverse/SubWallet-Extension/issues/4812) | Update chain-list stable v0.2.121 (#4812): | 1.3.66 | 2025-11-07 | US-24.331 |
-| [#4819](https://github.com/Koniverse/SubWallet-Extension/issues/4819) | Some updates after Polkadot Asset Hub Migration (#4819) | 1.3.65 | 2025-11-06 | US-24.332 |
-| [#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827) | Update chain-list stable v0.2.122 (#4827) | 1.3.69 | 2025-12-08 | US-24.333 |
-| [#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861) | Update chain-list stable v0.2.123 (#4861) | 1.3.72 | 2026-01-14 | US-24.334 |
-| [#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892) | Display token name and subnet ID for subnet tokens \| Bittensor (#4892) | 1.3.76 | 2026-03-20 | US-24.336 |
-| [#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972) | Unable to turn network when no add correct API key (#4972) | 1.3.76 | 2026-03-20 | US-24.339 |
-| [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979) | Update ParaSpell API integration to v1 (#4979) | 1.3.79 | 2026-05-21 | US-24.340 |
-| [#311](https://github.com/Koniverse/SubWallet-Extension/issues/311) | Fix bug displaying incorrect balance & load incorrect view when update configure network (#311) | 0.5.3 | 2022-07-29 | US-24.36 |
-| [#314](https://github.com/Koniverse/SubWallet-Extension/issues/314) | Fix bug happens when user delete all custom tokens & predefined tokens (#314) | 0.4.4 | 2022-06-08 | US-24.37 |
-| [#331](https://github.com/Koniverse/SubWallet-Extension/issues/331) | Support Single-chain mode feature customize for Parachain & Solo chains (#331) | 0.6.2 | 2022-09-16 | US-24.38 |
-| [#387](https://github.com/Koniverse/SubWallet-Extension/issues/387) | Add new network, update endpoint: Tinkernet, Imbue, HydraDX,...(#387) | 0.4.9 | 2022-07-02 | US-24.42 |
-| [#408](https://github.com/Koniverse/SubWallet-Extension/issues/408) | Fix some errors related to Network Settings (#408) | 0.4.9 | 2022-07-02 | US-24.46 |
-| [#485](https://github.com/Koniverse/SubWallet-Extension/issues/485) | Integrate tokens for dapps on Moonbeam/Moonriver (#485) | 0.5.3 | 2022-07-29 | US-24.50 |
-| [#490](https://github.com/Koniverse/SubWallet-Extension/issues/490) | Fix bug adding default EVM token after deleting it (#490) | 0.5.3 | 2022-07-29 | US-24.51 |
-| [#499](https://github.com/Koniverse/SubWallet-Extension/issues/499) | Update logo & modal style (#499) | 0.5.3 | 2022-07-29 | US-24.52 |
-| [#524](https://github.com/Koniverse/SubWallet-Extension/issues/524) | Update the logo of xcINTR, xciBTC, xckBTC, xcCSM, xcSDN, xcKMA, xcLIT, xcCRAB, xcTEER#524 | 0.5.7 | 2022-09-06 | US-24.53 |
-| [#558](https://github.com/Koniverse/SubWallet-Extension/issues/558) | Add new networks to SubWallet (#558) | 0.5.6 | 2022-08-24 | US-24.55 |
-| [#588](https://github.com/Koniverse/SubWallet-Extension/issues/588) | Auto update metadata (#588) | 1.1.3 | 2023-07-21 | US-24.58 |
-| [#605](https://github.com/Koniverse/SubWallet-Extension/issues/605) | Integrate Gear testnet into SubWallet (#605) | 0.5.7 | 2022-09-06 | US-24.61 |
-| [#608](https://github.com/Koniverse/SubWallet-Extension/issues/608) | Add new networks (new parachain winners) (#608) | 0.6.4 | 2022-09-22 | US-24.62 |
-| [#625](https://github.com/Koniverse/SubWallet-Extension/issues/625) | Update Gear Staging Testnet logo (#625) | 0.6.1 | 2022-09-13 | US-24.65 |
-| [#626](https://github.com/Koniverse/SubWallet-Extension/issues/626) | Update ArthSwap logo (ARSW token on Astar-EVM) (#626) | 0.6.1 | 2022-09-13 | US-24.66 |
-| [#632](https://github.com/Koniverse/SubWallet-Extension/issues/632) | Update endpoint list for GM Chain (#632) | 0.6.1 | 2022-09-13 | US-24.67 |
-| [#646](https://github.com/Koniverse/SubWallet-Extension/issues/646) | Integrate Aventus Network (#646) | 0.8.4 | 2023-03-31 | US-24.70 |
-| [#651](https://github.com/Koniverse/SubWallet-Extension/issues/651) | Update subscan for Subspace 2a network (#651) | 0.6.4 | 2022-09-22 | US-24.71 |
-| [#669](https://github.com/Koniverse/SubWallet-Extension/issues/669) | Update Zeitgeist endpoints (#669) | 0.6.5 | 2022-09-24 | US-24.73 |
-| [#671](https://github.com/Koniverse/SubWallet-Extension/issues/671) | Update $ price for ZTG token (#671) | 0.6.6 | 2022-09-30 | US-24.74 |
-| [#685](https://github.com/Koniverse/SubWallet-Extension/issues/685) | Update Acala endpoints (#685) | 0.6.6 | 2022-09-30 | US-24.75 |
-| [#697](https://github.com/Koniverse/SubWallet-Extension/issues/697) | Update provider URL for some chains (#697) | 0.6.7 | 2022-10-22 | US-24.76 |
-| [#714](https://github.com/Koniverse/SubWallet-Extension/issues/714) | An error occurs when a user deletes tokens in case the tokens to be deleted have the same address contract (#714) | 0.6.7 | 2022-10-22 | US-24.78 |
-| [#730](https://github.com/Koniverse/SubWallet-Extension/issues/730) | Support Boba Networks (#730) | 0.6.9 | 2022-11-04 | US-24.80 |
-| [#734](https://github.com/Koniverse/SubWallet-Extension/issues/734) | Support Snow Parachain (#734) | 0.6.7 | 2022-10-22 | US-24.81 |
-| [#742](https://github.com/Koniverse/SubWallet-Extension/issues/742) | Support sending PSP tokens (#742) | 0.6.8 | 2022-10-31 | US-24.82 |
-| [#760](https://github.com/Koniverse/SubWallet-Extension/issues/760) | Add top token on ETH and BSC (#760) | 0.6.9 | 2022-11-04 | US-24.83 |
-| [#773](https://github.com/Koniverse/SubWallet-Extension/issues/773) | Support sending BIT token for Bit.Country Alpha Net (#773) | 0.6.9 | 2022-11-04 | US-24.84 |
-| [#775](https://github.com/Koniverse/SubWallet-Extension/issues/775) | Update Amplitude endpoint (#775) | 0.6.9 | 2022-11-04 | US-24.85 |
-| [#788](https://github.com/Koniverse/SubWallet-Extension/issues/788) | Add support for the Octopus Network ecosystem (#788) | 0.7.5 | 2022-12-15 | US-24.87 |
-| [#789](https://github.com/Koniverse/SubWallet-Extension/issues/789) | Bug automatically redirects to the Ethereum network when requesting permission (#789) | 0.7.3 | 2022-11-25 | US-24.88 |
-| [#816](https://github.com/Koniverse/SubWallet-Extension/issues/816) | Update BIT token logo (#816) | 0.7.2 | 2022-11-19 | US-24.90 |
-| [#854](https://github.com/Koniverse/SubWallet-Extension/issues/854) | Integrate Watr Protocol and Token (#854) | 0.7.4 | 2022-12-04 | US-24.93 |
-| [#873](https://github.com/Koniverse/SubWallet-Extension/issues/873) | Integrate xx.network - a L1 Substrate-based network (#873) | 0.7.4 | 2022-12-04 | US-24.96 |
-| [#908](https://github.com/Koniverse/SubWallet-Extension/issues/908) | Add the missing networks in Polkadot & Parachain group (#908) | 0.7.6 | 2022-12-17 | US-24.99 |
+| [#909](https://github.com/Koniverse/SubWallet-Extension/issues/909) | Add the missing networks in Kusama & Parachain group (#909) | 0.7.6 | 2022-12-17 | US-4.4 |
+| [#910](https://github.com/Koniverse/SubWallet-Extension/issues/910) | Add the missing networks in Live Networks group (#910) | 0.7.6 | 2022-12-17 | US-4.1 |
+| [#928](https://github.com/Koniverse/SubWallet-Extension/issues/928) | Integrate $TFA token into SubWallet(#928) | 0.7.6 | 2022-12-17 | US-4.12 |
+| [#936](https://github.com/Koniverse/SubWallet-Extension/issues/936) | Update default endpoint for Basilisk, HydraDX (#936) | 0.7.6 | 2022-12-17 | US-4.1 |
+| [#951](https://github.com/Koniverse/SubWallet-Extension/issues/951) | Update APR for Turing Network (#951) | 0.7.7 | 2022-12-28 | US-4.1 |
+| [#977](https://github.com/Koniverse/SubWallet-Extension/issues/977) | Update networks endpoint (#977) | 0.7.8 | 2023-01-19 | US-4.1 |
+| [#1032](https://github.com/Koniverse/SubWallet-Extension/issues/1032) | Update Token's logo of the Equilibrium (#1032) | 0.8.2 | 2023-03-15 | US-4.3 |
+| [#1086](https://github.com/Koniverse/SubWallet-Extension/issues/1086) | Temporarily hide Kintsugi in the Origin Chain list (#1086) | 0.8.2 | 2023-03-15 | US-4.3 |
+| [#1098](https://github.com/Koniverse/SubWallet-Extension/issues/1098) | Equilibrium logo update (#1098) | 0.8.3 | 2023-03-29 | US-4.3 |
+| [#1273](https://github.com/Koniverse/SubWallet-Extension/issues/1273) | Update get chain, assets logo direct from @subwallet/chain-list package (#1273) | 1.0.3 | 2023-05-06 | US-4.3 |
+| [#1348](https://github.com/Koniverse/SubWallet-Extension/issues/1348) | Update URL explorer for Subspace networks (#1348) | 1.0.5 | 2023-05-21 | US-4.1 |
+| [#117](https://github.com/Koniverse/SubWallet-Extension/issues/117) | Update stable coin tokens and others in some networks (issue #117,#170) | 0.3.4 | 2022-04-16 | US-4.12 |
+| [#170](https://github.com/Koniverse/SubWallet-Extension/issues/170) | Update stable coin tokens and others in some networks (issue #117,#170) | 0.3.4 | 2022-04-16 | US-4.12 |
+| [#1355](https://github.com/Koniverse/SubWallet-Extension/issues/1355) | Fixed bug show the WND balance (#1355) | 1.0.5 | 2023-05-21 | US-4.12 |
+| [#1429](https://github.com/Koniverse/SubWallet-Extension/issues/1429) | Update APR for some chain (#1429) | 1.0.6 | 2023-05-26 | US-4.1 |
+| [#1444](https://github.com/Koniverse/SubWallet-Extension/issues/1444) | Support sort token by value (#1444) | 1.1.3 | 2023-07-21 | US-4.12 |
+| [#1511](https://github.com/Koniverse/SubWallet-Extension/issues/1511) | Fix bug detecting on-chain attributes for WASM NFTs (#1511) | 1.0.11 | 2023-06-24 | US-4.1 |
+| [#1519](https://github.com/Koniverse/SubWallet-Extension/issues/1519) | Update chain-list (#1519) | 1.0.9 | 2023-06-13 | US-4.3 |
+| [#1525](https://github.com/Koniverse/SubWallet-Extension/issues/1525) | Support viewing ZK tokens on Manta (#1525) | 1.1.1 | 2023-07-06 | US-4.12 |
+| [#1541](https://github.com/Koniverse/SubWallet-Extension/issues/1541) | Update `@subwallet/chain-list@0.2.1` (#1541): | 1.0.10 | 2023-06-17 | US-4.3 |
+| [#1620](https://github.com/Koniverse/SubWallet-Extension/issues/1620) | Update chainlist (#1620) | 1.1.2 | 2023-07-14 | US-4.3 |
+| [#1633](https://github.com/Koniverse/SubWallet-Extension/issues/1633) | Fixed bug does not synchronize the configuration of the network and the token (#1633) | 1.1.5 | 2023-07-29 | US-4.1 |
+| [#136](https://github.com/Koniverse/SubWallet-Extension/issues/136) | Support get Shiden balance and tokens (issue #136) | 0.3.3 | 2022-04-08 | US-4.5 |
+| [#1715](https://github.com/Koniverse/SubWallet-Extension/issues/1715) | Update chain list (#1715) | 1.1.6 | 2023-08-04 | US-4.3 |
+| [#1752](https://github.com/Koniverse/SubWallet-Extension/issues/1752) | Fixed bug showing Minimum active value on the network detail screen (#1752) | 1.1.8 | 2023-08-12 | US-4.1 |
+| [#1777](https://github.com/Koniverse/SubWallet-Extension/issues/1777) | Update chain list (#1777) | 1.1.8 | 2023-08-12 | US-4.3 |
+| [#1791](https://github.com/Koniverse/SubWallet-Extension/issues/1791) | Update the default logo (#1791) | 1.1.24 | 2023-12-01 | US-4.27 |
+| [#1821](https://github.com/Koniverse/SubWallet-Extension/issues/1821) | Update chain-list (#1821) | 1.1.9 | 2023-08-22 | US-4.3 |
+| [#1861](https://github.com/Koniverse/SubWallet-Extension/issues/1861) | Update chain list (#1861) | 1.1.11 | 2023-09-09 | US-4.3 |
+| [#1866](https://github.com/Koniverse/SubWallet-Extension/issues/1866) | Fixed bug The network address displayed is incorrect (#1866) | 1.1.11 | 2023-09-09 | US-4.1 |
+| [#1896](https://github.com/Koniverse/SubWallet-Extension/issues/1896) | Update chain list (#1896) | 1.1.12 | 2023-09-15 | US-4.3 |
+| [#1939](https://github.com/Koniverse/SubWallet-Extension/issues/1939) | Improve network and asset subscription (#1939) | 1.1.14 | 2023-09-26 | US-4.1 |
+| [#1947](https://github.com/Koniverse/SubWallet-Extension/issues/1947) | Update token’s logo retrieval mechanism (#1947) | 1.1.15 | 2023-09-30 | US-4.3 |
+| [#1982](https://github.com/Koniverse/SubWallet-Extension/issues/1982) | Add support for the sub0 2023 Biodiversity NFT Collection (#1982) | 1.1.16 | 2023-10-07 | US-4.3 |
+| [#1997](https://github.com/Koniverse/SubWallet-Extension/issues/1997) | Support show balance detail by account on All accounts mode (#1997) | 1.1.24 | 2023-12-01 | US-4.12 |
+| [#2019](https://github.com/Koniverse/SubWallet-Extension/issues/2019) | The default Vara network is enabled (#2019) | 1.1.17 | 2023-10-17 | US-4.1 |
+| [#2104](https://github.com/Koniverse/SubWallet-Extension/issues/2104) | Fixed UI bug when scrolling on the Token detail screen (#2104) | 1.1.20 | 2023-11-04 | US-4.12 |
+| [#2154](https://github.com/Koniverse/SubWallet-Extension/issues/2154) | Fixed bug Can’t get balance of the ENJ token (#2154) | 1.1.22 | 2023-11-15 | US-4.12 |
+| [#2158](https://github.com/Koniverse/SubWallet-Extension/issues/2158) | Fixed bug still show token of the inactive network (#2158) | 1.1.21 | 2023-11-08 | US-4.1 |
+| [#2198](https://github.com/Koniverse/SubWallet-Extension/issues/2198) | Update chain-list (#2198) | 1.1.23 | 2023-11-24 | US-4.3 |
+| [#174](https://github.com/Koniverse/SubWallet-Extension/issues/174) | Integrate Genshiro & Equilibrium (#174) | 0.4.2 | 2022-05-20 | US-4.4 |
+| [#2201](https://github.com/Koniverse/SubWallet-Extension/issues/2201) | Fixed UI bug show balance in the Token details screen (#2201) | 1.1.27 | 2023-12-20 | US-4.12 |
+| [#2293](https://github.com/Koniverse/SubWallet-Extension/issues/2293) | Update RPC for some chains (#2293) | 1.1.24 | 2023-12-01 | US-4.1 |
+| [#2287](https://github.com/Koniverse/SubWallet-Extension/issues/2287) | Add block explorer for Creditcoin (#2287) | 1.1.24 | 2023-12-01 | US-4.3 |
+| [#2302](https://github.com/Koniverse/SubWallet-Extension/issues/2302) | Update chain list (#2302) | 1.1.25 | 2023-12-07 | US-4.3 |
+| [#2329](https://github.com/Koniverse/SubWallet-Extension/issues/2329) | Update chain-list (#2329) | 1.1.26 | 2023-12-16 | US-4.3 |
+| [#2339](https://github.com/Koniverse/SubWallet-Extension/issues/2339) | Sort token by balance (#2339) | 1.3.29 | 2025-04-08 | US-4.12 |
+| [#2340](https://github.com/Koniverse/SubWallet-Extension/issues/2340) | Update token details screen (#2340) | 1.1.29 | 2023-12-29 | US-4.27 |
+| [#2368](https://github.com/Koniverse/SubWallet-Extension/issues/2368) | Update chain-list (#2368) | 1.1.27 | 2023-12-20 | US-4.3 |
+| [#2404](https://github.com/Koniverse/SubWallet-Extension/issues/2404) | Add support Polimec (#2404) | 1.1.28 | 2023-12-25 | US-4.3 |
+| [#2425](https://github.com/Koniverse/SubWallet-Extension/issues/2425) | Remove some RPC on Polkadot and Kusama (#2425) | 1.1.29 | 2023-12-29 | US-4.3 |
+| [#2452](https://github.com/Koniverse/SubWallet-Extension/issues/2452) | Fixed bug Show custom network on the token list when nominate (#2452) | 1.1.31 | 2024-01-11 | US-4.12 |
+| [#2509](https://github.com/Koniverse/SubWallet-Extension/issues/2509) | Fixed some UI bug (#2509) | 1.1.38 | 2024-02-17 | US-4.27 |
+| [#180](https://github.com/Koniverse/SubWallet-Extension/issues/180) | Fix some network in wrong group (issue #180) | 0.3.4 | 2022-04-16 | US-4.1 |
+| [#2540](https://github.com/Koniverse/SubWallet-Extension/issues/2540) | Fixed bug not showing GENS token from Genshiro (#2540) | 1.1.34 | 2024-02-01 | US-4.12 |
+| [#2550](https://github.com/Koniverse/SubWallet-Extension/issues/2550) | Optimize performance by separate chain status and chain state (#2550) | 1.1.41 | 2024-03-02 | US-4.1 |
+| [#2585](https://github.com/Koniverse/SubWallet-Extension/issues/2585) | Support NFT and Send token on Continuum network (#2585) | 1.1.41 | 2024-03-02 | US-4.1 |
+| [#2609](https://github.com/Koniverse/SubWallet-Extension/issues/2609) | Update IPFS domain for NFTs from Unique network (#2609) | 1.1.39 | 2024-02-24 | US-4.1 |
+| [#185](https://github.com/Koniverse/SubWallet-Extension/issues/185) | Integrate aUSD and USDT on Bifrost (#185) | 0.5.6 | 2022-08-24 | US-4.4 |
+| [#2771](https://github.com/Koniverse/SubWallet-Extension/issues/2771) | Update chain-list 0.2.45 (#2771) | 1.1.45 | 2024-03-20 | US-4.3 |
+| [#2791](https://github.com/Koniverse/SubWallet-Extension/issues/2791) | Fixed bug Do not show balance in case standing on History list to search token (#2791) | 1.1.50 | 2024-03-28 | US-4.12 |
+| [#2799](https://github.com/Koniverse/SubWallet-Extension/issues/2799) | Fixed bug Error parsing token balance for frozen asset on Asset Hub (#2799) | 1.1.49 | 2024-03-26 | US-4.3 |
+| [#2805](https://github.com/Koniverse/SubWallet-Extension/issues/2805) | Update chain-list (#2805) | 1.1.50 | 2024-03-28 | US-4.3 |
+| [#2851](https://github.com/Koniverse/SubWallet-Extension/issues/2851) | Update chain-list (#2851) | 1.1.52 | 2024-04-05 | US-4.3 |
+| [#186](https://github.com/Koniverse/SubWallet-Extension/issues/186) | Add more Astar EVM tokens (#186) | 0.4.2 | 2022-05-20 | US-4.5 |
+| [#2885](https://github.com/Koniverse/SubWallet-Extension/issues/2885) | Fixed bug fetching balance with Enjin Relay Chain (#2885) | 1.1.53 | 2024-04-08 | US-4.1 |
+| [#2890](https://github.com/Koniverse/SubWallet-Extension/issues/2890) | Update chain-list (#2890) | 1.1.55 | 2024-04-14 | US-4.3 |
+| [#2934](https://github.com/Koniverse/SubWallet-Extension/issues/2934) | Support NFTs on Asset Hub (#2934) | 1.1.56 | 2024-04-19 | US-4.3 |
+| [#2947](https://github.com/Koniverse/SubWallet-Extension/issues/2947) | Update chain-list (#2947) | 1.1.58 | 2024-04-24 | US-4.3 |
+| [#2966](https://github.com/Koniverse/SubWallet-Extension/issues/2966) | Add support Mythos chain (#2966) | 1.1.60 | 2024-04-29 | US-4.1 |
+| [#3037](https://github.com/Koniverse/SubWallet-Extension/issues/3037) | Fixed bug Network's status show incorrect (#3037) | 1.1.63 | 2024-05-09 | US-4.1 |
+| [#3053](https://github.com/Koniverse/SubWallet-Extension/issues/3053) | Add the "View on explorer" button on the Token details screen (#3053) | 1.2.4 | 2024-06-08 | US-4.12 |
+| [#3075](https://github.com/Koniverse/SubWallet-Extension/issues/3075) | Remove the logic that differentiates between Native tokens and Local tokens in case show sub-logo (#3075) | 1.2.2 | 2024-05-30 | US-4.3 |
+| [#3084](https://github.com/Koniverse/SubWallet-Extension/issues/3084) | Fix bug integrating chain online (#3084) | 1.1.67 | 2024-05-22 | US-4.1 |
+| [#3101](https://github.com/Koniverse/SubWallet-Extension/issues/3101) | Fix bug missing custom tokens on applying online patch (#3101) | 1.1.68 | 2024-05-25 | US-4.11 |
+| [#193](https://github.com/Koniverse/SubWallet-Extension/issues/193) | Update logo of $CHRWNA, $CHAO (#193,#195) | 0.4.1 | 2022-05-11 | US-4.3 |
+| [#195](https://github.com/Koniverse/SubWallet-Extension/issues/195) | Update logo of $CHRWNA, $CHAO (#193,#195) | 0.4.1 | 2022-05-11 | US-4.3 |
+| [#3268](https://github.com/Koniverse/SubWallet-Extension/issues/3268) | Change token type from GRC-20 to VFT (#3268) | 1.2.13 | 2024-07-05 | US-4.12 |
+| [#3270](https://github.com/Koniverse/SubWallet-Extension/issues/3270) | Update Vara token sdk version (#3270) | 1.2.16 | 2024-07-19 | US-4.12 |
+| [#3305](https://github.com/Koniverse/SubWallet-Extension/issues/3305) | Move step shorten metadata and calculate metadataHash to client (#3305) | 1.2.16 | 2024-07-19 | US-4.3 |
+| [#201](https://github.com/Koniverse/SubWallet-Extension/issues/201) | Support ERC20 tokens of Moonfit on Moonbase (#201) | 0.3.6 | 2022-04-22 | US-4.5 |
+| [#3612](https://github.com/Koniverse/SubWallet-Extension/issues/3612) | Fix bug not showing balance of VFT tokens (#3612) | 1.2.30 | 2024-09-20 | US-4.12 |
+| [#3710](https://github.com/Koniverse/SubWallet-Extension/issues/3710) | Support Asset Hub migration (#3710) | 1.3.46 | 2025-07-04 | US-4.3 |
+| [#3713](https://github.com/Koniverse/SubWallet-Extension/issues/3713) | Fixed bug validating recipient balance when sending Substrate token (#3713) | 1.3.9 | 2024-12-09 | US-4.12 |
+| [#3718](https://github.com/Koniverse/SubWallet-Extension/issues/3718) | Add infobox about Wallet version for TON token (#3718) | 1.3.2 | 2024-10-12 | US-4.7 |
+| [#203](https://github.com/Koniverse/SubWallet-Extension/issues/203) | Update Centrifuge Parachain info (#203) | 0.4.1 | 2022-05-11 | US-4.4 |
+| [#3747](https://github.com/Koniverse/SubWallet-Extension/issues/3747) | Update Network details screen for TON (#3747) | 1.3.3 | 2024-10-16 | US-4.7 |
+| [#3756](https://github.com/Koniverse/SubWallet-Extension/issues/3756) | Improve UI related to Select token screen (#3756) | 1.3.2 | 2024-10-12 | US-4.12 |
+| [#3786](https://github.com/Koniverse/SubWallet-Extension/issues/3786) | Fixed bug Can't reset data when search on select token popup (#3786) | 1.3.24 | 2025-03-18 | US-4.12 |
+| [#3816](https://github.com/Koniverse/SubWallet-Extension/issues/3816) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-4.8 |
+| [#3924](https://github.com/Koniverse/SubWallet-Extension/issues/3924) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-4.8 |
+| [#3925](https://github.com/Koniverse/SubWallet-Extension/issues/3925) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-4.8 |
+| [#3942](https://github.com/Koniverse/SubWallet-Extension/issues/3942) | Support Cardano (#3816, #3924, #3925, #3942) | 1.3.23 | 2025-03-05 | US-4.8 |
+| [#3864](https://github.com/Koniverse/SubWallet-Extension/issues/3864) | Unified address format integration (#3864) | 1.3.23 | 2025-03-05 | US-4.1 |
+| [#3920](https://github.com/Koniverse/SubWallet-Extension/issues/3920) | Show well-known tokens on top (#3920) | 1.3.17 | 2025-02-18 | US-4.12 |
+| [#3958](https://github.com/Koniverse/SubWallet-Extension/issues/3958) | Re-enable search token feature (#3958) | 1.3.13 | 2025-01-21 | US-4.12 |
+| [#3960](https://github.com/Koniverse/SubWallet-Extension/issues/3960) | Improve token enabling (#3960) | 1.3.31 | 2025-04-18 | US-4.12 |
+| [#4013](https://github.com/Koniverse/SubWallet-Extension/issues/4013) | Update for patch chain (#4013) | 1.3.54 | 2025-08-21 | US-4.1 |
+| [#4037](https://github.com/Koniverse/SubWallet-Extension/issues/4037) | Auto update metadata for substrate chain (#4037) | 1.3.24 | 2025-03-18 | US-4.3 |
+| [#4081](https://github.com/Koniverse/SubWallet-Extension/issues/4081) | Show value of derivative token relative to the origin tokens (#4081) | 1.3.28 | 2025-04-02 | US-4.12 |
+| [#4085](https://github.com/Koniverse/SubWallet-Extension/issues/4085) | Integrate Meld All in One Wizard (#4085) | 1.3.25 | 2025-03-24 | US-4.4 |
+| [#4086](https://github.com/Koniverse/SubWallet-Extension/issues/4086) | Fixed bug integrating Wagmi into SubWallet (#4086) | 1.3.25 | 2025-03-24 | US-4.4 |
+| [#4150](https://github.com/Koniverse/SubWallet-Extension/issues/4150) | Display dTAO balance like another token (#4150) | 1.3.28 | 2025-04-02 | US-4.12 |
+| [#4151](https://github.com/Koniverse/SubWallet-Extension/issues/4151) | Add dTAO token (#4151) | 1.3.28 | 2025-04-02 | US-4.12 |
+| [#4198](https://github.com/Koniverse/SubWallet-Extension/issues/4198) | Update for Meld on-ramp (#4198) | 1.3.29 | 2025-04-08 | US-4.4 |
+| [#4241](https://github.com/Koniverse/SubWallet-Extension/issues/4241) | Fixed bug Wrong Price Impact When Swapping on PAH (#4241) | 1.3.40 | 2025-05-30 | US-4.3 |
+| [#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247) | Improve token enabling (Round 2) (#4247) | 1.3.71 | 2025-12-29 | US-4.12 |
+| [#4297](https://github.com/Koniverse/SubWallet-Extension/issues/4297) | Review address/chain/token handling for Bitcoin support (#4297) | 1.3.42 | 2025-06-23 | US-4.6 |
+| [#4316](https://github.com/Koniverse/SubWallet-Extension/issues/4316) | Improve UI after Bitcoin integration (#4316) | 1.3.42 | 2025-06-23 | US-4.6 |
+| [#4412](https://github.com/Koniverse/SubWallet-Extension/issues/4412) | Fixed some UI bugs after Bitcoin integration (#4412, #4425) | 1.3.42 | 2025-06-23 | US-4.6 |
+| [#4425](https://github.com/Koniverse/SubWallet-Extension/issues/4425) | Fixed some UI bugs after Bitcoin integration (#4412, #4425) | 1.3.42 | 2025-06-23 | US-4.6 |
+| [#4413](https://github.com/Koniverse/SubWallet-Extension/issues/4413) | Fixed bug show Moonbeam local token balance (#4413) | 1.3.41 | 2025-06-11 | US-4.12 |
+| [#301](https://github.com/Koniverse/SubWallet-Extension/issues/301) | Integrate SubSpace Token (#301) | 0.4.3 | 2022-05-31 | US-4.12 |
+| [#4468](https://github.com/Koniverse/SubWallet-Extension/issues/4468) | Filter "To token" Based on Selected "From token" - Round 1 (#4468) | 1.3.49 | 2025-07-28 | US-4.12 |
+| [#4475](https://github.com/Koniverse/SubWallet-Extension/issues/4475) | Turn off default enabled tokens (#4475) | 1.3.48 | 2025-07-21 | US-4.12 |
+| [#4481](https://github.com/Koniverse/SubWallet-Extension/issues/4481) | Fixed bug Don't show list address type for BTC token when get address on Token details screen (#4481) | 1.3.47 | 2025-07-11 | US-4.12 |
+| [#4522](https://github.com/Koniverse/SubWallet-Extension/issues/4522) | Fixed bug Cannot withdraw on Westend Asset Hub (#4522) | 1.3.48 | 2025-07-21 | US-4.3 |
+| [#4525](https://github.com/Koniverse/SubWallet-Extension/issues/4525) | Fixed bug auto-enable chain for popular tokens (#4525) | 1.3.48 | 2025-07-21 | US-4.12 |
+| [#4542](https://github.com/Koniverse/SubWallet-Extension/issues/4542) | Improve detect assets & optimize enabled tokens on EVM chains (#4542) | 1.3.65 | 2025-11-06 | US-4.12 |
+| [#4278](https://github.com/Koniverse/SubWallet-Extension/issues/4278) | Extension - Support display destination fee for transfer XCM (#4278) | 1.3.78 | 2026-05-14 | US-13.14 |
+| [#4606](https://github.com/Koniverse/SubWallet-Extension/issues/4606) | Migrate to ParaSpell V4 & Update asset metadata (#4606) | 1.3.55 | 2025-09-05 | US-13.14 |
+| [#4730](https://github.com/Koniverse/SubWallet-Extension/issues/4730) | Update chain-list stable v0.2.118 (#4730): | 1.3.62 | 2025-10-10 | US-4.3 |
+| [#4767](https://github.com/Koniverse/SubWallet-Extension/issues/4767) | Update chain-list stable v0.2.119 (#4767) | 1.3.63 | 2025-10-23 | US-4.3 |
+| [#4790](https://github.com/Koniverse/SubWallet-Extension/issues/4790) | Polkadot Asset Hub Migration (#4790) | 1.3.64 | 2025-10-31 | US-4.3 |
+| [#4797](https://github.com/Koniverse/SubWallet-Extension/issues/4797) | Update chain-list stable v0.2.120 (#4797): | 1.3.64 | 2025-10-31 | US-4.3 |
+| [#4812](https://github.com/Koniverse/SubWallet-Extension/issues/4812) | Update chain-list stable v0.2.121 (#4812): | 1.3.66 | 2025-11-07 | US-4.3 |
+| [#4819](https://github.com/Koniverse/SubWallet-Extension/issues/4819) | Some updates after Polkadot Asset Hub Migration (#4819) | 1.3.65 | 2025-11-06 | US-4.3 |
+| [#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827) | Update chain-list stable v0.2.122 (#4827) | 1.3.69 | 2025-12-08 | US-4.3 |
+| [#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861) | Update chain-list stable v0.2.123 (#4861) | 1.3.72 | 2026-01-14 | US-4.3 |
+| [#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892) | Display token name and subnet ID for subnet tokens \| Bittensor (#4892) | 1.3.76 | 2026-03-20 | US-4.12 |
+| [#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972) | Unable to turn network when no add correct API key (#4972) | 1.3.76 | 2026-03-20 | US-4.1 |
+| [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979) | Update ParaSpell API integration to v1 (#4979) | 1.3.79 | 2026-05-21 | US-13.14 |
+| [#311](https://github.com/Koniverse/SubWallet-Extension/issues/311) | Fix bug displaying incorrect balance & load incorrect view when update configure network (#311) | 0.5.3 | 2022-07-29 | US-4.1 |
+| [#314](https://github.com/Koniverse/SubWallet-Extension/issues/314) | Fix bug happens when user delete all custom tokens & predefined tokens (#314) | 0.4.4 | 2022-06-08 | US-4.11 |
+| [#331](https://github.com/Koniverse/SubWallet-Extension/issues/331) | Support Single-chain mode feature customize for Parachain & Solo chains (#331) | 0.6.2 | 2022-09-16 | US-4.4 |
+| [#387](https://github.com/Koniverse/SubWallet-Extension/issues/387) | Add new network, update endpoint: Tinkernet, Imbue, HydraDX,...(#387) | 0.4.9 | 2022-07-02 | US-4.1 |
+| [#408](https://github.com/Koniverse/SubWallet-Extension/issues/408) | Fix some errors related to Network Settings (#408) | 0.4.9 | 2022-07-02 | US-4.1 |
+| [#485](https://github.com/Koniverse/SubWallet-Extension/issues/485) | Integrate tokens for dapps on Moonbeam/Moonriver (#485) | 0.5.3 | 2022-07-29 | US-4.12 |
+| [#490](https://github.com/Koniverse/SubWallet-Extension/issues/490) | Fix bug adding default EVM token after deleting it (#490) | 0.5.3 | 2022-07-29 | US-4.5 |
+| [#499](https://github.com/Koniverse/SubWallet-Extension/issues/499) | Update logo & modal style (#499) | 0.5.3 | 2022-07-29 | US-4.3 |
+| [#524](https://github.com/Koniverse/SubWallet-Extension/issues/524) | Update the logo of xcINTR, xciBTC, xckBTC, xcCSM, xcSDN, xcKMA, xcLIT, xcCRAB, xcTEER#524 | 0.5.7 | 2022-09-06 | US-4.3 |
+| [#558](https://github.com/Koniverse/SubWallet-Extension/issues/558) | Add new networks to SubWallet (#558) | 0.5.6 | 2022-08-24 | US-4.1 |
+| [#588](https://github.com/Koniverse/SubWallet-Extension/issues/588) | Auto update metadata (#588) | 1.1.3 | 2023-07-21 | US-4.3 |
+| [#605](https://github.com/Koniverse/SubWallet-Extension/issues/605) | Integrate Gear testnet into SubWallet (#605) | 0.5.7 | 2022-09-06 | US-4.4 |
+| [#608](https://github.com/Koniverse/SubWallet-Extension/issues/608) | Add new networks (new parachain winners) (#608) | 0.6.4 | 2022-09-22 | US-4.4 |
+| [#625](https://github.com/Koniverse/SubWallet-Extension/issues/625) | Update Gear Staging Testnet logo (#625) | 0.6.1 | 2022-09-13 | US-4.3 |
+| [#626](https://github.com/Koniverse/SubWallet-Extension/issues/626) | Update ArthSwap logo (ARSW token on Astar-EVM) (#626) | 0.6.1 | 2022-09-13 | US-4.3 |
+| [#632](https://github.com/Koniverse/SubWallet-Extension/issues/632) | Update endpoint list for GM Chain (#632) | 0.6.1 | 2022-09-13 | US-4.1 |
+| [#646](https://github.com/Koniverse/SubWallet-Extension/issues/646) | Integrate Aventus Network (#646) | 0.8.4 | 2023-03-31 | US-4.1 |
+| [#651](https://github.com/Koniverse/SubWallet-Extension/issues/651) | Update subscan for Subspace 2a network (#651) | 0.6.4 | 2022-09-22 | US-4.1 |
+| [#669](https://github.com/Koniverse/SubWallet-Extension/issues/669) | Update Zeitgeist endpoints (#669) | 0.6.5 | 2022-09-24 | US-4.1 |
+| [#671](https://github.com/Koniverse/SubWallet-Extension/issues/671) | Update $ price for ZTG token (#671) | 0.6.6 | 2022-09-30 | US-4.12 |
+| [#685](https://github.com/Koniverse/SubWallet-Extension/issues/685) | Update Acala endpoints (#685) | 0.6.6 | 2022-09-30 | US-4.1 |
+| [#697](https://github.com/Koniverse/SubWallet-Extension/issues/697) | Update provider URL for some chains (#697) | 0.6.7 | 2022-10-22 | US-4.1 |
+| [#714](https://github.com/Koniverse/SubWallet-Extension/issues/714) | An error occurs when a user deletes tokens in case the tokens to be deleted have the same address contract (#714) | 0.6.7 | 2022-10-22 | US-4.12 |
+| [#730](https://github.com/Koniverse/SubWallet-Extension/issues/730) | Support Boba Networks (#730) | 0.6.9 | 2022-11-04 | US-4.1 |
+| [#734](https://github.com/Koniverse/SubWallet-Extension/issues/734) | Support Snow Parachain (#734) | 0.6.7 | 2022-10-22 | US-4.4 |
+| [#742](https://github.com/Koniverse/SubWallet-Extension/issues/742) | Support sending PSP tokens (#742) | 0.6.8 | 2022-10-31 | US-4.12 |
+| [#760](https://github.com/Koniverse/SubWallet-Extension/issues/760) | Add top token on ETH and BSC (#760) | 0.6.9 | 2022-11-04 | US-4.12 |
+| [#773](https://github.com/Koniverse/SubWallet-Extension/issues/773) | Support sending BIT token for Bit.Country Alpha Net (#773) | 0.6.9 | 2022-11-04 | US-4.12 |
+| [#775](https://github.com/Koniverse/SubWallet-Extension/issues/775) | Update Amplitude endpoint (#775) | 0.6.9 | 2022-11-04 | US-4.1 |
+| [#788](https://github.com/Koniverse/SubWallet-Extension/issues/788) | Add support for the Octopus Network ecosystem (#788) | 0.7.5 | 2022-12-15 | US-4.1 |
+| [#789](https://github.com/Koniverse/SubWallet-Extension/issues/789) | Bug automatically redirects to the Ethereum network when requesting permission (#789) | 0.7.3 | 2022-11-25 | US-4.1 |
+| [#816](https://github.com/Koniverse/SubWallet-Extension/issues/816) | Update BIT token logo (#816) | 0.7.2 | 2022-11-19 | US-4.3 |
+| [#854](https://github.com/Koniverse/SubWallet-Extension/issues/854) | Integrate Watr Protocol and Token (#854) | 0.7.4 | 2022-12-04 | US-4.12 |
+| [#873](https://github.com/Koniverse/SubWallet-Extension/issues/873) | Integrate xx.network - a L1 Substrate-based network (#873) | 0.7.4 | 2022-12-04 | US-4.1 |
+| [#908](https://github.com/Koniverse/SubWallet-Extension/issues/908) | Add the missing networks in Polkadot & Parachain group (#908) | 0.7.6 | 2022-12-17 | US-4.4 |
 | [#2372](https://github.com/Koniverse/SubWallet-Extension/issues/2372) | Fixed bug phishing detection (#2372) | 1.1.27 | 2023-12-20 | US-5.1 |
 | [#3741](https://github.com/Koniverse/SubWallet-Extension/issues/3741) | Fixed bug Reset Auto-lock, Advanced phishing detection, Camera in case upgrade version (#3741) | 1.3.28 | 2025-04-02 | US-5.10 |
 | [#4891](https://github.com/Koniverse/SubWallet-Extension/issues/4891) | Turn off "Advanced phishing detection" feature (#4891) | 1.3.69 | 2025-12-08 | US-5.1 |
@@ -516,7 +516,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#480](https://github.com/Koniverse/SubWallet-Extension/issues/480) | Optimize NFT loading with <https://nft.storage/> (#480) | 0.5.3 | 2022-07-29 | US-9.13 |
 | [#517](https://github.com/Koniverse/SubWallet-Extension/issues/517) | Add Moonpets NFT (#517) | 0.5.4 | 2022-08-05 | US-9.3 |
 | [#557](https://github.com/Koniverse/SubWallet-Extension/issues/557) | Fix bug happens when NFT image error (#557) | 0.5.6 | 2022-08-24 | US-9.13 |
-| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT (#639) | 1.3.72 | 2026-01-14 | US-24.341 |
+| [#639](https://github.com/Koniverse/SubWallet-Extension/issues/639) | Add support for USDC & stEWT (#639) | 1.3.72 | 2026-01-14 | US-4.12 |
 | [#643](https://github.com/Koniverse/SubWallet-Extension/issues/643) | Add more attributes to NFT collection and item (#643) | 0.6.4 | 2022-09-22 | US-9.10 |
 | [#29](https://github.com/Koniverse/SubWallet-Extension/issues/29) | Update Zeitgeist and Subsocial integration (#29) | 1.0.5 | 2023-05-21 | US-9.1 |
 | [#649](https://github.com/Koniverse/SubWallet-Extension/issues/649) | Integrate Pioneer Network NFT (#649) | 0.6.5 | 2022-09-24 | US-9.1 |

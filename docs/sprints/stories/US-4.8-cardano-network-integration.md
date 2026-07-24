@@ -22,6 +22,11 @@ A user can hold and view ADA and CIP-26 native assets from the same unified
 wallet, with chain data served by a managed indexer, so Cardano support ships
 without self-hosting a Cardano node.
 
+## Status
+
+> **✅ done — shipped in 1.3.23.** All acceptance criteria are ticked and the 1 row below is
+> settled.
+
 ## Background
 
 Cardano is a UTXO (eUTXO) ecosystem served through Blockfrost rather than a
@@ -110,6 +115,18 @@ external system integration).
 
 Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.23` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `3ba31ae831, eca66a269c` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.23 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**1 tracker issues** landed on Cardano network integration — 1 with a release. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.23 | [#3816](https://github.com/Koniverse/SubWallet-Extension/issues/3816) | Implement Cardano chain service and balance service | ✅ done |
+
+> **One row for the whole Cardano network integration** — the Blockfrost-backed data path shipped
+> clean. Cardano's dApp-connector maintenance is elsewhere ([US-10.4](US-10.4-cardano-cip-30-connector.md)).
+
 ## Cross-references
 
 - [PRD FR-39](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.6](US-4.6-bitcoin-network-integration.md) · [US-4.7](US-4.7-ton-network-integration.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

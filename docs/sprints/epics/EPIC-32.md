@@ -414,7 +414,7 @@ is recorded); **Shipped** is the `(Koni)` release, `—` when no CHANGELOG line 
 
 > **US-32.373 arrived on 2026-07-22, not from the generator.** #4189 had been mis-filed as
 > out-of-repo platform work by a title heuristic reading *"Deploying …"* as a deploy chore. It is a
-> **cross-epic umbrella** over six shipped sub-issues — three here, two in [EPIC-24](EPIC-24.md),
+> **cross-epic umbrella** over six shipped sub-issues — three here, two in [EPIC-4](EPIC-4.md),
 > one in the fiat area, now [US-14.1](../stories/US-14.1-fiat-on-ramp-buy-crypto-with-card.md) —
 > so this ledger owns it by plurality and the story says so. The
 > six children were repointed to it in the same pass; the correction is recorded in the

@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-24 05:26:58 UTC
-> Total stories: 1446
+> Last generated: 2026-07-24 08:37:22 UTC
+> Total stories: 1108
 
-## 📋 Backlog (179)
+## 📋 Backlog (146)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -40,39 +40,6 @@
 | US-19.13 | Avail Space mission pool improvement (improvement on US-19.7) | EPIC-19 | P3 | 1 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
-| US-24.17 | Integrate with Kilt Protocol | EPIC-24 | P3 | 1 | — | tunghp2002 |
-| US-24.68 | Create PR for the Starlay team to integrate SubWallet | EPIC-24 | P3 | 1 | — | hieudd |
-| US-24.94 | Integrate wallet-to-wallet message solution from Gear Technologies | EPIC-24 | P3 | 1 | — | hieudd |
-| US-24.95 | Integrate Domain Chain into SubWallet | EPIC-24 | P3 | 1 | — | hieudd |
-| US-24.106 | Integrate Ternoa NFTs | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.131 | Integrate Aventus NFTs | EPIC-24 | P3 | 1 | — | nulllpc |
-| US-24.136 | Integrate Joystream NFTs into SubWallet | EPIC-24 | P3 | 1 | — | — |
-| US-24.142 | Improve chain-list on extension | EPIC-24 | P3 | 1 | — | — |
-| US-24.163 | WebApp - Update UI Manage network by tab: Substrate, EVM | EPIC-24 | P3 | 1 | — | — |
-| US-24.172 | Bugs related to Manage networks feature | EPIC-24 | P3 | 1 | — | Thiendekaco |
-| US-24.177 | WebApp - An error occurred when turning on/off the network | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.192 | Handle the case of not being able to turn on/turn off the network if the network previously failed | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.194 | Extension - Add fields to update logo for custom token/ network | EPIC-24 | P3 | 1 | — | Thiendekaco |
-| US-24.208 | Change RPC provider automatically when the current provider dies | EPIC-24 | P3 | 1 | — | nulllpc |
-| US-24.212 | WebApp - Added footer for some token detail screens | EPIC-24 | P3 | 1 | — | — |
-| US-24.214 | Add new feature: Automatically detect all users' assets on all networks and show on the wallet | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.217 | Distinguishing tokens with similar symbols | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.219 | Extension - Do not enable native token in case network is enabled when change rpc | EPIC-24 | P3 | 1 | — | — |
-| US-24.224 | Update auto enable tokens | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.232 | WebApp - Cannot search for tokens if token name is different from group token name | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.239 | Extension - Error loading when click group token details | EPIC-24 | P3 | 1 | — | — |
-| US-24.258 | WebApp - Update token list (Hompage) in responsive screen | EPIC-24 | P3 | 1 | — | — |
-| US-24.259 | Extension - Improve UI on Select network screen when attach Migration App | EPIC-24 | P3 | 1 | — | — |
-| US-24.261 | Extension - Do not show the list of tokens available for purchase in case the network is not enabled | EPIC-24 | P3 | 1 | — | — |
-| US-24.269 | Extension - Error when working with rpc : 'light-client' | EPIC-24 | P3 | 1 | — | — |
-| US-24.275 | Extension - Check the issue of not displaying logo | EPIC-24 | P3 | 1 | — | — |
-| US-24.279 | Bug sending tokens on Astar portal | EPIC-24 | P3 | 1 | — | PDTnhah |
-| US-24.282 | Extension - Integrate Subwallet into Privy | EPIC-24 | P3 | 1 | — | PDTnhah |
-| US-24.285 | Extension - Improve search token | EPIC-24 | P3 | 1 | — | — |
-| US-24.292 | Extension - Improve Customize asset display screen | EPIC-24 | P3 | 1 | — | — |
-| US-24.317 | Extension - Improve Filter To token Based on Selected From token ( Round 2) | EPIC-24 | P3 | 1 | — | Quangdm-cdm |
-| US-24.318 | Extension – Bundling Extension Code for Mobile Wallet App Integration | EPIC-24 | P3 | 1 | — | — |
-| US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
 | US-32.16 | Built-in staking for Dotsama layer2 dapps' tokens | EPIC-32 | P3 | 1 | — | hieudd |
@@ -188,14 +155,13 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (10)
+## 🟢 Ready (9)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W28 | S2kael |
-| US-24.338 | Extension - Update chain-list stable v0.2.124 | EPIC-24 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
@@ -218,7 +184,6 @@
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
-| US-24.306 | Research Midnight network | EPIC-24 | P3 | 1 | sprint-2026-W28 | — |
 | US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
 | US-32.260 | Recheck and update cancel unstake logic for amplitude, krest native staking | EPIC-32 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-32.372 | Add recommend validator for native and subnet staking | EPIC-32 | P3 | 1 | sprint-2026-W30 | tunghp2002 |
@@ -226,6 +191,7 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
+| US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
 | US-41.261 | Extension - Fix bug show withdraw time (Round 2) | EPIC-41 | P3 | 1 | sprint-2025-W47 | tunghp2002 |
 | US-41.324 | Add support for Polkadot API | EPIC-41 | P3 | 1 | sprint-2026-W28 | nulllpc |
 | US-41.409 | Test Avail Light client | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
@@ -249,7 +215,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1134)
+## ✅ Done (849)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -341,293 +307,6 @@
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-24.1 | Show balance for substrate based chain assets | EPIC-24 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-24.2 | Integrate all parachains assets in to SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
-| US-24.3 | Integrate Dotsama ecosystem testnets: Rococo, Westend | EPIC-24 | P3 | 1 | sprint-2022-M03 | lw-cdm |
-| US-24.4 | Integrate some Independent Substrate chains: Edgeware, AlephZero | EPIC-24 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
-| US-24.5 | Integration EVM assets: $GLMR, $MOVR, $DEV | EPIC-24 | P3 | 1 | sprint-2022-M03 | minhle2994 |
-| US-24.6 | Compatible with Metamask and Integration Moonbeam/Moonriver ecosystem assets | EPIC-24 | P3 | 1 | sprint-2022-M03 | saltict |
-| US-24.8 | isEthereum`  - Option: default is false  - Determind if the network supports Ethereum` | EPIC-24 | P3 | 1 | sprint-2022-M04 | — |
-| US-24.9 | Avatar GUI error when choosing Moonriver, Moonbeam chain | EPIC-24 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-24.10 | Check the status of not showing the balance of some networks for the first time after installation | EPIC-24 | P3 | 1 | sprint-2022-M05 | saltict |
-| US-24.11 | Can't display All Network when viewing the balance details of any 1 network | EPIC-24 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-24.12 | Change the experience when clicking on a relaychain or Parachain, instead of dropdown, it will go to a new screen | EPIC-24 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-24.13 | Implement xcToken asset conversion APIs from available APIs | EPIC-24 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-24.14 | Update stable coin tokens and others in some networks | EPIC-24 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-24.15 | Implement Light Client as a predefined endpoint | EPIC-24 | P3 | 1 | sprint-2022-M04 | sinzii |
-| US-24.16 | Support get Shiden balance and tokens | EPIC-24 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-24.18 | Update new network Apr 16, 2022 | EPIC-24 | P3 | 1 | sprint-2022-M04 | hieudd |
-| US-24.19 | Integrate Genshiro & Equilibrium | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.20 | Add some Moonbeam EVM Assets: | EPIC-24 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-24.21 | Fix some network in wrong group | EPIC-24 | P3 | 1 | sprint-2022-M04 | hieudd |
-| US-24.22 | Integrate aUSD and USDT on Bifrost | EPIC-24 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-24.23 | Add more Astar EVM tokens | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.24 | Add Sakura Parachain | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.25 | Update logo of $CHRWNA, $CHAO | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.26 | Support ERC20 tokens of Moonfit on Moonbase | EPIC-24 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-24.27 | Update Centrifuge Parachain info | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.28 | Total Balance was wrong due to DOT Crowd loan for Acala & Parallel Token Price was wrong | EPIC-24 | P3 | 1 | sprint-2022-M07 | S2kael |
-| US-24.29 | Integrate $BEANS (Moonbeans) on Moonriver and change the current logo of $BEAN | EPIC-24 | P3 | 1 | sprint-2022-M06 | hieudd |
-| US-24.30 | Display wrong tokens on Interlay and Kintsuigi | EPIC-24 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-24.31 | Integrate SubSpace Token | EPIC-24 | P3 | 1 | sprint-2022-M05 | hieudd |
-| US-24.32 | Add the feature that allows users to show/hide zero balance of tokens, or delete/hide tokens inside each chain | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.35 | Distinguishing the Network's Coingecko Key and Token's Coingecko Key | EPIC-24 | P3 | 1 | sprint-2023-M06 | — |
-| US-24.36 | Fix bug displaying incorrect balance & load incorrect view when update configure network | EPIC-24 | P3 | 1 | sprint-2022-M07 | S2kael |
-| US-24.37 | Fix bug happens when user delete all custom tokens & predefined tokens | EPIC-24 | P3 | 1 | sprint-2022-M06 | nulllpc |
-| US-24.38 | Support Single-chain mode feature customize for Parachain & Solo chains | EPIC-24 | P3 | 1 | sprint-2022-M09 | saltict |
-| US-24.39 | Add new networks (parachain winners on Kusama & Polkadot) | EPIC-24 | P3 | 1 | sprint-2022-M08 | hieudd |
-| US-24.40 | Bug happens when change Origin Chain | EPIC-24 | P3 | 1 | sprint-2022-M06 | lw-cdm |
-| US-24.41 | Update Bifrost Polkadot Parachain | EPIC-24 | P3 | 1 | sprint-2022-M06 | hieudd |
-| US-24.42 | Add new network, update endpoint: Tinkernet, Imbue, HydraDX,... | EPIC-24 | P3 | 1 | sprint-2022-M07 | hieudd |
-| US-24.43 | Add auto-compounding for TUR (Turing Network) inside SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.44 | Update some features for custom network | EPIC-24 | P3 | 1 | sprint-2023-M04 | — |
-| US-24.45 | Add networks Pangolin EVM and Crab EVM | EPIC-24 | P3 | 1 | sprint-2022-M08 | saltict |
-| US-24.46 | Fix some errors related to Network Settings | EPIC-24 | P3 | 1 | sprint-2022-M07 | nulllpc |
-| US-24.47 | Error enabling Litentry/Litmus network | EPIC-24 | P3 | 1 | sprint-2022-M07 | nulllpc |
-| US-24.48 | Integration MoonFit token | EPIC-24 | P3 | 1 | sprint-2023-M06 | PDTnhah |
-| US-24.49 | Update Chain Logo | EPIC-24 | P3 | 1 | sprint-2022-M07 | hieudd |
-| US-24.50 | Integrate tokens for dapps on Moonbeam/Moonriver | EPIC-24 | P3 | 1 | sprint-2022-M07 | hieudd |
-| US-24.51 | Fix bug adding default EVM token after deleting it | EPIC-24 | P3 | 1 | sprint-2022-M07 | nulllpc |
-| US-24.52 | Update logo & modal style | EPIC-24 | P3 | 1 | sprint-2022-M07 | hieudd |
-| US-24.53 | Update the logo of xcINTR, xciBTC, xckBTC, xcCSM, xcSDN, xcKMA, xcLIT, xcCRAB, xcTEER#524 | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.54 | Create PR for the ArthSwap team to integrate SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.55 | Add new networks to SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-24.56 | Update information for Ternoa network | EPIC-24 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-24.57 | Remove Neumann Network | EPIC-24 | P3 | 1 | sprint-2022-M08 | nulllpc |
-| US-24.58 | Auto update metadata | EPIC-24 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-24.59 | Integrate Joystream network and NFTs | EPIC-24 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-24.60 | Separate network services | EPIC-24 | P3 | 1 | sprint-2023-M06 | huukhai |
-| US-24.61 | Integrate Gear testnet into SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.62 | Add new networks (new parachain winners) | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.64 | Create a PR request to integrate SubWallet into Rainbowkit | EPIC-24 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-24.65 | Update Gear Staging Testnet logo | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.66 | Update ArthSwap logo (ARSW token on Astar-EVM) | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.67 | Update endpoint list for GM Chain | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.69 | Push Pioneer Network to the top to support Promotion activity | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.70 | Integrate Aventus Network | EPIC-24 | P3 | 1 | sprint-2023-M03 | nulllpc |
-| US-24.71 | Update subscan for Subspace 2a network | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.72 | Update Subspace Network Endpoint & Bit.Country Token Logo | EPIC-24 | P3 | 1 | sprint-2022-M09 | hieudd |
-| US-24.73 | Update Zeitgeist endpoints | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.74 | Update $ price for ZTG token | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.75 | Update Acala endpoints | EPIC-24 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-24.76 | Update provider URL for some chains | EPIC-24 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-24.77 | Add default option for parachain inflation information | EPIC-24 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-24.78 | An error occurs when a user deletes tokens in case the tokens to be deleted have the same address contract | EPIC-24 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-24.80 | Support Boba Networks | EPIC-24 | P3 | 1 | sprint-2022-M11 | saltict |
-| US-24.81 | Support Snow Parachain | EPIC-24 | P3 | 1 | sprint-2022-M10 | saltict |
-| US-24.82 | Support sending PSP tokens | EPIC-24 | P3 | 1 | sprint-2022-M10 | nulllpc |
-| US-24.83 | Add top token on ETH and BSC | EPIC-24 | P3 | 1 | sprint-2022-M11 | hieudd |
-| US-24.84 | Support sending BIT token for Bit.Country Alpha Net | EPIC-24 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-24.85 | Update Amplitude endpoint | EPIC-24 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-24.86 | Support more EVM Networks | EPIC-24 | P3 | 1 | sprint-2023-M04 | hieudd |
-| US-24.87 | Add support for the Octopus Network ecosystem | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.88 | Bug automatically redirects to the Ethereum network when requesting permission | EPIC-24 | P3 | 1 | sprint-2022-M11 | saltict |
-| US-24.89 | Do not show sub-token of the Ethereum, Binance network on the Firefox browser in case update version extension | EPIC-24 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-24.90 | Update BIT token logo | EPIC-24 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-24.91 | Add support for new networks (new parachains winners) | EPIC-24 | P3 | 1 | sprint-2023-M04 | hieudd |
-| US-24.92 | Update  Amplitude Testnet logo | EPIC-24 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-24.93 | Integrate Watr Protocol and Token | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.96 | Integrate xx.network - a L1 Substrate-based network | EPIC-24 | P3 | 1 | sprint-2022-M12 | hieudd |
-| US-24.97 | Integrate Watr Mainnet and token (Updating...) | EPIC-24 | P3 | 1 | sprint-2023-M06 | — |
-| US-24.98 | Check and add more network from Polkadot{.js} App | EPIC-24 | P3 | 1 | sprint-2022-M12 | sokol142 |
-| US-24.99 | Add the missing networks in Polkadot & Parachain group | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.100 | Add the missing networks in Kusama & Parachain group | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.101 | Add the missing networks in Live Networks group | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.103 | Integrate $TFA token into SubWallet | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.104 | Update default endpoint for Basilisk, HydraDX | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.105 | Follow-up some networks to add new | EPIC-24 | P3 | 1 | sprint-2023-M06 | Sokol142196 |
-| US-24.107 | Update APR for Turing Network | EPIC-24 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-24.108 | Update networks endpoint | EPIC-24 | P3 | 1 | sprint-2023-M01 | nulllpc |
-| US-24.109 | Add support new endpoint for Astar | EPIC-24 | P3 | 1 | sprint-2023-M01 | sokol142 |
-| US-24.110 | Upgrade UI - Screen Settings / Networks | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.111 | Upgrade UI - Screen Token List | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.112 | Update Token's logo of the Equilibrium | EPIC-24 | P3 | 1 | sprint-2023-M03 | Quangdm-cdm |
-| US-24.113 | Upgrade UI - Update Network's logo & Token's logo | EPIC-24 | P3 | 1 | sprint-2023-M03 | saltict |
-| US-24.114 | Temporarily hide Kintsugi in the Origin Chain list | EPIC-24 | P3 | 1 | sprint-2023-M03 | Quangdm-cdm |
-| US-24.115 | Equilibrium logo update | EPIC-24 | P3 | 1 | sprint-2023-M03 | nulllpc |
-| US-24.116 | Upgrade UI - An error occurs when turn on Kylin network | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.117 | Update endpoint for Shiden-EVM | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.118 | Upgrade UI - Improve UI on the Config Token screen | EPIC-24 | P3 | 1 | sprint-2023-M07 | — |
-| US-24.119 | Upgrade UI - Show incorrect balance on some tokens | EPIC-24 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-24.120 | Upgrade UI - Still allow the user to delete the native token of the custom network | EPIC-24 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-24.121 | Upgrade UI - Do not update the Available balance of the token when turning on token | EPIC-24 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-24.122 | Update logo for LIT token | EPIC-24 | P3 | 1 | sprint-2023-M06 | — |
-| US-24.123 | Upgrade UI - Do not automatically switch network | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.124 | Adjust the display order of tokens | EPIC-24 | P3 | 1 | sprint-2023-M07 | saltict |
-| US-24.125 | Re-check condition Delete token | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.126 | Status of network show incorrect | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.127 | Do not display the add network screen in case the network already exists | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.128 | Re-check the feature of automatically turning on the network according to the existing balance | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.129 | Incorrect balance display of some tokens | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.130 | INW token logo update | EPIC-24 | P3 | 1 | sprint-2023-M04 | — |
-| US-24.132 | Update get chain, assets logo direct from @subwallet/chain-list package | EPIC-24 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-24.133 | Update network name: 'InvArch Tinker' -> 'Tinkernet' | EPIC-24 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-24.134 | Update Welcome and Login Logo & Background | EPIC-24 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-24.137 | Auto-update online from chain list (step 2) | EPIC-24 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-24.139 | Update URL explorer for Subspace networks | EPIC-24 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-24.140 | Fixed bug show the WND balance | EPIC-24 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-24.141 | Re-check the token price status (increase/decrease) and change rate in 24h | EPIC-24 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-24.143 | Optimize logo | EPIC-24 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-24.144 | Update chain-list dependency and check issues | EPIC-24 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-24.145 | Sort tokens in order of value or balance of tokens held | EPIC-24 | P3 | 1 | sprint-2023-M07 | — |
-| US-24.146 | Update default logo | EPIC-24 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-24.147 | Update APR for some chain | EPIC-24 | P3 | 1 | sprint-2023-M05 | nulllpc |
-| US-24.148 | Update logo for some chains and tokens | EPIC-24 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-24.149 | Support sort token by value | EPIC-24 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-24.150 | Automatically enable native tokens when enabling local tokens from the Manage tokens screen | EPIC-24 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-24.151 | Fix bug detecting on-chain attributes for WASM NFTs | EPIC-24 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-24.152 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-24.153 | Support viewing ZK tokens on Manta | EPIC-24 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-24.154 | Bump chain-list dependency | EPIC-24 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-24.156 | Update `@subwallet/chain-list@0.2.1` (#1541): | EPIC-24 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-24.157 | Update enable chain interaction UX | EPIC-24 | P3 | 1 | sprint-2023-M11 | saltict |
-| US-24.158 | Update chainlist | EPIC-24 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-24.159 | Fixed bug does not synchronize the configuration of the network and the token | EPIC-24 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-24.160 | WebApp - Bugs related to Manage network feature | EPIC-24 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-24.161 | Update chain list | EPIC-24 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-24.162 | Create PR to integrate SubWallet to Wagmi support List | EPIC-24 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-24.164 | Fixed bug showing Minimum active value on the network detail screen | EPIC-24 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-24.165 | Update chain list | EPIC-24 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-24.166 | WebApp - Update basic Metadata for WebApp (for sharing, SEO...) | EPIC-24 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-24.167 | Update the default logo | EPIC-24 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-24.168 | Reseach Avail network | EPIC-24 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-24.169 | WebApp - $value of token on History is incorrect | EPIC-24 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-24.170 | WebApp - UI bugs on the custom token detail | EPIC-24 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-24.171 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2023-M08 | nulllpc |
-| US-24.173 | WebApp - Update token list (Hompage) by new design | EPIC-24 | P3 | 1 | sprint-2024-M08 | frenkie-ng |
-| US-24.174 | Update chain list | EPIC-24 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-24.175 | Fixed bug The network address displayed is incorrect | EPIC-24 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-24.176 | Update chain list | EPIC-24 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-24.178 | Improve network and asset subscription | EPIC-24 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-24.179 | Update token’s logo retrieval mechanism | EPIC-24 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-24.180 | Add support for the sub0 2023 Biodiversity NFT Collection | EPIC-24 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-24.181 | Support show balance detail by account on All accounts mode | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.182 | Re-check metadata update feature | EPIC-24 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-24.183 | The default Vara network is enabled | EPIC-24 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-24.184 | Fixed UI bug when scrolling on the Token detail screen | EPIC-24 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-24.186 | Fixed bug Can’t get balance of the ENJ token | EPIC-24 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-24.187 | Fixed bug still show token of the inactive network | EPIC-24 | P3 | 1 | sprint-2023-M11 | saltict |
-| US-24.188 | Pooled assets are not included in locked balance | EPIC-24 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-24.189 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-24.190 | Fixed UI bug show balance in the Token details screen | EPIC-24 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-24.193 | Re-check for networks that are using Parity RPC | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.195 | Add block explorer for Creditcoin | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.196 | Update chain list | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.197 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.198 | Sort token by balance | EPIC-24 | P3 | 1 | sprint-2025-M04 | Thiendekaco |
-| US-24.199 | Update token details screen | EPIC-24 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-24.200 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.201 | Setup banner to notify to user about serveral networks | EPIC-24 | P3 | 1 | sprint-2023-M12 | Sokol142196 |
-| US-24.202 | Add support Polimec | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.203 | Remove some RPC on Polkadot and Kusama | EPIC-24 | P3 | 1 | sprint-2023-M12 | S2kael |
-| US-24.204 | Fixed bug Show custom network on the token list when nominate | EPIC-24 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-24.205 | UI bug when token name is long on the Select token when click on search token icon on header | EPIC-24 | P3 | 1 | sprint-2024-M01 | — |
-| US-24.206 | WebApp - Add banner for token list page | EPIC-24 | P3 | 1 | sprint-2024-M01 | frenkie-ng |
-| US-24.207 | [Manta] Integrate Manta Atlantic Network | EPIC-24 | P3 | 1 | sprint-2024-M01 | bluezdot |
-| US-24.209 | Fixed some UI bug | EPIC-24 | P3 | 1 | sprint-2024-M02 | frenkie-ng |
-| US-24.210 | Fixed bug not showing GENS token from Genshiro | EPIC-24 | P3 | 1 | sprint-2024-M02 | S2kael |
-| US-24.211 | Optimize performance by separate chain status and chain state | EPIC-24 | P3 | 1 | sprint-2024-M03 | saltict |
-| US-24.213 | Support NFT and Send token on Continuum network | EPIC-24 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-24.215 | Support Paseo network | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.216 | Update IPFS domain for NFTs from Unique network | EPIC-24 | P3 | 1 | sprint-2024-M02 | bluezdot |
-| US-24.218 | Integrate LLD and LLM from Liberland network | EPIC-24 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-24.220 | WebApp - Sort the token by balance | EPIC-24 | P3 | 1 | sprint-2025-M06 | Thiendekaco |
-| US-24.221 | Update chain-list 0.2.45 | EPIC-24 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-24.222 | Fixed bug Do not show balance in case standing on History list to search token | EPIC-24 | P3 | 1 | sprint-2024-M03 | frenkie-ng |
-| US-24.223 | Fixed bug Error parsing token balance for frozen asset on Asset Hub | EPIC-24 | P3 | 1 | sprint-2024-M03 | S2kael |
-| US-24.225 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2024-M03 | bluezdot |
-| US-24.227 | Support new assets on Moonbeam | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.228 | Improve withdraw time for parachain | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.229 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.230 | Fixed bug fetching balance with Enjin Relay Chain | EPIC-24 | P3 | 1 | sprint-2024-M04 | S2kael |
-| US-24.231 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.234 | Support NFTs on Asset Hub | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.235 | Update chain-list | EPIC-24 | P3 | 1 | sprint-2024-M04 | bluezdot |
-| US-24.236 | WebApp - Support NFTs on Asset Hub | EPIC-24 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-24.237 | Add support Mythos chain | EPIC-24 | P3 | 1 | sprint-2024-M04 | S2kael |
-| US-24.238 | Check online network integration | EPIC-24 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-24.240 | Fixed bug Network's status show incorrect | EPIC-24 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-24.241 | Add the 'View on explorer' button on the Token details screen | EPIC-24 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-24.242 | Remove the logic that differentiates between Native tokens and Local tokens in case show sub-logo | EPIC-24 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-24.243 | Fix bug integrating chain online | EPIC-24 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-24.244 | WebApp - Add the 'View on explorer' button on the Token details screen | EPIC-24 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-24.245 | WebApp - Support GRC-20 token | EPIC-24 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
-| US-24.246 | Fix bug missing custom tokens on applying online patch | EPIC-24 | P3 | 1 | sprint-2024-M05 | nulllpc |
-| US-24.247 | Implement asset-pallet touch to prevent loss of funds | EPIC-24 | P3 | 1 | sprint-2024-M08 | nulllpc |
-| US-24.248 | WebApp - Remove the logic that differentiates between Native tokens and Local tokens in case show sub-logo | EPIC-24 | P3 | 1 | sprint-2024-M06 | frenkie-ng |
-| US-24.249 | Support TON network | EPIC-24 | P3 | 1 | sprint-2024-M06 | nulllpc |
-| US-24.250 | Change token type from GRC-20 to VFT | EPIC-24 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-24.251 | Update Vara token sdk version | EPIC-24 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-24.253 | WebApp - Change token type from GRC-20 to VFT | EPIC-24 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-24.254 | Refactor pallet parsing for token balance | EPIC-24 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-24.255 | Move step shorten metadata and calculate metadataHash to client | EPIC-24 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-24.256 | Support showing balance on TON network | EPIC-24 | P3 | 1 | sprint-2024-M08 | bluezdot |
-| US-24.257 | Support showing Jetton (TEP-74) balance on Ton Network | EPIC-24 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-24.260 | Test TON RPC | EPIC-24 | P3 | 1 | sprint-2024-M10 | bluezdot |
-| US-24.262 | Update UI for Chain abstraction demo | EPIC-24 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-24.263 | Fix bug not showing balance of VFT tokens | EPIC-24 | P3 | 1 | sprint-2024-M09 | bluezdot |
-| US-24.264 | Write script to validate chain - asset relationship | EPIC-24 | P3 | 1 | sprint-2025-M01 | PDTnhah |
-| US-24.265 | Support Asset Hub migration | EPIC-24 | P3 | 1 | sprint-2025-M07 | S2kael |
-| US-24.266 | Fixed bug validating recipient balance when sending Substrate token | EPIC-24 | P3 | 1 | sprint-2024-M12 | PDTnhah |
-| US-24.267 | Read up on Asset hub migration | EPIC-24 | P3 | 1 | sprint-2025-M06 | S2kael |
-| US-24.268 | Add infobox about Wallet version for TON token | EPIC-24 | P3 | 1 | sprint-2024-M10 | Quangdm-cdm |
-| US-24.270 | Update chain abstraction POC | EPIC-24 | P3 | 1 | sprint-2024-M10 | S2kael |
-| US-24.271 | Update Network details screen for TON | EPIC-24 | P3 | 1 | sprint-2024-M10 | PDTnhah |
-| US-24.272 | Improve UI related to Select token screen | EPIC-24 | P3 | 1 | sprint-2024-M10 | Quangdm-cdm |
-| US-24.273 | Fixed bug Can't reset data when search on select token popup | EPIC-24 | P3 | 1 | sprint-2025-M03 | frenkie-ng |
-| US-24.274 | Support Cardano | EPIC-24 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-24.276 | Unified address format integration | EPIC-24 | P3 | 1 | sprint-2025-M03 | frenkie-ng |
-| US-24.277 | [Chain abstraction] Setup chain abstraction explorer website | EPIC-24 | P3 | 1 | sprint-2024-M12 | saltict |
-| US-24.278 | [Chain abstraction] Update UI for chain abstraction explorer website | EPIC-24 | P3 | 1 | sprint-2024-M12 | lw-cdm |
-| US-24.280 | Support asset migration on Moonbeam | EPIC-24 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-24.281 | Show well-known tokens on top | EPIC-24 | P3 | 1 | sprint-2025-M02 | lw-cdm |
-| US-24.283 | Re-enable search token feature | EPIC-24 | P3 | 1 | sprint-2025-M01 | frenkie-ng |
-| US-24.284 | Improve token enabling | EPIC-24 | P3 | 1 | sprint-2025-M04 | frenkie-ng |
-| US-24.286 | Update for patch chain | EPIC-24 | P3 | 1 | sprint-2025-M08 | PDTnhah |
-| US-24.287 | Extension - Re-check validating recipient balance when sending local token for EVM | EPIC-24 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-24.288 | Auto update metadata for substrate chain | EPIC-24 | P3 | 1 | sprint-2025-M03 | bluezdot |
-| US-24.289 | Show value of derivative token relative to the origin tokens | EPIC-24 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-24.290 | Integrate Meld All in One Wizard | EPIC-24 | P3 | 1 | sprint-2025-M03 | lw-cdm |
-| US-24.291 | Fixed bug integrating Wagmi into SubWallet | EPIC-24 | P3 | 1 | sprint-2025-M03 | Thiendekaco |
-| US-24.293 | Extension - Fix bug related to RPC | EPIC-24 | P3 | 1 | sprint-2025-M06 | saltict |
-| US-24.294 | Display dTAO balance like another token | EPIC-24 | P3 | 1 | sprint-2025-M04 | S2kael |
-| US-24.295 | Add dTAO token | EPIC-24 | P3 | 1 | sprint-2025-M04 | PDTnhah |
-| US-24.296 | Follow up Asset Hub Next migration | EPIC-24 | P3 | 1 | sprint-2025-M11 | saltict |
-| US-24.297 | Asset Hub Migration | EPIC-24 | P3 | 1 | sprint-2025-M11 | saltict |
-| US-24.298 | Update for Meld on-ramp | EPIC-24 | P3 | 1 | sprint-2025-M04 | lw-cdm |
-| US-24.299 | Fixed bug Wrong Price Impact When Swapping on PAH | EPIC-24 | P3 | 1 | sprint-2025-M05 | bluezdot |
-| US-24.300 | Improve token enabling (Round 2) | EPIC-24 | P3 | 1 | sprint-2025-M12 | PDTnhah |
-| US-24.301 | Extension - Improve token enabling(Round 2) | EPIC-24 | P3 | 1 | sprint-2025-M06 | — |
-| US-24.302 | Review address/chain/token handling for Bitcoin support | EPIC-24 | P3 | 1 | sprint-2025-M06 | lw-cdm |
-| US-24.303 | Extension - Don't automatically enable common tokens when doing eraser all | EPIC-24 | P3 | 1 | sprint-2025-M05 | frenkie-ng |
-| US-24.304 | Improve UI after Bitcoin integration | EPIC-24 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-24.305 | Review and Update Kusama & Westend Network Integrations in SubWallet | EPIC-24 | P3 | 1 | sprint-2025-M10 | saltict |
-| US-24.307 | VARA network nor Wallet balance | EPIC-24 | P3 | 1 | sprint-2025-M06 | — |
-| US-24.308 | Fixed some UI bugs after Bitcoin integration | EPIC-24 | P3 | 1 | sprint-2025-M06 | frenkie-ng |
-| US-24.309 | Fixed bug show Moonbeam local token balance | EPIC-24 | P3 | 1 | sprint-2025-M06 | bluezdot |
-| US-24.310 | [UI] Update outdated functions related to address/chain/token handling [Phase 1] | EPIC-24 | P3 | 1 | sprint-2025-M06 | lw-cdm |
-| US-24.311 | Filter 'To token' Based on Selected 'From token' - Round 1 | EPIC-24 | P3 | 1 | sprint-2025-M07 | bluezdot |
-| US-24.312 | Turn off default enabled tokens | EPIC-24 | P3 | 1 | sprint-2025-M07 | PDTnhah |
-| US-24.313 | Fixed bug Don't show list address type for BTC token when get address on Token details screen | EPIC-24 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-24.314 | Fixed bug Cannot withdraw on Westend Asset Hub | EPIC-24 | P3 | 1 | sprint-2025-M07 | S2kael |
-| US-24.315 | Fixed bug auto-enable chain for popular tokens | EPIC-24 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-24.316 | Improve detect assets & optimize enabled tokens on EVM chains | EPIC-24 | P3 | 1 | sprint-2025-M11 | PDTnhah |
-| US-24.319 | Migrate to ParaSpell V4 & Update asset metadata | EPIC-24 | P3 | 1 | sprint-2025-M09 | bluezdot |
-| US-24.320 | Improve Price Impact when swapping on Asset Hub | EPIC-24 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-24.324 | Update chain-list stable v0.2.118 (#4730): | EPIC-24 | P3 | 1 | sprint-2025-M10 | PDTnhah |
-| US-24.325 | WebApp - Update paseo asset hub migration | EPIC-24 | P3 | 1 | sprint-2025-M10 | bluezdot |
-| US-24.327 | Update chain-list stable v0.2.119 | EPIC-24 | P3 | 1 | sprint-2025-M10 | PDTnhah |
-| US-24.328 | Polkadot Asset Hub Migration | EPIC-24 | P3 | 1 | sprint-2025-M10 | saltict |
-| US-24.329 | WebApp - Update UI after Asset Hub Migration | EPIC-24 | P3 | 1 | sprint-2025-M10 | lw-cdm |
-| US-24.330 | Update chain-list stable v0.2.120 (#4797): | EPIC-24 | P3 | 1 | sprint-2025-M10 | PDTnhah |
-| US-24.331 | Update chain-list stable v0.2.121 (#4812): | EPIC-24 | P3 | 1 | sprint-2025-M11 | PDTnhah |
-| US-24.332 | Some updates after Polkadot Asset Hub Migration | EPIC-24 | P3 | 1 | sprint-2025-M11 | bluezdot |
-| US-24.333 | Update chain-list stable v0.2.122 | EPIC-24 | P3 | 1 | sprint-2025-M12 | PDTnhah |
-| US-24.334 | Update chain-list stable v0.2.123 | EPIC-24 | P3 | 1 | sprint-2026-M01 | PDTnhah |
-| US-24.336 | Display token name and subnet ID for subnet tokens \| Bittensor | EPIC-24 | P3 | 1 | sprint-2026-M03 | Thiendekaco |
-| US-24.339 | Unable to turn network when no add correct API key | EPIC-24 | P3 | 1 | sprint-2026-M03 | tunghp2002 |
-| US-24.340 | Update ParaSpell API integration to v1 | EPIC-24 | P3 | 1 | sprint-2026-M05 | tunghp2002 |
-| US-24.341 | Add support for USDC & stEWT | EPIC-24 | P3 | 1 | sprint-2026-M01 | nulllpc |
 | US-3.1 | Create a new wallet via seed phrase | EPIC-3 | P0 | 3 | sprint-2022-M01 | jacogr |
 | US-3.2 | Import account via seed phrase or private key | EPIC-3 | P0 | 3 | sprint-2022-M03 | Quangdm-cdm |
 | US-3.3 | Import account via JSON / QR / Trust Wallet | EPIC-3 | P1 | 5 | sprint-2025-M12 | bluezdot |
@@ -959,6 +638,8 @@
 | US-4.11 | Custom token import (ERC-20 / PSP-22) | EPIC-4 | P1 | 3 | sprint-2022-M10 | nulllpc |
 | US-4.12 | Token registry enable/disable | EPIC-4 | P1 | 2 | sprint-2023-M03 | nulllpc |
 | US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
+| US-4.26 | Network & token screens in the 1.0.2 UI rewrite | EPIC-4 | P3 | 1 | sprint-2023-M04 | — |
+| US-4.27 | Network & token on the WebApp & Avail Space | EPIC-4 | P3 | 5 | sprint-2024-M01 | — |
 | US-41.1 | Update new architecture aim to adding more features while being able to rebase the polkadot-js origin at any time. | EPIC-41 | P3 | 1 | sprint-2022-M03 | saltict |
 | US-41.2 | Support Mobile Devices | EPIC-41 | P3 | 1 | sprint-2022-M08 | saltict |
 | US-41.5 | Fix some bugs with AlephZero balance | EPIC-41 | P3 | 1 | sprint-2022-M04 | lw-cdm |
@@ -1392,30 +1073,11 @@
 
 _No stories_
 
-## 🗑️ Deprecated (87)
+## 🗑️ Deprecated (68)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
-| US-24.7 | Integrate in to popular web 2.0 CMS and Ecommerce: WordPress, Shopify & Merchize | EPIC-24 | P3 | 1 | — | — |
-| US-24.33 | The Sub-token doesn't occasionally display on Chain | EPIC-24 | P3 | 1 | — | — |
-| US-24.34 | Custom Network for Providers URL support both Substrate Chain & EVM Chain | EPIC-24 | P3 | 1 | — | — |
-| US-24.63 | Create a PR request to integrate SubWallet into Mangata | EPIC-24 | P3 | 1 | — | hieudd |
-| US-24.79 | Add support manual add token ID for ERC-721 that doesn't support tokenOfOwnerByIndex() | EPIC-24 | P3 | 1 | — | nulllpc |
-| US-24.102 | Integrate PhalaWorld Shells Collection | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.135 | Create PR request to integrate SubWallet into Composable Finance dapps | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.138 | Auto-update online from chain-list (step 3) | EPIC-24 | P3 | 1 | — | saltict |
-| US-24.155 | Re-check nominated record of the Calamari network | EPIC-24 | P3 | 1 | — | nulllpc |
-| US-24.185 | Improve UX: Enables faster RPC updates | EPIC-24 | P3 | 1 | — | — |
-| US-24.191 | Re-check all functions on Moonbeam network | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.226 | Integrate asset online ( Round 2) | EPIC-24 | P3 | 1 | — | S2kael |
-| US-24.233 | Re-check case remove custom network | EPIC-24 | P3 | 1 | — | — |
-| US-24.252 | WebApp - Change token type from GRC-20 to VFT | EPIC-24 | P3 | 1 | — | lw-cdm |
-| US-24.321 | Polkadot Asset Hub Migration | EPIC-24 | P3 | 1 | — | — |
-| US-24.322 | [Extension][Manage network/Filter] Display incorrect list of networks when combining enabled/disabled filter and other f | EPIC-24 | P3 | 1 | — | — |
-| US-24.323 | Support Minting DOT and POAP at Token2049 | EPIC-24 | P3 | 1 | — | bluezdot |
-| US-24.326 | [WebApp / Network detail] - Unable to open network detail screen when clicking first time on edit button of network | EPIC-24 | P3 | 1 | — | lw-cdm |
-| US-24.342 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-24 | P3 | 1 | — | anhntk54 |
 | US-32.17 | Support staking for cross-chain tokens inside parachains | EPIC-32 | P3 | 1 | — | hieudd |
 | US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-32.42 | Bug withdrawing GLMR stake | EPIC-32 | P3 | 1 | — | Sokol142196 |
@@ -1488,12 +1150,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 179
-- 🟢 **Ready**: 10
+- 📋 **Backlog**: 146
+- 🟢 **Ready**: 9
 - 🟡 **In Progress**: 27
 - 👀 **Review**: 9
-- ✅ **Done**: 1134
+- ✅ **Done**: 849
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 87
+- 🗑️ **Deprecated**: 68
 
 ⚠️  **WIP limit exceeded**: 27 stories in-progress (limit: 3).

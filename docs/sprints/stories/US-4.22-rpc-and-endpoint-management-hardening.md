@@ -135,6 +135,23 @@ facet — which also absorbs #4216 — calibrates at 3.)
 
 _Hardening story — RPC-management facet of #4451 + #4216. Fill `commit` / `version_shipped` during reconciliation._
 
+## Incremental work, fixes & chores
+
+**2 tracker issues** — both open, folded in from the former Network & Token maintenance ledger
+(2026-07-24). These are RPC-management issues beyond the #4451 / #4216 pair this story was scoped
+around; they belong to the same open hardening surface.
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#2504](https://github.com/Koniverse/SubWallet-Extension/issues/2504) | Change RPC provider automatically when the current provider dies | 📋 backlog |
+| — | [#2705](https://github.com/Koniverse/SubWallet-Extension/issues/2705) | Extension - Do not enable native token in case network is enabled when change rpc | 📋 backlog |
+
+> **Both are the endpoint-reliability problem this story exists for.** #2504 (*"change RPC provider
+> automatically when the current one is down"*) is the fallback AC-1 asks for; #3722 (*"error when
+> working with rpc: light-client"*) is the light-client endpoint path failing. They stay open here
+> rather than in a `done` capability story ([AGENTS.md](../../../AGENTS.md) rule 9).
+
 ## Cross-references
 
 - [Issue #4451](https://github.com/Koniverse/SubWallet-Extension/issues/4451) · [Issue #4216](https://github.com/Koniverse/SubWallet-Extension/issues/4216) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.1](US-4.1-add-remove-networks-and-custom-rpc.md) · [US-4.21](US-4.21-asset-hub-migration-hardening.md) · [US-4.23](US-4.23-bitcoin-api-path-hardening.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

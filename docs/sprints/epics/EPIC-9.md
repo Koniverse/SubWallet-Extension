@@ -162,7 +162,7 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 >
 > **US-9.22 / US-9.23 / US-9.24 are improvement stories**, split out on 2026-07-22 from US-9.7, US-9.10 and US-9.20. Each parent carried an open row beside its shipped ones; US-9.20's went further and asserted *"not yet started, no release delivers it"* over a table showing #4884 `done @ 1.3.80`. Completed work stays in the story that shipped it, open work becomes an improvement story on it ([AGENTS.md](../../../AGENTS.md) rule 9).
 >
-> Two mis-area issues a title heuristic had routed here — **#639** (USDC & stEWT, token support) and **#1967** (Mint-NFT campaign) — were **relocated 2026-07-17** to [EPIC-24](EPIC-24.md) and the engagement area, which on 2026-07-22 folded into [EPIC-19](EPIC-19.md) — #1967 now sits in [US-19.6](../stories/US-19.6-nft-mint-campaigns.md). Full issue→story map: [consolidation note](../../notes/2026-07-17.md).
+> Two mis-area issues a title heuristic had routed here — **#639** (USDC & stEWT, token support) and **#1967** (Mint-NFT campaign) — were **relocated 2026-07-17** to the network & token ledger (folded into [EPIC-4](EPIC-4.md) on 2026-07-24, #639 now in [US-4.12](../stories/US-4.12-token-registry-enable-disable.md)) and the engagement area, which on 2026-07-22 folded into [EPIC-19](EPIC-19.md) — #1967 now sits in [US-19.6](../stories/US-19.6-nft-mint-campaigns.md). Full issue→story map: [consolidation note](../../notes/2026-07-17.md).
 
 ## Object map & user-story interactions
 

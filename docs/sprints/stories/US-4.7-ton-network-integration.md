@@ -22,6 +22,11 @@ A user can hold and view TON and Jetton tokens from the same unified wallet, and
 choose which wallet-contract version their TON account uses, so funds created on
 any prior contract version stay accessible from one seed.
 
+## Status
+
+> **✅ done — shipped in 1.3.1.** All acceptance criteria are ticked and the 6 rows below are
+> settled — all delivered.
+
 ## Background
 
 TON is an account-model ecosystem with a distinctive wrinkle: the user's address
@@ -108,6 +113,24 @@ external system integration).
 
 Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.1` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `7119ac0e44, e23ecdf9a2` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.1 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**6 tracker issues** landed on TON network integration — 4 with a release, 2 delivered with no line naming them. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.1 | [#3384](https://github.com/Koniverse/SubWallet-Extension/issues/3384) | Support showing balance on TON network | ✅ done |
+| 1.3.1 | [#3394](https://github.com/Koniverse/SubWallet-Extension/issues/3394) | Support showing Jetton (TEP-74) balance on Ton Network | ✅ done |
+| 1.3.2 | [#3718](https://github.com/Koniverse/SubWallet-Extension/issues/3718) | Extension - Add infobox about Wallet version for TON token | ✅ done |
+| 1.3.3 | [#3747](https://github.com/Koniverse/SubWallet-Extension/issues/3747) | Extension - Update Network details screen for TON | ✅ done |
+| — | [#3186](https://github.com/Koniverse/SubWallet-Extension/issues/3186) | Support TON network | ✅ done |
+| — | [#3523](https://github.com/Koniverse/SubWallet-Extension/issues/3523) | Test TON RPC | ✅ done |
+
+> **TON's rows are the wallet-contract version and Jetton assets** — the two things that make TON
+> different from an account-model chain. Selecting the contract version is a TON-specific concept the
+> registry had to learn.
+
 ## Cross-references
 
 - [PRD FR-38](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.6](US-4.6-bitcoin-network-integration.md) · [US-4.8](US-4.8-cardano-network-integration.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

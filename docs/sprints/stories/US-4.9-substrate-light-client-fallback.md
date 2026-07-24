@@ -21,6 +21,11 @@ updated: 2026-06-12
 When no RPC endpoint is reachable for a Substrate chain, the wallet falls back to
 a light client so the user can still connect, rather than seeing a dead network.
 
+## Status
+
+> **✅ done — shipped in 0.7.7.** All acceptance criteria are ticked and the 1 row below is
+> settled (delivered with no CHANGELOG line naming it).
+
 ## Background
 
 Public RPC endpoints go down, get rate-limited, or simply do not exist for some
@@ -95,6 +100,18 @@ build), per SKILL §3a-bis.
 
 Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `0.7.7` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `c161e7d1f0` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v0.7.7 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**1 tracker issues** landed on the Substrate light-client fallback — 0 with a release, 1 delivered with no line naming them. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| — | [#119](https://github.com/Koniverse/SubWallet-Extension/issues/119) | Implement Light Client as a predefined endpoint | ✅ done |
+
+> **One row, no release line.** The `@substrate/connect` fallback is a rarely-touched path — it
+> only matters when no RPC is reachable — and it generated a single maintenance issue.
+
 ## Cross-references
 
 - [PRD FR-40](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.4](US-4.4-substrate-parachain-registry.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

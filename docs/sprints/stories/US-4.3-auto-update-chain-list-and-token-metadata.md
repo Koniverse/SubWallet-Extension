@@ -22,6 +22,14 @@ New chains and updated token metadata reach users **without shipping a new
 extension version**, so the wallet can track the fast-moving multi-chain
 ecosystem in near-real-time instead of on the extension-store release cadence.
 
+## Status
+
+> **✅ done — shipped in 1.1.50.** All acceptance criteria are ticked and the 71 rows below are
+> settled: 67 delivered, 4 closed without shipping. **This is the second-largest story in the epic.**
+> Its chain-list update batches with sub-issues — #4861, #4827, #4767, #4812, #4730, #4797 — keep
+> their own rows (each has a CHANGELOG line); the two batches with no line, #4935 and the Asset Hub
+> umbrella #4187, are owned by [EPIC-4](../epics/EPIC-4.md) ([AGENTS.md](../../../AGENTS.md) rule 10).
+
 ## Background
 
 Hard-coding chain specs and token lists into the bundle would mean every new
@@ -108,6 +116,93 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `d4bb42fea3838255a103dcd45ca1286184f6acfc, 78c857751bdf2b2e2acf7ef68f3fd9ea5461d056, 40a60fcd720e88a730efa969f22c52ba9ac62cf3` verified contained in the v1.1.50 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**71 tracker issues** landed on the chain list, token/network metadata and logos — 58 with a release, 9 delivered with no line naming them, 4 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.4.1 | [#193](https://github.com/Koniverse/SubWallet-Extension/issues/193) | Change the logo of $CHRWNA token on Statemine | ✅ done |
+| 0.5.3 | [#499](https://github.com/Koniverse/SubWallet-Extension/issues/499) | Update logo & modal style | ✅ done |
+| 0.5.7 | [#524](https://github.com/Koniverse/SubWallet-Extension/issues/524) | Change the logo of xcINTR, xciBTC, xckBTC, xcCSM, xcSDN, xcKMA, xcLIT, xcCRAB, xcTEER | ✅ done |
+| 0.6.1 | [#625](https://github.com/Koniverse/SubWallet-Extension/issues/625) | Fix Gear Staging Testnet logo | ✅ done |
+| 0.6.1 | [#626](https://github.com/Koniverse/SubWallet-Extension/issues/626) | Update ArthSwap logo (ARSW token on Astar-EVM) | ✅ done |
+| 0.6.4 | [#656](https://github.com/Koniverse/SubWallet-Extension/issues/656) | Update Subspace Network Endpoint & Bit.Country Token Logo | ✅ done |
+| 0.7.2 | [#816](https://github.com/Koniverse/SubWallet-Extension/issues/816) | Update BIT token logo | ✅ done |
+| 0.8.2 | [#1032](https://github.com/Koniverse/SubWallet-Extension/issues/1032) | Token Logos Update | ✅ done |
+| 0.8.2 | [#1086](https://github.com/Koniverse/SubWallet-Extension/issues/1086) | Temporarily hide Kintsugi in the Origin chain list | ✅ done |
+| 0.8.3 | [#1098](https://github.com/Koniverse/SubWallet-Extension/issues/1098) | Equilibrium logo update | ✅ done |
+| 1.0.2 | [#1298](https://github.com/Koniverse/SubWallet-Extension/issues/1298) | Update Welcome and Login Logo & Background | ✅ done |
+| 1.0.3 | [#1273](https://github.com/Koniverse/SubWallet-Extension/issues/1273) | Auto-update online from chain list (Step 1) | ✅ done |
+| 1.0.4 | [#1319](https://github.com/Koniverse/SubWallet-Extension/issues/1319) | Auto-update online from chain list (step 2) | ✅ done |
+| 1.0.5 | [#1374](https://github.com/Koniverse/SubWallet-Extension/issues/1374) | Optimize logo | ✅ done |
+| 1.0.5 | [#1383](https://github.com/Koniverse/SubWallet-Extension/issues/1383) | Update chain-list dependency and check issues | ✅ done |
+| 1.0.6 | [#1437](https://github.com/Koniverse/SubWallet-Extension/issues/1437) | Update logo for some chains and tokens | ✅ done |
+| 1.0.9 | [#1519](https://github.com/Koniverse/SubWallet-Extension/issues/1519) | Update chain-list | ✅ done |
+| 1.0.9 | [#1526](https://github.com/Koniverse/SubWallet-Extension/issues/1526) | Bump chain-list dependency | ✅ done |
+| 1.0.10 | [#1541](https://github.com/Koniverse/SubWallet-Extension/issues/1541) | Update chain-list | ✅ done |
+| 1.1.2 | [#1620](https://github.com/Koniverse/SubWallet-Extension/issues/1620) | Update chain-list | ✅ done |
+| 1.1.3 | [#588](https://github.com/Koniverse/SubWallet-Extension/issues/588) | Auto update metadata: Auto update metadata via API, not required update from polkadot-js/app | ✅ done |
+| 1.1.6 | [#1715](https://github.com/Koniverse/SubWallet-Extension/issues/1715) | Update chain-list (w31) | ✅ done |
+| 1.1.8 | [#1777](https://github.com/Koniverse/SubWallet-Extension/issues/1777) | Update chain-list | ✅ done |
+| 1.1.9 | [#1821](https://github.com/Koniverse/SubWallet-Extension/issues/1821) | Update chain-list | ✅ done |
+| 1.1.11 | [#1861](https://github.com/Koniverse/SubWallet-Extension/issues/1861) | Update chain-list (w35-36) | ✅ done |
+| 1.1.12 | [#1896](https://github.com/Koniverse/SubWallet-Extension/issues/1896) | Update chain list (w37) | ✅ done |
+| 1.1.15 | [#1947](https://github.com/Koniverse/SubWallet-Extension/issues/1947) | Update token logo retrieval mechanism | ✅ done |
+| 1.1.16 | [#1982](https://github.com/Koniverse/SubWallet-Extension/issues/1982) | Update chain list (w40) | ✅ done |
+| 1.1.23 | [#2198](https://github.com/Koniverse/SubWallet-Extension/issues/2198) | Build Chain-List | ✅ done |
+| 1.1.24 | [#2287](https://github.com/Koniverse/SubWallet-Extension/issues/2287) | Update chain-list (w48) | ✅ done |
+| 1.1.25 | [#2302](https://github.com/Koniverse/SubWallet-Extension/issues/2302) | Update chain-list (w49) | ✅ done |
+| 1.1.26 | [#2329](https://github.com/Koniverse/SubWallet-Extension/issues/2329) | Update chain-list (w50) | ✅ done |
+| 1.1.27 | [#2368](https://github.com/Koniverse/SubWallet-Extension/issues/2368) | Update chain-list (w51) | ✅ done |
+| 1.1.28 | [#2404](https://github.com/Koniverse/SubWallet-Extension/issues/2404) | Update chain-list (w52) | ✅ done |
+| 1.1.29 | [#2425](https://github.com/Koniverse/SubWallet-Extension/issues/2425) | Update chain-list (w52) (2) | ✅ done |
+| 1.1.45 | [#2771](https://github.com/Koniverse/SubWallet-Extension/issues/2771) | Update chain-list (0.2.45) | ✅ done |
+| 1.1.49 | [#2799](https://github.com/Koniverse/SubWallet-Extension/issues/2799) | Error parsing token balance for frozen asset on Asset Hub | ✅ done |
+| 1.1.50 | [#2805](https://github.com/Koniverse/SubWallet-Extension/issues/2805) | Update chain-list | ✅ done |
+| 1.1.52 | [#2851](https://github.com/Koniverse/SubWallet-Extension/issues/2851) | Update chain-list | ✅ done |
+| 1.1.55 | [#2890](https://github.com/Koniverse/SubWallet-Extension/issues/2890) | Update chain-list | ✅ done |
+| 1.1.56 | [#2934](https://github.com/Koniverse/SubWallet-Extension/issues/2934) | Integrate nfts pallet on Asset hub | ✅ done |
+| 1.1.58 | [#2947](https://github.com/Koniverse/SubWallet-Extension/issues/2947) | Update chain-list | ✅ done |
+| 1.2.2 | [#3075](https://github.com/Koniverse/SubWallet-Extension/issues/3075) | Extension - Remove the logic that differentiates between Native tokens and Local tokens in case show sub-logo | ✅ done |
+| 1.2.16 | [#3305](https://github.com/Koniverse/SubWallet-Extension/issues/3305) | Move step shorten metadata and calculate `metadataHash` to client | ✅ done |
+| 1.3.13 | [#2016](https://github.com/Koniverse/SubWallet-Extension/issues/2016) | Re-check metadata update feature | ✅ done |
+| 1.3.24 | [#4037](https://github.com/Koniverse/SubWallet-Extension/issues/4037) | Auto update metadata for substrate chain | ✅ done |
+| 1.3.40 | [#4241](https://github.com/Koniverse/SubWallet-Extension/issues/4241) | 🔄 Wrong Price Impact When Swapping on Asset Hub (Polkadot) | ✅ done |
+| 1.3.46 | [#3710](https://github.com/Koniverse/SubWallet-Extension/issues/3710) | Support Asset Hub migration | ✅ done |
+| 1.3.48 | [#4522](https://github.com/Koniverse/SubWallet-Extension/issues/4522) | Extension - Cannot withdraw on Westend Asset Hub | ✅ done |
+| 1.3.62 | [#4730](https://github.com/Koniverse/SubWallet-Extension/issues/4730) | Extension - Update chain-list stable v0.2.118 | ✅ done |
+| 1.3.63 | [#4767](https://github.com/Koniverse/SubWallet-Extension/issues/4767) | Extension - Update chain-list stable v0.2.119 | ✅ done |
+| 1.3.64 | [#4790](https://github.com/Koniverse/SubWallet-Extension/issues/4790) | Polkadot Asset Hub Migration | ✅ done |
+| 1.3.64 | [#4797](https://github.com/Koniverse/SubWallet-Extension/issues/4797) | Extension - Update chain-list stable v0.2.120 | ✅ done |
+| 1.3.65 | [#4819](https://github.com/Koniverse/SubWallet-Extension/issues/4819) | Some updates after Polkadot Asset Hub Migration | ✅ done |
+| 1.3.66 | [#4812](https://github.com/Koniverse/SubWallet-Extension/issues/4812) | Extension - Update chain-list stable v0.2.121 | ✅ done |
+| 1.3.69 | [#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827) | Extension - Update chain-list stable v0.2.122 | ✅ done |
+| 1.3.70 | [#4648](https://github.com/Koniverse/SubWallet-Extension/issues/4648) | Improve Price Impact when swapping on Asset Hub | ✅ done |
+| 1.3.72 | [#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861) | Extension - Update chain-list stable v0.2.123 | ✅ done |
+| — | [#47](https://github.com/Koniverse/SubWallet-Extension/issues/47) | Integrate in to popular web 2.0 CMS and Ecommerce: WordPress, Shopify & Merchize | ⏸ deprecated |
+| — | [#238](https://github.com/Koniverse/SubWallet-Extension/issues/238) | Integrate $BEANS (Moonbeans) on Moonriver and change the current logo of $BEAN | ✅ done |
+| — | [#478](https://github.com/Koniverse/SubWallet-Extension/issues/478) | Update Chain Logo | ✅ done |
+| — | [#852](https://github.com/Koniverse/SubWallet-Extension/issues/852) | Update  Amplitude Testnet logo | ✅ done |
+| — | [#918](https://github.com/Koniverse/SubWallet-Extension/issues/918) | Integrate PhalaWorld Shells Collection | ⏸ deprecated |
+| — | [#1162](https://github.com/Koniverse/SubWallet-Extension/issues/1162) | Update logo for LIT token | ✅ done |
+| — | [#1260](https://github.com/Koniverse/SubWallet-Extension/issues/1260) | INW token logo update | ✅ done |
+| — | [#1320](https://github.com/Koniverse/SubWallet-Extension/issues/1320) | Auto-update online from chain-list (step 3) | ⏸ deprecated |
+| — | [#1416](https://github.com/Koniverse/SubWallet-Extension/issues/1416) | Update default logo | ✅ done |
+| — | [#3714](https://github.com/Koniverse/SubWallet-Extension/issues/3714) | Read up on Asset hub migration | ✅ done |
+| — | [#3731](https://github.com/Koniverse/SubWallet-Extension/issues/3731) | Update chain abstraction POC | ✅ done |
+| — | [#4170](https://github.com/Koniverse/SubWallet-Extension/issues/4170) | Follow up Asset Hub Next migration | ✅ done |
+| — | [#4658](https://github.com/Koniverse/SubWallet-Extension/issues/4658) | Polkadot Asset Hub Migration | ⏸ deprecated |
+
+> **The registry updates online, so a chain, a logo or a metadata fix is a data push, not a
+> release — and it never stops.** Auto-update rolled out in numbered steps (#1273, #1319, #1320), then
+> became a standing release train: *"Update chain-list stable v0.2.118 … v0.2.124"* is a dozen batches,
+> each bumping the shared `@subwallet/chain-list` dependency. Logo updates alone are ~20 rows. **The
+> Asset Hub migration lives here** too — 16 issues (#3710, #4170, #4522, #4790, #4819 …) that were
+> fundamentally chain-list, endpoint and default-set updates; its ongoing hardening anchor is
+> [US-4.21](US-4.21-asset-hub-migration-hardening.md).
+
 ## Cross-references
 
 - [PRD FR-34](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.4](US-4.4-substrate-parachain-registry.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

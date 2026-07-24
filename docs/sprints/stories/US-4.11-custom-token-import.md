@@ -22,6 +22,11 @@ A user can add any ERC-20 or PSP-22 token to the wallet by pasting its contract
 address, so tokens that are not yet in the bundled registry still show a balance
 and can be transferred.
 
+## Status
+
+> **✅ done — shipped in 0.6.7.** All acceptance criteria are ticked and the 3 rows below are
+> settled: 2 delivered, 1 closed without shipping.
+
 ## Background
 
 Not every token ships in the auto-updated asset registry
@@ -110,6 +115,21 @@ Backfilled by US-21.2 (multi-agent trace + adversarial verify, run `wf_6b56f4cd-
 
 Commits `2b181e4c8a, 52d791e49c, 35f5a8aa31` verified contained in the v0.6.7 anchor via `git merge-base --is-ancestor`; assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**3 tracker issues** landed on custom-token import (ERC-20 / PSP-22) — 2 with a release, 1 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 0.4.4 | [#314](https://github.com/Koniverse/SubWallet-Extension/issues/314) | Bug happens when user delete all custom tokens & predefined tokens | ✅ done |
+| 1.1.68 | [#3101](https://github.com/Koniverse/SubWallet-Extension/issues/3101) | Fix bug missing custom tokens on applying online patch | ✅ done |
+| — | [#726](https://github.com/Koniverse/SubWallet-Extension/issues/726) | Add support manual add token ID for ERC-721 that doesn't support tokenOfOwnerByIndex() | ⏸ deprecated |
+
+> **Import is small; the registry is large.** Adding a token by contract address is three rows;
+> the wallet's token *maintenance* is overwhelmingly about auto-detection and visibility, which is
+> [US-4.12](US-4.12-token-registry-enable-disable.md)'s 67.
+
 ## Cross-references
 
 - [PRD FR-42](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.12](US-4.12-token-registry-enable-disable.md) · [US-4.3](US-4.3-auto-update-chain-list-and-token-metadata.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)

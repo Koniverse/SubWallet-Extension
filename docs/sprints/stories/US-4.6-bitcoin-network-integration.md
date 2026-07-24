@@ -22,6 +22,11 @@ A user can hold and view Bitcoin from the same unified wallet, with all three
 standard address types per account, so the wallet is compatible with the broad
 range of BTC dApps and counterparties that each expect a different format.
 
+## Status
+
+> **✅ done — shipped in 1.3.42.** All acceptance criteria are ticked and the 3 rows below are
+> settled — all delivered.
+
 ## Background
 
 Bitcoin is a non-account-model (UTXO) ecosystem, so it needs its own integration
@@ -107,6 +112,21 @@ system integration).
 
 Backfilled by US-21.2 (batch 1, commit `571f3085be`). Version `1.3.42` is the release whose docs/CHANGELOG.md bullet first delivers this story's headline capability; commits `a6dfc0bd26, 49d460215b` were resolved from that bullet's issue number (`git log --grep`, filtered to a ±270-day window around the release date to exclude same-numbered upstream polkadot-js PRs) and each verified contained in the v1.3.42 anchor via `git merge-base --is-ancestor`. Assignee resolved through the [US-21.1 contributor map](../../notes/contributor-map.md).
 
+## Incremental work, fixes & chores
+
+**3 tracker issues** landed on Bitcoin network integration — 3 with a release. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+
+| Shipped | Issue | Title | Status |
+|---|---|---|---|
+| 1.3.42 | [#4297](https://github.com/Koniverse/SubWallet-Extension/issues/4297) | [UI] Review address/chain/token handling for Bitcoin support | ✅ done |
+| 1.3.42 | [#4316](https://github.com/Koniverse/SubWallet-Extension/issues/4316) | Extension - Improve UI after Bitcoin integration | ✅ done |
+| 1.3.42 | [#4412](https://github.com/Koniverse/SubWallet-Extension/issues/4412) | Extension - Fix some UI bugs after Bitcoin integration (Round 2) | ✅ done |
+
+> **Three rows for a whole ecosystem — because the Bitcoin *API path* has its own story.** The
+> UTXO / indexer / provider-drift reliability work is [US-4.23](US-4.23-bitcoin-api-path-hardening.md);
+> what lands here is the network integration itself.
+
 ## Cross-references
 
 - [PRD FR-37](../../PRD.md#epic-4--chain-management) · [Epic EPIC-4](../epics/EPIC-4.md) · [US-4.13](US-4.13-bitcoin-utxo-multi-asset-transfer.md)
+- [consolidation note](../../notes/2026-07-24.md#d-epic-24-maintenance--network--token-merged-into-epic-4)
