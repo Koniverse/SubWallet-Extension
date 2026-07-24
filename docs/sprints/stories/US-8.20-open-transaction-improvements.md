@@ -22,8 +22,7 @@ gets when a transfer fails.
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 17 rows below are **open on the tracker**: 12
-> `In Backlog`, 5 `In Plan`. No acceptance criterion is ticked, and `commit`, `sprint` and
+> **🚧 in-progress — nothing here has shipped.** All 19 rows below are **open on the tracker**. No acceptance criterion is ticked, and `commit`, `sprint` and
 > `version_shipped` stay empty until work lands in a release.
 
 ## Scope
@@ -59,6 +58,10 @@ its eight issues, and splitting on the title is what keeps both readable.
 | — | [#4041](https://github.com/Koniverse/SubWallet-Extension/issues/4041) | Extension - Improve show well-known tokens on top when Receive token | 📋 backlog |
 | — | [#4093](https://github.com/Koniverse/SubWallet-Extension/issues/4093) | Extension - Add validate receipient address  when transfer | 📋 backlog |
 | — | [#4432](https://github.com/Koniverse/SubWallet-Extension/issues/4432) | [Transaction] Ensure proper initialization when navigating via direct link | 📋 backlog |
+| — | [#158](https://github.com/Koniverse/SubWallet-Extension/issues/158) | Make the extrinsic decoding and reviewing more seemless | 📋 backlog |
+| — | [#3428](https://github.com/Koniverse/SubWallet-Extension/issues/3428) | WebApp - Disable all actions when submitting data | 📋 backlog |
+
+> **+2 open rows recovered from the Uncategorized ledger** (2026-07-24).
 
 > **#2618 is the structural answer nobody has taken.** *"Implement new fee service"* — one place that
 > owns fee estimation, instead of the per-chain, per-provider guessing that

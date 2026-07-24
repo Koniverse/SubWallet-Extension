@@ -145,6 +145,7 @@ their own epics.
 | [US-8.18](../stories/US-8.18-webapp-transaction-surface.md) | WebApp transaction surface | Confirming, cancelling and scanning where there is no popup | ✅ done | 1.1.62 |
 | [US-8.19](../stories/US-8.19-unified-account-transaction-migration.md) | Unified-account transaction migration | Eight issues, one release, zero stragglers | ✅ done | 1.3.1 |
 | [US-8.20](../stories/US-8.20-open-transaction-improvements.md) | Open transaction improvements | Address validation round 2, more history types, the fee service nobody built | 🚧 in-progress | — |
+| [US-8.21](../stories/US-8.21-transaction-fixes-recovered-from-uncategorized.md) | Transaction fixes recovered from Uncategorized | Extrinsic/queueing/status-subscription fixes | ✅ done | 1.3.30 |
 
 > **US-8.14 … US-8.20 carry no FR.** They hold the incremental work, fixes and chores that landed on
 > this epic — **212 tracker issues**, folded in from the former one-issue-per-story maintenance

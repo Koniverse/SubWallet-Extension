@@ -204,6 +204,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.25](../stories/US-4.25-open-network-and-token-improvements.md) | Open network & token improvements | The open network/token work no `done` story can carry (rule 9) | 🚧 in-progress | — |
 | [US-4.26](../stories/US-4.26-network-and-token-screens-in-the-1-0-2-rewrite.md) | Network & token screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — Settings/Networks, token list, logos | ✅ done | 1.0.2 |
 | [US-4.27](../stories/US-4.27-network-and-token-on-the-webapp-and-avail-space.md) | Network & token on the WebApp & Avail Space | Manage networks / tokens on the non-extension surfaces | ✅ done | 1.2.14 |
+| [US-4.28](../stories/US-4.28-chains-tokens-and-data-recovered-from-uncategorized.md) | Chains, tokens & data recovered from Uncategorized | Chain/token adds, chainlist train, data-indexer | ✅ done | 1.3.61 |
 
 > **US-4.25 … US-4.27 carry no FR**, and neither do the hardening stories US-4.21 … US-4.23. They hold
 > the incremental work, fixes and chores that landed on this epic's capabilities — **341 tracker

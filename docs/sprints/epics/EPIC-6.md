@@ -119,6 +119,8 @@ here; currency-converted *amounts* are computed by the balance epic
 | [US-6.10](../stories/US-6.10-notification-and-campaign-surfaces.md) | Notification & marketing-campaign surfaces | Where the banner lands, in what order, and how the user gets out | ✅ done | 1.3.4 |
 | [US-6.11](../stories/US-6.11-transaction-history-surface.md) | Transaction-history surface | The list the user reads, and the indexers behind it | ✅ done | 1.3.1 |
 | [US-6.12](../stories/US-6.12-early-ux-iteration.md) | Early UX iteration (pre-design-system) | UX work from before there was a design system to work in | ✅ done | 1.1.10 |
+| [US-6.13](../stories/US-6.13-ui-fixes-recovered-from-uncategorized.md) | UI fixes recovered from Uncategorized | Screen/layout/nav/content fixes from the triage bucket | ✅ done | 1.3.70 |
+| [US-6.14](../stories/US-6.14-open-ui-improvements-recovered-from-uncategorized.md) | Open UI improvements (recovered) | Open UI work not yet delivered (rule 9) | 🚧 in-progress | — |
 
 > Every FR is assigned a story ID up front (FR order) so numbering is locked — no
 > renumber later. US-6.6 is the epic's hardening story (no FR).

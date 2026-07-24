@@ -112,6 +112,7 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 | [US-11.15](../stories/US-11.15-providers-evaluated-not-integrated.md) | Providers evaluated but not integrated | Zenlink, Acala, Parallel Finance, ArthSwap, 1inch — the record of five decisions not to build | ✅ done | — |
 | [US-11.16](../stories/US-11.16-swap-flow-improvements.md) | Swap flow improvements | Open provider-neutral work — four of ten rows are the fee | 🚧 in-progress | — |
 | [US-11.17](../stories/US-11.17-swap-coverage-expansion.md) | Swap coverage expansion | Open per-provider reach — one more venue, pair, fee token or control | 🚧 in-progress | — |
+| [US-11.18](../stories/US-11.18-swap-fixes-recovered-from-uncategorized.md) | Swap fixes recovered from Uncategorized | Provider-specific swap fixes (ArthSwap, Stellaswap) | ✅ done | 1.3.32 |
 
 > The 11 provider stories (US-11.1–11.11) are the **FR map**: one requirement each, FR-103 … FR-113.
 > The shipped state of each lives in [PRD](../../PRD.md#functional-requirements).

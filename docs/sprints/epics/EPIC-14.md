@@ -119,6 +119,7 @@ balances itself.
 | [US-14.2](../stories/US-14.2-fiat-off-ramp-sell-crypto-for-fiat.md) | Fiat off-ramp: sell crypto for fiat | Sell crypto for fiat via the Transak hand-off (`action: SELL`) | ✅ done | 1.3.56 |
 | [US-14.3](../stories/US-14.3-additional-on-ramp-providers.md) | Additional on-ramp providers | Add MoonPay, Ramp.Network and native Apple Pay / Google Pay rails as new adapters | 📋 backlog | — |
 | [US-14.4](../stories/US-14.4-off-ramp-flow-improvements.md) | Off-ramp flow improvements | Improvement on US-14.2 — keep selling inside the popup (#4453) and finish the WebApp surface (#3839) | 📋 backlog | — |
+| [US-14.5](../stories/US-14.5-fiat-fixes-recovered-from-uncategorized.md) | Fiat on-ramp fixes recovered from Uncategorized | Provider-config & faucet-adjacent fixes | ✅ done | 1.1.17 |
 
 > US-14.1 and US-14.2 are retroactive (capability already ships); US-14.3 is
 > forward/planned. Each of those materializes exactly one FR.

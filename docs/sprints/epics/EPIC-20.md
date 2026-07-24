@@ -208,6 +208,7 @@ boundary is drawn explicitly in Out of scope.
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | List rendering performance | Make heavy lists/screens (NFT / Receive / customization / select token / select network) render fast | 📋 backlog | — |
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp & web-runner performance | WebApp animations + list pagination and a web-runner shared worker across tabs | 📋 backlog | — |
 | [US-20.10](../stories/US-20.10-early-performance-passes.md) | Early performance passes (2022–2024) | The six performance issues that shipped before this programme started | ✅ done | 1.0.7 |
+| [US-20.11](../stories/US-20.11-lifecycle-fixes-recovered-from-uncategorized.md) | Lifecycle & performance fixes recovered from Uncategorized | Race-conditions, MV3 wake/sleep | ✅ done | 1.0.3 |
 
 > Every EPIC-20 story owns **no FR** (cf. the
 > [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) /

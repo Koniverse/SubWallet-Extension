@@ -162,6 +162,7 @@ page.
 | [US-10.16](../stories/US-10.16-add-token-and-network-from-a-dapp.md) | Add token & network from a dApp | The `watchAsset` / `addEthereumChain` family that changes the wallet's own registry | ✅ done | 1.3.24 |
 | [US-10.17](../stories/US-10.17-open-dapp-connection-and-signing-improvements.md) | Open dApp connection & signing improvements | The unthemed open remainder — 21 rows across connection, signing, errors | 🚧 in-progress | — |
 | [US-10.19](../stories/US-10.19-dapp-directory-docs-and-qa.md) | dApp directory, integration docs & QA | The catalogue and process around connectivity, not the connectors | ✅ done | 1.1.27 |
+| [US-10.20](../stories/US-10.20-dapp-fixes-recovered-from-uncategorized.md) | dApp fixes recovered from Uncategorized | Provider injection, EIP standards, website-access | ✅ done | 1.3.46 |
 
 ## Object map & user-story interactions
 

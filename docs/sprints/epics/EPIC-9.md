@@ -157,6 +157,7 @@ Each NFT capability is **one story** — it carries its requirement (where it ma
 | [US-9.24](../stories/US-9.24-client-side-nft-service-full-sdk-migration.md) | Client-side NFT Service — full SDK migration | Improvement on US-9.20 — everything Phase 1 did not move (#4883) | 📋 backlog | — |
 | [US-9.25](../stories/US-9.25-nft-display-open-defects.md) | NFT display & UI open defects | Improvement on US-9.10 — its five open defects | 📋 backlog | — |
 | [US-9.26](../stories/US-9.26-erc-1155-on-ethereum.md) | ERC-1155 on Ethereum | Improvement on US-9.4 — the chain RARI's support did not reach (#4881) | 📋 backlog | — |
+| [US-9.27](../stories/US-9.27-nft-fixes-recovered-from-uncategorized.md) | NFT fixes recovered from Uncategorized | Collection parsing, stale-NFT display, standards | ✅ done | 1.1.2 |
 
 > **US-9.9** (FR-93) is 📋 planned in the PRD; authored here as `backlog` per Stream-B convention. **US-9.7** / **US-9.10** are `backlog` at the requirement level (the FR/hardening capability is not signed off) even though shipped incremental work appears in their timelines.
 >

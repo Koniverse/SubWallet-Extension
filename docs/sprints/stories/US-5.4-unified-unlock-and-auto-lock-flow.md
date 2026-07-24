@@ -122,8 +122,8 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **1
-> ledger still separate** finds **9 issues** mentioning "unlock" / "lock", sitting in EPIC-41.
+> **This capability's history is now fully folded — the scan is complete (0 ledgers remain).** The
+> last ledger (Uncategorized) folded on 2026-07-24; its "unlock" / "lock" matches resolved as below.
 >
 > **The transactions ledger held none of them.** It folded on 2026-07-24 with 200 issues and not one
 > title matched — a whole area of the tracker that never touches the lock state.
@@ -152,13 +152,20 @@ That ledger held only 13 issues and they were almost all phishing.
 > ledger folded the same day, then 23 → 18 when the account ledger folded on 2026-07-24, then 18 → 17
 > when the network & token ledger folded the same day — its one *"lock"* title, #2185 (*"pooled assets
 > are not included in locked balance"*), is a balance bug, not screen-lock — then 17 → 9 when the
-> earning ledger folded on 2026-07-24, whose eight matches are crowdloan *unlock* actions, nomination
-> pools with *block* status, and *lock balance* — none screen-lock. **Not one of those twenty issues
-> landed here.**
-> Treat the remainder as an **upper bound, not a count**: routing there is a title heuristic
-> ([D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)),
-> so some will belong elsewhere once read. Which of them land here is decided when those ledgers
-> are folded, not now.
+> earning ledger folded on 2026-07-24, then **9 → 0 when the Uncategorized ledger folded the same day —
+> the last of ten**. Of its unlock/lock matches, the auto-lock work (#1171, #1763, *"improve auto-lock
+> feature"*) and the online *block-action* guard (#3635, #3678, #3814) are security maintenance and
+> landed in [US-5.13](US-5.13-security-fixes-recovered-from-uncategorized.md) /
+> [US-5.14](US-5.14-open-security-improvements-recovered-from-uncategorized.md); the other eight are
+> *block explorer*, *pooled block status* and a proxy *Block Action* — substring noise, routed to their
+> real epics.
+>
+> **The scan is over, and across all ten ledgers not one issue landed in this story.** The unified
+> unlock / auto-lock *flow* shipped clean; every candidate a title-scan raised was a screen (EPIC-6), a
+> fix in the security-maintenance stories (US-5.13/5.14), an account-flow touch, or a `lock`/`block`
+> substring false positive — never the flow this story owns. That is the boundary
+> [D108](../../CONTEXT.md#d108-every-tracker-issue-gets-a-story--in-a-maintenance-epic-layer-so-the-fr-map-stays-the-fr-map)
+> exists to defend, now proven across the whole tracker.
 
 ## Cross-references
 

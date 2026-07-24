@@ -123,8 +123,12 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
-> ledgers still separate** finds **1 issue** mentioning "auto-lock", sitting in EPIC-41. (The account
+> **This capability's history is now fully folded — the scan is complete (0 ledgers remain).** The
+> last ledger (Uncategorized) folded on 2026-07-24 with **2** "auto-lock" matches — #1171 and #1763,
+> both *"improve auto-lock feature"* — genuine auto-lock *maintenance* that landed in
+> [US-5.13](US-5.13-security-fixes-recovered-from-uncategorized.md), EPIC-5's recovered-maintenance
+> story adjacent to this policy capability: the closest a candidate ever came to this story, and still
+> a fix rather than the timer/unlock-type policy it owns. (The account
 > ledger's one match, #1910 *"auto lock after import multi account"*, folded on 2026-07-24 into
 > [US-3.2](US-3.2-import-account-via-seed-phrase-or-private-key.md) as import-flow work — the lock
 > *fired by* an import, not the timer policy this story owns; it did not land here.)

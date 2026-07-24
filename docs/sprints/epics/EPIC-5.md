@@ -133,6 +133,8 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Security audit & remediation hardening | Remediate audit + false-positive findings (#4471, #4929, #4959, #4889, #4998), each regression-guarded | 🚧 in-progress | — |
 | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Two-factor authentication for outgoing transfers | A second factor in front of value leaving the wallet (#4125) | 📋 backlog | — |
 | [US-5.12](../stories/US-5.12-earlier-security-audit-rounds.md) | Earlier security audit rounds (2022–2025) | The four audit/hardening rounds that closed before US-5.10's scope was written | ✅ done | 1.3.28 |
+| [US-5.13](../stories/US-5.13-security-fixes-recovered-from-uncategorized.md) | Security fixes recovered from Uncategorized | Reset/ZK-mode/block-action from the triage bucket | ✅ done | 1.3.7 |
+| [US-5.14](../stories/US-5.14-open-security-improvements-recovered-from-uncategorized.md) | Open security improvements (recovered) | Open security work not yet delivered (rule 9) | 🚧 in-progress | — |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is

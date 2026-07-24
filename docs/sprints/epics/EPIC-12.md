@@ -182,6 +182,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.18](../stories/US-12.18-earning-screens-in-the-1-0-2-rewrite.md) | Earning screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite | ✅ done | 1.0.2 |
 | [US-12.19](../stories/US-12.19-earning-on-the-webapp-and-avail-space.md) | Earning on the WebApp & Avail Space | Staking / earning / crowdloan on the non-extension surfaces | ✅ done | 1.2.26 |
 | [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |
+| [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**

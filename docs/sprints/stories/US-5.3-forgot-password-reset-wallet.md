@@ -124,8 +124,12 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **2 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-41. (The dApp ledger's two matches, #1762 and #1806, were WalletConnect-on-reset issues, not the reset-wallet feature, and folded on 2026-07-24 without landing here.)
+> **This capability's history is now fully folded — the scan is complete (0 ledgers remain).** The
+> last ledger (Uncategorized) folded on 2026-07-24 with **4** "reset wallet" / "forgot password"
+> matches: the reset-wallet feature itself (#1224) and reset-all (#2374) are security and landed in
+> [US-5.13](US-5.13-security-fixes-recovered-from-uncategorized.md) /
+> [US-5.14](US-5.14-open-security-improvements-recovered-from-uncategorized.md); the other two were
+> platform — an iOS reset-data bug (#2272) and a backend-reset chore (#4700), now in EPIC-1. (The dApp ledger's two matches, #1762 and #1806, were WalletConnect-on-reset issues, not the reset-wallet feature, and folded on 2026-07-24 without landing here.)
 >
 > **The UI ledger's three were surface work.** #1075 went to
 > [US-6.7](US-6.7-the-1-0-2-ui-upgrade-programme.md), #2056 to

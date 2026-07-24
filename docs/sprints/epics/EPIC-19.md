@@ -170,6 +170,8 @@ notification feed and bundled locale files ride the same delivery substrate.
 | [US-19.11](../stories/US-19.11-onboarding-gate-follow-ups.md) | Onboarding gate follow-ups | Improvement on US-19.1 — WebApp backup reminder (#3010) and multilingual Terms of use (#2423) | 📋 backlog | — |
 | [US-19.12](../stories/US-19.12-i18n-coverage-and-key-hygiene.md) | i18n coverage & key hygiene | Improvement on US-19.2 — hardcoded strings (#4564, #4656), key format (#2460), Welcome-screen picker (#2004) | 📋 backlog | — |
 | [US-19.13](../stories/US-19.13-avail-space-mission-pool-improvement.md) | Avail Space mission pool improvement | Improvement on US-19.7 — refinement of the Avail Space surface (#3529) | 📋 backlog | — |
+| [US-19.14](../stories/US-19.14-onboarding-and-engagement-recovered-from-uncategorized.md) | Onboarding & engagement recovered from Uncategorized | T&C, support, faucet, FAQ, campaign | ✅ done | 1.2.32 |
+| [US-19.15](../stories/US-19.15-open-onboarding-and-engagement-recovered-from-uncategorized.md) | Open onboarding & engagement (recovered) | Open engagement work not yet delivered (rule 9) | 🚧 in-progress | — |
 
 > US-19.1, US-19.2, US-19.4..19.8 are **retroactive** (the capability already ships);
 > US-19.3 is **forward** (📋 planned, FR-154). Each of those materializes exactly one FR.

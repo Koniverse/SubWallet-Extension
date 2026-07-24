@@ -122,8 +122,12 @@ and any implementation caveats during version reconciliation._
 security maintenance ledger landed here (per-issue map: [consolidation note](../../notes/2026-07-21.md)).
 That ledger held only 13 issues and they were almost all phishing.
 
-> **This capability's history is not empty — it is not yet folded.** A title scan of the **3
-> ledgers still separate** finds **10 issues** mentioning "master password" / "password", sitting in EPIC-41. (The dApp ledger's three matches — #72, #737, #871 — were about remembering a password in the signing flow, not the master-password policy, and folded on 2026-07-24 into [US-10.8](US-10.8-arbitrary-message-signing.md).)
+> **This capability's history is now fully folded — the scan is complete (0 ledgers remain).** The
+> last ledger (Uncategorized) folded on 2026-07-24; its **10** "master password" / "password" matches
+> were all master-password *maintenance* — bugs, field sizing, show/hide, ZK-auth (#1295, #1543, #1642,
+> #2555, #2973 …) — and landed in [US-5.13](US-5.13-security-fixes-recovered-from-uncategorized.md),
+> EPIC-5's recovered-maintenance story, **not this policy capability**. The distinction held all the
+> way through: every one was a screen or a fix, never the policy. (The dApp ledger's three matches — #72, #737, #871 — were about remembering a password in the signing flow, not the master-password policy, and folded on 2026-07-24 into [US-10.8](US-10.8-arbitrary-message-signing.md).)
 >
 > **The Account ledger's four went to account stories, not here.** When it folded on 2026-07-24, #144
 > (*"master password for all account"*) and #2376 (*"export when input valid master password"*) landed

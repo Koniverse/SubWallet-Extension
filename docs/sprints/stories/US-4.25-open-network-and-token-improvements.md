@@ -22,7 +22,7 @@ carry without becoming a mix of done and open rows.
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 31 rows below are **open on the tracker**. No
+> **🚧 in-progress — nothing here has shipped.** All 37 rows below are **open on the tracker**. No
 > acceptance criterion is ticked, and `commit`, `sprint` and `version_shipped` stay empty until work
 > lands in a release.
 
@@ -40,7 +40,7 @@ migration is [US-4.21](US-4.21-asset-hub-migration-hardening.md), and the Bitcoi
 
 ## Incremental work, fixes & chores
 
-**31 tracker issues**, all open.
+**37 tracker issues**, all open.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -75,6 +75,14 @@ migration is [US-4.21](US-4.21-asset-hub-migration-hardening.md), and the Bitcoi
 | — | [#4395](https://github.com/Koniverse/SubWallet-Extension/issues/4395) | Research Midnight network | 🚧 in-progress |
 | — | [#4603](https://github.com/Koniverse/SubWallet-Extension/issues/4603) | Extension – Bundling Extension Code for Mobile Wallet App Integration | 📋 backlog |
 | — | [#4906](https://github.com/Koniverse/SubWallet-Extension/issues/4906) | Add Cardano Preview Network | 📋 backlog |
+| — | [#2236](https://github.com/Koniverse/SubWallet-Extension/issues/2236) | Bug when add new provider of different type | 📋 backlog |
+| — | [#2768](https://github.com/Koniverse/SubWallet-Extension/issues/2768) | Extension - Improve Subscan service | 📋 backlog |
+| — | [#3415](https://github.com/Koniverse/SubWallet-Extension/issues/3415) | WebApp - Check case input value min on Hydradation | 📋 backlog |
+| — | [#3530](https://github.com/Koniverse/SubWallet-Extension/issues/3530) | Update Verify Chainlist page | 📋 backlog |
+| — | [#4361](https://github.com/Koniverse/SubWallet-Extension/issues/4361) | Extension - Index UTXOs | 📋 backlog |
+| — | [#4400](https://github.com/Koniverse/SubWallet-Extension/issues/4400) | 🚀 Migration to ink! v6 & Support for pallet_revive on Polkadot Hub | 🚧 in-progress |
+
+> **+6 open rows recovered from the Uncategorized ledger** (2026-07-24) — open network/token work the triage bucket held.
 
 > **Token detection and display is the largest open theme** — auto-detect all assets (#2589), update
 > auto-enable (#2800), search improvements (#3961, #2907), distinguishing similar symbols (#2667),

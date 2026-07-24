@@ -22,7 +22,7 @@ rows.
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 24 rows below are **open on the tracker**. No
+> **🚧 in-progress — nothing here has shipped.** All 29 rows below are **open on the tracker**. No
 > acceptance criterion is ticked, and `commit`, `sprint` and `version_shipped` stay empty until work
 > lands in a release.
 
@@ -43,7 +43,7 @@ children (#4206, #3811, #3337) are rows here.
 
 ## Incremental work, fixes & chores
 
-**24 tracker issues**, all open.
+**29 tracker issues**, all open.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -71,6 +71,13 @@ children (#4206, #3811, #3337) are rows here.
 | — | [#4862](https://github.com/Koniverse/SubWallet-Extension/issues/4862) | Extension - “Invalid QR Code” When Importing Account via QR | 📋 backlog |
 | — | [#4893](https://github.com/Koniverse/SubWallet-Extension/issues/4893) | Extension - Bug about migrating to unified account | 📋 backlog |
 | — | [#4978](https://github.com/Koniverse/SubWallet-Extension/issues/4978) | Extension - Bug about export account when account is imported from json file and normal account | 📋 backlog |
+| — | [#46](https://github.com/Koniverse/SubWallet-Extension/issues/46) | DAO Fi features: Payroll, Contact | 📋 backlog |
+| — | [#1765](https://github.com/Koniverse/SubWallet-Extension/issues/1765) | Need to show a message to the user in case of copied the address when clicking on the avatar | 📋 backlog |
+| — | [#3928](https://github.com/Koniverse/SubWallet-Extension/issues/3928) | Extension - Change TON version but address does not update after successful change | 📋 backlog |
+| — | [#4070](https://github.com/Koniverse/SubWallet-Extension/issues/4070) | Extension - Improve Unified address format | 📋 backlog |
+| — | [#4327](https://github.com/Koniverse/SubWallet-Extension/issues/4327) | WebApp - Update link for "Contact support" | 📋 backlog |
+
+> **+5 open rows recovered from the Uncategorized ledger** (2026-07-24).
 
 > **Unified account is the largest open theme** — #3638, #3644, #3811, #4206, #4270, #4893 and the
 > Firefox thread behind umbrella #4205 are the tail of the same programme that shipped

@@ -155,6 +155,7 @@ number; EPIC-8 enforces it against the existential-deposit guard.
 | [US-7.6](../stories/US-7.6-balance-history-portfolio-value-over-time.md) | Balance history (portfolio value over time) | Historical portfolio value series over time (planned) | 📋 backlog | — |
 | [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md) | Balance-cache invalidation hardening | Keep the home-screen balance cache correct under change: multi-step balance-change listening (#4337), crowdloan in locked composition (#1583), stale-cache invalidation on account removal (#2410) plus the account-switch / chain-toggle / transfer-submit invariant | 📋 backlog | — |
 | [US-7.8](../stories/US-7.8-earlier-balance-cache-fixes.md) | Earlier balance-cache fixes (2022–2023) | The three cache fixes that shipped before US-7.7's scope was written | ✅ done | 1.1.29 |
+| [US-7.9](../stories/US-7.9-portfolio-fixes-recovered-from-uncategorized.md) | Portfolio & balance fixes recovered from Uncategorized | Crypto-list/big-number/currency/percentage display | ✅ done | 1.1.65 |
 
 > US-7.1–7.6 each materialize one FR (US-7.6 forward; the rest retroactive); US-7.7
 > is the epic's balance-correctness hardening cluster and owns no FR — it is anchored
