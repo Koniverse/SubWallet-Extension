@@ -83,7 +83,7 @@ work its children already carry.
 | Issue | Title | Children | Where the children are |
 |---|---|---|---|
 | [#4408](https://github.com/Koniverse/SubWallet-Extension/issues/4408) | Integrate Polkadot Ledger App | #2453, #3256, #3307, #3402, #3460 | all five in [US-16.7](../stories/US-16.7-generic-ledger-app-migration-and-metadata.md) |
-| [#4175](https://github.com/Koniverse/SubWallet-Extension/issues/4175) | Support cold wallets | #1387, #1829, #831, #3857 | #1387 and #1829 in [US-16.3](../stories/US-16.3-additional-hardware-wallets.md); #3857 in [US-16.11](../stories/US-16.11-qr-device-signing-defects.md); **#831 is still filed elsewhere** |
+| [#4175](https://github.com/Koniverse/SubWallet-Extension/issues/4175) | Support cold wallets | #1387, #1829, #831, #3857 | #1387, #1829, #831 in [US-16.3](../stories/US-16.3-additional-hardware-wallets.md); #3857 in [US-16.11](../stories/US-16.11-qr-device-signing-defects.md) |
 
 > **#4408 recovered two issues the ledger never had.** Its child list is the only place
 > [#2453](https://github.com/Koniverse/SubWallet-Extension/issues/2453) — *"Integrate Polkadot
@@ -98,8 +98,10 @@ work its children already carry.
 > and the issue is now [US-16.11](../stories/US-16.11-qr-device-signing-defects.md), as this epic
 > recorded it would be. **[#831](https://github.com/Koniverse/SubWallet-Extension/issues/831)** —
 > *"Integrate with AirGap Vault for QR signer"*, which extends
-> [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md)'s QR path — is still in the
-> **dApp** ledger. Route it here when EPIC-30 folds.
+> [US-16.2](../stories/US-16.2-qr-signing-keystone-and-polkadot-vault.md)'s QR path — was in the
+> **dApp** ledger and, when that folded on 2026-07-24, became the first row of
+> [US-16.3](../stories/US-16.3-additional-hardware-wallets.md). Both of #4175's misfiled children are
+> now home.
 
 ## Cross-cutting invariants
 

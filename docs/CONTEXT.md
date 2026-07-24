@@ -1887,7 +1887,7 @@ carry an *(as of …)* marker and the current value.
 
 **Date**: 2025 *(entry reconstructed 2026-06-09; corrected 2026-07-20)*
 **Version**: v1.3.21 — [#3901](https://github.com/Koniverse/SubWallet-Extension/issues/3901) *"Allow signing once for multiple transactions"*
-**Citations**: `setting-service/constants.ts:19`; `useOneSignProcess.ts:14`; `transaction-service/README.md` §One-Sign Multi-Step Process; PRD FR-82, FR-60; [US-5.7](sprints/stories/US-5.7-camera-access-and-one-sign-toggles.md), [US-30.195](sprints/stories/US-30.195-allow-signing-once-for-multiple-transactions.md)
+**Citations**: `setting-service/constants.ts:19`; `useOneSignProcess.ts:14`; `transaction-service/README.md` §One-Sign Multi-Step Process; PRD FR-82, FR-60; [US-5.7](sprints/stories/US-5.7-camera-access-and-one-sign-toggles.md), [US-10.8](sprints/stories/US-10.8-arbitrary-message-signing.md)
 
 ---
 

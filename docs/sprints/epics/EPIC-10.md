@@ -18,7 +18,7 @@ arch_ref:
   - AD-13
   - AD-14
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-07-24
 ---
 
 ## Goal
@@ -97,10 +97,33 @@ page.
 | FR-101 | [US-10.8](../stories/US-10.8-arbitrary-message-signing.md) | ✅ done |
 | FR-102 | [US-10.9](../stories/US-10.9-dapp-createtransaction-api-rfc-6213.md) | 📋 backlog |
 
-> US-10.10 (multi-wallet coexistence hardening), US-10.11 (WalletConnect
-> session & dashboard hardening) and US-10.12 (WebApp injected-account caching)
-> own no FR — they are the bug/iteration (hardening) cluster for this epic, split
+> US-10.10 (multi-wallet coexistence), US-10.11 (WalletConnect session & dashboard hardening) and
+> US-10.12 (WebApp injected-account caching) own no FR — the bug/iteration cluster, split
 > one-concern-per-story.
+>
+> **US-10.13 … US-10.19 also carry no FR.** They hold the incremental work, fixes and chores that
+> landed on this epic — **217 tracker issues**, folded in from the former one-issue-per-story
+> maintenance ledger on 2026-07-24
+> ([note](../../notes/2026-07-24.md#b-epic-30-maintenance--dapp-connectivity-merged-into-epic-10)).
+> The FR map above is unchanged.
+>
+> **This epic owns one umbrella:**
+> [#4438](https://github.com/Koniverse/SubWallet-Extension/issues/4438) — *"Bug related to
+> WalletConnect"*, closed, six children (#2614, #2917, #3025, #3456, #2923, #4598) all rows in
+> [US-10.3](../stories/US-10.3-walletconnect-v2-substrate-and-evm.md). It carries no CHANGELOG line
+> of its own ([AGENTS.md](../../../AGENTS.md) rule 10).
+> **[#4330](https://github.com/Koniverse/SubWallet-Extension/issues/4330) is not an umbrella** despite
+> having a child — it carries its own line, so it is a delivery that spawned a sub-task and stays a row.
+>
+> **One issue left this epic in the fold**: #831 *"Integrate with AirGap Vault for QR signer"* — a
+> child of the cold-wallet umbrella #4175 — went to
+> [US-16.3](../stories/US-16.3-additional-hardware-wallets.md), paying the debt EPIC-16 recorded when
+> the hardware ledger folded on 2026-07-23.
+>
+> **The dApp share of the 1.0.2 UI rewrite is [US-10.15](../stories/US-10.15-dapp-screens-in-the-1-0-2-rewrite.md)**
+> — 3 rows, the third area the same parentless programme surfaced in, after
+> [US-6.7](../stories/US-6.7-the-1-0-2-ui-upgrade-programme.md) (60) and
+> [US-8.17](../stories/US-8.17-transaction-screens-in-the-1-0-2-rewrite.md) (11).
 
 ## AD Coverage
 
@@ -133,6 +156,12 @@ page.
 | [US-10.10](../stories/US-10.10-multi-wallet-coexistence-hardening.md) | Multi-wallet coexistence hardening | Coexist with other injected wallets without fighting over `window.ethereum` | 📋 backlog | — |
 | [US-10.11](../stories/US-10.11-walletconnect-session-and-dashboard-hardening.md) | WalletConnect session & dashboard hardening | Reconcile WC v2 sessions to live relay state; reject dead-session requests | 📋 backlog | — |
 | [US-10.12](../stories/US-10.12-webapp-injected-account-caching.md) | WebApp injected-account caching | Cache/reconcile injected accounts so add-side-effects run once, not each open (#2286) | 📋 backlog | — |
+| [US-10.13](../stories/US-10.13-dapp-connection-lifecycle-and-network-state.md) | dApp connection lifecycle & network state | Connect, lose, reconnect, enable-the-chain — the state machine every connector shares (56 rows) | ✅ done | 1.3.55 |
+| [US-10.14](../stories/US-10.14-webapp-dapp-surface.md) | WebApp dApp surface | Connecting to the extension and other wallets from a page, not a background | ✅ done | 1.1.36 |
+| [US-10.15](../stories/US-10.15-dapp-screens-in-the-1-0-2-rewrite.md) | dApp screens in the 1.0.2 UI rewrite | This epic's 3 rows of a 74-row programme held together by a title prefix | ✅ done | 1.0.2 |
+| [US-10.16](../stories/US-10.16-add-token-and-network-from-a-dapp.md) | Add token & network from a dApp | The `watchAsset` / `addEthereumChain` family that changes the wallet's own registry | ✅ done | 1.3.24 |
+| [US-10.17](../stories/US-10.17-open-dapp-connection-and-signing-improvements.md) | Open dApp connection & signing improvements | The unthemed open remainder — 21 rows across connection, signing, errors | 🚧 in-progress | — |
+| [US-10.19](../stories/US-10.19-dapp-directory-docs-and-qa.md) | dApp directory, integration docs & QA | The catalogue and process around connectivity, not the connectors | ✅ done | 1.1.27 |
 
 ## Object map & user-story interactions
 

@@ -125,7 +125,7 @@ security maintenance ledger landed here (per-issue map: [consolidation note](../
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **4 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-30, EPIC-41.
+> ledgers still separate** finds **2 issues** mentioning "reset wallet" / "forgot password", sitting in EPIC-41. (The dApp ledger's two matches, #1762 and #1806, were WalletConnect-on-reset issues, not the reset-wallet feature, and folded on 2026-07-24 without landing here.)
 >
 > **The UI ledger's three were surface work.** #1075 went to
 > [US-6.7](US-6.7-the-1-0-2-ui-upgrade-programme.md), #2056 to

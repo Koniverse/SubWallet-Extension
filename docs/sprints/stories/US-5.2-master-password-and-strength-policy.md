@@ -123,7 +123,7 @@ security maintenance ledger landed here (per-issue map: [consolidation note](../
 That ledger held only 13 issues and they were almost all phishing.
 
 > **This capability's history is not empty — it is not yet folded.** A title scan of the **10
-> ledgers still separate** finds **17 issues** mentioning "master password" / "password", sitting in EPIC-23, EPIC-30, EPIC-41.
+> ledgers still separate** finds **14 issues** mentioning "master password" / "password", sitting in EPIC-23, EPIC-41. (The dApp ledger's three matches — #72, #737, #871 — were about remembering a password in the signing flow, not the master-password policy, and folded on 2026-07-24 into [US-10.8](US-10.8-arbitrary-message-signing.md).)
 >
 > **The UI ledger's six went to UI stories, not here.** When it folded on 2026-07-23, #1012, #1193
 > (the 1.0.2 rewrite's master-password screens) landed in

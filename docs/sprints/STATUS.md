@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-24 03:32:07 UTC
-> Total stories: 1899
+> Last generated: 2026-07-24 04:13:07 UTC
+> Total stories: 1688
 
-## 📋 Backlog (224)
+## 📋 Backlog (201)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -97,29 +97,6 @@
 | US-24.337 | Add Cardano Preview Network | EPIC-24 | P3 | 1 | — | — |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
-| US-30.94 | WebApp - Implement Wallet Connect like DApp | EPIC-30 | P3 | 1 | — | — |
-| US-30.98 | Allow EVM Dapp can import network, tokens with logo | EPIC-30 | P3 | 1 | — | PDTnhah |
-| US-30.103 | WebApp - Handling the case of losing internet connection | EPIC-30 | P3 | 1 | — | — |
-| US-30.108 | Handling cases of internet connection loss | EPIC-30 | P3 | 1 | — | — |
-| US-30.123 | Extension - Handle the case of disconnect internet but still click Approve | EPIC-30 | P3 | 1 | — | — |
-| US-30.133 | Enable network before signing request from dApps with some special networks | EPIC-30 | P3 | 1 | — | PDTnhah |
-| US-30.141 | [Mobile] Support Nightly Connect | EPIC-30 | P3 | 1 | — | saltict |
-| US-30.145 | Extension - Unable to connect a Polkadot Vault account on Ubuntu | EPIC-30 | P3 | 1 | — | — |
-| US-30.151 | WebApp - Re-check the on/off status and continuously disconnect the network | EPIC-30 | P3 | 1 | — | nulllpc |
-| US-30.155 | Can not connect to Moonbeam (substrate interface - v1.1.53) | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-30.162 | Extension - Do not update transaction status in case web-runner disconnect when retrieving transaction data | EPIC-30 | P3 | 1 | — | Quangdm-cdm |
-| US-30.165 | Extension - Follow-up to test all methods on demo dApp | EPIC-30 | P3 | 1 | — | saltict |
-| US-30.169 | Extension - Validate when the user sends to the EVM QR-signer account | EPIC-30 | P3 | 1 | — | S2kael |
-| US-30.179 | WebApp - Add popup in case the network you're connecting to is not yet supported when connect with WalletConnect | EPIC-30 | P3 | 1 | — | — |
-| US-30.183 | WebApp - Improve connect extension feature ( Round 2) | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-30.189 | Support showing decoded txs from dapp | EPIC-30 | P3 | 1 | — | tunghp2002 |
-| US-30.193 | Extension - Re-check connect with dApps | EPIC-30 | P3 | 1 | — | PDTnhah |
-| US-30.196 | Connect dApp with solo account in Avail Space and SubWallet | EPIC-30 | P3 | 1 | — | — |
-| US-30.198 | Update signing flow with metadata( Round 2 ) | EPIC-30 | P3 | 1 | — | — |
-| US-30.199 | Allow signing once for multiple transactions ( Round 2) | EPIC-30 | P3 | 1 | — | — |
-| US-30.202 | Extension - Update UI for connect dApp features | EPIC-30 | P3 | 1 | — | — |
-| US-30.205 | Extension - Improve when sign transaction with dApp on Cardano | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-30.214 | Extension - Support connect dApp for Bitcoin ( Round 2) | EPIC-30 | P3 | 1 | — | Thiendekaco |
 | US-32.16 | Built-in staking for Dotsama layer2 dapps' tokens | EPIC-32 | P3 | 1 | — | hieudd |
 | US-32.73 | Supporting Fast unstake | EPIC-32 | P3 | 1 | — | nulllpc |
 | US-32.90 | Support Stake Max | EPIC-32 | P3 | 1 | — | — |
@@ -233,7 +210,7 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (12)
+## 🟢 Ready (11)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -242,7 +219,6 @@
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W28 | S2kael |
 | US-23.245 | Extension - Error can't derive F2 TON solo account | EPIC-23 | P3 | 1 | sprint-2026-W28 | frenkie-ng |
 | US-24.338 | Extension - Update chain-list stable v0.2.124 | EPIC-24 | P3 | 1 | sprint-2026-W28 | PDTnhah |
-| US-30.56 | Integrate with AirGap Vault for QR signer | EPIC-30 | P3 | 1 | sprint-2026-W28 | PDTnhah |
 | US-41.288 | Check for issues related to middleware services | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.418 | Support DeDot | EPIC-41 | P3 | 1 | sprint-2026-W28 | bluezdot |
 | US-41.423 | Implement Light-client related issues | EPIC-41 | P3 | 1 | sprint-2026-W28 | — |
@@ -250,10 +226,12 @@
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (25)
+## 🟡 In Progress (27)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
+| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
+| US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
 | US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
 | US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
@@ -280,12 +258,11 @@
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 | US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
 
-## 👀 Review (11)
+## 👀 Review (10)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
-| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
 | US-23.234 | Extension - Verify the latest Unified Accounts build on Firefox | EPIC-23 | P3 | 1 | sprint-2026-W28 | — |
@@ -296,7 +273,7 @@
 | US-41.486 | Extension - [Feature] Create staticContent, staticData in SDK | EPIC-41 | P3 | 1 | sprint-2026-W28 | Thiendekaco |
 | US-41.497 | [ Extension ] Some issues are open when upgrade version | EPIC-41 | P3 | 1 | sprint-2026-W28 | tunghp2002 |
 
-## ✅ Done (1497)
+## ✅ Done (1330)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -311,6 +288,11 @@
 | US-10.4 | Cardano CIP-30 connector | EPIC-10 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
 | US-10.7 | dApp authorization UI (per-origin) | EPIC-10 | P1 | 3 | sprint-2022-M01 | Tbaut |
 | US-10.8 | Arbitrary message signing | EPIC-10 | P1 | 3 | sprint-2022-M01 | c410-f3r |
+| US-10.13 | dApp connection lifecycle & network state | EPIC-10 | P3 | 5 | sprint-2025-M09 | — |
+| US-10.14 | WebApp dApp surface | EPIC-10 | P3 | 3 | sprint-2024-M02 | — |
+| US-10.15 | dApp screens in the 1.0.2 UI rewrite | EPIC-10 | P3 | 1 | sprint-2023-M04 | — |
+| US-10.16 | Add token & network from a dApp | EPIC-10 | P3 | 2 | sprint-2025-M03 | — |
+| US-10.19 | dApp directory, integration docs & QA | EPIC-10 | P3 | 1 | sprint-2023-M12 | — |
 | US-11.1 | In-wallet swap via Chainflip | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.2 | In-wallet swap via Hydration DEX | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.3 | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EPIC-11 | P1 | 5 | sprint-2025-M05 | bluezdot |
@@ -875,178 +857,6 @@
 | US-3.5 | The Unified Account model | EPIC-3 | P1 | 8 | sprint-2024-M10 | saltict |
 | US-3.6 | Watch-only accounts & address book | EPIC-3 | P2 | 3 | sprint-2023-M04 | saltict |
 | US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2022-M01 | barrutko |
-| US-30.1 | Support QR code signer such as Stylo and Parity Signer | EPIC-30 | P3 | 1 | sprint-2022-M05 | saltict |
-| US-30.2 | The attach QR signer feature is not working | EPIC-30 | P3 | 1 | sprint-2022-M03 | Quangdm-cdm |
-| US-30.3 | Deploy mini-app SubConnect integration all wallets in the Dotsama ecosystem: Polkadot JS, SubWallet, Talisman | EPIC-30 | P3 | 1 | sprint-2022-M03 | saltict |
-| US-30.4 | Scrolls are not displayed in the Account Management screen when accessing from the Authorize Connect wallet screen | EPIC-30 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-30.5 | [v0.2.8] Failed to connect some sites (eg Sub.id) when there is EVM account in wallet | EPIC-30 | P3 | 1 | sprint-2022-M04 | saltict |
-| US-30.6 | Do not save the password in the Signing screen after performing Send Fund even though Remember Password was ticked befor | EPIC-30 | P3 | 1 | sprint-2023-M04 | lw-cdm |
-| US-30.7 | Improve experience when clicking the disconnect icon | EPIC-30 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-30.8 | RPC connection error | EPIC-30 | P3 | 1 | sprint-2022-M05 | saltict |
-| US-30.9 | The account should disconnect/connect in the Manage Website Access screen when user click on the disconnect/connect icon | EPIC-30 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-30.10 | Can't connect with SubSocial Parachain | EPIC-30 | P3 | 1 | sprint-2022-M04 | lw-cdm |
-| US-30.12 | Bug GUI when Change Theme of the SubWallet Connect Page | EPIC-30 | P3 | 1 | sprint-2022-M04 | Quangdm-cdm |
-| US-30.13 | Fix bug display incorrect screen when connection is lost | EPIC-30 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-30.14 | Fix display multi popup connect wallet | EPIC-30 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-30.15 | Fix can't connect account in case user created account successfully while popup connect wallet is displaying | EPIC-30 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-30.16 | Integrate SubWallet with EVM Dapp | EPIC-30 | P3 | 1 | sprint-2022-M06 | saltict |
-| US-30.18 | Display 2 popup connect when connect to <https://portal.astar.network>... | EPIC-30 | P3 | 1 | sprint-2022-M05 | Quangdm-cdm |
-| US-30.19 | Fix do not automatically connect account in case create both Substrate & EVM Account | EPIC-30 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-30.20 | Cannot connect to SubWallet from Astar App on the first time. | EPIC-30 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-30.21 | (4b) Sign with mobile signer via QR: Support Parity Signer/ Style to sign transaction or send funds transaction of accou | EPIC-30 | P3 | 1 | sprint-2022-M06 | S2kael |
-| US-30.22 | (2c) Sign with the extension via QR: Add method sign via QR with extension | EPIC-30 | P3 | 1 | sprint-2022-M05 | S2kael |
-| US-30.23 | add custom network but it show 'Unable to connect to the provider' | EPIC-30 | P3 | 1 | sprint-2022-M07 | — |
-| US-30.24 | Fixed incorrect number of connected accounts displayed on 'Manage Website Access' screen in case of 'Connect All Account | EPIC-30 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-30.25 | Update new way to interaction with chainId and accounts in EVM Provider | EPIC-30 | P3 | 1 | sprint-2022-M06 | saltict |
-| US-30.26 | Add the checkbox 'Auto connect to all EVM DApps after importing' in the Import Private Key screen | EPIC-30 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-30.27 | Some problems with connect with EVM DApp Interface | EPIC-30 | P3 | 1 | sprint-2022-M06 | saltict |
-| US-30.28 | Fixed bug do not display popup connect wallet in case upgrade version | EPIC-30 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-30.30 | Infinity loading when verifying transactions on the Avault dapp | EPIC-30 | P3 | 1 | sprint-2022-M07 | saltict |
-| US-30.31 | Display connection information with DApps | EPIC-30 | P3 | 1 | sprint-2022-M07 | S2kael |
-| US-30.32 | Show wrong account on the allow list by dApp type in case of upgrade version | EPIC-30 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-30.33 | Fix bug display wrong connection information with DApps | EPIC-30 | P3 | 1 | sprint-2022-M08 | S2kael |
-| US-30.34 | Fix bug not trigger accountChanged when changed account list and submit authList of DApp | EPIC-30 | P3 | 1 | sprint-2022-M08 | saltict |
-| US-30.35 | Fix issues related to QR Signer | EPIC-30 | P3 | 1 | sprint-2022-M09 | S2kael |
-| US-30.36 | Fix bug some dApp can't connect to wallet when user close extension | EPIC-30 | P3 | 1 | sprint-2022-M08 | huukhai |
-| US-30.38 | Some issues related to connect to Astar Portal | EPIC-30 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-30.41 | Some bugs related to custom tokens when the chain is disconnected | EPIC-30 | P3 | 1 | sprint-2022-M09 | nulllpc |
-| US-30.42 | The withdrawal value cannot be loaded in case any network fails to connect | EPIC-30 | P3 | 1 | sprint-2023-M06 | nulllpc |
-| US-30.44 | Looping reconnecting issue | EPIC-30 | P3 | 1 | sprint-2023-M04 | nulllpc |
-| US-30.45 | Update message when attaching QR-signer for EVM account | EPIC-30 | P3 | 1 | sprint-2022-M10 | S2kael |
-| US-30.46 | Refactor Interface Sign Request | EPIC-30 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-30.48 | Update the experience of displaying the wallet connection popup while opening the extension | EPIC-30 | P3 | 1 | sprint-2023-M06 | — |
-| US-30.49 | Support sending PSP tokens for QR-signer account | EPIC-30 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-30.50 | The wallet can't connect to StellaSwap when turning on both Moonbeam and Ethereum/Binance networks | EPIC-30 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-30.52 | Update message when having no account to connect to dApp | EPIC-30 | P3 | 1 | sprint-2022-M11 | nulllpc |
-| US-30.53 | Need a link so that users can go to the Create new account screen in case having no account to connect to dApp (improve  | EPIC-30 | P3 | 1 | sprint-2023-M06 | — |
-| US-30.54 | Reconnecting too many time when change or reconect internet (for mobile web-runner) | EPIC-30 | P3 | 1 | sprint-2022-M11 | lw-cdm |
-| US-30.55 | Incorrect navigation when cancel transaction with QR signer account | EPIC-30 | P3 | 1 | sprint-2022-M11 | S2kael |
-| US-30.57 | Fix bug don't show the QR code to sign an approved transaction after remembering the password with the QR-signer account | EPIC-30 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-30.58 | Update message when scan QR code with QR signer account in case the account does not exist | EPIC-30 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-30.59 | Update default network for sign message request | EPIC-30 | P3 | 1 | sprint-2022-M12 | S2kael |
-| US-30.60 | Fix wrong signature when signing raw with QR Signer account | EPIC-30 | P3 | 1 | sprint-2022-M12 | Quangdm-cdm |
-| US-30.61 | Allow disconnect Polkadot & Kusama chain | EPIC-30 | P3 | 1 | sprint-2023-M06 | sokol142 |
-| US-30.62 | Fix the error when adding a token from dApp | EPIC-30 | P3 | 1 | sprint-2022-M12 | saltict |
-| US-30.63 | Fix bug can not connect to AstarEVM | EPIC-30 | P3 | 1 | sprint-2023-M02 | saltict |
-| US-30.64 | Upgrade UI - Screen Websitte Access (Authorized DApp List) | EPIC-30 | P3 | 1 | sprint-2023-M04 | lw-cdm |
-| US-30.65 | Upgrade UI - DApps Connection Status | EPIC-30 | P3 | 1 | sprint-2023-M03 | lw-cdm |
-| US-30.66 | Upgrade UI - Screen Signing Data | EPIC-30 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-30.67 | Upgrade UI - Handle the scroll bar on the connect wallet | EPIC-30 | P3 | 1 | sprint-2023-M04 | S2kael |
-| US-30.69 | Upgrade UI - The network connection status is incorrect | EPIC-30 | P3 | 1 | sprint-2023-M06 | — |
-| US-30.70 | Allow DApp access to read-only account | EPIC-30 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-30.71 | Fix wagmi connector problems | EPIC-30 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-30.72 | Show the alternate title name of Dapp in the Manage website access screen | EPIC-30 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-30.73 | Can't add token from dApp | EPIC-30 | P3 | 1 | sprint-2023-M04 | saltict |
-| US-30.74 | Do not automatically switch the network according to the dApp in case of version upgrade | EPIC-30 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-30.75 | Handle status of the history transaction when disconnecting or stopping the extension suddenly, the network does not ret | EPIC-30 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-30.76 | Update Parity Signer logo & name | EPIC-30 | P3 | 1 | sprint-2023-M05 | S2kael |
-| US-30.77 | Do not connect to beamswap dApp | EPIC-30 | P3 | 1 | sprint-2023-M05 | saltict |
-| US-30.78 | Implemented immediate display of the 'Add network' screen upon pressing 'Add to network' from dApp | EPIC-30 | P3 | 1 | sprint-2023-M06 | S2kael |
-| US-30.79 | Recheck DApp UX | EPIC-30 | P3 | 1 | sprint-2024-M09 | Sokol142196 |
-| US-30.80 | Re-check sign transaction request from dApp with Extrinsic on the Chrome browser | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.81 | Improve connection stability | EPIC-30 | P3 | 1 | sprint-2023-M06 | saltict |
-| US-30.82 | Integrate WalletConnect | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.84 | Support add PSP token from dApp | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.85 | Improve connection status | EPIC-30 | P3 | 1 | sprint-2023-M08 | saltict |
-| US-30.87 | Fixed bug show transaction fee on the History detail screen | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.88 | Re-check bug 'invalid signature' when sign CFG transfer transaction with Polkadot Vault account | EPIC-30 | P3 | 1 | sprint-2023-M07 | Sokol142196 |
-| US-30.89 | Improve DApp Integration Document | EPIC-30 | P3 | 1 | sprint-2025-M03 | saltict |
-| US-30.90 | Optimize WalletConnect - Not implement if no connection | EPIC-30 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-30.91 | Support camera for WalletConnect | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.92 | Fix bug signing transaction on Avail | EPIC-30 | P3 | 1 | sprint-2023-M07 | nulllpc |
-| US-30.93 | Fixed bug signature method handling is not supported for Wallet Connect | EPIC-30 | P3 | 1 | sprint-2023-M07 | S2kael |
-| US-30.95 | WebApp - Connect with SubWallet via EVM, substrate interface | EPIC-30 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-30.96 | Improve Substrate Injected Object | EPIC-30 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-30.97 | Allow substrate Dapp subscribe allow access accounts List | EPIC-30 | P3 | 1 | sprint-2023-M07 | saltict |
-| US-30.100 | Fixed bug do not delete connection when reset wallet | EPIC-30 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-30.101 | WebApp - Recheck connection status when turn on/turn off network | EPIC-30 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-30.102 | WebApp - Bugs related to WalletConnect feature | EPIC-30 | P3 | 1 | sprint-2023-M08 | lw-cdm |
-| US-30.104 | WebApp - Implement connect with SubWallet | EPIC-30 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-30.105 | Update Banxa service | EPIC-30 | P3 | 1 | sprint-2023-M08 | S2kael |
-| US-30.106 | WebApp - Implement DApp features | EPIC-30 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-30.107 | WebApp - Update UI for WalletConnect feature | EPIC-30 | P3 | 1 | sprint-2023-M09 | lw-cdm |
-| US-30.109 | WebApp - Allow show multiple confirmation from WalletConnect | EPIC-30 | P3 | 1 | sprint-2023-M12 | lw-cdm |
-| US-30.110 | Add injected placeholder to avoid extension cannot load in the first time | EPIC-30 | P3 | 1 | sprint-2023-M09 | saltict |
-| US-30.111 | Improve connect extension feature | EPIC-30 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-30.112 | Fixed bug Create incorrect account when connect dApp | EPIC-30 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-30.113 | WebApp - Do not show the Account name in case have 1 account when connect with extension | EPIC-30 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-30.114 | Fixed bug Do not scroll the network list in case of connecting dApp via WalletConnect | EPIC-30 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-30.115 | Fixed bug Navigate incorrect in case Create one when connect dApp | EPIC-30 | P3 | 1 | sprint-2023-M09 | S2kael |
-| US-30.117 | Fixed bug dApp detection when connect wallet | EPIC-30 | P3 | 1 | sprint-2023-M12 | saltict |
-| US-30.118 | Handle the case lost internet connection (to implement mobile app) | EPIC-30 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-30.119 | Fixed bug when connect to dApp via WallectConnect | EPIC-30 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-30.120 | WebApp - Need to switch to the account in case connect to extension with only 1 account | EPIC-30 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-30.121 | WebApp - Bug when connect extension | EPIC-30 | P3 | 1 | sprint-2023-M10 | S2kael |
-| US-30.122 | Prepare Network list and dApp list to update to SubWallet UM document | EPIC-30 | P3 | 1 | sprint-2023-M11 | saltict |
-| US-30.124 | WebApp - Support Connect More Wallet | EPIC-30 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-30.125 | Re-check for WalletConnect connection loss | EPIC-30 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-30.126 | WebApp - Do not show token group information in case interrupt connection | EPIC-30 | P3 | 1 | sprint-2023-M10 | lw-cdm |
-| US-30.127 | WebApp - Add support connect mobile wallet | EPIC-30 | P3 | 1 | sprint-2023-M10 | saltict |
-| US-30.128 | Bugs related to connect mobile wallet | EPIC-30 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-30.129 | Update WalletConnect namespace | EPIC-30 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-30.130 | Recheck issue cannot connect extension because the embedded content.js file is blocked | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.131 | Unable to detect accounts in the case of an injected account-only web application | EPIC-30 | P3 | 1 | sprint-2024-M09 | S2kael |
-| US-30.132 | Fixed bug decode dApp address | EPIC-30 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-30.134 | Review RPC connection for substrate chains | EPIC-30 | P3 | 1 | sprint-2023-M11 | S2kael |
-| US-30.135 | Improve UX for the dApp status connection | EPIC-30 | P3 | 1 | sprint-2024-M09 | — |
-| US-30.137 | WebApp - Show incorrect account on the Token detail screen when disconnect account injected | EPIC-30 | P3 | 1 | sprint-2024-M01 | Thiendekaco |
-| US-30.138 | WebApp - Show 'select account' on the history screen in case disconnect injected account | EPIC-30 | P3 | 1 | sprint-2023-M12 | frenkie-ng |
-| US-30.139 | Fixed bug Wallet Connect not show connection popup | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.140 | Fixed bug can not connect to WalletConnect | EPIC-30 | P3 | 1 | sprint-2023-M12 | saltict |
-| US-30.142 | Do not connect to Manta dApp | EPIC-30 | P3 | 1 | sprint-2024-M01 | saltict |
-| US-30.143 | Fix bug Do not show Signature popup in case not enough balance to cover gas fee | EPIC-30 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-30.144 | Re-check issue can not connect SubWallet extension | EPIC-30 | P3 | 1 | sprint-2024-M04 | — |
-| US-30.147 | SubConnect - Review and test Subconnect | EPIC-30 | P3 | 1 | sprint-2024-M03 | Thiendekaco |
-| US-30.148 | Check problem with signed transactions on Zeitgeist | EPIC-30 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-30.149 | Merge dApp request from both of interface into one interface | EPIC-30 | P3 | 1 | sprint-2024-M03 | Thiendekaco |
-| US-30.150 | WebApp - Re-check bug when have multi connect with WalletConnect | EPIC-30 | P3 | 1 | sprint-2024-M08 | S2kael |
-| US-30.152 | Fixed bug  Invalid recipient address when Dapp deploy smart contract | EPIC-30 | P3 | 1 | sprint-2024-M05 | Thiendekaco |
-| US-30.153 | Fixed bug Some required methods are missing when connecting Dapp to Subwallet via WalletConnect | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.154 | Fix issue in transaction screen | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.156 | WebApp - Appeared error page when connect WalletConnect | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.157 | Automatically enable network when connecting via Substrate provider | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.158 | Fixed bug displaying 'connection existed' when connecting WalletConnect | EPIC-30 | P3 | 1 | sprint-2024-M04 | Thiendekaco |
-| US-30.159 | Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.160 | WebApp - Error displaying 'connection existed' when connecting WalletConnect. | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.164 | Extension - Error when perform sign transaction with Beamswap | EPIC-30 | P3 | 1 | sprint-2025-M03 | haiyenvu23 |
-| US-30.166 | Fixed bug no network support when connecting to the WalletConnect | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.167 | Fixed cannot signing with dApp in case network is not publish | EPIC-30 | P3 | 1 | sprint-2024-M05 | S2kael |
-| US-30.168 | WebApp - Add message when perform connect and sign transaction with Moonbeam on Polkadot vault | EPIC-30 | P3 | 1 | sprint-2024-M09 | frenkie-ng |
-| US-30.170 | Extension - Update message when import token in case rpc disconnect | EPIC-30 | P3 | 1 | sprint-2024-M09 | — |
-| US-30.171 | Add CheckMetadataHash signed extension support | EPIC-30 | P3 | 1 | sprint-2024-M06 | S2kael |
-| US-30.172 | Update chain-list health-check and report RPC connect status | EPIC-30 | P3 | 1 | sprint-2024-M07 | bluezdot |
-| US-30.174 | Update UI for the Signature request screen from dApp | EPIC-30 | P3 | 1 | sprint-2024-M07 | frenkie-ng |
-| US-30.175 | Fix bug connecting to uquid dapp with Wallet Connect | EPIC-30 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-30.176 | Follow-up and review sign txns on Firefox browser | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.177 | Fix bug transaction has a bad signature when transfer AVL token | EPIC-30 | P3 | 1 | sprint-2024-M07 | S2kael |
-| US-30.178 | Update signing flow with metadata | EPIC-30 | P3 | 1 | sprint-2025-M01 | tunghp2002 |
-| US-30.180 | WebApp - Show blank screen in case sign transaction with dApp used WalletConnect | EPIC-30 | P3 | 1 | sprint-2024-M08 | Thiendekaco |
-| US-30.181 | Update connector version | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.182 | Update substrate dApp connect interface to allow dApp connect with EVM account | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.184 | Format error when connecting to dApp | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.185 | Improve UI for case connection unsuccessfully when connect WalletConnect | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.186 | Unified account - Review and update connect dApp | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.188 | WebApp - Update UI when connecting to dApp | EPIC-30 | P3 | 1 | sprint-2024-M09 | Thiendekaco |
-| US-30.190 | Unified account - Update UX when click on 'dApp connection' icon | EPIC-30 | P3 | 1 | sprint-2024-M10 | Thiendekaco |
-| US-30.191 | Unified account - Error page in case search account on config dapp detail | EPIC-30 | P3 | 1 | sprint-2024-M10 | Thiendekaco |
-| US-30.192 | Add notification when dapp connection but network does not exist | EPIC-30 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
-| US-30.194 | Allow Polkadot namespace use EVM address | EPIC-30 | P3 | 1 | sprint-2024-M12 | S2kael |
-| US-30.195 | Allow signing once for multiple transactions | EPIC-30 | P3 | 1 | sprint-2025-M02 | S2kael |
-| US-30.197 | Extension - Check request update metadata from dapp | EPIC-30 | P3 | 1 | sprint-2025-M03 | nulllpc |
-| US-30.200 | Fixed bug Unable to estimate fee when signing for dApp | EPIC-30 | P3 | 1 | sprint-2025-M02 | S2kael |
-| US-30.201 | Fixed bug getting EVM addresses when connecting to Autonomy | EPIC-30 | P3 | 1 | sprint-2025-M04 | Thiendekaco |
-| US-30.203 | Extension - Support connect dApp for Bitcoin | EPIC-30 | P3 | 1 | sprint-2025-M06 | Thiendekaco |
-| US-30.204 | Fixed bug Cannot sign transaction when chain connection not be initialized | EPIC-30 | P3 | 1 | sprint-2025-M05 | Thiendekaco |
-| US-30.206 | Fixed bug connecting to Aleph Zero EVM dapp | EPIC-30 | P3 | 1 | sprint-2025-M05 | Thiendekaco |
-| US-30.207 | Fixed bug when connects to Remix | EPIC-30 | P3 | 1 | sprint-2025-M05 | Thiendekaco |
-| US-30.208 | Update Wallet Connector Libraries | EPIC-30 | P3 | 1 | sprint-2025-M05 | Thiendekaco |
-| US-30.210 | Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js | EPIC-30 | P3 | 1 | sprint-2025-M07 | Thiendekaco |
-| US-30.211 | Update UI Connect dApp screen | EPIC-30 | P3 | 1 | sprint-2025-M06 | Thiendekaco |
-| US-30.212 | Fix bug error page when connect with dApp | EPIC-30 | P3 | 1 | sprint-2025-M05 | Thiendekaco |
-| US-30.213 | Bug related to WalletConnect | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.215 | WebApp - Don't show Migrate to unified account screen in case wallet only has account connected from extension | EPIC-30 | P3 | 1 | sprint-2025-M07 | lw-cdm |
-| US-30.216 | Handle case connecting with network systems that do not support WalletConnect connection | EPIC-30 | P3 | 1 | sprint-2025-M08 | Thiendekaco |
-| US-30.217 | Add Launchly dApp to SubWallet dApp list | EPIC-30 | P3 | 1 | sprint-2026-M07 | — |
 | US-32.1 | Integrate Vara network | EPIC-32 | P3 | 1 | sprint-2023-M05 | saltict |
 | US-32.2 | Staking Portfolio Management | EPIC-32 | P3 | 1 | sprint-2022-M03 | nulllpc |
 | US-32.3 | Integration with SubQuery & SubSquid to show Transactions History & Crowdloan Status and Staking Information | EPIC-32 | P3 | 1 | sprint-2022-M03 | saltict |
@@ -1802,7 +1612,7 @@
 
 _No stories_
 
-## 🗑️ Deprecated (130)
+## 🗑️ Deprecated (109)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -1848,27 +1658,6 @@ _No stories_
 | US-24.323 | Support Minting DOT and POAP at Token2049 | EPIC-24 | P3 | 1 | — | bluezdot |
 | US-24.326 | [WebApp / Network detail] - Unable to open network detail screen when clicking first time on edit button of network | EPIC-24 | P3 | 1 | — | lw-cdm |
 | US-24.342 | WebApp - Proxy the mempools API via Cloudflare worker | EPIC-24 | P3 | 1 | — | anhntk54 |
-| US-30.11 | Support Multi-Sign | EPIC-30 | P3 | 1 | — | saltict |
-| US-30.17 | Get an existential deposit warning when doing a sign transactions | EPIC-30 | P3 | 1 | — | lw-cdm |
-| US-30.29 | Classify connected/cancelled/rejected status for the connect to the DApps | EPIC-30 | P3 | 1 | — | — |
-| US-30.37 | Discussion about sign transaction by chain for QR signer | EPIC-30 | P3 | 1 | — | S2kael |
-| US-30.39 | Create a PR request to integrate SubWallet into Imbue Network dapp | EPIC-30 | P3 | 1 | — | hieudd |
-| US-30.40 | Incorrect transaction history in case of user perform transaction from dApp | EPIC-30 | P3 | 1 | — | Sokol142196 |
-| US-30.43 | Handling the case of loss of network connection | EPIC-30 | P3 | 1 | — | — |
-| US-30.47 | Add checkbox 'Remember password' for Authorize Transaction with EVM QR-signer account | EPIC-30 | P3 | 1 | — | saltict |
-| US-30.51 | Integrate with WalletConnect | EPIC-30 | P3 | 1 | — | hieudd |
-| US-30.68 | Re-check case connect dApp when have network is disconnected | EPIC-30 | P3 | 1 | — | Sokol142196 |
-| US-30.83 | Do not sign transaction with EVM QR-signer account | EPIC-30 | P3 | 1 | — | S2kael |
-| US-30.86 | Recheck init and get balance for Sign Transaction of EQ | EPIC-30 | P3 | 1 | — | S2kael |
-| US-30.99 | WebApp - Bug related to the Wallet connect feature | EPIC-30 | P3 | 1 | — | lw-cdm |
-| US-30.116 | Re-check for WalletConnect connection loss | EPIC-30 | P3 | 1 | — | S2kael |
-| US-30.136 | WebApp - Do not show information on the confirmation screen in case perform transaction from dApp via WalletConnect | EPIC-30 | P3 | 1 | — | saltict |
-| US-30.146 | Unable to connect SubWallet via WalletConnect | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-30.161 | WebApp - Automatically enable network when connecting via Substrate provider | EPIC-30 | P3 | 1 | — | Sokol142196 |
-| US-30.163 | Extension - Cannot connect with hydraDX | EPIC-30 | P3 | 1 | — | Sokol142196 |
-| US-30.173 | Fix some bugs when connect to dApps | EPIC-30 | P3 | 1 | — | Thiendekaco |
-| US-30.187 | Error using WalletConnect with Energy Web app | EPIC-30 | P3 | 1 | — | — |
-| US-30.209 | Check dApp connect | EPIC-30 | P3 | 1 | — | Thiendekaco |
 | US-32.17 | Support staking for cross-chain tokens inside parachains | EPIC-32 | P3 | 1 | — | hieudd |
 | US-32.23 | Not showing staking record on account using different stash and controller account | EPIC-32 | P3 | 1 | sprint-2023-M08 | nulllpc |
 | US-32.42 | Bug withdrawing GLMR stake | EPIC-32 | P3 | 1 | — | Sokol142196 |
@@ -1941,12 +1730,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 224
-- 🟢 **Ready**: 12
-- 🟡 **In Progress**: 25
-- 👀 **Review**: 11
-- ✅ **Done**: 1497
+- 📋 **Backlog**: 201
+- 🟢 **Ready**: 11
+- 🟡 **In Progress**: 27
+- 👀 **Review**: 10
+- ✅ **Done**: 1330
 - 🚫 **Blocked**: 0
-- 🗑️ **Deprecated**: 130
+- 🗑️ **Deprecated**: 109
 
-⚠️  **WIP limit exceeded**: 25 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 27 stories in-progress (limit: 3).

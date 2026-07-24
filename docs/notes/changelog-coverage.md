@@ -544,93 +544,93 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#3133](https://github.com/Koniverse/SubWallet-Extension/issues/3133) | Fix bug Show incorrect Amount on Transaction history, Transaction confirmation for transfer NFT (#3133) | 1.2.10 | 2024-06-25 | US-9.5 |
 | [#3559](https://github.com/Koniverse/SubWallet-Extension/issues/3559) | Support Ternoa NFT (#3559) | 1.3.2 | 2024-10-12 | US-9.1 |
 | [#3609](https://github.com/Koniverse/SubWallet-Extension/issues/3609) | Add validate tokenOfOwnerByIndex when import NFT (#3609) | 1.3.2 | 2024-10-12 | US-9.8 |
-| [#1762](https://github.com/Koniverse/SubWallet-Extension/issues/1762) | Fixed bug do not delete connection when reset wallet (#1762) | 1.1.8 | 2023-08-12 | US-30.100 |
-| [#1806](https://github.com/Koniverse/SubWallet-Extension/issues/1806) | Update Banxa service (#1806) | 1.1.9 | 2023-08-22 | US-30.105 |
-| [#1906](https://github.com/Koniverse/SubWallet-Extension/issues/1906) | Add injected placeholder to avoid extension cannot load in the first time (#1906) | 1.1.13 | 2023-09-21 | US-30.110 |
-| [#1912](https://github.com/Koniverse/SubWallet-Extension/issues/1912) | Fixed bug Create incorrect account when connect dApp (#1912) | 1.1.12 | 2023-09-15 | US-30.112 |
-| [#1926](https://github.com/Koniverse/SubWallet-Extension/issues/1926) | Fixed bug Do not scroll the network list in case of connecting dApp via WalletConnect (#1926) | 1.1.15 | 2023-09-30 | US-30.114 |
-| [#1930](https://github.com/Koniverse/SubWallet-Extension/issues/1930) | Fixed bug Navigate incorrect in case Create one when connect dApp (#1930) | 1.1.15 | 2023-09-30 | US-30.115 |
-| [#1936](https://github.com/Koniverse/SubWallet-Extension/issues/1936) | Fixed bug dApp detection when connect wallet (#1936) | 1.1.27 | 2023-12-20 | US-30.117 |
-| [#1981](https://github.com/Koniverse/SubWallet-Extension/issues/1981) | Fixed bug when connect to dApp via WallectConnect (#1981) | 1.1.16 | 2023-10-07 | US-30.119 |
-| [#2119](https://github.com/Koniverse/SubWallet-Extension/issues/2119) | Update WalletConnect namespace (#2119) | 1.1.22 | 2023-11-15 | US-30.129 |
-| [#225](https://github.com/Koniverse/SubWallet-Extension/issues/225) | Fix bug display incorrect screen when connection is lost (#225) | 0.4.1 | 2022-05-11 | US-30.13 |
-| [#2139](https://github.com/Koniverse/SubWallet-Extension/issues/2139) | Fixed bug decode dApp address (#2139) | 1.1.23 | 2023-11-24 | US-30.132 |
-| [#2407](https://github.com/Koniverse/SubWallet-Extension/issues/2407) | Fixed bug Wallet Connect not show connection popup (#2407) | 1.1.53 | 2024-04-08 | US-30.139 |
-| [#227](https://github.com/Koniverse/SubWallet-Extension/issues/227) | Fix display multi popup connect wallet (#227) | 0.4.2 | 2022-05-20 | US-30.14 |
-| [#2413](https://github.com/Koniverse/SubWallet-Extension/issues/2413) | Fixed bug can not connect to WalletConnect (#2413) | 1.1.29 | 2023-12-29 | US-30.140 |
-| [#2501](https://github.com/Koniverse/SubWallet-Extension/issues/2501) | Fix bug Do not show Signature popup in case not enough balance to cover gas fee (#2501) | 1.2.25 | 2024-08-17 | US-30.143 |
-| [#2722](https://github.com/Koniverse/SubWallet-Extension/issues/2722) | Merge dApp request from both of interface into one interface (#2722) | 1.1.46 | 2024-03-22 | US-30.149 |
-| [#231](https://github.com/Koniverse/SubWallet-Extension/issues/231) | Fix can't connect account in case user created account successfully while popup connect wallet is displaying (#231) | 0.4.2 | 2022-05-20 | US-30.15 |
-| [#2859](https://github.com/Koniverse/SubWallet-Extension/issues/2859) | Fixed bug  Invalid recipient address when Dapp deploy smart contract (#2859) | 1.1.64 | 2024-05-10 | US-30.152 |
-| [#2860](https://github.com/Koniverse/SubWallet-Extension/issues/2860) | Fixed bug Some required methods are missing when connecting Dapp to Subwallet via WalletConnect (#2860) | 1.1.53 | 2024-04-08 | US-30.153 |
-| [#2891](https://github.com/Koniverse/SubWallet-Extension/issues/2891) | Fix issue in transaction screen (#2891) | 1.1.54 | 2024-04-09 | US-30.154 |
-| [#2899](https://github.com/Koniverse/SubWallet-Extension/issues/2899) | Automatically enable network when connecting via Substrate provider (#2899) | 1.1.55 | 2024-04-14 | US-30.157 |
-| [#2903](https://github.com/Koniverse/SubWallet-Extension/issues/2903) | Fixed bug displaying 'connection existed' when connecting WalletConnect (#2903) | 1.1.55 | 2024-04-14 | US-30.158 |
-| [#2917](https://github.com/Koniverse/SubWallet-Extension/issues/2917) | Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect (#2917) | 1.3.53 | 2025-08-12 | US-30.159 |
-| [#3025](https://github.com/Koniverse/SubWallet-Extension/issues/3025) | Fixed bug no network support when connecting to the WalletConnect (#3025) | 1.3.52 | 2025-08-07 | US-30.166 |
-| [#3027](https://github.com/Koniverse/SubWallet-Extension/issues/3027) | Fixed cannot signing with dApp in case network is not publish (#3027) | 1.1.63 | 2024-05-09 | US-30.167 |
-| [#3175](https://github.com/Koniverse/SubWallet-Extension/issues/3175) | Add CheckMetadataHash signed extension support (#3175) | 1.2.5 | 2024-06-11 | US-30.171 |
-| [#3243](https://github.com/Koniverse/SubWallet-Extension/issues/3243) | Update chain-list health-check and report RPC connect status (#3243) | 1.2.15 | 2024-07-12 | US-30.172 |
-| [#3260](https://github.com/Koniverse/SubWallet-Extension/issues/3260) | Update UI for the Signature request screen from dApp (#3260) | 1.2.13 | 2024-07-05 | US-30.174 |
-| [#3275](https://github.com/Koniverse/SubWallet-Extension/issues/3275) | Fix bug connecting to uquid dapp with Wallet Connect (#3275) | 1.2.16 | 2024-07-19 | US-30.175 |
-| [#3300](https://github.com/Koniverse/SubWallet-Extension/issues/3300) | Fix bug transaction has a bad signature when transfer AVL token (#3300) | 1.2.14 | 2024-07-09 | US-30.177 |
-| [#3306](https://github.com/Koniverse/SubWallet-Extension/issues/3306) | Update signing flow with metadata (#3306) | 1.3.13 | 2025-01-21 | US-30.178 |
-| [#285](https://github.com/Koniverse/SubWallet-Extension/issues/285) | Display 2 popup connect when connect to <https://portal.astar.network>... (#285) | 0.4.3 | 2022-05-31 | US-30.18 |
-| [#3363](https://github.com/Koniverse/SubWallet-Extension/issues/3363) | Update connector version (#3363) | 1.2.28 | 2024-09-04 | US-30.181 |
-| [#3401](https://github.com/Koniverse/SubWallet-Extension/issues/3401) | Update substrate dApp connect interface to allow dApp connect with EVM account (#3401) | 1.2.28 | 2024-09-04 | US-30.182 |
-| [#3445](https://github.com/Koniverse/SubWallet-Extension/issues/3445) | Format error when connecting to dApp (#3445) | 1.2.28 | 2024-09-04 | US-30.184 |
-| [#3456](https://github.com/Koniverse/SubWallet-Extension/issues/3456) | Improve UI for case connection unsuccessfully when connect WalletConnect (#3456) | 1.3.53 | 2025-08-12 | US-30.185 |
-| [#297](https://github.com/Koniverse/SubWallet-Extension/issues/297) | Fix do not automatically connect account in case create both Substrate & EVM Account (#297) | 0.5.2 | 2022-07-22 | US-30.19 |
-| [#3753](https://github.com/Koniverse/SubWallet-Extension/issues/3753) | Add notification when dapp connection but network does not exist (#3753) | 1.3.55 | 2025-09-05 | US-30.192 |
-| [#3870](https://github.com/Koniverse/SubWallet-Extension/issues/3870) | Allow Polkadot namespace use EVM address (#3870) | 1.3.9 | 2024-12-09 | US-30.194 |
-| [#3901](https://github.com/Koniverse/SubWallet-Extension/issues/3901) | Allow signing once for multiple transactions (#3901) | 1.3.21 | 2025-02-28 | US-30.195 |
-| [#4050](https://github.com/Koniverse/SubWallet-Extension/issues/4050) | Fixed bug Unable to estimate fee when signing for dApp (#4050) | 1.3.20 | 2025-02-24 | US-30.200 |
-| [#4172](https://github.com/Koniverse/SubWallet-Extension/issues/4172) | Fixed bug getting EVM addresses when connecting to Autonomy (#4172) | 1.3.29 | 2025-04-08 | US-30.201 |
-| [#4300](https://github.com/Koniverse/SubWallet-Extension/issues/4300) | Fixed bug Cannot sign transaction when chain connection not be initialized (#4300) | 1.3.35 | 2025-05-09 | US-30.204 |
-| [#4320](https://github.com/Koniverse/SubWallet-Extension/issues/4320) | Fixed bug connecting to Aleph Zero EVM dapp (#4320) | 1.3.35 | 2025-05-09 | US-30.206 |
-| [#4330](https://github.com/Koniverse/SubWallet-Extension/issues/4330) | Fixed bug when connects to Remix (#4330) | 1.3.37 | 2025-05-23 | US-30.207 |
-| [#4353](https://github.com/Koniverse/SubWallet-Extension/issues/4353) | Update Wallet Connector Libraries (#4353) | 1.3.37 | 2025-05-23 | US-30.208 |
-| [#4375](https://github.com/Koniverse/SubWallet-Extension/issues/4375) | Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375) | 1.3.48 | 2025-07-21 | US-30.210 |
-| [#4377](https://github.com/Koniverse/SubWallet-Extension/issues/4377) | Update UI Connect dApp screen (#4377) | 1.3.41 | 2025-06-11 | US-30.211 |
-| [#4401](https://github.com/Koniverse/SubWallet-Extension/issues/4401) | Fix bug error page when connect with dApp (#4401) | 1.3.39 | 2025-05-26 | US-30.212 |
-| [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598) | Handle case connecting with network systems that do not support WalletConnect connection (#4598) | 1.3.54 | 2025-08-21 | US-30.216 |
-| [#355](https://github.com/Koniverse/SubWallet-Extension/issues/355) | Fixed incorrect number of connected accounts displayed on "Manage Website Access" screen in case of "Connect All Accounts" (#355) | 0.5.3 | 2022-07-29 | US-30.24 |
-| [#357](https://github.com/Koniverse/SubWallet-Extension/issues/357) | Update new way to interaction with chainId and accounts in EVM Provider (#357) | 0.4.8 | 2022-06-25 | US-30.25 |
-| [#358](https://github.com/Koniverse/SubWallet-Extension/issues/358) | Add the checkbox "Auto connect to all EVM DApps after importing" in the Import Private Key screen (#358) | 0.5.4 | 2022-08-05 | US-30.26 |
-| [#359](https://github.com/Koniverse/SubWallet-Extension/issues/359) | Some problems with connect with EVM DApp Interface (#359) | 0.4.7 | 2022-06-24 | US-30.27 |
-| [#401](https://github.com/Koniverse/SubWallet-Extension/issues/401) | Fixed bug do not display popup connect wallet in case upgrade version (#401) | 0.5.3 | 2022-07-29 | US-30.28 |
-| [#469](https://github.com/Koniverse/SubWallet-Extension/issues/469) | Display connection information with DApps (#469) | 0.5.3 | 2022-07-29 | US-30.31 |
-| [#498](https://github.com/Koniverse/SubWallet-Extension/issues/498) | Fix bug display wrong connection information with DApps (#498) | 0.5.5 | 2022-08-11 | US-30.33 |
-| [#518](https://github.com/Koniverse/SubWallet-Extension/issues/518) | Fix bug not trigger accountChanged when changed account list and submit authList of DApp (#518) | 0.5.6 | 2022-08-24 | US-30.34 |
-| [#525](https://github.com/Koniverse/SubWallet-Extension/issues/525) | Fix issues related to QR Signer (#525) | 0.5.7 | 2022-09-06 | US-30.35 |
-| [#530](https://github.com/Koniverse/SubWallet-Extension/issues/530) | Fix bug some dApp can't connect to wallet when user close extension (#530) | 0.5.5 | 2022-08-11 | US-30.36 |
-| [#687](https://github.com/Koniverse/SubWallet-Extension/issues/687) | Some bugs related to custom tokens when the chain is disconnected (#687) | 0.6.6 | 2022-09-30 | US-30.41 |
-| [#751](https://github.com/Koniverse/SubWallet-Extension/issues/751) | Support sending PSP tokens for QR-signer account (#751) | 0.7.2 | 2022-11-19 | US-30.49 |
-| [#798](https://github.com/Koniverse/SubWallet-Extension/issues/798) | Update message when having no account to connect to dApp (#798) | 0.7.2 | 2022-11-19 | US-30.52 |
-| [#825](https://github.com/Koniverse/SubWallet-Extension/issues/825) | Incorrect navigation when cancel transaction with QR signer account (#825) | 0.7.2 | 2022-11-19 | US-30.55 |
-| [#871](https://github.com/Koniverse/SubWallet-Extension/issues/871) | Fix bug don't show the QR code to sign an approved transaction after remembering the password with the QR-signer account (#871) | 0.7.4 | 2022-12-04 | US-30.57 |
-| [#889](https://github.com/Koniverse/SubWallet-Extension/issues/889) | Update message when scan QR code with QR signer account in case the account does not exist (#889) | 0.7.5 | 2022-12-15 | US-30.58 |
-| [#890](https://github.com/Koniverse/SubWallet-Extension/issues/890) | Update default network for sign message request (#890) | 0.7.5 | 2022-12-15 | US-30.59 |
-| [#897](https://github.com/Koniverse/SubWallet-Extension/issues/897) | Fix wrong signature when signing raw with QR Signer account (#897) | 0.7.5 | 2022-12-15 | US-30.60 |
-| [#959](https://github.com/Koniverse/SubWallet-Extension/issues/959) | Fix the error when adding a token from dApp (#959) | 0.7.7 | 2022-12-28 | US-30.62 |
-| [#1001](https://github.com/Koniverse/SubWallet-Extension/issues/1001) | Fix bug can not connect to AstarEVM (#1001) | 0.8.1 | 2023-02-03 | US-30.63 |
-| [#86](https://github.com/Koniverse/SubWallet-Extension/issues/86) | Improve experience when clicking the disconnect icon (issue #86) | 0.3.1 | 2022-04-05 | US-30.7 |
-| [#1225](https://github.com/Koniverse/SubWallet-Extension/issues/1225) | Allow DApp access to read-only account (#1225) | 1.0.9 | 2023-06-13 | US-30.70 |
-| [#1234](https://github.com/Koniverse/SubWallet-Extension/issues/1234) | Show the alternate title name of Dapp in the Manage website access screen (#1234) | 1.0.4 | 2023-05-12 | US-30.72 |
-| [#1301](https://github.com/Koniverse/SubWallet-Extension/issues/1301) | Do not automatically switch the network according to the dApp in case of version upgrade (#1301) | 1.0.4 | 2023-05-12 | US-30.74 |
-| [#1351](https://github.com/Koniverse/SubWallet-Extension/issues/1351) | Update Parity Signer logo & name (#1351) | 1.0.5 | 2023-05-21 | US-30.76 |
-| [#1384](https://github.com/Koniverse/SubWallet-Extension/issues/1384) | Spelling update (#1384) | 1.0.5 | 2023-05-21 | US-30.76 |
-| [#1398](https://github.com/Koniverse/SubWallet-Extension/issues/1398) | Implemented immediate display of the "Add network" screen upon pressing "Add to network" from dApp (#1398) | 1.0.7 | 2023-06-01 | US-30.78 |
-| [#1469](https://github.com/Koniverse/SubWallet-Extension/issues/1469) | Improve connection stability (#1469) | 1.0.11 | 2023-06-24 | US-30.81 |
-| [#1497](https://github.com/Koniverse/SubWallet-Extension/issues/1497) | Integrate WalletConnect (#1497) | 1.1.1 | 2023-07-06 | US-30.82 |
-| [#1529](https://github.com/Koniverse/SubWallet-Extension/issues/1529) | Support add PSP token from dApp (#1529) | 1.1.1 | 2023-07-06 | US-30.84 |
-| [#1554](https://github.com/Koniverse/SubWallet-Extension/issues/1554) | Improve connection status (#1554) | 1.1.6 | 2023-08-04 | US-30.85 |
-| [#1580](https://github.com/Koniverse/SubWallet-Extension/issues/1580) | Fixed bug show transaction fee on the History detail screen (#1580) | 1.1.1 | 2023-07-06 | US-30.87 |
-| [#1626](https://github.com/Koniverse/SubWallet-Extension/issues/1626) | Optimize WalletConnect - Not implement if no connection (#1626) | 1.1.6 | 2023-08-04 | US-30.90 |
-| [#1627](https://github.com/Koniverse/SubWallet-Extension/issues/1627) | Support camera for WalletConnect (#1627) | 1.1.2 | 2023-07-14 | US-30.91 |
-| [#1670](https://github.com/Koniverse/SubWallet-Extension/issues/1670) | Fix bug signing transaction on Avail (#1670) | 1.1.3 | 2023-07-21 | US-30.92 |
-| [#1674](https://github.com/Koniverse/SubWallet-Extension/issues/1674) | Fixed bug signature method handling is not supported for Wallet Connect (#1674) | 1.1.5 | 2023-07-29 | US-30.93 |
-| [#1712](https://github.com/Koniverse/SubWallet-Extension/issues/1712) | Allow substrate Dapp subscribe allow access accounts List (#1712) | 1.1.5 | 2023-07-29 | US-30.97 |
+| [#1762](https://github.com/Koniverse/SubWallet-Extension/issues/1762) | Fixed bug do not delete connection when reset wallet (#1762) | 1.1.8 | 2023-08-12 | US-10.3 |
+| [#1806](https://github.com/Koniverse/SubWallet-Extension/issues/1806) | Update Banxa service (#1806) | 1.1.9 | 2023-08-22 | US-10.13 |
+| [#1906](https://github.com/Koniverse/SubWallet-Extension/issues/1906) | Add injected placeholder to avoid extension cannot load in the first time (#1906) | 1.1.13 | 2023-09-21 | US-10.14 |
+| [#1912](https://github.com/Koniverse/SubWallet-Extension/issues/1912) | Fixed bug Create incorrect account when connect dApp (#1912) | 1.1.12 | 2023-09-15 | US-10.13 |
+| [#1926](https://github.com/Koniverse/SubWallet-Extension/issues/1926) | Fixed bug Do not scroll the network list in case of connecting dApp via WalletConnect (#1926) | 1.1.15 | 2023-09-30 | US-10.3 |
+| [#1930](https://github.com/Koniverse/SubWallet-Extension/issues/1930) | Fixed bug Navigate incorrect in case Create one when connect dApp (#1930) | 1.1.15 | 2023-09-30 | US-10.13 |
+| [#1936](https://github.com/Koniverse/SubWallet-Extension/issues/1936) | Fixed bug dApp detection when connect wallet (#1936) | 1.1.27 | 2023-12-20 | US-10.19 |
+| [#1981](https://github.com/Koniverse/SubWallet-Extension/issues/1981) | Fixed bug when connect to dApp via WallectConnect (#1981) | 1.1.16 | 2023-10-07 | US-10.3 |
+| [#2119](https://github.com/Koniverse/SubWallet-Extension/issues/2119) | Update WalletConnect namespace (#2119) | 1.1.22 | 2023-11-15 | US-10.3 |
+| [#225](https://github.com/Koniverse/SubWallet-Extension/issues/225) | Fix bug display incorrect screen when connection is lost (#225) | 0.4.1 | 2022-05-11 | US-10.13 |
+| [#2139](https://github.com/Koniverse/SubWallet-Extension/issues/2139) | Fixed bug decode dApp address (#2139) | 1.1.23 | 2023-11-24 | US-10.8 |
+| [#2407](https://github.com/Koniverse/SubWallet-Extension/issues/2407) | Fixed bug Wallet Connect not show connection popup (#2407) | 1.1.53 | 2024-04-08 | US-10.3 |
+| [#227](https://github.com/Koniverse/SubWallet-Extension/issues/227) | Fix display multi popup connect wallet (#227) | 0.4.2 | 2022-05-20 | US-10.13 |
+| [#2413](https://github.com/Koniverse/SubWallet-Extension/issues/2413) | Fixed bug can not connect to WalletConnect (#2413) | 1.1.29 | 2023-12-29 | US-10.3 |
+| [#2501](https://github.com/Koniverse/SubWallet-Extension/issues/2501) | Fix bug Do not show Signature popup in case not enough balance to cover gas fee (#2501) | 1.2.25 | 2024-08-17 | US-10.8 |
+| [#2722](https://github.com/Koniverse/SubWallet-Extension/issues/2722) | Merge dApp request from both of interface into one interface (#2722) | 1.1.46 | 2024-03-22 | US-10.8 |
+| [#231](https://github.com/Koniverse/SubWallet-Extension/issues/231) | Fix can't connect account in case user created account successfully while popup connect wallet is displaying (#231) | 0.4.2 | 2022-05-20 | US-10.7 |
+| [#2859](https://github.com/Koniverse/SubWallet-Extension/issues/2859) | Fixed bug  Invalid recipient address when Dapp deploy smart contract (#2859) | 1.1.64 | 2024-05-10 | US-10.8 |
+| [#2860](https://github.com/Koniverse/SubWallet-Extension/issues/2860) | Fixed bug Some required methods are missing when connecting Dapp to Subwallet via WalletConnect (#2860) | 1.1.53 | 2024-04-08 | US-10.3 |
+| [#2891](https://github.com/Koniverse/SubWallet-Extension/issues/2891) | Fix issue in transaction screen (#2891) | 1.1.54 | 2024-04-09 | US-10.8 |
+| [#2899](https://github.com/Koniverse/SubWallet-Extension/issues/2899) | Automatically enable network when connecting via Substrate provider (#2899) | 1.1.55 | 2024-04-14 | US-10.13 |
+| [#2903](https://github.com/Koniverse/SubWallet-Extension/issues/2903) | Fixed bug displaying 'connection existed' when connecting WalletConnect (#2903) | 1.1.55 | 2024-04-14 | US-10.3 |
+| [#2917](https://github.com/Koniverse/SubWallet-Extension/issues/2917) | Fixed bug Can not disconnect when connecting to 2 URIs of the same website with WalletConnect (#2917) | 1.3.53 | 2025-08-12 | US-10.3 |
+| [#3025](https://github.com/Koniverse/SubWallet-Extension/issues/3025) | Fixed bug no network support when connecting to the WalletConnect (#3025) | 1.3.52 | 2025-08-07 | US-10.3 |
+| [#3027](https://github.com/Koniverse/SubWallet-Extension/issues/3027) | Fixed cannot signing with dApp in case network is not publish (#3027) | 1.1.63 | 2024-05-09 | US-10.8 |
+| [#3175](https://github.com/Koniverse/SubWallet-Extension/issues/3175) | Add CheckMetadataHash signed extension support (#3175) | 1.2.5 | 2024-06-11 | US-10.8 |
+| [#3243](https://github.com/Koniverse/SubWallet-Extension/issues/3243) | Update chain-list health-check and report RPC connect status (#3243) | 1.2.15 | 2024-07-12 | US-10.13 |
+| [#3260](https://github.com/Koniverse/SubWallet-Extension/issues/3260) | Update UI for the Signature request screen from dApp (#3260) | 1.2.13 | 2024-07-05 | US-10.8 |
+| [#3275](https://github.com/Koniverse/SubWallet-Extension/issues/3275) | Fix bug connecting to uquid dapp with Wallet Connect (#3275) | 1.2.16 | 2024-07-19 | US-10.3 |
+| [#3300](https://github.com/Koniverse/SubWallet-Extension/issues/3300) | Fix bug transaction has a bad signature when transfer AVL token (#3300) | 1.2.14 | 2024-07-09 | US-10.8 |
+| [#3306](https://github.com/Koniverse/SubWallet-Extension/issues/3306) | Update signing flow with metadata (#3306) | 1.3.13 | 2025-01-21 | US-10.8 |
+| [#285](https://github.com/Koniverse/SubWallet-Extension/issues/285) | Display 2 popup connect when connect to <https://portal.astar.network>... (#285) | 0.4.3 | 2022-05-31 | US-10.13 |
+| [#3363](https://github.com/Koniverse/SubWallet-Extension/issues/3363) | Update connector version (#3363) | 1.2.28 | 2024-09-04 | US-10.13 |
+| [#3401](https://github.com/Koniverse/SubWallet-Extension/issues/3401) | Update substrate dApp connect interface to allow dApp connect with EVM account (#3401) | 1.2.28 | 2024-09-04 | US-10.1 |
+| [#3445](https://github.com/Koniverse/SubWallet-Extension/issues/3445) | Format error when connecting to dApp (#3445) | 1.2.28 | 2024-09-04 | US-10.13 |
+| [#3456](https://github.com/Koniverse/SubWallet-Extension/issues/3456) | Improve UI for case connection unsuccessfully when connect WalletConnect (#3456) | 1.3.53 | 2025-08-12 | US-10.3 |
+| [#297](https://github.com/Koniverse/SubWallet-Extension/issues/297) | Fix do not automatically connect account in case create both Substrate & EVM Account (#297) | 0.5.2 | 2022-07-22 | US-10.1 |
+| [#3753](https://github.com/Koniverse/SubWallet-Extension/issues/3753) | Add notification when dapp connection but network does not exist (#3753) | 1.3.55 | 2025-09-05 | US-10.13 |
+| [#3870](https://github.com/Koniverse/SubWallet-Extension/issues/3870) | Allow Polkadot namespace use EVM address (#3870) | 1.3.9 | 2024-12-09 | US-10.3 |
+| [#3901](https://github.com/Koniverse/SubWallet-Extension/issues/3901) | Allow signing once for multiple transactions (#3901) | 1.3.21 | 2025-02-28 | US-10.8 |
+| [#4050](https://github.com/Koniverse/SubWallet-Extension/issues/4050) | Fixed bug Unable to estimate fee when signing for dApp (#4050) | 1.3.20 | 2025-02-24 | US-10.8 |
+| [#4172](https://github.com/Koniverse/SubWallet-Extension/issues/4172) | Fixed bug getting EVM addresses when connecting to Autonomy (#4172) | 1.3.29 | 2025-04-08 | US-10.1 |
+| [#4300](https://github.com/Koniverse/SubWallet-Extension/issues/4300) | Fixed bug Cannot sign transaction when chain connection not be initialized (#4300) | 1.3.35 | 2025-05-09 | US-10.8 |
+| [#4320](https://github.com/Koniverse/SubWallet-Extension/issues/4320) | Fixed bug connecting to Aleph Zero EVM dapp (#4320) | 1.3.35 | 2025-05-09 | US-10.1 |
+| [#4330](https://github.com/Koniverse/SubWallet-Extension/issues/4330) | Fixed bug when connects to Remix (#4330) | 1.3.37 | 2025-05-23 | US-10.3 |
+| [#4353](https://github.com/Koniverse/SubWallet-Extension/issues/4353) | Update Wallet Connector Libraries (#4353) | 1.3.37 | 2025-05-23 | US-10.3 |
+| [#4375](https://github.com/Koniverse/SubWallet-Extension/issues/4375) | Fixed bug SubWallet flagged by Avast and blocks connection to Polkadot.js (#4375) | 1.3.48 | 2025-07-21 | US-10.13 |
+| [#4377](https://github.com/Koniverse/SubWallet-Extension/issues/4377) | Update UI Connect dApp screen (#4377) | 1.3.41 | 2025-06-11 | US-10.13 |
+| [#4401](https://github.com/Koniverse/SubWallet-Extension/issues/4401) | Fix bug error page when connect with dApp (#4401) | 1.3.39 | 2025-05-26 | US-10.13 |
+| [#4598](https://github.com/Koniverse/SubWallet-Extension/issues/4598) | Handle case connecting with network systems that do not support WalletConnect connection (#4598) | 1.3.54 | 2025-08-21 | US-10.3 |
+| [#355](https://github.com/Koniverse/SubWallet-Extension/issues/355) | Fixed incorrect number of connected accounts displayed on "Manage Website Access" screen in case of "Connect All Accounts" (#355) | 0.5.3 | 2022-07-29 | US-10.7 |
+| [#357](https://github.com/Koniverse/SubWallet-Extension/issues/357) | Update new way to interaction with chainId and accounts in EVM Provider (#357) | 0.4.8 | 2022-06-25 | US-10.1 |
+| [#358](https://github.com/Koniverse/SubWallet-Extension/issues/358) | Add the checkbox "Auto connect to all EVM DApps after importing" in the Import Private Key screen (#358) | 0.5.4 | 2022-08-05 | US-10.1 |
+| [#359](https://github.com/Koniverse/SubWallet-Extension/issues/359) | Some problems with connect with EVM DApp Interface (#359) | 0.4.7 | 2022-06-24 | US-10.1 |
+| [#401](https://github.com/Koniverse/SubWallet-Extension/issues/401) | Fixed bug do not display popup connect wallet in case upgrade version (#401) | 0.5.3 | 2022-07-29 | US-10.13 |
+| [#469](https://github.com/Koniverse/SubWallet-Extension/issues/469) | Display connection information with DApps (#469) | 0.5.3 | 2022-07-29 | US-10.13 |
+| [#498](https://github.com/Koniverse/SubWallet-Extension/issues/498) | Fix bug display wrong connection information with DApps (#498) | 0.5.5 | 2022-08-11 | US-10.13 |
+| [#518](https://github.com/Koniverse/SubWallet-Extension/issues/518) | Fix bug not trigger accountChanged when changed account list and submit authList of DApp (#518) | 0.5.6 | 2022-08-24 | US-10.7 |
+| [#525](https://github.com/Koniverse/SubWallet-Extension/issues/525) | Fix issues related to QR Signer (#525) | 0.5.7 | 2022-09-06 | US-10.8 |
+| [#530](https://github.com/Koniverse/SubWallet-Extension/issues/530) | Fix bug some dApp can't connect to wallet when user close extension (#530) | 0.5.5 | 2022-08-11 | US-10.13 |
+| [#687](https://github.com/Koniverse/SubWallet-Extension/issues/687) | Some bugs related to custom tokens when the chain is disconnected (#687) | 0.6.6 | 2022-09-30 | US-10.7 |
+| [#751](https://github.com/Koniverse/SubWallet-Extension/issues/751) | Support sending PSP tokens for QR-signer account (#751) | 0.7.2 | 2022-11-19 | US-10.8 |
+| [#798](https://github.com/Koniverse/SubWallet-Extension/issues/798) | Update message when having no account to connect to dApp (#798) | 0.7.2 | 2022-11-19 | US-10.13 |
+| [#825](https://github.com/Koniverse/SubWallet-Extension/issues/825) | Incorrect navigation when cancel transaction with QR signer account (#825) | 0.7.2 | 2022-11-19 | US-10.8 |
+| [#871](https://github.com/Koniverse/SubWallet-Extension/issues/871) | Fix bug don't show the QR code to sign an approved transaction after remembering the password with the QR-signer account (#871) | 0.7.4 | 2022-12-04 | US-10.8 |
+| [#889](https://github.com/Koniverse/SubWallet-Extension/issues/889) | Update message when scan QR code with QR signer account in case the account does not exist (#889) | 0.7.5 | 2022-12-15 | US-10.8 |
+| [#890](https://github.com/Koniverse/SubWallet-Extension/issues/890) | Update default network for sign message request (#890) | 0.7.5 | 2022-12-15 | US-10.7 |
+| [#897](https://github.com/Koniverse/SubWallet-Extension/issues/897) | Fix wrong signature when signing raw with QR Signer account (#897) | 0.7.5 | 2022-12-15 | US-10.8 |
+| [#959](https://github.com/Koniverse/SubWallet-Extension/issues/959) | Fix the error when adding a token from dApp (#959) | 0.7.7 | 2022-12-28 | US-10.16 |
+| [#1001](https://github.com/Koniverse/SubWallet-Extension/issues/1001) | Fix bug can not connect to AstarEVM (#1001) | 0.8.1 | 2023-02-03 | US-10.1 |
+| [#86](https://github.com/Koniverse/SubWallet-Extension/issues/86) | Improve experience when clicking the disconnect icon (issue #86) | 0.3.1 | 2022-04-05 | US-10.7 |
+| [#1225](https://github.com/Koniverse/SubWallet-Extension/issues/1225) | Allow DApp access to read-only account (#1225) | 1.0.9 | 2023-06-13 | US-10.7 |
+| [#1234](https://github.com/Koniverse/SubWallet-Extension/issues/1234) | Show the alternate title name of Dapp in the Manage website access screen (#1234) | 1.0.4 | 2023-05-12 | US-10.7 |
+| [#1301](https://github.com/Koniverse/SubWallet-Extension/issues/1301) | Do not automatically switch the network according to the dApp in case of version upgrade (#1301) | 1.0.4 | 2023-05-12 | US-10.13 |
+| [#1351](https://github.com/Koniverse/SubWallet-Extension/issues/1351) | Update Parity Signer logo & name (#1351) | 1.0.5 | 2023-05-21 | US-10.19 |
+| [#1280](https://github.com/Koniverse/SubWallet-Extension/issues/1280) | Spelling update (#1384 — the bullet cites the PR, not issue #1280) | 1.0.5 | 2023-05-21 | US-10.19 |
+| [#1398](https://github.com/Koniverse/SubWallet-Extension/issues/1398) | Implemented immediate display of the "Add network" screen upon pressing "Add to network" from dApp (#1398) | 1.0.7 | 2023-06-01 | US-10.16 |
+| [#1469](https://github.com/Koniverse/SubWallet-Extension/issues/1469) | Improve connection stability (#1469) | 1.0.11 | 2023-06-24 | US-10.13 |
+| [#1497](https://github.com/Koniverse/SubWallet-Extension/issues/1497) | Integrate WalletConnect (#1497) | 1.1.1 | 2023-07-06 | US-10.3 |
+| [#1529](https://github.com/Koniverse/SubWallet-Extension/issues/1529) | Support add PSP token from dApp (#1529) | 1.1.1 | 2023-07-06 | US-10.16 |
+| [#1554](https://github.com/Koniverse/SubWallet-Extension/issues/1554) | Improve connection status (#1554) | 1.1.6 | 2023-08-04 | US-10.13 |
+| [#1580](https://github.com/Koniverse/SubWallet-Extension/issues/1580) | Fixed bug show transaction fee on the History detail screen (#1580) | 1.1.1 | 2023-07-06 | US-10.8 |
+| [#1626](https://github.com/Koniverse/SubWallet-Extension/issues/1626) | Optimize WalletConnect - Not implement if no connection (#1626) | 1.1.6 | 2023-08-04 | US-10.3 |
+| [#1627](https://github.com/Koniverse/SubWallet-Extension/issues/1627) | Support camera for WalletConnect (#1627) | 1.1.2 | 2023-07-14 | US-10.3 |
+| [#1670](https://github.com/Koniverse/SubWallet-Extension/issues/1670) | Fix bug signing transaction on Avail (#1670) | 1.1.3 | 2023-07-21 | US-10.8 |
+| [#1674](https://github.com/Koniverse/SubWallet-Extension/issues/1674) | Fixed bug signature method handling is not supported for Wallet Connect (#1674) | 1.1.5 | 2023-07-29 | US-10.3 |
+| [#1712](https://github.com/Koniverse/SubWallet-Extension/issues/1712) | Allow substrate Dapp subscribe allow access accounts List (#1712) | 1.1.5 | 2023-07-29 | US-10.2 |
 | [#4644](https://github.com/Koniverse/SubWallet-Extension/issues/4644) | Apply dry-run to validate bridge step for swap feature (#4644) | 1.3.55 | 2025-09-05 | US-11.8 |
 | [#4671](https://github.com/Koniverse/SubWallet-Extension/issues/4671) | Improve Swap validation by Dry-run-preview API from ParaSpell (#4671) | 1.3.67 | 2025-11-13 | US-11.8 |
 | [#4826](https://github.com/Koniverse/SubWallet-Extension/issues/4826) | Refactor Swap Service interface and redundant code (#4826) | 1.3.79 | 2026-05-21 | US-11.13 |
