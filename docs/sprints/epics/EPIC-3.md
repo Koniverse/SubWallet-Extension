@@ -130,7 +130,7 @@ policy belongs to EPIC-5 (security) and signing/submission to EPIC-8
 | [US-3.4](../stories/US-3.4-export-keys-multi-account-management.md) | Export keys & multi-account management | Export seed/key; manage multiple named accounts | ✅ done | 1.0.1 |
 | [US-3.5](../stories/US-3.5-the-unified-account-model.md) | The Unified Account model | One seed → five ecosystems + solo↔unified | ✅ done | 1.3.1 |
 | [US-3.6](../stories/US-3.6-watch-only-accounts-address-book.md) | Watch-only accounts & address book | Read-only monitoring + saved recipients | ✅ done | 1.0.2 |
-| [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | Account derivation: custom path & child accounts | Custom + auto-index derived accounts | ✅ done | 0.24.1 |
+| [US-3.7](../stories/US-3.7-account-derivation-custom-path-child-accounts.md) | Account derivation: custom path & child accounts | Custom + auto-index derived accounts | ✅ done | 0.2.1 |
 | [US-3.8](../stories/US-3.8-account-recovery-identity-roadmap.md) | Account recovery & identity (roadmap) | Social recovery, session keys, DID (planned) | 📋 backlog | — |
 | [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | Unified → Solo account split | Split a unified account back into per-chain solo accounts (FR-23, forward) | 📋 backlog | — |
 | [US-3.10](../stories/US-3.10-account-screens-in-the-1-0-2-rewrite.md) | Account screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — list / add / export / select screens | ✅ done | 1.0.2 |
