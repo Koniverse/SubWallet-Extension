@@ -147,9 +147,11 @@ around; they belong to the same open hardening surface.
 | — | [#2705](https://github.com/Koniverse/SubWallet-Extension/issues/2705) | Extension - Do not enable native token in case network is enabled when change rpc | 📋 backlog |
 
 > **Both are the endpoint-reliability problem this story exists for.** #2504 (*"change RPC provider
-> automatically when the current one is down"*) is the fallback AC-1 asks for; #3722 (*"error when
-> working with rpc: light-client"*) is the light-client endpoint path failing. They stay open here
-> rather than in a `done` capability story ([AGENTS.md](../../../AGENTS.md) rule 9).
+> automatically when the current one is down"*) is the fallback AC-1 asks for; #2705 (*"native token
+> wrongly enabled when changing a network's RPC"*) is a side-effect on the same custom-RPC change
+> path. They stay open here rather than in a `done` capability story
+> ([AGENTS.md](../../../AGENTS.md) rule 9). (The light-client RPC error #3722 is the sibling endpoint
+> bug, homed in [US-4.25](US-4.25-open-network-and-token-improvements.md).)
 
 ## Cross-references
 
