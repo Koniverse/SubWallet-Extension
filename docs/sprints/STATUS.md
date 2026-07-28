@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-28 09:35:53 UTC
+> Last generated: 2026-07-28 11:48:27 UTC
 > Total stories: 283
 
 ## 📋 Backlog (56)
@@ -109,7 +109,7 @@
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
-| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
+| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W31 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W31 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
