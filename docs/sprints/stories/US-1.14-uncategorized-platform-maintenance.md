@@ -5,13 +5,13 @@ epic: EPIC-1
 status: done
 priority: P3
 points: 4
-sprint:
+sprint: sprint-2026-M05
 version_shipped: 1.3.79
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
-commit:
+assignee: tunghp2002
+commit: e3c41425e053d26f0427b1988d76ae9459bba35a
 created: 2026-07-24
 updated: 2026-07-24
 ---

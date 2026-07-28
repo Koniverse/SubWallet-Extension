@@ -8,8 +8,8 @@ points: 2
 sprint: sprint-2024-M05
 version_shipped: 1.1.62
 prd_ref: []
-assignee:
-commit:
+assignee: frenkie-ng
+commit: 289a26f95f5aeaa15cf5f6e887380ba9e8a29aa7
 created: 2026-07-24
 updated: 2026-07-24
 ---

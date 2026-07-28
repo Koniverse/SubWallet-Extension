@@ -8,7 +8,7 @@ points: 2
 sprint: sprint-2025-M09
 version_shipped: 1.3.56
 prd_ref: []
-assignee:
+assignee: frenkie-ng
 commit:
 created: 2026-07-23
 updated: 2026-07-23

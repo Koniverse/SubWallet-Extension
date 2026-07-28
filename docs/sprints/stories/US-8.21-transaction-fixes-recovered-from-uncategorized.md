@@ -5,13 +5,13 @@ epic: EPIC-8
 status: done
 priority: P3
 points: 1
-sprint:
+sprint: sprint-2025-M04
 version_shipped: 1.3.30
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
-commit:
+assignee: bluezdot
+commit: 37101cc5c9bd164156231ca5a7e6030fe67a6f81
 created: 2026-07-24
 updated: 2026-07-24
 ---

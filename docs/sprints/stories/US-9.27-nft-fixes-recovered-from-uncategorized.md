@@ -5,13 +5,13 @@ epic: EPIC-9
 status: done
 priority: P3
 points: 1
-sprint:
+sprint: sprint-2023-M07
 version_shipped: 1.1.2
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
-commit:
+assignee: nulllpc
+commit: 398e387bd4ec78fe395912fa0f41f31f5b6a05f7
 created: 2026-07-24
 updated: 2026-07-24
 ---

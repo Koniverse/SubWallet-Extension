@@ -8,8 +8,8 @@ points: 3
 sprint: sprint-2025-M10
 version_shipped: 1.3.62
 prd_ref: []
-assignee:
-commit:
+assignee: frenkie-ng
+commit: 52504609ea48f91b300f74fd8d2e0ee619f14a23
 created: 2026-07-24
 updated: 2026-07-24
 ---

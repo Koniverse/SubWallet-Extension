@@ -8,8 +8,8 @@ points: 8
 sprint: sprint-2024-M06
 version_shipped: 1.2.10
 prd_ref: []
-assignee:
-commit:
+assignee: lw-cdm
+commit: 152e9bb56ea8cb69711d22815a10f4b0fd11228f
 created: 2026-07-23
 updated: 2026-07-23
 ---

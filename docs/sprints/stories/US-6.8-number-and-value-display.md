@@ -8,8 +8,8 @@ points: 2
 sprint: sprint-2025-M10
 version_shipped: 1.3.64
 prd_ref: []
-assignee:
-commit:
+assignee: tunghp2002
+commit: eb3434da4a96c2874659c9e64ce9e6338f5f14aa
 created: 2026-07-23
 updated: 2026-07-23
 ---

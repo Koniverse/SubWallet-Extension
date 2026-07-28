@@ -8,8 +8,8 @@ points: 1
 sprint: sprint-2023-M06
 version_shipped: 1.1.29
 prd_ref: []
-assignee:
-commit:
+assignee: saltict
+commit: aa7401353ce937b3f3d5fc309310838dfeabb17b
 created: 2026-07-22
 updated: 2026-07-22
 ---

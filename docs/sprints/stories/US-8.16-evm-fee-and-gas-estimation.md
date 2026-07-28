@@ -8,8 +8,8 @@ points: 3
 sprint: sprint-2025-M11
 version_shipped: 1.3.66
 prd_ref: []
-assignee:
-commit:
+assignee: bluezdot
+commit: 4071dda0cabb8cd6a0a4cfbccdc4e4bad38e4461
 created: 2026-07-24
 updated: 2026-07-24
 ---

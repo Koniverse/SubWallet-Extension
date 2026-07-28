@@ -8,8 +8,8 @@ points: 1
 sprint: sprint-2023-M04
 version_shipped: 1.0.2
 prd_ref: []
-assignee:
-commit:
+assignee: S2kael
+commit: be359cbbe611de7fb4790e872e5407c6e0b34519
 created: 2026-07-24
 updated: 2026-07-24
 ---

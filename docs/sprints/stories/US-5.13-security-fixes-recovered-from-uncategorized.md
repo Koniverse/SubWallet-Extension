@@ -5,13 +5,13 @@ epic: EPIC-5
 status: done
 priority: P3
 points: 2
-sprint:
+sprint: sprint-2024-M11
 version_shipped: 1.3.7
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
-commit:
+assignee: bluezdot
+commit: ad259334c8707ba7730a40d43eb1f93db86ff321
 created: 2026-07-24
 updated: 2026-07-24
 ---

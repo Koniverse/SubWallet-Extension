@@ -8,8 +8,8 @@ points: 1
 sprint: sprint-2023-M06
 version_shipped: 1.1.36
 prd_ref: []
-assignee:
-commit:
+assignee: anhntk54
+commit: fb262ebf5cc7b0bfd08ef2f30b650280b641d955
 created: 2026-07-22
 updated: 2026-07-22
 ---

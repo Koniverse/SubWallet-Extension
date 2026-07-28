@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-24 10:41:08 UTC
+> Last generated: 2026-07-28 03:33:40 UTC
 > Total stories: 283
 
 ## 📋 Backlog (56)
@@ -65,17 +65,16 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (5)
+## 🟢 Ready (4)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W28 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W28 | S2kael |
-| US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
 
-## 🟡 In Progress (24)
+## 🟡 In Progress (25)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -99,6 +98,7 @@
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
 | US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
+| US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
 | US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
 | US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
@@ -123,23 +123,23 @@
 | US-1.2 | Yarn 3 monorepo shared across extension, web app and mobile | EPIC-1 | P0 | 5 | sprint-2024-M02 | saltict |
 | US-1.3 | Online chain-list hot-update (release-free network/token/XCM delivery) | EPIC-1 | P0 | 5 | sprint-2024-M03 | S2kael |
 | US-1.6 | Platform operations & out-of-repo tooling | EPIC-1 | P3 | 1 | sprint-2026-W30 | — |
-| US-1.10 | Earlier build & packaging work (2023–2025) | EPIC-1 | P3 | 1 | sprint-2023-M06 | — |
-| US-1.11 | Dependency, library & build maintenance | EPIC-1 | P3 | 3 | — | — |
-| US-1.12 | WebApp & mobile platform sync | EPIC-1 | P3 | 5 | — | — |
-| US-1.13 | Backend, middleware & platform refactors | EPIC-1 | P3 | 4 | — | — |
-| US-1.14 | Uncategorized platform maintenance | EPIC-1 | P3 | 4 | — | — |
+| US-1.10 | Earlier build & packaging work (2023–2025) | EPIC-1 | P3 | 1 | sprint-2023-M06 | anhntk54 |
+| US-1.11 | Dependency, library & build maintenance | EPIC-1 | P3 | 3 | sprint-2026-M01 | bluezdot |
+| US-1.12 | WebApp & mobile platform sync | EPIC-1 | P3 | 5 | sprint-2025-M05 | lw-cdm |
+| US-1.13 | Backend, middleware & platform refactors | EPIC-1 | P3 | 4 | sprint-2025-M06 | tunghp2002 |
+| US-1.14 | Uncategorized platform maintenance | EPIC-1 | P3 | 4 | sprint-2026-M05 | tunghp2002 |
 | US-10.1 | EVM provider injection (EIP-1193 / EIP-6963) | EPIC-10 | P1 | 5 | sprint-2023-M12 | S2kael |
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | sprint-2022-M01 | jacogr |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | sprint-2023-M07 | S2kael |
 | US-10.4 | Cardano CIP-30 connector | EPIC-10 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
 | US-10.7 | dApp authorization UI (per-origin) | EPIC-10 | P1 | 3 | sprint-2022-M01 | Tbaut |
 | US-10.8 | Arbitrary message signing | EPIC-10 | P1 | 3 | sprint-2022-M01 | c410-f3r |
-| US-10.13 | dApp connection lifecycle & network state | EPIC-10 | P3 | 5 | sprint-2025-M09 | — |
-| US-10.14 | WebApp dApp surface | EPIC-10 | P3 | 3 | sprint-2024-M02 | — |
-| US-10.15 | dApp screens in the 1.0.2 UI rewrite | EPIC-10 | P3 | 1 | sprint-2023-M04 | — |
-| US-10.16 | Add token & network from a dApp | EPIC-10 | P3 | 2 | sprint-2025-M03 | — |
-| US-10.19 | dApp directory, integration docs & QA | EPIC-10 | P3 | 1 | sprint-2023-M12 | — |
-| US-10.20 | dApp fixes recovered from Uncategorized | EPIC-10 | P3 | 2 | — | — |
+| US-10.13 | dApp connection lifecycle & network state | EPIC-10 | P3 | 5 | sprint-2025-M09 | Thiendekaco |
+| US-10.14 | WebApp dApp surface | EPIC-10 | P3 | 3 | sprint-2024-M02 | S2kael |
+| US-10.15 | dApp screens in the 1.0.2 UI rewrite | EPIC-10 | P3 | 1 | sprint-2023-M04 | lw-cdm |
+| US-10.16 | Add token & network from a dApp | EPIC-10 | P3 | 2 | sprint-2025-M03 | nulllpc |
+| US-10.19 | dApp directory, integration docs & QA | EPIC-10 | P3 | 1 | sprint-2023-M12 | saltict |
+| US-10.20 | dApp fixes recovered from Uncategorized | EPIC-10 | P3 | 2 | sprint-2025-M07 | Thiendekaco |
 | US-11.1 | In-wallet swap via Chainflip | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.2 | In-wallet swap via Hydration DEX | EPIC-11 | P1 | 5 | sprint-2024-M04 | frenkie-ng |
 | US-11.3 | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EPIC-11 | P1 | 5 | sprint-2025-M05 | bluezdot |
@@ -149,11 +149,11 @@
 | US-11.7 | In-wallet Bittensor dTAO swap | EPIC-11 | P1 | 5 | sprint-2026-M05 | tunghp2002 |
 | US-11.8 | Cross-chain swap routing (Swap↔Bridge multi-hop) | EPIC-11 | P1 | 8 | sprint-2025-M04 | saltict |
 | US-11.9 | In-wallet swap via Optimex | EPIC-11 | P1 | 8 | sprint-2025-M10 | bluezdot |
-| US-11.12 | Swap UI, content & confirmation flow | EPIC-11 | P3 | 3 | sprint-2026-M06 | — |
-| US-11.13 | Swap quote pipeline & service internals | EPIC-11 | P3 | 3 | sprint-2026-M05 | — |
+| US-11.12 | Swap UI, content & confirmation flow | EPIC-11 | P3 | 3 | sprint-2026-M06 | PDTnhah |
+| US-11.13 | Swap quote pipeline & service internals | EPIC-11 | P3 | 3 | sprint-2026-M05 | bluezdot |
 | US-11.14 | Swap pair catalogue & operational tooling (out-of-repo) | EPIC-11 | P3 | 2 | sprint-2025-M10 | — |
 | US-11.15 | Swap providers evaluated but not integrated | EPIC-11 | P3 | 1 | sprint-2025-M04 | — |
-| US-11.18 | Swap fixes recovered from Uncategorized | EPIC-11 | P3 | 1 | — | — |
+| US-11.18 | Swap fixes recovered from Uncategorized | EPIC-11 | P3 | 1 | sprint-2025-M04 | tunghp2002 |
 | US-12.1 | Native nomination staking (relay + parachains) | EPIC-12 | P1 | 5 | sprint-2022-M06 | saltict |
 | US-12.2 | Nomination pool staking | EPIC-12 | P1 | 3 | sprint-2023-M03 | nulllpc |
 | US-12.3 | Collator / parachain staking | EPIC-12 | P1 | 3 | sprint-2022-M07 | nulllpc |
@@ -164,11 +164,11 @@
 | US-12.8 | Earning-path simulation & step tracking | EPIC-12 | P1 | 5 | sprint-2024-M02 | nulllpc |
 | US-12.9 | XCM deposit routing into earning | EPIC-12 | P1 | 5 | sprint-2024-M02 | nulllpc |
 | US-12.15 | Earning term and condition display mechanism | EPIC-12 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
-| US-12.16 | Crowdloan contribution & portfolio | EPIC-12 | P3 | 3 | sprint-2022-M01 | — |
-| US-12.18 | Earning screens in the 1.0.2 UI rewrite | EPIC-12 | P3 | 1 | sprint-2023-M04 | — |
-| US-12.19 | Earning on the WebApp & Avail Space | EPIC-12 | P3 | 5 | sprint-2024-M01 | — |
-| US-12.20 | Earning rewards & APY accuracy (settled) | EPIC-12 | P2 | 3 | sprint-2024-M01 | — |
-| US-12.21 | Earning fixes recovered from Uncategorized | EPIC-12 | P3 | 3 | — | — |
+| US-12.16 | Crowdloan contribution & portfolio | EPIC-12 | P3 | 3 | sprint-2022-M01 | frenkie-ng |
+| US-12.18 | Earning screens in the 1.0.2 UI rewrite | EPIC-12 | P3 | 1 | sprint-2023-M04 | S2kael |
+| US-12.19 | Earning on the WebApp & Avail Space | EPIC-12 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
+| US-12.20 | Earning rewards & APY accuracy (settled) | EPIC-12 | P2 | 3 | sprint-2024-M01 | bluezdot |
+| US-12.21 | Earning fixes recovered from Uncategorized | EPIC-12 | P3 | 3 | sprint-2026-M04 | tunghp2002 |
 | US-13.1 | XCM cross-chain parachain transfers (fee estimation + per-route toggle) | EPIC-13 | P1 | 8 | sprint-2022-M06 | saltict |
 | US-13.2 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | EPIC-13 | P1 | 5 | sprint-2024-M06 | nulllpc |
 | US-13.3 | Avail Bridge: Avail ↔ Ethereum | EPIC-13 | P2 | 5 | sprint-2024-M10 | bluezdot |
@@ -176,23 +176,23 @@
 | US-13.5 | Across protocol cross-chain bridge | EPIC-13 | P2 | 5 | sprint-2025-M04 | tunghp2002 |
 | US-13.6 | Bridge claim / withdrawal step to finalize cross-chain transfers | EPIC-13 | P1 | 5 | sprint-2024-M10 | bluezdot |
 | US-13.7 | Bittensor TAO ↔ Subtensor-EVM native-token bridge | EPIC-13 | P2 | 5 | sprint-2026-M05 | tunghp2002 |
-| US-13.12 | XCM route & channel coverage | EPIC-13 | P3 | 5 | sprint-2025-M09 | — |
-| US-13.13 | XCM channel operations & health | EPIC-13 | P3 | 3 | sprint-2025-M09 | — |
-| US-13.14 | XCM fee, dry-run & transfer validation | EPIC-13 | P3 | 5 | sprint-2026-M06 | — |
-| US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | sprint-2024-M07 | — |
-| US-13.16 | Asset Hub Migration & relay-chain wind-down | EPIC-13 | P3 | 3 | sprint-2025-M11 | — |
+| US-13.12 | XCM route & channel coverage | EPIC-13 | P3 | 5 | sprint-2025-M09 | PDTnhah |
+| US-13.13 | XCM channel operations & health | EPIC-13 | P3 | 3 | sprint-2025-M09 | PDTnhah |
+| US-13.14 | XCM fee, dry-run & transfer validation | EPIC-13 | P3 | 5 | sprint-2026-M06 | PDTnhah |
+| US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | sprint-2024-M07 | frenkie-ng |
+| US-13.16 | Asset Hub Migration & relay-chain wind-down | EPIC-13 | P3 | 3 | sprint-2025-M11 | bluezdot |
 | US-14.1 | Fiat on-ramp: buy crypto with card | EPIC-14 | P1 | 8 | sprint-2022-M09 | S2kael |
 | US-14.2 | Fiat off-ramp: sell crypto for fiat | EPIC-14 | P2 | 3 | sprint-2025-M09 | tunghp2002 |
-| US-14.5 | Fiat on-ramp fixes recovered from Uncategorized | EPIC-14 | P3 | 1 | — | — |
+| US-14.5 | Fiat on-ramp fixes recovered from Uncategorized | EPIC-14 | P3 | 1 | sprint-2023-M10 | S2kael |
 | US-15.1 | OpenGov referenda + conviction voting | EPIC-15 | P1 | 5 | sprint-2025-M12 | saltict |
 | US-15.2 | Locked-token detail & unlock flow | EPIC-15 | P1 | 3 | sprint-2025-M12 | tunghp2002 |
 | US-15.3 | Governance V1 (Democracy) display-only | EPIC-15 | P2 | 2 | sprint-2025-M12 | Thiendekaco |
 | US-16.1 | Ledger hardware-wallet signing | EPIC-16 | P2 | 5 | sprint-2022-M08 | S2kael |
 | US-16.2 | QR-based signing — Keystone & Polkadot Vault | EPIC-16 | P2 | 5 | sprint-2022-M08 | S2kael |
-| US-16.4 | Ledger network & app coverage | EPIC-16 | P3 | 3 | sprint-2025-M01 | — |
-| US-16.5 | Ledger connection & account discovery | EPIC-16 | P3 | 3 | sprint-2025-M09 | — |
-| US-16.6 | Ledger signing across wallet features | EPIC-16 | P3 | 3 | sprint-2025-M07 | — |
-| US-16.7 | Generic Ledger app — migration & runtime metadata | EPIC-16 | P3 | 5 | sprint-2025-M09 | — |
+| US-16.4 | Ledger network & app coverage | EPIC-16 | P3 | 3 | sprint-2025-M01 | PDTnhah |
+| US-16.5 | Ledger connection & account discovery | EPIC-16 | P3 | 3 | sprint-2025-M09 | Thiendekaco |
+| US-16.6 | Ledger signing across wallet features | EPIC-16 | P3 | 3 | sprint-2025-M07 | Thiendekaco |
+| US-16.7 | Generic Ledger app — migration & runtime metadata | EPIC-16 | P3 | 5 | sprint-2025-M09 | Thiendekaco |
 | US-16.8 | Ledger asset-recovery tool (offline, out-of-repo) | EPIC-16 | P3 | 2 | sprint-2024-M02 | frenkie-ng |
 | US-17.1 | Proxy types & authority management | EPIC-17 | P2 | 5 | sprint-2026-M01 | Thiendekaco |
 | US-17.2 | Proxy signing (Sign Selector) + proxied-by display | EPIC-17 | P2 | 5 | sprint-2026-M01 | Thiendekaco |
@@ -204,7 +204,7 @@
 | US-19.5 | Airdrop / quest mission display | EPIC-19 | P2 | 5 | sprint-2024-M03 | frenkie-ng |
 | US-19.7 | Mission Pools reward program | EPIC-19 | P2 | 5 | sprint-2024-M03 | frenkie-ng |
 | US-19.8 | In-app notification center | EPIC-19 | P2 | 5 | sprint-2024-M10 | frenkie-ng |
-| US-19.14 | Onboarding & engagement recovered from Uncategorized | EPIC-19 | P3 | 2 | — | — |
+| US-19.14 | Onboarding & engagement recovered from Uncategorized | EPIC-19 | P3 | 2 | sprint-2024-M10 | Quangdm-cdm |
 | US-2.1 | Unified-Account keyring engine | EPIC-2 | P0 | 8 | sprint-2024-M10 | S2kael |
 | US-2.2 | ChainService — live API object per chain | EPIC-2 | P0 | 8 | sprint-2023-M03 | nulllpc |
 | US-2.3 | EarningService pool-handler engine | EPIC-2 | P1 | 8 | sprint-2024-M02 | S2kael |
@@ -216,8 +216,8 @@
 | US-20.7 | MV3 wake-depth split (pub → partial, pri → full) | EPIC-20 | P1 | 5 | sprint-2025-M06 | saltict |
 | US-20.8 | API request strategy v2 — response cache, group cancellation, adaptive backoff | EPIC-20 | P1 | 5 | sprint-2025-M07 | S2kael |
 | US-20.9 | Aggregated data routed through the external Services SDK | EPIC-20 | P1 | 5 | sprint-2025-M08 | bluezdot |
-| US-20.10 | Early performance passes (2022–2024) | EPIC-20 | P3 | 1 | sprint-2022-M12 | — |
-| US-20.11 | Lifecycle & performance fixes recovered from Uncategorized | EPIC-20 | P3 | 1 | — | — |
+| US-20.10 | Early performance passes (2022–2024) | EPIC-20 | P3 | 1 | sprint-2022-M12 | nulllpc |
+| US-20.11 | Lifecycle & performance fixes recovered from Uncategorized | EPIC-20 | P3 | 1 | sprint-2023-M05 | saltict |
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | sprint-2026-W28 | tunghp2002 |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | sprint-2026-W28 | tunghp2002 |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
@@ -228,9 +228,9 @@
 | US-3.5 | The Unified Account model | EPIC-3 | P1 | 8 | sprint-2024-M10 | saltict |
 | US-3.6 | Watch-only accounts & address book | EPIC-3 | P2 | 3 | sprint-2023-M04 | saltict |
 | US-3.7 | Account derivation: custom path & child accounts | EPIC-3 | P2 | 3 | sprint-2022-M01 | barrutko |
-| US-3.10 | Account screens in the 1.0.2 UI rewrite | EPIC-3 | P3 | 1 | sprint-2023-M04 | — |
-| US-3.11 | Account on the WebApp & Avail Space | EPIC-3 | P3 | 5 | sprint-2024-M01 | — |
-| US-3.13 | Account fixes recovered from Uncategorized | EPIC-3 | P3 | 2 | — | — |
+| US-3.10 | Account screens in the 1.0.2 UI rewrite | EPIC-3 | P3 | 1 | sprint-2023-M04 | S2kael |
+| US-3.11 | Account on the WebApp & Avail Space | EPIC-3 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
+| US-3.13 | Account fixes recovered from Uncategorized | EPIC-3 | P3 | 2 | sprint-2025-M06 | lw-cdm |
 | US-4.1 | Add/remove networks + custom RPC | EPIC-4 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-4.2 | Bulk disable + reset to default networks | EPIC-4 | P1 | 2 | sprint-2022-M05 | nulllpc |
 | US-4.3 | Auto-update chain list & token metadata | EPIC-4 | P1 | 3 | sprint-2024-M03 | S2kael |
@@ -243,9 +243,9 @@
 | US-4.11 | Custom token import (ERC-20 / PSP-22) | EPIC-4 | P1 | 3 | sprint-2022-M10 | nulllpc |
 | US-4.12 | Token registry enable/disable | EPIC-4 | P1 | 2 | sprint-2023-M03 | nulllpc |
 | US-4.24 | Remove Polygon zkEVM logic and update chainlist | EPIC-4 | P1 | 3 | sprint-2026-M07 | tunghp2002 |
-| US-4.26 | Network & token screens in the 1.0.2 UI rewrite | EPIC-4 | P3 | 1 | sprint-2023-M04 | — |
-| US-4.27 | Network & token on the WebApp & Avail Space | EPIC-4 | P3 | 5 | sprint-2024-M01 | — |
-| US-4.28 | Chains, tokens & data recovered from Uncategorized | EPIC-4 | P3 | 5 | — | — |
+| US-4.26 | Network & token screens in the 1.0.2 UI rewrite | EPIC-4 | P3 | 1 | sprint-2023-M04 | nulllpc |
+| US-4.27 | Network & token on the WebApp & Avail Space | EPIC-4 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
+| US-4.28 | Chains, tokens & data recovered from Uncategorized | EPIC-4 | P3 | 5 | sprint-2025-M10 | bluezdot |
 | US-42.1 | Test — Stake/unstake screen bugs after upgrade (#5013) | EPIC-42 | P2 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.2 | Test — Cypress (CP) token on Base shows correctly in wallet (#703) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
@@ -261,27 +261,27 @@
 | US-5.5 | Seed-phrase input safety | EPIC-5 | P0 | 2 | sprint-2023-M08 | S2kael |
 | US-5.6 | Auto-lock timer + unlock type | EPIC-5 | P0 | 3 | sprint-2023-M08 | saltict |
 | US-5.7 | Camera-access + One-Sign toggles | EPIC-5 | P0 | 3 | sprint-2025-M02 | S2kael |
-| US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | — |
-| US-5.13 | Security fixes recovered from Uncategorized | EPIC-5 | P3 | 2 | — | — |
+| US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | S2kael |
+| US-5.13 | Security fixes recovered from Uncategorized | EPIC-5 | P3 | 2 | sprint-2024-M11 | bluezdot |
 | US-6.1 | Dark-only responsive UI: popup and full-page expand view | EPIC-6 | P2 | 3 | sprint-2023-M03 | lw-cdm |
 | US-6.2 | Web app (standalone browser app) with feature parity to the extension | EPIC-6 | P2 | 5 | sprint-2024-M02 | saltict |
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
 | US-6.4 | Settings management: network selection, token preferences, account metadata | EPIC-6 | P2 | 3 | sprint-2022-M05 | saltict |
 | US-6.5 | Select display fiat currency for balances and prices | EPIC-6 | P2 | 2 | sprint-2024-M04 | saltict |
-| US-6.7 | The 1.0.2 UI upgrade programme | EPIC-6 | P3 | 8 | sprint-2024-M06 | — |
-| US-6.8 | Number, decimal & value display | EPIC-6 | P3 | 2 | sprint-2025-M10 | — |
-| US-6.9 | Phishing & security surfaces | EPIC-6 | P3 | 2 | sprint-2025-M09 | — |
-| US-6.10 | Notification & marketing-campaign surfaces | EPIC-6 | P3 | 3 | sprint-2024-M10 | — |
-| US-6.11 | Transaction-history surface | EPIC-6 | P3 | 2 | sprint-2024-M10 | — |
-| US-6.12 | Early UX iteration (pre-design-system) | EPIC-6 | P3 | 2 | sprint-2023-M08 | — |
-| US-6.13 | UI fixes recovered from Uncategorized | EPIC-6 | P3 | 4 | — | — |
+| US-6.7 | The 1.0.2 UI upgrade programme | EPIC-6 | P3 | 8 | sprint-2024-M06 | lw-cdm |
+| US-6.8 | Number, decimal & value display | EPIC-6 | P3 | 2 | sprint-2025-M10 | tunghp2002 |
+| US-6.9 | Phishing & security surfaces | EPIC-6 | P3 | 2 | sprint-2025-M09 | frenkie-ng |
+| US-6.10 | Notification & marketing-campaign surfaces | EPIC-6 | P3 | 3 | sprint-2024-M10 | bluezdot |
+| US-6.11 | Transaction-history surface | EPIC-6 | P3 | 2 | sprint-2024-M10 | bluezdot |
+| US-6.12 | Early UX iteration (pre-design-system) | EPIC-6 | P3 | 2 | sprint-2023-M08 | saltict |
+| US-6.13 | UI fixes recovered from Uncategorized | EPIC-6 | P3 | 4 | sprint-2025-M12 | frenkie-ng |
 | US-7.1 | Aggregate portfolio across accounts and chains | EPIC-7 | P1 | 5 | sprint-2022-M02 | LeeW0ng |
 | US-7.2 | Transferable vs locked/frozen balance calculation | EPIC-7 | P1 | 3 | sprint-2022-M02 | Quangdm-cdm |
 | US-7.3 | Auto-detect tokens; show/hide zero-balance | EPIC-7 | P1 | 3 | sprint-2023-M04 | saltict |
 | US-7.4 | Real-time token price and per-asset chart | EPIC-7 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
 | US-7.5 | Price history (OHLCV) chart per asset | EPIC-7 | P1 | 5 | sprint-2025-M04 | Thiendekaco |
-| US-7.8 | Earlier balance-cache fixes (2022–2023) | EPIC-7 | P3 | 1 | sprint-2023-M06 | — |
-| US-7.9 | Portfolio & balance fixes recovered from Uncategorized | EPIC-7 | P3 | 1 | — | — |
+| US-7.8 | Earlier balance-cache fixes (2022–2023) | EPIC-7 | P3 | 1 | sprint-2023-M06 | saltict |
+| US-7.9 | Portfolio & balance fixes recovered from Uncategorized | EPIC-7 | P3 | 1 | sprint-2024-M05 | frenkie-ng |
 | US-8.1 | Send native & fungible tokens | EPIC-8 | P1 | 3 | sprint-2022-M05 | saltict |
 | US-8.2 | Receive (QR + copyable address) | EPIC-8 | P1 | 3 | sprint-2022-M02 | LeeW0ng |
 | US-8.3 | Custom fee / tip | EPIC-8 | P1 | 5 | sprint-2025-M03 | frenkie-ng |
@@ -293,13 +293,13 @@
 | US-8.9 | Multi-step / one-sign signing | EPIC-8 | P1 | 5 | sprint-2025-M02 | bluezdot |
 | US-8.10 | Token spending-approval confirmation | EPIC-8 | P1 | 3 | sprint-2024-M02 | S2kael |
 | US-8.13 | Payload decode error handling — graceful degradation instead of crash | EPIC-8 | P1 | 2 | sprint-2026-M07 | tunghp2002 |
-| US-8.14 | Send-fund form & recipient validation | EPIC-8 | P3 | 3 | sprint-2025-M10 | — |
-| US-8.15 | Transfer-max & available-balance edges | EPIC-8 | P3 | 3 | sprint-2026-M06 | — |
-| US-8.16 | EVM fee & gas estimation | EPIC-8 | P3 | 3 | sprint-2025-M11 | — |
-| US-8.17 | Transaction screens in the 1.0.2 UI rewrite | EPIC-8 | P3 | 3 | sprint-2023-M04 | — |
-| US-8.18 | WebApp transaction surface | EPIC-8 | P3 | 2 | sprint-2024-M05 | — |
-| US-8.19 | Unified-account transaction migration | EPIC-8 | P3 | 3 | sprint-2024-M10 | — |
-| US-8.21 | Transaction fixes recovered from Uncategorized | EPIC-8 | P3 | 1 | — | — |
+| US-8.14 | Send-fund form & recipient validation | EPIC-8 | P3 | 3 | sprint-2025-M10 | frenkie-ng |
+| US-8.15 | Transfer-max & available-balance edges | EPIC-8 | P3 | 3 | sprint-2026-M06 | PDTnhah |
+| US-8.16 | EVM fee & gas estimation | EPIC-8 | P3 | 3 | sprint-2025-M11 | bluezdot |
+| US-8.17 | Transaction screens in the 1.0.2 UI rewrite | EPIC-8 | P3 | 3 | sprint-2023-M04 | S2kael |
+| US-8.18 | WebApp transaction surface | EPIC-8 | P3 | 2 | sprint-2024-M05 | frenkie-ng |
+| US-8.19 | Unified-account transaction migration | EPIC-8 | P3 | 3 | sprint-2024-M10 | bluezdot |
+| US-8.21 | Transaction fixes recovered from Uncategorized | EPIC-8 | P3 | 1 | sprint-2025-M04 | bluezdot |
 | US-9.1 | Substrate NFT display (RMRK / Unique / PSP-34) | EPIC-9 | P1 | 5 | sprint-2022-M10 | nulllpc |
 | US-9.2 | Nested / bundled NFT display | EPIC-9 | P1 | 3 | sprint-2026-M06 | frenkie-ng |
 | US-9.3 | EVM NFT display (ERC-721) | EPIC-9 | P1 | 3 | sprint-2022-M04 | nulllpc |
@@ -309,7 +309,7 @@
 | US-9.13 | NFT media & IPFS gateway pipeline | EPIC-9 | P3 | 1 | sprint-2025-M09 | Thiendekaco |
 | US-9.19 | NFT service migration | EPIC-9 | P3 | 1 | sprint-2023-M06 | nulllpc |
 | US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | sprint-2026-M02 | frenkie-ng |
-| US-9.27 | NFT fixes recovered from Uncategorized | EPIC-9 | P3 | 1 | — | — |
+| US-9.27 | NFT fixes recovered from Uncategorized | EPIC-9 | P3 | 1 | sprint-2023-M07 | nulllpc |
 
 ## 🚫 Blocked (0)
 
@@ -326,11 +326,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 56
-- 🟢 **Ready**: 5
-- 🟡 **In Progress**: 24
+- 🟢 **Ready**: 4
+- 🟡 **In Progress**: 25
 - 👀 **Review**: 6
 - ✅ **Done**: 191
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 24 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 25 stories in-progress (limit: 3).

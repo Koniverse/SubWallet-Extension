@@ -8,8 +8,8 @@ points: 2
 sprint: sprint-2024-M10
 version_shipped: 1.3.1
 prd_ref: []
-assignee:
-commit:
+assignee: bluezdot
+commit: 9ef442373e84ac3d8f6cf7b3bcb75aa435113fea
 created: 2026-07-23
 updated: 2026-07-23
 ---

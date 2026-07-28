@@ -5,13 +5,13 @@ epic: EPIC-7
 status: done
 priority: P3
 points: 1
-sprint:
+sprint: sprint-2024-M05
 version_shipped: 1.1.65
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
-commit:
+assignee: frenkie-ng
+commit: f4e26716c5fc8028e98b0f1e60cb01c1f39ed6f7
 created: 2026-07-24
 updated: 2026-07-24
 ---

@@ -5,12 +5,12 @@ epic: EPIC-1
 status: done
 priority: P3
 points: 3
-sprint:
+sprint: sprint-2026-M01
 version_shipped: 1.3.73
 prd_ref: []
 arch_ref:
 depends_on:
-assignee:
+assignee: bluezdot
 commit:
 created: 2026-07-24
 updated: 2026-07-24

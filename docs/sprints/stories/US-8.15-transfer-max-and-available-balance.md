@@ -8,8 +8,8 @@ points: 3
 sprint: sprint-2026-M06
 version_shipped: 1.3.80
 prd_ref: []
-assignee:
-commit:
+assignee: PDTnhah
+commit: 8dee08cedf197a9fc8cbb54d03df436786ef33e3
 created: 2026-07-24
 updated: 2026-07-24
 ---
