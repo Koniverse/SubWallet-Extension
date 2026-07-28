@@ -5,7 +5,7 @@ epic: EPIC-4
 status: in-progress
 priority: P1
 points: 5
-sprint: sprint-2026-W28
+sprint: sprint-2026-W31
 version_shipped:
 prd_ref: [FR-45]
 arch_ref: [AD-02]

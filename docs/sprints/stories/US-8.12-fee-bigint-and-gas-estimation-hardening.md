@@ -5,7 +5,7 @@ epic: EPIC-8
 status: ready
 priority: P1
 points: 5
-sprint: sprint-2026-W28
+sprint: sprint-2026-W31
 version_shipped:
 prd_ref: [FR-76, FR-77, FR-80, NFR-22]
 arch_ref: [AD-02, AD-25]

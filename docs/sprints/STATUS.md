@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-28 03:33:40 UTC
+> Last generated: 2026-07-28 08:59:27 UTC
 > Total stories: 283
 
 ## 📋 Backlog (56)
@@ -69,37 +69,37 @@
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W28 | frenkie-ng |
-| US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W28 | saltict |
-| US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W28 | S2kael |
-| US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W28 | bluezdot |
+| US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
+| US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
+| US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
+| US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
 ## 🟡 In Progress (25)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.15 | Open platform improvements | EPIC-1 | P3 | 4 | — | — |
-| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
+| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
 | US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
 | US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
 | US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
-| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W28 | bluezdot |
+| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W31 | bluezdot |
 | US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
-| US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W28 | frenkie-ng |
+| US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-16.11 | QR-device signing defects (improvement on US-16.2) | EPIC-16 | P3 | 2 | — | — |
-| US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W30 | bluezdot |
+| US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
 | US-19.15 | Open onboarding & engagement (recovered from Uncategorized) | EPIC-19 | P3 | 1 | — | — |
 | US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
-| US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W28 | nulllpc |
+| US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W31 | nulllpc |
 | US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
-| US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
-| US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W28 | bluezdot |
-| US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
-| US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W28 | saltict |
+| US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
+| US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
+| US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
+| US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
 | US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
-| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W30 | frenkie-ng |
+| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
 | US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
 | US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
@@ -108,12 +108,12 @@
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W28 | Thiendekaco |
+| US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | — | tunghp2002 |
-| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W28 | tunghp2002 |
-| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
-| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
-| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W28 | frenkie-ng |
+| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W31 | tunghp2002 |
+| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
+| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
+| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
 
 ## ✅ Done (191)
 
