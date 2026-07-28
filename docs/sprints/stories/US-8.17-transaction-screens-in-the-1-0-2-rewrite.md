@@ -41,7 +41,7 @@ generator twice, in two different areas.
 
 ## Incremental work, fixes & chores
 
-**11 tracker issues** — 6 with a release, 2 delivered with no line naming them, 3 closed without
+**11 tracker issues** — 7 with a release, 1 delivered with no line naming them, 3 closed without
 shipping.
 
 | Shipped | Issue | Title | Status |
@@ -52,11 +52,11 @@ shipping.
 | 1.0.2 | [#1066](https://github.com/Koniverse/SubWallet-Extension/issues/1066) | Upgrade UI - Update for Transaction Types | ✅ done |
 | 1.0.2 | [#1067](https://github.com/Koniverse/SubWallet-Extension/issues/1067) | Upgrade UI - Add Components for Transaction Screens | ✅ done |
 | 1.0.2 | [#1140](https://github.com/Koniverse/SubWallet-Extension/issues/1140) | Upgrade UI - Bugs related to the send tokens feature | ✅ done |
+| 1.0.2 | [#1215](https://github.com/Koniverse/SubWallet-Extension/issues/1215) | Upgrade UI - Re-check validate amount must be equals when transfer | ✅ done |
 | — | [#1051](https://github.com/Koniverse/SubWallet-Extension/issues/1051) | Transactions Screen | ⏸ deprecated |
 | — | [#1063](https://github.com/Koniverse/SubWallet-Extension/issues/1063) | Implement new transaction logic in background | ⏸ deprecated |
 | — | [#1079](https://github.com/Koniverse/SubWallet-Extension/issues/1079) | Upgrade UI - Auto write history for any transaction | ⏸ deprecated |
 | — | [#1163](https://github.com/Koniverse/SubWallet-Extension/issues/1163) | Upgrade UI - Show incorrect Amount when user transfer all in case the remaining balance < ED | ✅ done |
-| — | [#1215](https://github.com/Koniverse/SubWallet-Extension/issues/1215) | Upgrade UI - Re-check validate amount must be equals when transfer | ✅ done |
 
 > **#1051 is #1024 filed twice.** *"Transactions Screen"* (opened 2023-02-27) closed `NOT_PLANNED`;
 > *"Upgrade UI - Screen Transactions"* (opened 2023-02-07, twenty days earlier) shipped in 1.0.2.

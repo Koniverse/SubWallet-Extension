@@ -115,7 +115,7 @@ Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 an
 
 ## Incremental work, fixes & chores
 
-**86 tracker issues** landed on network management, custom RPC and per-network config — 52 with a release, 27 delivered with no line naming them, 8 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+**86 tracker issues** landed on network management, custom RPC and per-network config — 55 with a release, 24 delivered with no line naming them, 8 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -149,6 +149,7 @@ Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 an
 | 0.8.4 | [#646](https://github.com/Koniverse/SubWallet-Extension/issues/646) | Integrate Aventus Network | ✅ done |
 | 1.0.2 | [#1237](https://github.com/Koniverse/SubWallet-Extension/issues/1237) | Status of network show incorrect | ✅ done |
 | 1.0.2 | [#1247](https://github.com/Koniverse/SubWallet-Extension/issues/1247) | Re-check the feature of automatically turning on the network according to the existing balance | ✅ done |
+| 1.0.2 | [#1241](https://github.com/Koniverse/SubWallet-Extension/issues/1241) | Do not display the add network screen in case the network already exists | ✅ done |
 | 1.0.5 | [#1348](https://github.com/Koniverse/SubWallet-Extension/issues/1348) | Update URL explorer for Subspace networks | ✅ done |
 | 1.0.6 | [#1429](https://github.com/Koniverse/SubWallet-Extension/issues/1429) | Update APR for A0 and re-check for more chain | ✅ done |
 | 1.0.11 | [#1508](https://github.com/Koniverse/SubWallet-Extension/issues/1508) | Fix bug detecting on-chain attributes for WASM NFTs | ✅ done |
@@ -159,11 +160,13 @@ Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 an
 | 1.1.17 | [#2019](https://github.com/Koniverse/SubWallet-Extension/issues/2019) | The default vara network is enabled | ✅ done |
 | 1.1.21 | [#2158](https://github.com/Koniverse/SubWallet-Extension/issues/2158) | Hide the token of the Inactive chain | ✅ done |
 | 1.1.24 | [#2258](https://github.com/Koniverse/SubWallet-Extension/issues/2258) | Re-check for networks that are using Parity RPC | ✅ done |
+| 1.1.32 | [#2486](https://github.com/Koniverse/SubWallet-Extension/issues/2486) | [Manta] Integrate Manta Atlantic Network | ✅ done |
 | 1.1.39 | [#2609](https://github.com/Koniverse/SubWallet-Extension/issues/2609) | Update IPFS domain for NFTs from Unique network | ✅ done |
 | 1.1.41 | [#2550](https://github.com/Koniverse/SubWallet-Extension/issues/2550) | Optimize performance by separate chain status and chain state | ✅ done |
 | 1.1.41 | [#2585](https://github.com/Koniverse/SubWallet-Extension/issues/2585) | Integrate Continuum network | ✅ done |
 | 1.1.41 | [#2676](https://github.com/Koniverse/SubWallet-Extension/issues/2676) | Integrate LLD and LLM from Liberland network | ✅ done |
 | 1.1.53 | [#2885](https://github.com/Koniverse/SubWallet-Extension/issues/2885) | Error when fetching balance with Enjin Relay Chain | ✅ done |
+| 1.1.56 | [#2591](https://github.com/Koniverse/SubWallet-Extension/issues/2591) | Support Paseo network | ✅ done |
 | 1.1.60 | [#2966](https://github.com/Koniverse/SubWallet-Extension/issues/2966) | [Extension] Add support for Mythos Chain | ✅ done |
 | 1.1.63 | [#3037](https://github.com/Koniverse/SubWallet-Extension/issues/3037) | Network's status show incorrect | ✅ done |
 | 1.1.67 | [#3084](https://github.com/Koniverse/SubWallet-Extension/issues/3084) | Fix bug integrating chain online | ✅ done |
@@ -186,7 +189,6 @@ Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 an
 | — | [#938](https://github.com/Koniverse/SubWallet-Extension/issues/938) | Follow-up some networks to add new | ✅ done |
 | — | [#988](https://github.com/Koniverse/SubWallet-Extension/issues/988) | Add support new endpoint for Astar | ✅ done |
 | — | [#1135](https://github.com/Koniverse/SubWallet-Extension/issues/1135) | Update endpoint for Shiden-EVM | ✅ done |
-| — | [#1241](https://github.com/Koniverse/SubWallet-Extension/issues/1241) | Do not display the add network screen in case the network already exists | ✅ done |
 | — | [#1276](https://github.com/Koniverse/SubWallet-Extension/issues/1276) | Update network name: "InvArch Tinker" -> "Tinkernet" | ✅ done |
 | — | [#1536](https://github.com/Koniverse/SubWallet-Extension/issues/1536) | Re-check nominated record of the Calamari network | ⏸ deprecated |
 | — | [#1597](https://github.com/Koniverse/SubWallet-Extension/issues/1597) | Update enable chain interaction UX | ✅ done |
@@ -194,8 +196,6 @@ Commits `4e32896869, a2ef6ef7a3, af8c77e83d` verified contained in the v0.4.3 an
 | — | [#2137](https://github.com/Koniverse/SubWallet-Extension/issues/2137) | Improve UX: Enables faster RPC updates | ⏸ deprecated |
 | — | [#2232](https://github.com/Koniverse/SubWallet-Extension/issues/2232) | Re-check all functions on Moonbeam network | ⏸ deprecated |
 | — | [#2392](https://github.com/Koniverse/SubWallet-Extension/issues/2392) | Setup banner to notify to user about serveral networks | ✅ done |
-| — | [#2486](https://github.com/Koniverse/SubWallet-Extension/issues/2486) | [Manta] Integrate Manta Atlantic Network | ✅ done |
-| — | [#2591](https://github.com/Koniverse/SubWallet-Extension/issues/2591) | Support Paseo network | ✅ done |
 | — | [#2927](https://github.com/Koniverse/SubWallet-Extension/issues/2927) | Re-check case remove custom network | ⏸ deprecated |
 | — | [#3016](https://github.com/Koniverse/SubWallet-Extension/issues/3016) | Check online network integration | ✅ done |
 | — | [#3596](https://github.com/Koniverse/SubWallet-Extension/issues/3596) | Update UI for Chain abstraction demo | ✅ done |

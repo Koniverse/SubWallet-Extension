@@ -39,7 +39,7 @@ them.
 
 ## Incremental work, fixes & chores
 
-**8 tracker issues**, all shipped in 1.0.2 (7 with a line naming them, 1 delivered without).
+**8 tracker issues**, all shipped in 1.0.2.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -50,7 +50,7 @@ them.
 | 1.0.2 | [#1149](https://github.com/Koniverse/SubWallet-Extension/issues/1149) | Upgrade UI - Handling the case where the user chooses the bet action when no account is supported | ✅ done |
 | 1.0.2 | [#1150](https://github.com/Koniverse/SubWallet-Extension/issues/1150) | Upgrade UI - Implement Withdraw feature for the "All accounts" mode | ✅ done |
 | 1.0.2 | [#1158](https://github.com/Koniverse/SubWallet-Extension/issues/1158) | Upgrade UI - Handle case forget all account | ✅ done |
-| — | [#1017](https://github.com/Koniverse/SubWallet-Extension/issues/1017) | Upgrade UI - Screen Account / List | ✅ done |
+| 1.0.2 | [#1017](https://github.com/Koniverse/SubWallet-Extension/issues/1017) | Upgrade UI - Screen Account / List | ✅ done |
 
 > **Four rows are the four account screens** — list (#1017), add (#1018), export (#1019) and the
 > select-account modal (#1020) — redrawn as a set. The other four are the "All accounts" mode the

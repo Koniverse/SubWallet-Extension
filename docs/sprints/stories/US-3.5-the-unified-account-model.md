@@ -170,7 +170,7 @@ solo → unified merge (FR-22).
 
 ## Incremental work, fixes & chores
 
-**59 tracker issues** landed on the Unified Account model — 38 with a release, 16 delivered with no
+**59 tracker issues** landed on the Unified Account model — 39 with a release, 16 delivered with no
 line naming them, 5 closed without shipping. Folded in from the former one-issue-per-story
 maintenance ledger (2026-07-24).
 
@@ -204,6 +204,7 @@ maintenance ledger (2026-07-24).
 | 1.3.1 | [#3696](https://github.com/Koniverse/SubWallet-Extension/issues/3696) | Unified account - Show derivation information for derived account | ✅ done |
 | 1.3.1 | [#3700](https://github.com/Koniverse/SubWallet-Extension/issues/3700) | Unified account - Update for TON account | ✅ done |
 | 1.3.1 | [#3701](https://github.com/Koniverse/SubWallet-Extension/issues/3701) | Unified account - Do not update address when change Address version for TON Solo account | ✅ done |
+| 1.3.1 | [#3667](https://github.com/Koniverse/SubWallet-Extension/issues/3667) | Unified account - Show avatar for address with TON token | ✅ done |
 | 1.3.23 | [#3926](https://github.com/Koniverse/SubWallet-Extension/issues/3926) | Implement account migration for Unified account | ✅ done |
 | 1.3.23 | [#3927](https://github.com/Koniverse/SubWallet-Extension/issues/3927) | Fix UI bug for Cardano unified account | ✅ done |
 | 1.3.42 | [#4094](https://github.com/Koniverse/SubWallet-Extension/issues/4094) | Extension - Improvements unified account after Bitcoin supported | ✅ done |
@@ -223,7 +224,6 @@ maintenance ledger (2026-07-24).
 | — | [#3510](https://github.com/Koniverse/SubWallet-Extension/issues/3510) | Checklist and Testing for Unified account: Create, Import... | ⏸ deprecated |
 | — | [#3548](https://github.com/Koniverse/SubWallet-Extension/issues/3548) | Unified account - Review performance in app | ✅ done |
 | — | [#3592](https://github.com/Koniverse/SubWallet-Extension/issues/3592) | Unified account - Can't export multi account | ✅ done |
-| — | [#3667](https://github.com/Koniverse/SubWallet-Extension/issues/3667) | Unified account - Show avatar for address with TON token | ✅ done |
 | — | [#3677](https://github.com/Koniverse/SubWallet-Extension/issues/3677) | Unified account - Update the latest code (v1.2.30) | ✅ done |
 | — | [#3704](https://github.com/Koniverse/SubWallet-Extension/issues/3704) | Unified account - Improve derive account feature | ✅ done |
 | — | [#3706](https://github.com/Koniverse/SubWallet-Extension/issues/3706) | Unified account - Update the latest code v1.2.31 | ✅ done |

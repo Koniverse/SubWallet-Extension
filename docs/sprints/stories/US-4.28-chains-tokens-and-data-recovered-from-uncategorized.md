@@ -32,7 +32,7 @@ It materializes **no FR**.
 
 ## Incremental work, fixes & chores
 
-**130 tracker issues** — 97 with a release, 22 delivered with no line naming them, 11 closed without shipping.
+**130 tracker issues** — 98 with a release, 21 delivered with no line naming them, 11 closed without shipping.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -57,6 +57,7 @@ It materializes **no FR**.
 | 0.8.3 | [#1089](https://github.com/Koniverse/SubWallet-Extension/issues/1089) | Update explorer for Gemini 3c, 2a | ✅ done |
 | 0.8.4 | [#1117](https://github.com/Koniverse/SubWallet-Extension/issues/1117) | Update Azero block explorer | ✅ done |
 | 1.0.2 | [#1282](https://github.com/Koniverse/SubWallet-Extension/issues/1282) | Update some new logos | ✅ done |
+| 1.0.2 | [#1255](https://github.com/Koniverse/SubWallet-Extension/issues/1255) | Add Gemini3d - Subspace testnet | ✅ done |
 | 1.0.5 | [#1307](https://github.com/Koniverse/SubWallet-Extension/issues/1307) | Add more search criteria | ✅ done |
 | 1.0.11 | [#1556](https://github.com/Koniverse/SubWallet-Extension/issues/1556) | Update chainlist | ✅ done |
 | 1.0.12 | [#1576](https://github.com/Koniverse/SubWallet-Extension/issues/1576) | Update chainlist (w26) | ✅ done |
@@ -143,7 +144,6 @@ It materializes **no FR**.
 | — | [#748](https://github.com/Koniverse/SubWallet-Extension/issues/748) | Support query with SubScan | ✅ done |
 | — | [#868](https://github.com/Koniverse/SubWallet-Extension/issues/868) | Summarize the list of data requirement from Subsquid | ✅ done |
 | — | [#1131](https://github.com/Koniverse/SubWallet-Extension/issues/1131) | Update handling ink! 4.0 for Astar related chains | ✅ done |
-| — | [#1255](https://github.com/Koniverse/SubWallet-Extension/issues/1255) | Add Gemini3d - Subspace testnet | ✅ done |
 | — | [#1315](https://github.com/Koniverse/SubWallet-Extension/issues/1315) | Support Subspace Gemini 3d on version 0.8.x | ✅ done |
 | — | [#1614](https://github.com/Koniverse/SubWallet-Extension/issues/1614) | Update chainlist (w28) | ⏸ deprecated |
 | — | [#1722](https://github.com/Koniverse/SubWallet-Extension/issues/1722) | Update chainlist (w31) | ⏸ deprecated |

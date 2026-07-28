@@ -42,12 +42,13 @@ is chain-independent, which is why this story has no per-chain tail.
 
 ## Incremental work, fixes & chores
 
-**17 tracker issues** — 9 with a release, 6 delivered with no line naming them, 2 closed without
+**17 tracker issues** — 10 with a release, 5 delivered with no line naming them, 2 closed without
 shipping.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
 | 0.5.4 | [#271](https://github.com/Koniverse/SubWallet-Extension/issues/271) | Balance showing incorrect in Send Fund screen in case create/forget acc successfully | ✅ done |
+| 1.0.2 | [#1197](https://github.com/Koniverse/SubWallet-Extension/issues/1197) | Add loading to free balance in send fund screen | ✅ done |
 | 1.0.9 | [#1509](https://github.com/Koniverse/SubWallet-Extension/issues/1509) | Update send-fund screen | ✅ done |
 | 1.1.10 | [#1555](https://github.com/Koniverse/SubWallet-Extension/issues/1555) | Save entered transaction information when closing and reopening the extension | ✅ done |
 | 1.1.13 | [#1872](https://github.com/Koniverse/SubWallet-Extension/issues/1872) | Allow paste Amount to send | ✅ done |
@@ -59,7 +60,6 @@ shipping.
 | — | [#59](https://github.com/Koniverse/SubWallet-Extension/issues/59) | Check the Send Fund Full Balance screen | ✅ done |
 | — | [#61](https://github.com/Koniverse/SubWallet-Extension/issues/61) | Duplicate account in Send Fund suggestions list when pasting address | ✅ done |
 | — | [#67](https://github.com/Koniverse/SubWallet-Extension/issues/67) | Wrong Send Fund unit displayed when switching network | ✅ done |
-| — | [#1197](https://github.com/Koniverse/SubWallet-Extension/issues/1197) | Add loading to free balance in send fund screen | ✅ done |
 | — | [#1923](https://github.com/Koniverse/SubWallet-Extension/issues/1923) | Update entered address on the transaction confirmation | ✅ done |
 | — | [#2156](https://github.com/Koniverse/SubWallet-Extension/issues/2156) | Handle error when get balance on transaction screen | ⏸ deprecated |
 | — | [#2697](https://github.com/Koniverse/SubWallet-Extension/issues/2697) | WebApp - Adjust showing/validating address when transfer assets | ⏸ deprecated |

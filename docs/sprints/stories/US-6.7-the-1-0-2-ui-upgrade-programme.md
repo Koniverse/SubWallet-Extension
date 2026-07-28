@@ -45,7 +45,7 @@ thing they have in common.
 
 ## Incremental work, fixes & chores
 
-**60 tracker issues** — 34 with a release, 25 delivered with no line naming them, 1 closed without
+**60 tracker issues** — 35 with a release, 24 delivered with no line naming them, 1 closed without
 shipping.
 
 | Shipped | Issue | Title | Status |
@@ -81,13 +81,13 @@ shipping.
 | 1.0.2 | [#1193](https://github.com/Koniverse/SubWallet-Extension/issues/1193) | Upgrade UI - Do not show the Successful screen after migrated password successfully | ✅ done |
 | 1.0.2 | [#1196](https://github.com/Koniverse/SubWallet-Extension/issues/1196) | Upgrade UI - Apply sort for some list | ✅ done |
 | 1.0.2 | [#1198](https://github.com/Koniverse/SubWallet-Extension/issues/1198) | Error page when search website in Manage website access screen | ✅ done |
+| 1.0.2 | [#1004](https://github.com/Koniverse/SubWallet-Extension/issues/1004) | Upgrade UI - Screen Phishing Page | ✅ done |
 | 1.0.6 | [#1450](https://github.com/Koniverse/SubWallet-Extension/issues/1450) | Update login & welcome screen | ✅ done |
 | 1.0.8 | [#1419](https://github.com/Koniverse/SubWallet-Extension/issues/1419) | Update some screens follow by design | ✅ done |
 | 1.2.10 | [#3228](https://github.com/Koniverse/SubWallet-Extension/issues/3228) | Update subwallet-react-ui | ✅ done |
 | — | [#969](https://github.com/Koniverse/SubWallet-Extension/issues/969) | Upgrade UI - Upgrade navigation | ✅ done |
 | — | [#973](https://github.com/Koniverse/SubWallet-Extension/issues/973) | Upgrade UI - Upgrade Theme Structure for new Design System | ✅ done |
 | — | [#993](https://github.com/Koniverse/SubWallet-Extension/issues/993) | Upgrade UI - Build navigation structure | ✅ done |
-| — | [#1004](https://github.com/Koniverse/SubWallet-Extension/issues/1004) | Upgrade UI - Screen Phishing Page | ✅ done |
 | — | [#1021](https://github.com/Koniverse/SubWallet-Extension/issues/1021) | Upgrade UI - Modal / Implement ScanQR | ✅ done |
 | — | [#1022](https://github.com/Koniverse/SubWallet-Extension/issues/1022) | Upgrade UI - Modal / Implement Select Modal | ✅ done |
 | — | [#1028](https://github.com/Koniverse/SubWallet-Extension/issues/1028) | Upgrade UI - Update Data Format | ✅ done |

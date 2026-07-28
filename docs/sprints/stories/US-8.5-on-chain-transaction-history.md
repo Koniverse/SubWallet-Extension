@@ -124,7 +124,7 @@ and any implementation caveats during version reconciliation._
 
 ## Incremental work, fixes & chores
 
-**20 tracker issues** — 12 with a release, 6 delivered with no line naming them, 2 closed without
+**20 tracker issues** — 13 with a release, 5 delivered with no line naming them, 2 closed without
 shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
 
 | Shipped | Issue | Title | Status |
@@ -134,6 +134,7 @@ shipping. Folded in from the former one-issue-per-story maintenance ledger (2026
 | 0.5.5 | [#521](https://github.com/Koniverse/SubWallet-Extension/issues/521) | Review SubQuery Transaction History | ✅ done |
 | 0.5.7 | [#584](https://github.com/Koniverse/SubWallet-Extension/issues/584) | Can't view Transaction history of Moonbase Alpha network | ✅ done |
 | 0.7.2 | [#827](https://github.com/Koniverse/SubWallet-Extension/issues/827) | Show incorrect the transfer result on the transaction history screen | ✅ done |
+| 1.0.2 | [#1249](https://github.com/Koniverse/SubWallet-Extension/issues/1249) | An error occurred while viewing transaction history | ✅ done |
 | 1.0.5 | [#1354](https://github.com/Koniverse/SubWallet-Extension/issues/1354) | Detect from from for transaction history type evm.execute | ✅ done |
 | 1.0.5 | [#1381](https://github.com/Koniverse/SubWallet-Extension/issues/1381) | Add support "view transaction explorer" for the some chain | ✅ done |
 | 1.0.9 | [#1411](https://github.com/Koniverse/SubWallet-Extension/issues/1411) | Do not get transaction history in case the wallet have multi-account | ✅ done |
@@ -145,7 +146,6 @@ shipping. Folded in from the former one-issue-per-story maintenance ledger (2026
 | — | [#324](https://github.com/Koniverse/SubWallet-Extension/issues/324) | Migrate Transaction History for Custom Network in case Merging networks from older version to a newer version | ✅ done |
 | — | [#505](https://github.com/Koniverse/SubWallet-Extension/issues/505) | Do not migrate transaction history of the Substrate Account in case update version extension | ✅ done |
 | — | [#927](https://github.com/Koniverse/SubWallet-Extension/issues/927) | Review and re-design the whole transaction history feature | ✅ done |
-| — | [#1249](https://github.com/Koniverse/SubWallet-Extension/issues/1249) | An error occurred while viewing transaction history | ✅ done |
 | — | [#1291](https://github.com/Koniverse/SubWallet-Extension/issues/1291) | Check the Transaction History status in the following case | ⏸ deprecated |
 | — | [#1846](https://github.com/Koniverse/SubWallet-Extension/issues/1846) | Re-check the service to get the transaction history | ✅ done |
 | — | [#2108](https://github.com/Koniverse/SubWallet-Extension/issues/2108) | Local transaction history display is missing | ⏸ deprecated |

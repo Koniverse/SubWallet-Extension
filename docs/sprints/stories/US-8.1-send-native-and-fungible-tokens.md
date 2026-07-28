@@ -125,7 +125,7 @@ and any implementation caveats during version reconciliation._
 
 ## Incremental work, fixes & chores
 
-**59 tracker issues** landed on the send path — 42 with a release, 16 delivered with no line naming
+**59 tracker issues** landed on the send path — 44 with a release, 16 delivered with no line naming
 them, 1 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger
 (2026-07-24).
 
@@ -157,7 +157,9 @@ them, 1 closed without shipping. Folded in from the former one-issue-per-story m
 | 1.1.19 | [#2042](https://github.com/Koniverse/SubWallet-Extension/issues/2042) | Re-check transfer function in Polkadot, Kusama network | ✅ done |
 | 1.1.21 | [#2146](https://github.com/Koniverse/SubWallet-Extension/issues/2146) | Re-check bug undefined is not an object when perform transaction | ✅ done |
 | 1.1.41 | [#2649](https://github.com/Koniverse/SubWallet-Extension/issues/2649) | Extension - Send crash log feature | ✅ done |
+| 1.1.41 | [#2688](https://github.com/Koniverse/SubWallet-Extension/issues/2688) | [Hotfix] Temporary disable transfer on NUUM token | ✅ done |
 | 1.1.42 | [#2659](https://github.com/Koniverse/SubWallet-Extension/issues/2659) | Extension - Update transaction result screen | ✅ done |
+| 1.1.44 | [#2727](https://github.com/Koniverse/SubWallet-Extension/issues/2727) | Support transferring Unique NFTs | ✅ done |
 | 1.1.65 | [#3041](https://github.com/Koniverse/SubWallet-Extension/issues/3041) | Extension - An error occured in case of transfering PANX (Aleph zero) | ✅ done |
 | 1.1.66 | [#2852](https://github.com/Koniverse/SubWallet-Extension/issues/2852) | Support showing balance & transfer for GRC20 tokens | ✅ done |
 | 1.1.66 | [#3067](https://github.com/Koniverse/SubWallet-Extension/issues/3067) | Support importing GRC20 token | ✅ done |
@@ -186,8 +188,6 @@ them, 1 closed without shipping. Folded in from the former one-issue-per-story m
 | — | [#1223](https://github.com/Koniverse/SubWallet-Extension/issues/1223) | Send multiple transactions | ✅ done |
 | — | [#1512](https://github.com/Koniverse/SubWallet-Extension/issues/1512) | Re-check all transaction on Westend | ✅ done |
 | — | [#1645](https://github.com/Koniverse/SubWallet-Extension/issues/1645) | Support Zk Assets transaction | ⏸ deprecated |
-| — | [#2688](https://github.com/Koniverse/SubWallet-Extension/issues/2688) | [Hotfix] Temporary disable transfer on NUUM token | ✅ done |
-| — | [#2727](https://github.com/Koniverse/SubWallet-Extension/issues/2727) | Support transferring Unique NFTs | ✅ done |
 | — | [#2757](https://github.com/Koniverse/SubWallet-Extension/issues/2757) | Check transfer not being submitted on Polimec | ✅ done |
 | — | [#4138](https://github.com/Koniverse/SubWallet-Extension/issues/4138) | Error when send transaction on Autonomys | ✅ done |
 

@@ -111,7 +111,7 @@ Commits `5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0e
 
 ## Incremental work, fixes & chores
 
-**67 tracker issues** landed on the token registry — visibility, auto-detection and search — 49 with a release, 16 delivered with no line naming them, 2 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
+**67 tracker issues** landed on the token registry — visibility, auto-detection and search — 51 with a release, 14 delivered with no line naming them, 2 closed without shipping. Folded in from the former one-issue-per-story maintenance ledger (2026-07-24).
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -127,6 +127,7 @@ Commits `5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0e
 | 0.6.9 | [#773](https://github.com/Koniverse/SubWallet-Extension/issues/773) | Support sending BIT token for Bit.Country Alpha Net | ✅ done |
 | 0.7.4 | [#854](https://github.com/Koniverse/SubWallet-Extension/issues/854) | Integrate Watr Protocol and Token | ✅ done |
 | 0.7.6 | [#928](https://github.com/Koniverse/SubWallet-Extension/issues/928) | Integrate $TFA token into SubWallet | ✅ done |
+| 1.0.2 | [#1248](https://github.com/Koniverse/SubWallet-Extension/issues/1248) | Incorrect balance display of some tokens | ✅ done |
 | 1.0.5 | [#1355](https://github.com/Koniverse/SubWallet-Extension/issues/1355) | WND token balance displayed incorrectly | ✅ done |
 | 1.1.1 | [#1525](https://github.com/Koniverse/SubWallet-Extension/issues/1525) | Support viewing zkAssets on Manta | ✅ done |
 | 1.1.3 | [#1444](https://github.com/Koniverse/SubWallet-Extension/issues/1444) | Sort the order of tokens displayed in the list | ✅ done |
@@ -139,6 +140,7 @@ Commits `5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0e
 | 1.1.34 | [#2540](https://github.com/Koniverse/SubWallet-Extension/issues/2540) | Fix bug not showing GENS token from Genshiro | ✅ done |
 | 1.1.36 | [#1236](https://github.com/Koniverse/SubWallet-Extension/issues/1236) | Re-check condition Delete token | ✅ done |
 | 1.1.50 | [#2791](https://github.com/Koniverse/SubWallet-Extension/issues/2791) | Extension - Do not show balance in case standing on History list to search token | ✅ done |
+| 1.1.52 | [#2848](https://github.com/Koniverse/SubWallet-Extension/issues/2848) | Support new assets on Moonbeam | ✅ done |
 | 1.2.4 | [#3053](https://github.com/Koniverse/SubWallet-Extension/issues/3053) | Extension - Add the "View on explorer" button on the Token details screen | ✅ done |
 | 1.2.13 | [#3268](https://github.com/Koniverse/SubWallet-Extension/issues/3268) | Change token type from GRC-20 to VFT | ✅ done |
 | 1.2.16 | [#3270](https://github.com/Koniverse/SubWallet-Extension/issues/3270) | Check Vara token sdk version | ✅ done |
@@ -171,13 +173,11 @@ Commits `5c82ff0bea9f68c2c48a62e00da2d101a1605631, 83e8c110419850de1b91618d21e0e
 | — | [#308](https://github.com/Koniverse/SubWallet-Extension/issues/308) | Distinguishing the Network's Coingecko Key and Token's Coingecko Key | ✅ done |
 | — | [#888](https://github.com/Koniverse/SubWallet-Extension/issues/888) | Integrate Watr Mainnet and token (Updating...) | ✅ done |
 | — | [#1208](https://github.com/Koniverse/SubWallet-Extension/issues/1208) | Adjust the display order of tokens | ✅ done |
-| — | [#1248](https://github.com/Koniverse/SubWallet-Extension/issues/1248) | Incorrect balance display of some tokens | ✅ done |
 | — | [#1357](https://github.com/Koniverse/SubWallet-Extension/issues/1357) | Re-check the token price status (increase/decrease) and change rate in 24h | ✅ done |
 | — | [#1410](https://github.com/Koniverse/SubWallet-Extension/issues/1410) | Sort tokens in order of value or balance of tokens held | ✅ done |
 | — | [#1455](https://github.com/Koniverse/SubWallet-Extension/issues/1455) | Automatically enable native tokens when enabling local tokens from the Manage tokens screen | ✅ done |
 | — | [#2481](https://github.com/Koniverse/SubWallet-Extension/issues/2481) | UI bug when token name is long on the Select token when click on search token icon on header | ✅ done |
 | — | [#2824](https://github.com/Koniverse/SubWallet-Extension/issues/2824) | Integrate asset online ( Round 2) | ⏸ deprecated |
-| — | [#2848](https://github.com/Koniverse/SubWallet-Extension/issues/2848) | Support new assets on Moonbeam | ✅ done |
 | — | [#3135](https://github.com/Koniverse/SubWallet-Extension/issues/3135) | Implement asset-pallet touch to prevent loss of funds | ✅ done |
 | — | [#4288](https://github.com/Koniverse/SubWallet-Extension/issues/4288) | Extension - Improve token enabling(Round 2) | ✅ done |
 | — | [#4308](https://github.com/Koniverse/SubWallet-Extension/issues/4308) | Extension - Don't automatically enable common tokens when doing eraser all | ✅ done |

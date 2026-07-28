@@ -150,10 +150,10 @@ Traced 2026-07-13 (US-21.2 straggler pass). Same first-delivery bullet as the en
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
+| 0.5.6 | [#556](https://github.com/Koniverse/SubWallet-Extension/issues/556) | Bug showing balance on a very small balance | ✅ done |
 | 1.1.36 | [#1802](https://github.com/Koniverse/SubWallet-Extension/issues/1802) | WebApp — wrong portfolio balance UI | ✅ done |
 | 1.1.36 | [#1843](https://github.com/Koniverse/SubWallet-Extension/issues/1843) | WebApp — implement Portfolio Statistic | ✅ done |
 | — | [#1166](https://github.com/Koniverse/SubWallet-Extension/issues/1166) | Upgrade UI — re-check the % increase/decrease of the total balance | ✅ done |
-| — | [#556](https://github.com/Koniverse/SubWallet-Extension/issues/556) | Bug showing balance on a very small balance | ✅ done |
 | — | [#3](https://github.com/Koniverse/SubWallet-Extension/issues/3) | Chrome extension not showing the correct balance for a Crust mainnet address | ✅ done |
 | — | [#2194](https://github.com/Koniverse/SubWallet-Extension/issues/2194) | Add a refresh button to the balance screen | ⏸ deprecated |
 

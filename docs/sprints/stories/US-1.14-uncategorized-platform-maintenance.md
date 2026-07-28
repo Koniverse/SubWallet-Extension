@@ -32,7 +32,7 @@ It materializes **no FR**.
 
 ## Incremental work, fixes & chores
 
-**32 tracker issues** — 17 with a release, 13 delivered with no line naming them, 2 closed without shipping.
+**32 tracker issues** — 18 with a release, 12 delivered with no line naming them, 2 closed without shipping.
 
 | Shipped | Issue | Title | Status |
 |---|---|---|---|
@@ -53,6 +53,7 @@ It materializes **no FR**.
 | 1.3.15 | [#4002](https://github.com/Koniverse/SubWallet-Extension/issues/4002) | Extension - Re-check and fix issue Don't open the extension | ✅ done |
 | 1.3.62 | [#4536](https://github.com/Koniverse/SubWallet-Extension/issues/4536) | Fix issue can not update patch and online resources | ✅ done |
 | 1.3.79 | [#4988](https://github.com/Koniverse/SubWallet-Extension/issues/4988) | Extension – Some issues when merging in version 78. | ✅ done |
+| 1.3.84 | [#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013) | [ Extension ] Some issues are open when upgrade version | ✅ done |
 | — | [#79](https://github.com/Koniverse/SubWallet-Extension/issues/79) | Some improvements in user experience | ✅ done |
 | — | [#81](https://github.com/Koniverse/SubWallet-Extension/issues/81) | Fix some small bugs | ✅ done |
 | — | [#83](https://github.com/Koniverse/SubWallet-Extension/issues/83) | Some experience improvements when adding Substrate and EVM parallel running mechanism | ✅ done |
@@ -66,7 +67,6 @@ It materializes **no FR**.
 | — | [#2434](https://github.com/Koniverse/SubWallet-Extension/issues/2434) | Periodically check some features | ✅ done |
 | — | [#4549](https://github.com/Koniverse/SubWallet-Extension/issues/4549) | Describes the process of setting up some features on the wallet | ✅ done |
 | — | [#4582](https://github.com/Koniverse/SubWallet-Extension/issues/4582) | Extension - Behaves differently on pjs apps locally | ✅ done |
-| — | [#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013) | [ Extension ] Some issues are open when upgrade version | ✅ done |
 | — | [#5016](https://github.com/Koniverse/SubWallet-Extension/issues/5016) | Wallet | ✅ done |
 
 > **The residue of a triage bucket is still mostly platform.** Logging and log-removal (#373, #438, #1373), caching-mechanism fixes (#583), generic *"Cannot read properties of undefined"* runtime bugs (#2986, #3218, #3259, #3891), and meta issues (#4181 product review, #4393 major update) — none maps to a feature; all are the platform staying alive.
