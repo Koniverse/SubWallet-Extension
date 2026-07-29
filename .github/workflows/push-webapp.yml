@@ -36,7 +36,7 @@ jobs:
         BRANCH_NAME: ${{ github.ref_name }}
         BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
-        yarn install --immutable
+        yarn install --immutable | grep -v 'YN0013'
         if [ ${{ github.ref_name }} == 'webapp-dev' ]; then
             yarn run webapp:change-build-number
         fi
