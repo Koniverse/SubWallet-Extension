@@ -3,7 +3,7 @@ id: sprint-2023-M07
 status: closed
 start: 2023-07-01
 end: 2023-07-31
-goal: "Reconstructed window — 1 story/stories shipped in release 1.1.1 (EPIC-10). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 2 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,9 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.1.1 (EPIC-1
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-10.3 | WalletConnect v2 (Substrate + EVM) | EPIC-10 | P1 | 5 | ✅ done | — | [link](stories/US-10.3-walletconnect-v2-substrate-and-evm.md) |
+| US-9.27 | NFT fixes recovered from Uncategorized | EPIC-9 | P3 | 1 | ✅ done | — | [link](stories/US-9.27-nft-fixes-recovered-from-uncategorized.md) |
 
-**Releases in this window:** 1.1.1 · **Points (retroactive):** 5
+**Releases represented by stories in this window:** 1.1.1, 1.1.2 · **Points (retroactive):** 6
 
 ## Per-Epic Retrospective
 

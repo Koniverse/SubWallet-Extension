@@ -178,7 +178,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning performance & cache hardening | Keep the earning surface fast, memory-bounded and cache-fresh across many pools | 📋 backlog | — |
 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | Earning term & condition display | Display earning T&Cs before user commits to a staking/earning position | ✅ done | 1.3.83 |
 | [US-12.16](../stories/US-12.16-crowdloan-contribution-and-portfolio.md) | Crowdloan contribution & portfolio | A retired feature's whole arc — contribute, show, and remove | ✅ done | 1.3.73 |
-| [US-12.17](../stories/US-12.17-open-earning-improvements.md) | Open earning improvements | The open earning work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-12.17](../stories/US-12.17-open-earning-improvements.md) | Open earning improvements | The open earning work no `done` story can carry (rule 9) | 📋 backlog | — |
 | [US-12.18](../stories/US-12.18-earning-screens-in-the-1-0-2-rewrite.md) | Earning screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite | ✅ done | 1.0.2 |
 | [US-12.19](../stories/US-12.19-earning-on-the-webapp-and-avail-space.md) | Earning on the WebApp & Avail Space | Staking / earning / crowdloan on the non-extension surfaces | ✅ done | 1.2.26 |
 | [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |

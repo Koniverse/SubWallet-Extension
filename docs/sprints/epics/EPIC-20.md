@@ -143,7 +143,8 @@ boundary is drawn explicitly in Out of scope.
 > | `#4448` `api-request-strategy-v2` — md5-keyed 60 s response cache + group cancellation (**the changelog mislabelled this `#4458`**) | **1.3.47** | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
 > | `#4465` aggregated data routed through the external Services SDK (18 call sites) — what actually satisfies NFR-20 / AD-24 | **1.3.52** | [US-20.2](../stories/US-20.2-api-call-optimization.md) |
 >
-> US-20.1 and US-20.2 are now `in-progress` — **stalled, not active** (last commits 2025).
+> US-20.1 is `backlog` — stalled before any sprint commitment; US-20.2 is `in-progress` —
+> **stalled, not active** (last commits 2025).
 > US-20.3 / US-20.4 / US-20.5 / US-20.6 remain `backlog`: every issue they cite (#4197,
 > #4427, #4445, #4446, #4021, #4447, #2245, #2549, #2248, #2337) has **zero commits**.
 > US-20.4's `#4984` has real work but on an **unmerged branch**, in no release.
@@ -198,7 +199,7 @@ boundary is drawn explicitly in Out of scope.
 
 | ID | Title | Goal | Status | Version |
 |---|---|---|---|---|
-| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 🚧 in-progress | — |
+| [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 📋 backlog | — |
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
 | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | ~~Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path~~ — retired; no live requirement | ⏸️ deprecated | — |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 👀 review | — |

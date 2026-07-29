@@ -3,7 +3,7 @@ id: sprint-2024-M07
 status: closed
 start: 2024-07-01
 end: 2024-07-31
-goal: "Reconstructed window — 1 story/stories shipped in release 1.2.14 (EPIC-11). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 2 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,9 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.2.14 (EPIC-
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-11.6 | In-wallet swap via Asset Hub DEX | EPIC-11 | P1 | 5 | ✅ done | — | [link](stories/US-11.6-in-wallet-swap-via-asset-hub-dex.md) |
+| US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | ✅ done | — | [link](stories/US-13.15-xcm-ui-history-and-token-selection.md) |
 
-**Releases in this window:** 1.2.14 · **Points (retroactive):** 5
+**Releases represented by stories in this window:** 1.2.14 · **Points (retroactive):** 8
 
 ## Per-Epic Retrospective
 

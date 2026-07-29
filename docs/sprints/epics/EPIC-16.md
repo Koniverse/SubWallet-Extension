@@ -65,7 +65,7 @@ queue to [EPIC-2](EPIC-2.md) (RequestService), and software-key accounts to
 | [US-16.8](../stories/US-16.8-ledger-asset-recovery-tool.md) | Ledger asset-recovery tool (offline, out-of-repo) | Reach assets stranded on a derivative address the device cannot open | ✅ done | — |
 | [US-16.9](../stories/US-16.9-ledger-connection-and-derivation-improvements.md) | Ledger connection & derivation improvements | Custom derivation paths, JSON import, auto-migration, dropping the legacy connector | 📋 backlog | — |
 | [US-16.10](../stories/US-16.10-ledger-on-webapp-and-avail-space.md) | Ledger on the WebApp & Avail Space | The non-extension surfaces whose extension halves already shipped | 📋 backlog | — |
-| [US-16.11](../stories/US-16.11-qr-device-signing-defects.md) | QR-device signing defects | A Polkadot Vault account that attaches and displays but cannot send | 🚧 in-progress | — |
+| [US-16.11](../stories/US-16.11-qr-device-signing-defects.md) | QR-device signing defects | A Polkadot Vault account that attaches and displays but cannot send | 📋 backlog | — |
 
 > **US-16.4 … US-16.11 carry no FR.** They hold the incremental work, fixes and chores that landed
 > on this epic's capabilities — **90 tracker issues** folded in from the former one-issue-per-story

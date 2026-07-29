@@ -3,7 +3,7 @@ id: sprint-2025-M12
 status: closed
 start: 2025-12-01
 end: 2025-12-31
-goal: "Reconstructed window — 4 story/stories shipped in releases 1.3.70, 1.3.71 (EPIC-3, EPIC-15). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 5 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -31,8 +31,9 @@ goal: "Reconstructed window — 4 story/stories shipped in releases 1.3.70, 1.3.
 | US-15.1 | OpenGov referenda + conviction voting | EPIC-15 | P1 | 5 | ✅ done | — | [link](stories/US-15.1-opengov-referenda-and-conviction-voting.md) |
 | US-15.2 | Locked-token detail & unlock flow | EPIC-15 | P1 | 3 | ✅ done | — | [link](stories/US-15.2-locked-token-detail-and-unlock-flow.md) |
 | US-15.3 | Governance V1 (Democracy) display-only | EPIC-15 | P2 | 2 | ✅ done | — | [link](stories/US-15.3-governance-v1-democracy-display-only.md) |
+| US-6.13 | UI fixes recovered from Uncategorized | EPIC-6 | P3 | 4 | ✅ done | — | [link](stories/US-6.13-ui-fixes-recovered-from-uncategorized.md) |
 
-**Releases in this window:** 1.3.70, 1.3.71 · **Points (retroactive):** 15
+**Releases represented by stories in this window:** 1.3.71, 1.3.70 · **Points (retroactive):** 19
 
 ## Per-Epic Retrospective
 

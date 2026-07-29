@@ -3,7 +3,7 @@ id: sprint-2026-M05
 status: closed
 start: 2026-05-01
 end: 2026-05-31
-goal: "Reconstructed window — 2 story/stories shipped in release 1.3.78 (EPIC-11, EPIC-13). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 4 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -29,8 +29,10 @@ goal: "Reconstructed window — 2 story/stories shipped in release 1.3.78 (EPIC-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-11.7 | In-wallet Bittensor dTAO swap | EPIC-11 | P1 | 5 | ✅ done | — | [link](stories/US-11.7-in-wallet-bittensor-dtao-swap.md) |
 | US-13.7 | Bittensor TAO ↔ Subtensor-EVM native-token bridge | EPIC-13 | P2 | 5 | ✅ done | — | [link](stories/US-13.7-bittensor-tao-subtensor-evm-bridge.md) |
+| US-1.14 | Uncategorized platform maintenance | EPIC-1 | P3 | 4 | ✅ done | — | [link](stories/US-1.14-uncategorized-platform-maintenance.md) |
+| US-11.13 | Swap quote pipeline & service internals | EPIC-11 | P3 | 3 | ✅ done | — | [link](stories/US-11.13-swap-quote-pipeline-and-service.md) |
 
-**Releases in this window:** 1.3.78 · **Points (retroactive):** 10
+**Releases represented by stories in this window:** 1.3.78, 1.3.79 · **Points (retroactive):** 17
 
 ## Per-Epic Retrospective
 

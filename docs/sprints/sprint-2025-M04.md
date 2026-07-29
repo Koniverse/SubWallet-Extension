@@ -3,7 +3,7 @@ id: sprint-2025-M04
 status: closed
 start: 2025-04-01
 end: 2025-04-30
-goal: "Reconstructed window — 5 story/stories shipped in releases 1.3.30, 1.3.31, 1.3.32, 1.3.33 (EPIC-7, EPIC-10, EPIC-11, EPIC-13). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 8 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -32,8 +32,11 @@ goal: "Reconstructed window — 5 story/stories shipped in releases 1.3.30, 1.3.
 | US-10.4 | Cardano CIP-30 connector | EPIC-10 | P1 | 5 | ✅ done | — | [link](stories/US-10.4-cardano-cip-30-connector.md) |
 | US-11.8 | Cross-chain swap routing (Swap↔Bridge multi-hop) | EPIC-11 | P1 | 8 | ✅ done | — | [link](stories/US-11.8-cross-chain-swap-routing.md) |
 | US-13.5 | Across protocol cross-chain bridge | EPIC-13 | P2 | 5 | ✅ done | — | [link](stories/US-13.5-across-protocol.md) |
+| US-11.15 | Swap providers evaluated but not integrated | EPIC-11 | P3 | 1 | ✅ done | — | [link](stories/US-11.15-providers-evaluated-not-integrated.md) |
+| US-11.18 | Swap fixes recovered from Uncategorized | EPIC-11 | P3 | 1 | ✅ done | — | [link](stories/US-11.18-swap-fixes-recovered-from-uncategorized.md) |
+| US-8.21 | Transaction fixes recovered from Uncategorized | EPIC-8 | P3 | 1 | ✅ done | — | [link](stories/US-8.21-transaction-fixes-recovered-from-uncategorized.md) |
 
-**Releases in this window:** 1.3.30, 1.3.31, 1.3.32, 1.3.33 · **Points (retroactive):** 28
+**Releases represented by stories in this window:** 1.3.33, 1.3.32, 1.3.30, 1.3.31 · **Points (retroactive):** 31
 
 ## Per-Epic Retrospective
 

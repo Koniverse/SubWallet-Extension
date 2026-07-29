@@ -3,7 +3,7 @@ id: sprint-2022-M12
 status: closed
 start: 2022-12-01
 end: 2022-12-31
-goal: "Reconstructed window — 1 story/stories shipped in release 0.7.7 (EPIC-4). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 2 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,9 @@ goal: "Reconstructed window — 1 story/stories shipped in release 0.7.7 (EPIC-4
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-4.9 | Substrate light-client fallback | EPIC-4 | P1 | 3 | ✅ done | — | [link](stories/US-4.9-substrate-light-client-fallback.md) |
+| US-20.10 | Early performance passes (2022–2024) | EPIC-20 | P3 | 1 | ✅ done | — | [link](stories/US-20.10-early-performance-passes.md) |
 
-**Releases in this window:** 0.7.7 · **Points (retroactive):** 3
+**Releases represented by stories in this window:** 0.7.7, 1.1.3 · **Points (retroactive):** 4
 
 ## Per-Epic Retrospective
 

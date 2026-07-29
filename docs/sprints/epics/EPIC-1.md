@@ -115,7 +115,7 @@ runtime* translation channel (FR-4).
 | [US-1.12](../stories/US-1.12-webapp-and-mobile-platform-sync.md) | WebApp & mobile platform sync | WebApp "latest code" sync + mobile web-runner portability | ✅ done | 1.3.34 |
 | [US-1.13](../stories/US-1.13-backend-middleware-and-platform-refactors.md) | Backend, middleware & platform refactors | Backend/middleware services + platform refactors | ✅ done | 1.3.41 |
 | [US-1.14](../stories/US-1.14-uncategorized-platform-maintenance.md) | Uncategorized platform maintenance | Logging, errors, caching, meta — fits no other cluster | ✅ done | 1.3.79 |
-| [US-1.15](../stories/US-1.15-open-platform-improvements.md) | Open platform improvements | Open platform work not yet delivered (rule 9) | 🚧 in-progress | — |
+| [US-1.15](../stories/US-1.15-open-platform-improvements.md) | Open platform improvements | Open platform work not yet delivered (rule 9) | 📋 backlog | — |
 
 > **There is no separate maintenance layer for build & platform.** Each capability above carries
 > its own requirement *and* its incremental-work history as a table inside the story. The 19

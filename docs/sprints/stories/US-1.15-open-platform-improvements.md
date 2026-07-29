@@ -2,7 +2,7 @@
 id: US-1.15
 title: "Open platform improvements"
 epic: EPIC-1
-status: in-progress
+status: backlog
 priority: P3
 points: 4
 sprint:
@@ -13,7 +13,7 @@ depends_on:
 assignee:
 commit:
 created: 2026-07-24
-updated: 2026-07-24
+updated: 2026-07-29
 ---
 
 ## Goal
@@ -22,7 +22,7 @@ The platform work asked for and not delivered — dependency, backend, refactor,
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 32 rows below are **open on the tracker**, recovered from the former **Uncategorized** maintenance ledger on 2026-07-24. `commit`, `sprint` and `version_shipped` stay empty until work lands.
+> **📋 backlog — nothing here has shipped or been committed to a sprint.** All 32 rows below are **open on the tracker**, recovered from the former **Uncategorized** maintenance ledger on 2026-07-24. `commit`, `sprint` and `version_shipped` stay empty until work lands.
 
 ## Scope
 

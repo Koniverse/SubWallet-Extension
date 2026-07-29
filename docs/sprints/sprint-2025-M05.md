@@ -3,7 +3,7 @@ id: sprint-2025-M05
 status: closed
 start: 2025-05-01
 end: 2025-05-31
-goal: "Reconstructed window — 2 story/stories shipped in release 1.3.36 (EPIC-11). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 3 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -29,8 +29,9 @@ goal: "Reconstructed window — 2 story/stories shipped in release 1.3.36 (EPIC-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-11.3 | In-wallet swap via Uniswap (V3/V4 + UniswapX) | EPIC-11 | P1 | 5 | ✅ done | — | [link](stories/US-11.3-in-wallet-swap-via-uniswap.md) |
 | US-11.4 | In-wallet swap via KyberSwap | EPIC-11 | P1 | 5 | ✅ done | — | [link](stories/US-11.4-in-wallet-swap-via-kyberswap.md) |
+| US-1.12 | WebApp & mobile platform sync | EPIC-1 | P3 | 5 | ✅ done | — | [link](stories/US-1.12-webapp-and-mobile-platform-sync.md) |
 
-**Releases in this window:** 1.3.36 · **Points (retroactive):** 10
+**Releases represented by stories in this window:** 1.3.36, 1.3.34 · **Points (retroactive):** 15
 
 ## Per-Epic Retrospective
 

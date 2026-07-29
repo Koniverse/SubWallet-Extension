@@ -3,7 +3,7 @@ id: sprint-2024-M10
 status: closed
 start: 2024-10-01
 end: 2024-10-31
-goal: "Reconstructed window — 6 story/stories shipped in releases 1.3.1, 1.3.4 (EPIC-2, EPIC-3, EPIC-4, EPIC-13, EPIC-19). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 10 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -33,8 +33,12 @@ goal: "Reconstructed window — 6 story/stories shipped in releases 1.3.1, 1.3.4
 | US-13.3 | Avail Bridge: Avail ↔ Ethereum | EPIC-13 | P2 | 5 | ✅ done | — | [link](stories/US-13.3-avail-bridge.md) |
 | US-13.6 | Bridge claim / withdrawal step to finalize cross-chain transfers | EPIC-13 | P1 | 5 | ✅ done | — | [link](stories/US-13.6-bridge-claim-withdrawal-step.md) |
 | US-19.8 | In-app notification center | EPIC-19 | P2 | 5 | ✅ done | — | [link](stories/US-19.8-in-app-notification-center.md) |
+| US-19.14 | Onboarding & engagement recovered from Uncategorized | EPIC-19 | P3 | 2 | ✅ done | — | [link](stories/US-19.14-onboarding-and-engagement-recovered-from-uncategorized.md) |
+| US-6.10 | Notification & marketing-campaign surfaces | EPIC-6 | P3 | 3 | ✅ done | — | [link](stories/US-6.10-notification-and-campaign-surfaces.md) |
+| US-6.11 | Transaction-history surface | EPIC-6 | P3 | 2 | ✅ done | — | [link](stories/US-6.11-transaction-history-surface.md) |
+| US-8.19 | Unified-account transaction migration | EPIC-8 | P3 | 3 | ✅ done | — | [link](stories/US-8.19-unified-account-transaction-migration.md) |
 
-**Releases in this window:** 1.3.1, 1.3.4 · **Points (retroactive):** 36
+**Releases represented by stories in this window:** 1.3.1, 1.3.4, 1.2.32 · **Points (retroactive):** 46
 
 ## Per-Epic Retrospective
 

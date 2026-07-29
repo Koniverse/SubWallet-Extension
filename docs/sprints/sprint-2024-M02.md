@@ -3,7 +3,7 @@ id: sprint-2024-M02
 status: closed
 start: 2024-02-01
 end: 2024-02-29
-goal: "Reconstructed window — 8 story/stories shipped in release 1.1.36 (EPIC-1, EPIC-2, EPIC-6, EPIC-8, EPIC-12). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 10 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -35,8 +35,10 @@ goal: "Reconstructed window — 8 story/stories shipped in release 1.1.36 (EPIC-
 | US-12.7 | Lending (Interlay) | EPIC-12 | P2 | 5 | ✅ done | — | [link](stories/US-12.7-lending-interlay.md) |
 | US-12.8 | Earning-path simulation & step tracking | EPIC-12 | P1 | 5 | ✅ done | — | [link](stories/US-12.8-earning-path-simulation-and-step-tracking.md) |
 | US-12.9 | XCM deposit routing into earning | EPIC-12 | P1 | 5 | ✅ done | — | [link](stories/US-12.9-xcm-deposit-routing-into-earning.md) |
+| US-10.14 | WebApp dApp surface | EPIC-10 | P3 | 3 | ✅ done | — | [link](stories/US-10.14-webapp-dapp-surface.md) |
+| US-16.8 | Ledger asset-recovery tool (offline, out-of-repo) | EPIC-16 | P3 | 2 | ✅ done | — | [link](stories/US-16.8-ledger-asset-recovery-tool.md) |
 
-**Releases in this window:** 1.1.36 · **Points (retroactive):** 41
+**Releases represented by stories in this window:** 1.1.36 · **Points (retroactive):** 46
 
 ## Per-Epic Retrospective
 

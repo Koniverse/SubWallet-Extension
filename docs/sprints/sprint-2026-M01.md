@@ -3,7 +3,7 @@ id: sprint-2026-M01
 status: closed
 start: 2026-01-01
 end: 2026-01-31
-goal: "Reconstructed window — 2 story/stories shipped in release 1.3.72 (EPIC-17). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 3 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -29,8 +29,9 @@ goal: "Reconstructed window — 2 story/stories shipped in release 1.3.72 (EPIC-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-17.1 | Proxy types & authority management | EPIC-17 | P2 | 5 | ✅ done | — | [link](stories/US-17.1-proxy-types-and-authority-management.md) |
 | US-17.2 | Proxy signing (Sign Selector) + proxied-by display | EPIC-17 | P2 | 5 | ✅ done | — | [link](stories/US-17.2-proxy-signing-sign-selector-and-proxied-by-display.md) |
+| US-1.11 | Dependency, library & build maintenance | EPIC-1 | P3 | 3 | ✅ done | — | [link](stories/US-1.11-dependency-library-and-build-maintenance.md) |
 
-**Releases in this window:** 1.3.72 · **Points (retroactive):** 10
+**Releases represented by stories in this window:** 1.3.72, 1.3.73 · **Points (retroactive):** 13
 
 ## Per-Epic Retrospective
 

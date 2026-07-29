@@ -3,7 +3,7 @@ id: sprint-2026-M06
 status: closed
 start: 2026-06-01
 end: 2026-06-30
-goal: "Reconstructed window — 1 story/stories shipped in release 1.3.80 (EPIC-9). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 4 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,11 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.3.80 (EPIC-
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-9.2 | Nested / bundled NFT display | EPIC-9 | P1 | 3 | ✅ done | — | [link](stories/US-9.2-nested-bundled-nft-display.md) |
+| US-11.12 | Swap UI, content & confirmation flow | EPIC-11 | P3 | 3 | ✅ done | — | [link](stories/US-11.12-swap-ui-content-and-confirmation.md) |
+| US-13.14 | XCM fee, dry-run & transfer validation | EPIC-13 | P3 | 5 | ✅ done | — | [link](stories/US-13.14-xcm-fee-dry-run-and-validation.md) |
+| US-8.15 | Transfer-max & available-balance edges | EPIC-8 | P3 | 3 | ✅ done | — | [link](stories/US-8.15-transfer-max-and-available-balance.md) |
 
-**Releases in this window:** 1.3.80 · **Points (retroactive):** 3
+**Releases represented by stories in this window:** 1.3.80 · **Points (retroactive):** 14
 
 ## Per-Epic Retrospective
 

@@ -3,7 +3,7 @@ id: sprint-2026-M04
 status: closed
 start: 2026-04-01
 end: 2026-04-30
-goal: "Reconstructed window — 1 maintenance issues shipped this month (1.3.77), none owned by an FR story. Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 1 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — retroactive, never a planned sprint
@@ -16,7 +16,11 @@ from the CHANGELOG after the fact; **velocity computed on it is meaningless — 
 
 ## Sprint scope
 
-See the maintenance epics — the stories dated 2026-04 in the coverage index.
+| US | Title | Epic | Pri | Points | Status | Carry | Story file |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| US-12.21 | Earning fixes recovered from Uncategorized | EPIC-12 | P3 | 3 | done | — | [link](stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) |
+
+**Releases represented by stories in this window:** 1.3.77 · **Points (retroactive):** 3
 
 ## Per-Epic Retrospective
 

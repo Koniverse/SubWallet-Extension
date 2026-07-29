@@ -110,8 +110,8 @@ AD-18), and the SwapService engine itself lives in [EPIC-2](EPIC-2.md).
 | [US-11.13](../stories/US-11.13-swap-quote-pipeline-and-service.md) | Swap quote pipeline & service internals | Which pairs are offerable, which provider is asked, what the answer is validated against | ✅ done | 1.3.79 |
 | [US-11.14](../stories/US-11.14-swap-pair-catalogue-and-tooling.md) | Swap pair catalogue & operational tooling | The CMS/backend control surface that decides which pairs the wallet offers at all | ✅ done | — |
 | [US-11.15](../stories/US-11.15-providers-evaluated-not-integrated.md) | Providers evaluated but not integrated | Zenlink, Acala, Parallel Finance, ArthSwap, 1inch — the record of five decisions not to build | ✅ done | — |
-| [US-11.16](../stories/US-11.16-swap-flow-improvements.md) | Swap flow improvements | Open provider-neutral work — four of ten rows are the fee | 🚧 in-progress | — |
-| [US-11.17](../stories/US-11.17-swap-coverage-expansion.md) | Swap coverage expansion | Open per-provider reach — one more venue, pair, fee token or control | 🚧 in-progress | — |
+| [US-11.16](../stories/US-11.16-swap-flow-improvements.md) | Swap flow improvements | Open provider-neutral work — four of ten rows are the fee | 📋 backlog | — |
+| [US-11.17](../stories/US-11.17-swap-coverage-expansion.md) | Swap coverage expansion | Open per-provider reach — one more venue, pair, fee token or control | 📋 backlog | — |
 | [US-11.18](../stories/US-11.18-swap-fixes-recovered-from-uncategorized.md) | Swap fixes recovered from Uncategorized | Provider-specific swap fixes (ArthSwap, Stellaswap) | ✅ done | 1.3.32 |
 
 > The 11 provider stories (US-11.1–11.11) are the **FR map**: one requirement each, FR-103 … FR-113.
