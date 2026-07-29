@@ -45,7 +45,7 @@ the right number" contract, not the rendering of it.
 ## Background
 
 The home screen rides a cached-first read path: US-7.1 serves last-known balances
-immediately over the lightweight WsProvider aggregation
+immediately over the shared balance aggregation
 ([AD-07](../../ARCHITECTURE.md#architecture-decisions)) and US-7.2 publishes the
 transferable-vs-locked split every send flow trusts. Prices and market data front
 the upstream through the `api-cache` proxy
@@ -125,7 +125,7 @@ are the real ones, and they are anchored rather than padded with invented work.
 
 ### Architecture constraints
 
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance recomposition rides the lightweight WsProvider read path; the balance-change subscription (#4337) and locked composition (#1583) MUST NOT force a full `@polkadot/api` ApiPromise on the read path.
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance recomposition rides the lightweight WsProvider read path; the balance-change subscription (#4337) and locked composition (#1583) MUST NOT force a full `@polkadot/api` ApiPromise on the read path.~~ **Retired:** cache correctness has no AD-07 memory constraint ([CONTEXT D96](../../CONTEXT.md)).
 - [AD-25](../../ARCHITECTURE.md#architecture-decisions) — market/price data fronts the upstream through `api-cache`; this story keeps the stale-if-error default from leaking past a real balance state change.
 - This story does NOT introduce new AD entries; it hardens the cache behavior the feature stories rely on.
 
@@ -167,7 +167,7 @@ external dependency — calibrated identically to the sibling EPIC-4 hardening s
 - [Issue #1583](https://github.com/Koniverse/SubWallet-Extension/issues/1583) — Calculate crowdloan data into Locked balance (locked composition)
 - [Issue #2410](https://github.com/Koniverse/SubWallet-Extension/issues/2410) — [WebApp] Still show token although all accounts removed (stale-cache after account removal)
 - [Source: ARCHITECTURE AD-25](../../ARCHITECTURE.md#architecture-decisions) — cache / CDN proxy layer for market data
-- [Source: ARCHITECTURE AD-07](../../ARCHITECTURE.md#architecture-decisions) — lightweight WsProvider read path for balance queries
+- ~~[Source: ARCHITECTURE AD-07](../../ARCHITECTURE.md#architecture-decisions) — lightweight WsProvider read path for balance queries~~ — **retired** ([CONTEXT D96](../../CONTEXT.md))
 
 ## Verification commands
 

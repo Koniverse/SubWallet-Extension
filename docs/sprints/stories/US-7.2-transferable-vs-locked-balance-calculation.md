@@ -53,7 +53,7 @@ display, another for send) is the classic source of "it said I had X but the sen
 failed" bugs, so the invariant is one calculation, one source of truth.
 
 The underlying per-chain balance breakdown comes from the `BalanceService` read
-path on the lightweight WsProvider ([AD-07](../../ARCHITECTURE.md#architecture-decisions));
+path through the managed ChainService API;
 this story renders the transferable/locked split into the dashboard set up by
 [US-7.1](US-7.1-aggregate-portfolio-across-accounts-and-chains.md).
 
@@ -90,7 +90,7 @@ story is **retroactive** — the capability already ships; `commit` /
 
 ### Architecture constraints
 
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — the per-chain balance breakdown is read on the lightweight WsProvider path; this story renders it, it does not force a full ApiPromise.
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — the per-chain balance breakdown is read on the lightweight WsProvider path; this story renders it, it does not force a full ApiPromise.~~ **Retired:** this story consumes the shared balance model; AD-07 is not a current constraint ([CONTEXT D96](../../CONTEXT.md)).
 - This story does NOT introduce new AD entries.
 
 ### Cross-story dependencies

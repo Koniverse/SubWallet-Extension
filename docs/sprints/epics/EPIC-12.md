@@ -238,7 +238,7 @@ the work its children already carry.
 | [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | Trusted Stake partner-curated alpha-index position (handler-backed) on the native Subtensor path | FR-124 |
 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | New per-network staking handler subclasses (Enjin / Phala / xx) on the existing native tree; targets from static cache (AD-23) | FR-125 |
 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) | Reward/APY-figure accuracy verified at the `BasePoolHandler` seam (AD-22) across every pool type | NFR-22 |
-| [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK / lightweight WsProvider (AD-24 / AD-07), removed-account invalidation | NFR-12, NFR-21 |
+| [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK aggregation (AD-24), removed-account invalidation | NFR-12, NFR-21 |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
@@ -304,7 +304,7 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | **Earning list first paint** | Cached positions visible ≤ 300 ms on popup open (NFR-12) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | The earning tab is a daily surface; a blank wait while many pool subjects resolve reads as a broken wallet |
 | **Pool data fetch** | Pool info / targets read from static cache, not live RPC per render (NFR-21, AD-23) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Live per-render RPC across many pools rate-limits the chain and stalls the list |
-| **Earning aggregation memory** | Read path stays on the lightweight WsProvider / Services-SDK aggregation (≤ 72 MB, NFR-11) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Instantiating a full ApiPromise per earning chain to read positions blows the memory budget |
+| ~~**Earning aggregation memory**~~ **retired** | ~~Lightweight WsProvider / Services-SDK aggregation (≤ 72 MB, NFR-11)~~ — no memory budget is stated | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | AD-07's read-path claim was never implemented; a future memory concern must be measured before it becomes work ([CONTEXT D96](../../CONTEXT.md)). |
 
 ## Acceptance criteria (propagated from stories)
 

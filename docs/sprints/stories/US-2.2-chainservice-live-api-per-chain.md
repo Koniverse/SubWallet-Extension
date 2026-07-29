@@ -48,19 +48,17 @@ that materializes two Architecture Decisions:
   `ChainService` that encapsulates the connect/disconnect lifecycle, retry logic
   and per-chain metadata caching, replacing ad-hoc chain lookups (issues #894,
   #926, #1222; shipped v0.7.6).
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — for balance/token
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — for balance/token
   queries the engine uses a **lightweight WsProvider** connector and defers the
-  full `@polkadot/api` ApiPromise until extrinsic construction actually needs it.
-  This is a hard memory decision: the full ApiPromise consumed ~137 MB for 4
-  chains / ~264 MB for 20 chains, whereas the WsProvider-only read path needs
-  ~72 MB regardless of chain count (issues #217, #232; PR #3024; shipped
-  v1.1.64).
+  full `@polkadot/api` ApiPromise until extrinsic construction actually needs it.~~
+  **Retired historical claim:** the code instead creates an `ApiPromise` per enabled
+  chain. The 2022 memory comparison was never implemented or re-measured under MV3;
+  NFR-11 is retired ([CONTEXT D96](../../CONTEXT.md)).
 
 Its responsibility is *live chain connectivity*: own one API object per network,
 manage its lifecycle, and publish it to the data engines. Sized 8 (multi-system:
 two ecosystem API families across 200+ networks, lifecycle/retry state, and the
-dual-mode lightweight/full-API memory contract that every read-path engine
-depends on).
+read-path integration that every data engine depends on).
 
 This story is **Retroactive** — the engine already ships; `commit` /
 `version_shipped` are backfilled during version reconciliation.
@@ -71,9 +69,11 @@ This story is **Retroactive** — the engine already ships; `commit` /
   API, **Then** ChainService returns a single managed API object
   (`SubstrateApi` / `EvmApi`) for that chain and reuses it rather than creating
   a duplicate (AD-02).
-- [x] **AC-2** — **Given** balance/token queries across many chains, **When** the
+- [x] ~~**AC-2** — **Given** balance/token queries across many chains, **When** the
   read path runs, **Then** it uses the lightweight WsProvider connector and does
-  **not** instantiate a full ApiPromise, keeping memory bounded (AD-07).
+  **not** instantiate a full ApiPromise, keeping memory bounded (AD-07).~~ **Retired
+  historical claim:** this assertion is false in the shipped code; it is retained only
+  to explain the former AD-07 record ([CONTEXT D96](../../CONTEXT.md)).
 - [x] **AC-3** — **Given** a chain connection drops, **When** the lifecycle
   manager detects it, **Then** it retries/reconnects and the cached metadata is
   reused without a full cold reload (AD-02).
@@ -85,7 +85,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 - [x] **TASK-2.2.1** — One managed `SubstrateApi`/`EvmApi` per network with reuse (AC: 1)
 - [x] **TASK-2.2.2** — ~~Lightweight WsProvider read path; defer full ApiPromise to extrinsic construction~~ — **never built** (see the banner). What shipped: one `ApiPromise` per enabled chain, created eagerly, with connect/disconnect/retry and a metadata cache. The memory contract is [US-20.3](US-20.3-read-path-memory-budget.md)'s to measure.
-  - [x] Confirm memory envelope holds as chain count grows (AD-07).
+  - [x] ~~Confirm memory envelope holds as chain count grows (AD-07).~~ **Retired with NFR-11; no memory envelope is claimed.**
 - [x] **TASK-2.2.3** — Connect/disconnect/retry lifecycle + metadata cache (AC: 3)
 - [x] **TASK-2.2.4** — Per-chain failure isolation on bad endpoints (AC: 4)
 
@@ -94,18 +94,18 @@ This story is **Retroactive** — the engine already ships; `commit` /
 ### Architecture constraints
 
 - [AD-02](../../ARCHITECTURE.md#architecture-decisions) — a central `ChainService` owns per-chain API objects; no feature may open ad-hoc chain connections.
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — the read path uses the lightweight WsProvider; the full `@polkadot/api` ApiPromise is constructed only when extrinsic building requires it. This memory contract is non-negotiable on the balance/fee read path.
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — the read path uses the lightweight WsProvider; the full `@polkadot/api` ApiPromise is constructed only when extrinsic building requires it. This memory contract is non-negotiable on the balance/fee read path.~~ **Retired:** AD-07 was never implemented and supplies no current constraint ([CONTEXT D96](../../CONTEXT.md)).
 - This story does NOT introduce new AD entries; it materializes AD-02 + AD-07.
 
 ### Cross-story dependencies
 
-- Required by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md) — the balance engine reads through the lightweight WsProvider this engine publishes.
+- Required by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md) — the balance engine reads through the managed ChainService API path this engine publishes.
 - Required by [US-2.6](US-2.6-fee-engine.md), [US-2.3](US-2.3-earningservice-pool-handler-engine.md), [US-2.8](US-2.8-transaction-lifecycle-engine.md) — all obtain their chain API from this engine.
 
 ### Performance budget
 
-- Balance/token read path memory stays in the WsProvider-only envelope (~72 MB regardless of chain count), not the full-ApiPromise envelope (~137 MB at 4 chains).
-- Story PR description must confirm the read path does not force a full ApiPromise.
+- ~~Balance/token read path memory stays in the WsProvider-only envelope (~72 MB regardless of chain count), not the full-ApiPromise envelope (~137 MB at 4 chains).~~ **Retired:** no read-path memory budget is stated.
+- Story PR descriptions must not claim the retired AD-07 memory contract.
 
 ### References
 
@@ -126,8 +126,8 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ### Added
 - ChainService engine: one managed API object per network across 200+ chains
-  with connect/disconnect/retry and metadata cache; lightweight WsProvider read
-  path with deferred full ApiPromise to cap memory.
+  with connect/disconnect/retry and metadata cache. The former lightweight-WsProvider
+  claim is not part of the shipped capability.
 
 **Commit**:
 

@@ -93,8 +93,8 @@ of the whole product: the core-structure and phased MV3 background lifecycle (In
 → Start → StartFull → idle, AD-20) that minimizes idle CPU/memory/API while the
 worker is backgrounded; the elimination of redundant and runaway API fan-out
 (including the notification-fetch flood that today can suspend every other request
-and block opening the extension); the read-path memory budget (≤72 MB, AD-07) that
-must hold even with many chains; the many-account submit/close behaviour that must
+and block opening the extension); the former read-path memory budget (≤72 MB, AD-07),
+which was retired after its mechanism proved unimplemented; the many-account submit/close behaviour that must
 not freeze the screen; the list/render performance across the heavy selection and
 collection screens; and the WebApp and web-runner web-surface performance.
 
@@ -200,7 +200,7 @@ boundary is drawn explicitly in Out of scope.
 |---|---|---|---|---|
 | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | Core-structure & lifecycle refactor | Phase the MV3 background into Init/Start/StartFull + background-idle, remove deprecated features, refactor cron/subscription into services, and refine the data-processing architecture | 🚧 in-progress | — |
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | API-call optimization | Remove redundant API fan-out, cap per-window requests, and fix the notification-fetch flood that suspends other requests and blocks opening the extension | 🚧 in-progress | — |
-| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path | ⏸️ deprecated | — |
+| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Read-path memory budget | ~~Hold the ≤72 MB balance/read-path budget regardless of chain count via the lightweight WsProvider path~~ — retired; no live requirement | ⏸️ deprecated | — |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Many-account submit performance | Stop the freeze when, with many accounts, a user submits a tx then closes the history popup | 👀 review | — |
 | [US-20.7](../stories/US-20.7-mv3-wake-depth-split.md) | MV3 wake-depth split | `pub(` wakes the core only; `pri(`/`mobile(` additionally starts the 11 data services (#4428 + #4478 fix) | ✅ done | 1.3.42 |
 | [US-20.8](../stories/US-20.8-api-request-strategy-v2.md) | API request strategy v2 | md5-keyed 60 s response cache, group cancellation, per-window cap, adaptive backoff (#4448) | ✅ done | 1.3.47 |
@@ -227,7 +227,7 @@ boundary is drawn explicitly in Out of scope.
 |---|---|---|
 | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | `KoniState` background lifecycle — `ServiceStatus` machine + `wakeup`/`_startFull`/`sleep`; `cronAndSubscription` services | NFR-8, NFR-12 |
 | [US-20.2](../stories/US-20.2-api-call-optimization.md) | Request layer — Services SDK / `api-cache`·`static-data`·`ipfs-files` proxy routing + `InappNotificationService` fetch class | NFR-20, NFR-21 |
-| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | `SubstrateApi` read path — lightweight `WsProvider`; full `ApiPromise` deferred to extrinsic construction | — (AD-07, AD-08) |
+| [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | `SubstrateApi` read path — actual `ApiPromise` per enabled chain; AD-07's lightweight-WsProvider design is historical and unimplemented | — (AD-07, AD-08) |
 | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | Submit/close path — per-account subscription teardown + history-popup reconciliation off the main thread | NFR-23 |
 | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | `extension-koni-ui` heavy lists (NFT / Receive / customization-network / Select Token / Select Network) reading `fetchStaticData` | NFR-21, NFR-23 |
 | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | `webapp` Dapps/Mission-Pools lists + `web-runner` shared-worker model | NFR-17, NFR-21 |
@@ -255,7 +255,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 |---|---|---|
 | **Lifecycle-phase assertion harness** | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | A test that drives the `ServiceStatus` machine through Init → Start → StartFull → Sleep and asserts no full-chain start on a partial wake |
 | **Request-count budget harness** | [US-20.2](../stories/US-20.2-api-call-optimization.md), [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | An instrumented fetch/RPC counter that asserts no duplicate in-flight request and a per-window request cap (reused for the notification-flood regression and the many-account submit path) |
-| **Memory-budget probe** | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | A read-path memory probe asserting ≤72 MB across a many-chain fixture |
+| ~~**Memory-budget probe**~~ **retired** | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | No standing memory probe or target. A measured investigation belongs in a new, scoped story only if a memory complaint appears ([CONTEXT D96](../../CONTEXT.md)). |
 | **Render-cost benchmark** | [US-20.5](../stories/US-20.5-list-rendering-performance.md), [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | A list-render benchmark (virtualization + pagination) across the heavy selection/collection screens and the WebApp lists |
 
 > The request-count budget harness set up by US-20.2 is reused by US-20.4 for the
@@ -270,7 +270,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 | **Idle background work** | No avoidable polling / chain connect / API call while backgrounded; partial wake never starts all chains | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | MV3 evicts idle workers (~5 min); idle CPU/memory/API is pure waste and drains the host |
 | **Cold-start first paint** | Cached state visible ≤ 300 ms on popup open (NFR-12) | [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md) | The popup is the most-opened surface; a blank wait reads as "wallet broken" |
 | **Redundant requests** | Zero duplicate in-flight requests; per-window request cap; no request class starves others | [US-20.2](../stories/US-20.2-api-call-optimization.md) | Notification fetch today floods and suspends all other requests so the extension can't open (#4021); fan-out also raises backend infra pressure (#4447) |
-| ~~**Read-path memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — no memory budget is stated any more ([D96](../../CONTEXT.md)) | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | Full ApiPromise across 20 chains hits ~264 MB; the read path MUST stay on the lightweight WsProvider path |
+| ~~**Read-path memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — no memory budget is stated any more ([D96](../../CONTEXT.md)) | [US-20.3](../stories/US-20.3-read-path-memory-budget.md) | The former ApiPromise/WsProvider comparison is historical only; it is not a current constraint. |
 | **Many-account submit** | Submit + history-popup close never blocks the main thread; per-account work bounded | [US-20.4](../stories/US-20.4-many-account-submit-performance.md) | With many accounts, submit-then-close-history freezes the screen today (#4984) |
 | **List render** | Heavy lists virtualized + paginated; no synchronous full-list render on the heavy selection/collection screens | [US-20.5](../stories/US-20.5-list-rendering-performance.md) | NFT / Receive Token / customization-network / select-token / select-network screens jank on large lists (#2245) |
 | **Web-surface render** | WebApp lists paginated with animations; web-runner shares one worker across tabs | [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md) | WebApp Dapps/Mission-Pools lists lack animations and load all at once (#2248); each tab spawns its own runner without a shared worker (#2337) |
@@ -279,7 +279,7 @@ HAPPY-PATH: N/A — performance/lifecycle epic; optimizations are cross-cutting,
 
 - [ ] The MV3 background phases through Init → Start → StartFull → idle, removes deprecated features, refactors cron/subscription into services, does no avoidable idle work, and serves cached state on cold start — [US-20.1](../stories/US-20.1-core-structure-and-lifecycle-refactor.md)
 - [ ] No duplicate in-flight API requests, a per-window request cap holds, and the notification fetch can no longer suspend other requests or block opening the extension — [US-20.2](../stories/US-20.2-api-call-optimization.md)
-- [ ] The read-path memory budget (≤72 MB) holds regardless of chain count on the lightweight WsProvider path — [US-20.3](../stories/US-20.3-read-path-memory-budget.md)
+- ~~The read-path memory budget (≤72 MB) holds regardless of chain count on the lightweight WsProvider path~~ — **retired** with NFR-11; no EPIC-20 acceptance criterion remains for it ([D96](../../CONTEXT.md)).
 - [ ] With many accounts, submitting a transaction then closing the history popup no longer freezes the screen — [US-20.4](../stories/US-20.4-many-account-submit-performance.md)
 - [ ] The heavy lists/screens (NFT / Receive / customization / select token / select network) stay responsive on large datasets — [US-20.5](../stories/US-20.5-list-rendering-performance.md)
 - [ ] The WebApp lists animate + paginate and the web-runner shares one worker across tabs — [US-20.6](../stories/US-20.6-webapp-and-web-runner-performance.md)

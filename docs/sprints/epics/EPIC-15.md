@@ -87,9 +87,8 @@ This epic adds both a *read path* (referenda indexing, conviction-lock status)
 and a constrained *write path* (the vote / unlock extrinsics). Referendum and
 track data across chains is **aggregated through the backend** — the Services SDK
 ([AD-24](../../ARCHITECTURE.md#architecture-decisions)) — rather than indexed
-on-device per chain, while the conviction-lock balance figure is read over the
-lightweight WsProvider path ([AD-07](../../ARCHITECTURE.md#architecture-decisions))
-that keeps the wallet memory-bounded. The vote and unlock extrinsics are
+on-device per chain, while the conviction-lock balance figure is read from the
+shared balance model. The vote and unlock extrinsics are
 constructed and signed in the background and surfaced to the UI only through the
 typed `pri()` message bus ([AD-03](../../ARCHITECTURE.md#architecture-decisions)):
 governance never holds key material in the UI process.
@@ -171,7 +170,7 @@ balance.
 - **Referendum/track data comes through the backend, not on-device indexing ([FR-139](../../PRD.md#functional-requirements), AD-24):** OpenGov and Democracy referendum lists, detail, and track metadata are aggregated through the Services SDK backend across chains; no governance story may stand up a per-chain on-device referendum indexer. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), reused by [US-15.3](../stories/US-15.3-governance-v1-democracy-display-only.md), [US-15.4](../stories/US-15.4-opengov-delegation-and-governance-tracks.md).
 - **The conviction lock is read from the balance model, never re-derived ([FR-140](../../PRD.md#functional-requirements), [FR-69](../../PRD.md#functional-requirements)):** the locked figure governance shows is the same `locked` reservation EPIC-7 authors in the transferable/locked split; the unlock flow releases it, but governance never computes a second balance figure. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md); the home-screen display of that figure is owned by [EPIC-7](EPIC-7.md).
 - **Vote and unlock extrinsics are signed in the background only ([FR-139](../../PRD.md#functional-requirements), AD-03):** the conviction-vote, revote/unvote, and unlock extrinsics are constructed and signed in the background service worker and surfaced to the UI through the typed `pri()` bus; no key material or raw extrinsic signing path is exposed in the governance UI. Enforced by [US-15.1](../stories/US-15.1-opengov-referenda-and-conviction-voting.md), [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
-- **Conviction-lock reads stay on the lightweight read path ([FR-140](../../PRD.md#functional-requirements), AD-07, NFR-11):** reading a vote-lock status / unlockable amount rides the lightweight WsProvider read path and must not force a full `@polkadot/api` ApiPromise; the full ApiPromise is instantiated only to *construct* the vote/unlock extrinsic. Enforced by [US-15.2](../stories/US-15.2-locked-token-detail-and-unlock-flow.md).
+- ~~**Conviction-lock reads stay on the lightweight read path ([FR-140](../../PRD.md#functional-requirements), AD-07, NFR-11):** reading a vote-lock status / unlockable amount rides the lightweight WsProvider read path and must not force a full `@polkadot/api` ApiPromise; the full ApiPromise is instantiated only to *construct* the vote/unlock extrinsic.~~ **Retired:** the shared balance model remains the source of truth, but AD-07 and NFR-11 supply no current memory constraint ([CONTEXT D96](../../CONTEXT.md)).
 - **Shared background logic renders identically across surfaces ([FR-143](../../PRD.md#functional-requirements), NFR-17):** the web-app governance surface (US-15.5) consumes the same `extension-base` governance logic and RxJS subjects as the extension popup; it re-renders, it does not re-implement, the OpenGov flow. Enforced by [US-15.5](../stories/US-15.5-web-app-governance-surface.md).
 
 ## Cross-story testing requirements

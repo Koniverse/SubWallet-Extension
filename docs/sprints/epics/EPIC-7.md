@@ -82,9 +82,9 @@ This epic adds a *read path*, not a write path. It does **not** compute balances
 on-device chain-by-chain and it does **not** move funds. Cross-chain balance
 aggregation and price assembly are the **engine** layer: `BalanceService` and the
 Services SDK live in [EPIC-2](EPIC-2.md) ([US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md)),
-which fans transferable/locked detection across all accounts and 200+ chains over
-the lightweight WsProvider read path (AD-07) and the backend aggregation layer
-(AD-24). EPIC-7 *consumes* those subjects and renders them; it owns the screen, the
+which fans transferable/locked detection across all accounts and 200+ chains through
+the current ChainService/API path and the backend aggregation layer (AD-24). EPIC-7
+*consumes* those subjects and renders them; it owns the screen, the
 visibility rules, the chart UX, and the cache-freshness contract the home screen
 depends on (AD-25).
 
@@ -205,7 +205,7 @@ sequenceDiagram
 
 ## Cross-cutting invariants
 
-- **Read path stays memory-bounded ([FR-68](../../PRD.md#functional-requirements), AD-07):** every balance read on the home screen rides the lightweight WsProvider / Services-SDK aggregation; no home-screen story may force a full `@polkadot/api` ApiPromise on the read path. Enforced by [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md), consumed from the EPIC-2 engine ([US-2.5](../stories/US-2.5-balance-detection-and-aggregation-engine.md)).
+- ~~**Read path stays memory-bounded ([FR-68](../../PRD.md#functional-requirements), AD-07):** every balance read on the home screen rides the lightweight WsProvider / Services-SDK aggregation; no home-screen story may force a full `@polkadot/api` ApiPromise on the read path.~~ **Retired:** AD-07's mechanism was never built; NFR-11 is no longer a requirement ([CONTEXT D96](../../CONTEXT.md)).
 - **Transferable is the single source of truth ([FR-69](../../PRD.md#functional-requirements)):** the transferable figure authored here is the same number every send flow uses; the home display and the send-max affordance MUST derive from one calculation, never two. Enforced by [US-7.2](../stories/US-7.2-transferable-vs-locked-balance-calculation.md); consumed by [EPIC-8](EPIC-8.md).
 - **Stale-but-visible over blank ([NFR-12](../../PRD.md#non-functional-requirements)):** on popup open the home screen serves last-known cached balances/prices immediately and refreshes progressively with visible skeletons; it never renders a blank portfolio while waiting. Enforced by [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) and defended by [US-7.7](../stories/US-7.7-balance-cache-invalidation-hardening.md).
 - **Price/market data goes through the proxy ([NFR-21](../../PRD.md#non-functional-requirements), AD-25):** token prices, exchange rates and historical OHLCV are fetched through SubWallet's `api-cache` proxy with a `static-cache` fallback — never directly from a keyed upstream in the bundle. Enforced by [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md), [US-7.5](../stories/US-7.5-price-history-ohlcv-chart-per-asset.md).
@@ -228,7 +228,7 @@ sequenceDiagram
 | Concern | Budget | Story | Rationale |
 |---|---|---|---|
 | **Home-screen first paint** | Cached portfolio visible ≤ 300 ms on popup open (NFR-12) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | The home screen is the most-opened surface; a blank wait reads as "wallet broken" |
-| ~~**Aggregation read memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — NFR-11 retired 2026-07-13 ([D96](../../CONTEXT.md)) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | Full ApiPromise across 20 chains hits ~264 MB; the home read MUST stay on the lightweight path |
+| ~~**Aggregation read memory**~~ **retired** | ~~≤ 72 MB regardless of chain count~~ — NFR-11 retired 2026-07-13 ([D96](../../CONTEXT.md)) | [US-7.1](../stories/US-7.1-aggregate-portfolio-across-accounts-and-chains.md) | The former ApiPromise/WsProvider comparison is historical only; it is not a current constraint. |
 | **Price refresh** | Live price tick ≤ 1 fetch per asset per refresh window through `api-cache` | [US-7.4](../stories/US-7.4-real-time-token-price-and-per-asset-chart.md) | Per-asset upstream fetches cascade into proxy rate-limit exposure (NFR-21) |
 
 ## Acceptance criteria (propagated from stories)

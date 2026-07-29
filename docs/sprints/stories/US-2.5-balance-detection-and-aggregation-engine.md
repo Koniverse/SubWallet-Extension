@@ -42,9 +42,10 @@ This story catalogues the **`balance-service`** module
 (`packages/extension-base/src/services/balance-service`) — the read-side data
 engine that aggregates holdings. It realizes two Architecture Decisions:
 
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance/token queries
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance/token queries
   run over the lightweight WsProvider read path published by ChainService
-  (US-2.2), keeping memory bounded as chain count grows.
+  (US-2.2), keeping memory bounded as chain count grows.~~ **Retired:** AD-07 was
+  never implemented and NFR-11 is no longer a requirement ([CONTEXT D96](../../CONTEXT.md)).
 - [AD-24](../../ARCHITECTURE.md#architecture-decisions) — aggregation is backed by
   the **SubWallet Services SDK** backend (`@subwallet-monorepos/subwallet-services-sdk`,
   wired in `setup-api-sdk.ts`) rather than computed entirely on-device, because
@@ -55,8 +56,8 @@ engine that aggregates holdings. It realizes two Architecture Decisions:
 Its responsibility is *balance subscription, token auto-detection and
 aggregation*: maintain live transferable/locked balances per account/chain and
 roll them up. Sized 8 (multi-system: live subscriptions across all accounts ×
-200+ chains, token auto-detection, and the two-sided memory + backend-aggregation
-contract). Depends on US-2.2 for the WsProvider read path.
+200+ chains, token auto-detection, and backend aggregation). Depends on US-2.2
+for the managed ChainService API path.
 
 This story is **Retroactive** — the engine already ships; `commit` /
 `version_shipped` are backfilled during version reconciliation.
@@ -69,9 +70,10 @@ This story is **Retroactive** — the engine already ships; `commit` /
 - [x] **AC-2** — **Given** a token held by an account that is not yet in the
   active list, **When** detection runs, **Then** the token is auto-detected and
   its balance included in the aggregate.
-- [x] **AC-3** — **Given** the read path, **When** balances are queried, **Then**
+- [x] ~~**AC-3** — **Given** the read path, **When** balances are queried, **Then**
   they go through the lightweight WsProvider / Services SDK aggregation layer and
-  do not force a full ApiPromise per chain (AD-07, AD-24).
+  do not force a full ApiPromise per chain (AD-07, AD-24).~~ **Retired historical
+  claim:** the Services SDK aggregation ships, while AD-07's memory assertion does not.
 - [x] **AC-4** — **Given** a chain's RPC or the Services SDK backend is
   unavailable, **When** that source fails, **Then** the engine degrades
   gracefully (stale/last-known for that source) without dropping balances from
@@ -88,7 +90,7 @@ This story is **Retroactive** — the engine already ships; `commit` /
 
 ### Architecture constraints
 
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance reads use the lightweight WsProvider, never a full ApiPromise per chain.
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance reads use the lightweight WsProvider, never a full ApiPromise per chain.~~ **Retired:** no current memory contract applies ([CONTEXT D96](../../CONTEXT.md)).
 - [AD-24](../../ARCHITECTURE.md#architecture-decisions) — aggregation goes through the Services SDK backend; the engine does not re-implement on-device aggregation across 200+ chains.
 - This story does NOT introduce new AD entries; it materializes AD-07 + AD-24.
 
