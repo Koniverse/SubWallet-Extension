@@ -582,8 +582,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | NFR-12 — Cold-start: cached-first paint, progressive refresh | 📋 [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | NFR-20 — Services SDK aggregation; reduce per-chain RPC fan-out | ✅ [US-20.9](sprints/stories/US-20.9-aggregated-data-via-services-sdk.md) · 📋 [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
 | NFR-21 — Cache / CDN proxy layer for market/metadata/media | ✅ [US-20.8](sprints/stories/US-20.8-api-request-strategy-v2.md) · 📋 [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
-| NFR-23 — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
-| NFR-23 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
+| NFR-23 — Responsiveness under account scale: submit/close and heavy-list rendering must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) (submit/close) · [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) (list rendering) |
 | NFR-17 (shared) — Web-surface portability/performance (webapp / web-runner) | [US-20.6](sprints/stories/US-20.6-webapp-and-web-runner-performance.md) |
 | NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-1.5](sprints/stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 
