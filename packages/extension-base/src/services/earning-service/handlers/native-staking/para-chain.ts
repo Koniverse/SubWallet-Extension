@@ -20,7 +20,6 @@ import { Codec } from '@polkadot/types/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 
 import BaseParaNativeStakingPoolHandler from './base-para';
-import { ApiPromise } from "@polkadot/api";
 
 interface PalletParachainStakingRoundInfo {
   current: string,
