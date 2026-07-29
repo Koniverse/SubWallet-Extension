@@ -38,7 +38,7 @@ jobs:
         BRANCH_NAME: master
         BTC_SERVICE_TOKEN: ${{ secrets.BTC_SERVICE_TOKEN }}
       run: |
-        yarn install --immutable | grep -v 'YN0013'
+        yarn install --immutable
         yarn ${{ matrix.step }}
 
     - name: Deploy Webrunner to Netlify
