@@ -5,7 +5,7 @@ import { NotificationType } from '@subwallet/extension-base/background/KoniTypes
 import { _ChainConnectionStatus } from '@subwallet/extension-base/services/chain-service/types';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { enableChain } from '@subwallet/extension-koni-ui/messaging';
+import { enableChainWithPriorityAssets } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Button } from '@subwallet/react-ui';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ export default function useChainChecker () {
         const message = t('ui.NETWORK.hook.chain.useChainChecker.confirmTurnOnFeature', { replace: { name: chainInfo?.name } });
 
         const _onEnabled = () => {
-          enableChain(chain, false).then(() => {
+          enableChainWithPriorityAssets(chain).then(() => {
             const chainInfo = chainInfoMap[chain];
 
             setConnectingChain(chain);

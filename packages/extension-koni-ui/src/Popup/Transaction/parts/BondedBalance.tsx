@@ -130,10 +130,11 @@ const BondedBalance = styled(Component)(({ theme: { token } }: Props) => {
     },
 
     '.balance-value': {
-      display: 'flex',
+      display: 'inline-flex',
       alignItems: 'center',
+      whiteSpace: 'nowrap',
       maxWidth: '10.625rem'
-    },
+    } as const,
 
     '.slippage-info': {
       display: 'flex',

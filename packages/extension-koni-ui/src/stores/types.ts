@@ -6,6 +6,8 @@ import { AddressBookState, AllLogoMap, AssetSetting, CampaignBanner, ChainStakin
 import { AccountsContext, AuthorizeRequest, MetadataRequest, SigningRequest } from '@subwallet/extension-base/background/types';
 import { _ChainApiStatus, _ChainState } from '@subwallet/extension-base/services/chain-service/types';
 import { AppBannerData, AppConfirmationData, AppPopupData } from '@subwallet/extension-base/services/mkt-campaign-service/types';
+import { PendingMultisigTxMap } from '@subwallet/extension-base/services/multisig-service';
+import { GovVotingInfo } from '@subwallet/extension-base/services/open-gov/interface';
 import { AuthUrlInfo } from '@subwallet/extension-base/services/request-service/types';
 import { SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
@@ -219,3 +221,17 @@ export interface SwapStore extends BaseReduxStore {
 export interface NotificationStore extends BaseReduxStore {
   unreadNotificationCountMap: Record<string, number>;
 }
+
+export interface GovernanceStore extends BaseReduxStore {
+  govLockedInfos: GovVotingInfo[];
+}
+
+export interface MultisigStore extends BaseReduxStore {
+  pendingMultisigTxs: PendingMultisigTxMap;
+}
+
+export type WalletConnectSessionsSubscription = {
+  promise: Promise<SessionTypes.Struct[]>;
+  start: () => void;
+  unsub: () => void;
+};

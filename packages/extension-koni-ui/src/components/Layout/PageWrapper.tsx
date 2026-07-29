@@ -3,6 +3,7 @@
 
 import { LoadingScreen } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import CN from 'classnames';
 import React, { useEffect, useState } from 'react';
 import { Await, useLocation } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
@@ -43,7 +44,7 @@ function Component ({ animateOnce, children, className, hideLoading, loadingClas
         unmountOnExit
       >
         <div
-          className={className}
+          className={CN(className, 'g-PageWrapper')}
           ref={nodeRef}
         >
           {children}

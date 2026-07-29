@@ -24,6 +24,7 @@ type ListItem = AccountAddressItemType | ListItemGroupLabel;
 
 type GroupedItems = {
   master: AccountAddressItemType[];
+  multisig: AccountAddressItemType[];
   qrSigner: AccountAddressItemType[];
   watchOnly: AccountAddressItemType[];
   ledger: AccountAddressItemType[];
@@ -39,6 +40,7 @@ interface Props extends ThemeProps {
   onBack?: VoidFunction;
   selectedValue?: string;
   autoSelectFirstItem?: boolean;
+  hiddenAccountProxyTypes?: AccountProxyType[];
 }
 
 const renderEmpty = () => <GeneralEmptyList />;
@@ -47,7 +49,7 @@ function isAccountAddressItem (item: ListItem): item is AccountAddressItemType {
   return 'address' in item && 'accountProxyId' in item && 'accountName' in item && !('groupLabel' in item);
 }
 
-function Component ({ autoSelectFirstItem, className = '', items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
+function Component ({ autoSelectFirstItem, className = '', hiddenAccountProxyTypes = [], items, modalId, onBack, onCancel, onSelectItem, selectedValue }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { checkActive } = useContext(ModalContext);
 
@@ -98,25 +100,28 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
   }, [onSelect, selectedValue]);
 
   const sortedItems = useMemo<AccountAddressItemType[]>(() => {
-    return [...items].sort((a, b) => {
-      const _isABitcoin = isBitcoinAddress(a.address);
-      const _isBBitcoin = isBitcoinAddress(b.address);
-      const _isSameProxyId = a.accountProxyId === b.accountProxyId;
+    return [...items]
+      .filter((i) => !hiddenAccountProxyTypes.includes(i.accountProxyType))
+      .sort((a, b) => {
+        const _isABitcoin = isBitcoinAddress(a.address);
+        const _isBBitcoin = isBitcoinAddress(b.address);
+        const _isSameProxyId = a.accountProxyId === b.accountProxyId;
 
-      if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
-        const aDetails = getBitcoinAccountDetails(a.accountType);
-        const bDetails = getBitcoinAccountDetails(b.accountType);
+        if (_isABitcoin && _isBBitcoin && _isSameProxyId) {
+          const aDetails = getBitcoinAccountDetails(a.accountType);
+          const bDetails = getBitcoinAccountDetails(b.accountType);
 
-        return aDetails.order - bDetails.order;
-      }
+          return aDetails.order - bDetails.order;
+        }
 
-      return 0;
-    });
-  }, [items]);
+        return 0;
+      });
+  }, [items, hiddenAccountProxyTypes]);
 
   const groupedItemMap = useMemo<GroupedItems>(() => {
     const result: GroupedItems = {
       master: [],
+      multisig: [],
       qrSigner: [],
       watchOnly: [],
       ledger: [],
@@ -129,6 +134,9 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         case AccountProxyType.SOLO:
         case AccountProxyType.UNIFIED:
           result.master.push(item);
+          break;
+        case AccountProxyType.MULTISIG:
+          result.multisig.push(item);
           break;
         case AccountProxyType.QR:
           result.qrSigner.push(item);
@@ -172,6 +180,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
     addGroup(groupedItemMap.watchOnly, 'Watch-only account', 'watch-only');
     addGroup(groupedItemMap.ledger, 'Ledger account', 'ledger');
     addGroup(groupedItemMap.injected, 'Injected account', 'injected');
+    addGroup(groupedItemMap.multisig, 'Multisig account', 'multisig');
     addGroup(groupedItemMap.unknown, 'Unknown account', 'unknown');
 
     return result;
@@ -197,6 +206,7 @@ function Component ({ autoSelectFirstItem, className = '', items, modalId, onBac
         ...groupedItemMap.watchOnly,
         ...groupedItemMap.ledger,
         ...groupedItemMap.injected,
+        ...groupedItemMap.multisig,
         ...groupedItemMap.unknown
       ];
 

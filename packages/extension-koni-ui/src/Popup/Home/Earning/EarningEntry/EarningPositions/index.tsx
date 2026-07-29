@@ -74,6 +74,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
           currency: currencyData
         };
       })
+      .filter((item) => !!item.asset)
       .sort((firstItem, secondItem) => {
         const getValue = (item: ExtraYieldPositionInfo): number => {
           return new BigN(item.totalStake)

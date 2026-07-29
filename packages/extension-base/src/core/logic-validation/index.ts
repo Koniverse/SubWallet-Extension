@@ -8,7 +8,6 @@ import { BasicTxErrorType } from '@subwallet/extension-base/types';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
-export * from './swap';
 export * from './request';
 export * from './earning';
 export * from './transfer';
@@ -20,7 +19,7 @@ export function validateSpendingAndFeePayment (spendingToken: _ChainAsset, feeTo
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
   } else {
-    if (bnFromTokenBalance.lte(bnSpendingAmount.plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
+    if (bnFromTokenBalance.lt(bnSpendingAmount.plus(_isNativeToken(spendingToken) ? '0' : _getTokenMinAmount(spendingToken)))) {
       return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: spendingToken.symbol } }))];
     }
 

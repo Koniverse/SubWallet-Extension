@@ -6,12 +6,13 @@ import { SwapError } from '@subwallet/extension-base/background/errors/SwapError
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { validateRecipientAddress } from '@subwallet/extension-base/core/logic-validation/recipientAddress';
 import { ActionType } from '@subwallet/extension-base/core/types';
-import { AcrossErrorMsg } from '@subwallet/extension-base/services/balance-service/transfer/xcm/acrossBridge';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetOriginChain, _getAssetSymbol, _getChainName, _getMultiChainAsset, _getOriginChainOfAsset, _isAssetFungibleToken, _isChainEvmCompatible, _isChainInfoCompatibleWithAccountInfo, _isNativeTokenBySlug, _parseAssetRefKey } from '@subwallet/extension-base/services/chain-service/utils';
 import { KyberSwapQuoteMetadata } from '@subwallet/extension-base/services/swap-service/handler/kyber-handler';
+import { DetectedGenOptimalProcessErrMsg } from '@subwallet/extension-base/services/swap-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountProxy, AccountProxyType, AnalyzedGroup, BalanceType, CommonOptimalSwapPath, ProcessType, SwapRequestResult, SwapRequestV2 } from '@subwallet/extension-base/types';
 import { CHAINFLIP_SLIPPAGE, SIMPLE_SWAP_SLIPPAGE, SlippageType, SwapProviderId, SwapQuote } from '@subwallet/extension-base/types/swap';
 import { isSameAddress } from '@subwallet/extension-base/utils';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -30,7 +31,7 @@ import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, getAssetDisplayName, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -100,6 +101,7 @@ function getTokenSelectorItem (
       symbol: asset.symbol,
       name: asset.name,
       balanceInfo,
+      displayName: getAssetDisplayName(asset, asset.symbol),
       showBalance: true,
       total: balanceInfo?.isReady && !balanceInfo?.isNotSupport ? balanceInfo?.free : undefined
     });
@@ -118,7 +120,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
   const { activeModal, inactiveAll, inactiveModal } = useContext(ModalContext);
 
-  const { accountProxies, accounts, isAllAccount } = useSelector((state) => state.accountState);
+  const { accountProxies, accounts, currentAccountProxy, isAllAccount } = useSelector((state) => state.accountState);
   const assetRegistryMap = useSelector((state) => state.assetRegistry.assetRegistry);
   const { priceMap } = useSelector((state) => state.price);
   const { chainInfoMap, chainStateMap, ledgerGenericAllowNetworks } = useSelector((root) => root.chainStore);
@@ -140,6 +142,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const [preferredProvider, setPreferredProvider] = useState<SwapProviderId | undefined>(undefined);
 
   const [swapError, setSwapError] = useState<SwapError|undefined>(undefined);
+  const [customSwapErrorMessage, setCustomSwapErrorMessage] = useState<string|undefined>(undefined);
   const [isFormInvalid, setIsFormInvalid] = useState<boolean>(false);
   const [currentOptimalSwapPath, setOptimalSwapPath] = useState<CommonOptimalSwapPath | undefined>(undefined);
 
@@ -186,7 +189,27 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   const chainValue = useWatchTransaction('chain', form, defaultData);
   const recipientValue = useWatchTransaction('recipient', form, defaultData);
 
-  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP);
+  const fromAssetInfo = useMemo(() => {
+    return assetRegistryMap[fromTokenSlugValue] || undefined;
+  }, [assetRegistryMap, fromTokenSlugValue]);
+
+  const toAssetInfo = useMemo(() => {
+    return assetRegistryMap[toTokenSlugValue] || undefined;
+  }, [assetRegistryMap, toTokenSlugValue]);
+
+  const isBittensorStakedSwap = useMemo(() => {
+    return _BALANCE_CHAIN_GROUP.bittensor.includes(fromAssetInfo?.originChain) && _BALANCE_CHAIN_GROUP.bittensor.includes(toAssetInfo?.originChain);
+  }, [fromAssetInfo?.originChain, toAssetInfo?.originChain]);
+
+  const balanceType = useMemo(() => {
+    if (isBittensorStakedSwap && _isNativeTokenBySlug(fromAssetInfo?.slug)) {
+      return BalanceType.STAKING;
+    } else {
+      return undefined;
+    }
+  }, [fromAssetInfo?.slug, isBittensorStakedSwap]);
+
+  const availableBalanceHookResult = useGetBalance(chainValue, fromValue, fromTokenSlugValue, true, ExtrinsicType.SWAP, balanceType);
 
   const [swapFromFieldRenderKey, setSwapFromFieldRenderKey] = useState<string>('SwapFromField');
 
@@ -219,7 +242,9 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } });
   }, [assetRegistryMap, chainInfoMap, fromTokenSlugValue, t]);
 
-  const onPreCheck = usePreCheckAction(fromValue, undefined, preCheckMessage);
+  const onPreCheck = usePreCheckAction({
+    address: fromValue, message: preCheckMessage, chain: chainValue
+  });
   const oneSign = useOneSignProcess(fromValue);
   const getReformatAddress = useCoreCreateReformatAddress();
 
@@ -343,14 +368,6 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     return tokenSelectorItems.filter((item) => destinationSlugSet.has(item.slug));
   }, [fromTokenSlugValue, tokenSelectorItems, pairMap]);
 
-  const fromAssetInfo = useMemo(() => {
-    return assetRegistryMap[fromTokenSlugValue] || undefined;
-  }, [assetRegistryMap, fromTokenSlugValue]);
-
-  const toAssetInfo = useMemo(() => {
-    return assetRegistryMap[toTokenSlugValue] || undefined;
-  }, [assetRegistryMap, toTokenSlugValue]);
-
   const destChainValue = _getAssetOriginChain(toAssetInfo);
 
   const isSwitchable = useMemo(() => {
@@ -442,31 +459,27 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     setFeeOptions(rs.quote.optimalQuote?.feeInfo?.feeOptions || []);
     setCurrentFeeOption(rs.quote.optimalQuote?.feeInfo?.feeOptions?.[0]);
     setSwapError(rs.quote.error);
+    setCustomSwapErrorMessage(undefined);
   }, []);
 
-  const notifyNoQuote = useCallback(() => {
-    notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+  const ErrorMessageMap = useMemo(() => ({
+    NoQuote: t('ui.TRANSACTION.screen.Transaction.Swap.swapPairNotSupportedTryAnother'),
+    TooLowAmount: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooLow'),
+    TooHighAmount: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'),
+    NotEnoughBitcoin: t('ui.TRANSACTION.screen.Transaction.Swap.notEnoughBitcoin')
+  }), [t]);
 
-  const notifyTooLowAmount = useCallback(() => {
-    notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooLow'),
-      type: 'error',
-      duration: 5
-    });
-  }, [notify, t]);
+  const notifyErrorMessage = useCallback((message: string, setErrorState = true) => {
+    if (setErrorState) {
+      setCustomSwapErrorMessage(message);
+    }
 
-  const notifyTooHighAmount = useCallback(() => {
     notify({
-      message: t('ui.TRANSACTION.screen.Transaction.Swap.amountTooHigh'),
+      message,
       type: 'error',
       duration: 5
     });
-  }, [notify, t]);
+  }, [notify, setCustomSwapErrorMessage]);
 
   const onConfirmSelectedQuote = useCallback(
     async (quote: SwapQuote) => {
@@ -524,6 +537,18 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
   }, [chainValue, checkChainConnected]);
 
   const onSubmit: FormCallbacks<SwapParams>['onFinish'] = useCallback((values: SwapParams) => {
+    const hasXcmStep = !!currentOptimalSwapPath?.steps?.some((s) => s.type === 'XCM');
+
+    if (targetAccountProxy.accountType === AccountProxyType.MULTISIG && hasXcmStep) {
+      notify({
+        message: t('ui.TRANSACTION.screen.Transaction.Swap.multisigAccountNotSupportedForSwap'),
+        type: 'error',
+        duration: 5
+      });
+
+      return;
+    }
+
     if (chainValue && !checkChainConnected(chainValue)) {
       openAlert({
         title: t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
@@ -549,8 +574,14 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return;
     }
 
+    if (customSwapErrorMessage) {
+      notifyErrorMessage(customSwapErrorMessage, false);
+
+      return;
+    }
+
     if (!currentQuote || !currentOptimalSwapPath) {
-      notifyNoQuote();
+      notifyErrorMessage(ErrorMessageMap.NoQuote, false);
 
       return;
     }
@@ -701,7 +732,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
     } else {
       transactionBlockProcess();
     }
-  }, [accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, isChainConnected, notify, notifyNoQuote, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t]);
+  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, targetAccountProxy.accountType]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');
@@ -740,11 +771,17 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       return;
     }
 
-    const result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
+    let result: string;
+
+    if (isBittensorStakedSwap) {
+      result = currentFromTokenAvailableBalance.value;
+    } else {
+      result = new BigN(currentFromTokenAvailableBalance.value).multipliedBy(92).dividedToIntegerBy(100).toFixed();
+    }
 
     onChangeAmount(result);
     setSwapFromFieldRenderKey(`SwapFromField-${Date.now()}`);
-  }, [currentFromTokenAvailableBalance, onChangeAmount]);
+  }, [currentFromTokenAvailableBalance, isBittensorStakedSwap, onChangeAmount]);
 
   const onClickHaftAmountButton = useCallback(() => {
     if (!currentFromTokenAvailableBalance) {
@@ -819,6 +856,40 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       name: accountJsonForRecipientAutoFilled.name
     });
   }, [chainInfoMap, destChainValue, getReformatAddress, isRecipientFieldAllowed, targetAccountProxy.accountType, targetAccountProxy.accounts]);
+
+  /**
+   * Retrieve the Substrate address associated with the current account proxy, or a selected account proxy in case All Account mode.
+   *
+   * The logic follows these steps:
+   * 1. Determine the AccountProxy, correspond to `currentSelectAccountProxy`.
+   * 2. Retrieve substrate address if it's available.
+   */
+  const alternativeAddress: string | undefined = useMemo(() => {
+    if (currentAccountProxy === null) {
+      return undefined;
+    }
+
+    let currentSelectAccountProxy: AccountProxy | undefined;
+
+    if (currentAccountProxy.accountType === AccountProxyType.ALL_ACCOUNT) {
+      // If in all account mode, find the selected from account by `targetAccountProxyIdForGetBalance`
+      currentSelectAccountProxy = accountProxies.find((account) => account.id === targetAccountProxyIdForGetBalance);
+    } else {
+      currentSelectAccountProxy = currentAccountProxy;
+    }
+
+    if (!currentSelectAccountProxy) {
+      return undefined;
+    }
+
+    const substrateAccount = currentSelectAccountProxy.accounts.find((account) => account.chainType === AccountChainType.SUBSTRATE);
+
+    if (!substrateAccount) {
+      return undefined;
+    }
+
+    return substrateAccount.address;
+  }, [accountProxies, currentAccountProxy, targetAccountProxyIdForGetBalance]);
 
   useEffect(() => {
     if (fromTokenSlugValue && toTokenSlugValue && isAddressInputReady) {
@@ -910,6 +981,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
           const currentRequest: SwapRequestV2 = {
             address: fromValue,
+            alternativeAddress: alternativeAddress,
             pair: {
               slug: _parseAssetRefKey(fromTokenSlugValue, toTokenSlugValue),
               from: fromTokenSlugValue,
@@ -941,15 +1013,19 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
 
             if (sync) {
               if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-                notifyNoQuote();
+                notifyErrorMessage(ErrorMessageMap.NoQuote);
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-                notifyTooLowAmount();
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
+                notifyErrorMessage(ErrorMessageMap.TooLowAmount);
               }
 
-              if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-                notifyTooHighAmount();
+              if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
+                notifyErrorMessage(ErrorMessageMap.TooHighAmount);
+              }
+
+              if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+                notifyErrorMessage(ErrorMessageMap.NotEnoughBitcoin);
               }
 
               setHandleRequestLoading(false);
@@ -971,7 +1047,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearTimeout(timeout);
     };
-  }, [currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates]);
+  }, [ErrorMessageMap, currentSlippage.slippage, form, fromAmountValue, fromTokenSlugValue, fromValue, isRecipientFieldAllowed, preferredProvider, recipientValue, toTokenSlugValue, updateSwapStates, notifyErrorMessage, alternativeAddress]);
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
@@ -992,15 +1068,19 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
           console.log('Error when doing refreshSwapRequestResult', e);
 
           if (e.message.toLowerCase().startsWith('swap pair is not found')) {
-            notifyNoQuote();
+            notifyErrorMessage(ErrorMessageMap.NoQuote);
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_LOW)) {
-            notifyTooLowAmount();
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_LOW)) {
+            notifyErrorMessage(ErrorMessageMap.TooLowAmount);
           }
 
-          if (e.message.toLowerCase().startsWith(AcrossErrorMsg.AMOUNT_TOO_HIGH)) {
-            notifyTooHighAmount();
+          if (e.message.toLowerCase().startsWith(DetectedGenOptimalProcessErrMsg.AMOUNT_TOO_HIGH)) {
+            notifyErrorMessage(ErrorMessageMap.TooHighAmount);
+          }
+
+          if (e.message.toLowerCase().includes(DetectedGenOptimalProcessErrMsg.NOT_ENOUGHT_BITCOIN)) {
+            notifyErrorMessage(ErrorMessageMap.NotEnoughBitcoin);
           }
         }).finally(() => {
           if (sync) {
@@ -1044,7 +1124,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       sync = false;
       clearInterval(timer);
     };
-  }, [currentQuoteRequest, hasInternalConfirmations, notifyTooHighAmount, notifyTooLowAmount, notifyNoQuote, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
+  }, [ErrorMessageMap, currentQuoteRequest, hasInternalConfirmations, notifyErrorMessage, quoteAliveUntil, requestUserInteractToContinue, updateSwapStates]);
 
   useEffect(() => {
     if (!confirmedTerm) {
@@ -1248,6 +1328,7 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
                 name={'from'}
               >
                 <AccountAddressSelector
+                  hiddenAccountProxyTypes={[AccountProxyType.MULTISIG]}
                   items={accountAddressItems}
                   label={`${t('ui.TRANSACTION.screen.Transaction.Swap.from')}:`}
                   labelStyle={'horizontal'}
@@ -1289,13 +1370,22 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
               <div className={'__balance-display-area'}>
                 <FreeBalance
                   address={fromValue}
+                  balanceType={balanceType}
                   chain={chainValue}
                   className={'__balance-display'}
                   extrinsicType={ExtrinsicType.SWAP}
                   hidden={!canShowAvailableBalance}
                   isSubscribe={true}
-                  label={`${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}`}
-                  labelTooltip={'Available balance for swap'}
+                  label={balanceType === BalanceType.STAKING ? `${t('ui.TRANSACTION.screen.Transaction.Swap.stakedBalance')}` : `${t('ui.TRANSACTION.screen.Transaction.Swap.availableBalance')}`}
+                  labelTooltip={
+                    balanceType === BalanceType.STAKING
+                      ? t('ui.TRANSACTION.screen.Transaction.Swap.stakedBalanceTooltip', {
+                        replace: {
+                          symbol: fromAssetInfo.symbol
+                        }
+                      })
+                      : t('ui.TRANSACTION.screen.Transaction.Swap.availableBalanceTooltip')
+                  }
                   tokenSlug={fromTokenSlugValue}
                 />
               </div>

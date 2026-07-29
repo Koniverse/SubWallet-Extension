@@ -13,6 +13,7 @@ import styled from 'styled-components';
 interface Props extends ThemeProps {
   children: React.ReactNode | React.ReactNode[];
   title: SwModalProps['title'];
+  showFooter?: boolean;
 }
 
 const modalId = CONFIRMATION_DETAIL_MODAL;
@@ -25,7 +26,7 @@ const closeIcon = (
 );
 
 const Component: React.FC<Props> = (props: Props) => {
-  const { children, className, title } = props;
+  const { children, className, showFooter, title } = props;
 
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
@@ -38,7 +39,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <SwModal
       className={CN(className)}
       destroyOnClose={true}
-      footer={(
+      footer={showFooter && (
         <Button
           block={true}
           icon={closeIcon}

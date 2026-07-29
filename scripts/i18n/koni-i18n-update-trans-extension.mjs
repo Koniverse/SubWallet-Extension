@@ -31,7 +31,7 @@ function saveJsonFile(filePath, data) {
 
 // --- MAIN FUNCTION ---
 async function updateTranslationFiles() {
-  console.log('🔄 Starting translation files update...');
+  console.log('🔄 Starting translation files update (English values only, others empty)...');
 
   // 1. Load combined data
   const combinedData = loadJsonFile(COMBINED_DATA_FILE);
@@ -47,35 +47,53 @@ async function updateTranslationFiles() {
   LANGUAGES.forEach(lng => {
     const langFile = path.join(LOCALES_DIR, lng, 'translation.json');
     const existingTranslations = loadJsonFile(langFile) || {};
-    const newTranslations = {...existingTranslations};
+    const newTranslations = {};
 
     let addedCount = 0;
     let updatedCount = 0;
     let removedCount = 0;
 
-    // Process each entry in combined data
-    Object.entries(combinedData).forEach(([key, entry]) => {
-      entry.locations.forEach(location => {
-        const translationKey = location.key;
-        const translationValue = entry.translations[lng] || entry.translations.en || key;
+    Object.keys(existingTranslations).forEach(key => {
+      if (!convertedTexts.has(key)) {
+        newTranslations[key] = existingTranslations[key];
+      } else {
+        removedCount++;
+      }
+    });
 
-        if (!newTranslations[translationKey]) {
-          newTranslations[translationKey] = translationValue;
-          addedCount++;
-        } else if (newTranslations[translationKey] !== translationValue) {
-          newTranslations[translationKey] = translationValue;
-          updatedCount++;
+    // Process each entry in combined data
+    Object.entries(combinedData).forEach(([rawText, entry]) => {
+      entry.locations.forEach(location => {
+        const tKey = location.key;
+        const newValueForEn = entry.translations.en || rawText;
+
+        if (lng === 'en') {
+          if (!newTranslations[tKey]) {
+            newTranslations[tKey] = newValueForEn;
+            addedCount++;
+          } else if (newTranslations[tKey] !== newValueForEn) {
+            console.warn(`⚠️  [EN] Update value for key: ${tKey}`);
+            console.warn(`   - Old: "${newTranslations[tKey]}"`);
+            console.warn(`   - New: "${newValueForEn}"`);
+            newTranslations[tKey] = newValueForEn;
+            updatedCount++;
+          }
+        } else {
+          if (!newTranslations[tKey]) {
+            newTranslations[tKey] = "";
+            addedCount++;
+          }
         }
       });
     });
 
     // ONLY remove old keys that have been converted
-    Object.keys(existingTranslations).forEach(key => {
-      if (convertedTexts.has(key)) {
-        delete newTranslations[key];
-        removedCount++;
-      }
-    });
+    // Object.keys(existingTranslations).forEach(key => {
+    //   if (convertedTexts.has(key)) {
+    //     delete newTranslations[key];
+    //     removedCount++;
+    //   }
+    // });
 
     // Save language file
     saveJsonFile(langFile, newTranslations);

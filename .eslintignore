@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+coverage/
+packages/extension-koni/build/
+packages/extension-koni/build-firefox/
+packages/web-runner/build/
+packages/webapp/build/
+*.spec.ts
+*.test.ts
+*.spec.tsx
+*.test.tsx

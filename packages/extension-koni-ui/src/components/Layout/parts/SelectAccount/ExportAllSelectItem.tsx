@@ -7,7 +7,7 @@ import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { PhosphorIcon } from '@subwallet/extension-koni-ui/types';
 import { Icon } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { CheckCircle, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches } from 'phosphor-react';
+import { CheckCircle, Eye, GitCommit, Needle, QrCode, Question, Strategy, Swatches, UserSwitch } from 'phosphor-react';
 import { IconWeight } from 'phosphor-react/src/lib';
 import React, { Context, useCallback, useContext, useMemo } from 'react';
 import styled, { ThemeContext } from 'styled-components';
@@ -87,6 +87,14 @@ function Component (props: _AccountCardItem): React.ReactElement<_AccountCardIte
     if (accountType === AccountProxyType.INJECTED) {
       return {
         value: Needle,
+        weight: 'fill'
+      };
+    }
+
+    if (accountProxy.accountType === AccountProxyType.MULTISIG) {
+      return {
+        className: '-is-multisig',
+        value: UserSwitch,
         weight: 'fill'
       };
     }
@@ -203,6 +211,10 @@ const ExportAllSelectItem = styled(Component)<_AccountCardItem>(({ theme }) => {
 
       '&.-is-derived': {
         color: token.colorWarning
+      },
+
+      '&.-is-multisig': {
+        color: token['geekblue-9']
       }
     },
     '.__item-center-part': {

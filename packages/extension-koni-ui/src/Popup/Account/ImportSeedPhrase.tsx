@@ -3,8 +3,9 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountProxyType, ResponseMnemonicValidateV2 } from '@subwallet/extension-base/types';
+import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AccountNameModal, CloseIcon, Layout, PageWrapper, PhraseNumberSelector, SeedPhraseInput } from '@subwallet/extension-koni-ui/components';
-import { ACCOUNT_NAME_MODAL, IMPORT_ACCOUNT_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { ACCOUNT_NAME_MODAL, DEFAULT_MNEMONIC_TYPE, IMPORT_ACCOUNT_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAutoNavigateToCreatePassword, useCompleteCreateAccount, useDefaultNavigate, useFocusFormItem, useGoBackFromCreateAccount, useNotification, useTranslation, useUnlockChecker } from '@subwallet/extension-koni-ui/hooks';
 import { createAccountSuriV2, validateSeedV2 } from '@subwallet/extension-koni-ui/messaging';
@@ -15,9 +16,15 @@ import { wordlists } from 'bip39';
 import CN from 'classnames';
 import { CheckCircle, Eye, EyeSlash, FileArrowDown, XCircle } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-type Props = ThemeProps;
+interface ImportSeedPhraseProps extends ThemeProps {
+  phraseNumberOptions?: number[];
+  mnemonicType?: string;
+  formName?: string;
+}
 
 const FooterIcon = (
   <Icon
@@ -26,7 +33,12 @@ const FooterIcon = (
   />
 );
 
-const formName = 'import-seed-phrase-form';
+const defaultFormName = 'import-seed-phrase-form';
+const trustWalletFormName = 'import-seed-phrase-trust-form';
+
+const defaultPhraseNumberOptions = [12, 15, 24];
+const trustWalletPhraseNumberOptions = [12];
+
 const fieldNamePrefix = 'seed-phrase-';
 const accountNameModalId = ACCOUNT_NAME_MODAL;
 
@@ -36,14 +48,20 @@ interface FormState extends Record<`seed-phrase-${number}`, string> {
 }
 
 const words = wordlists.english;
-const phraseNumberOptions = [12, 15, 24];
 
-const Component: React.FC<Props> = ({ className }: Props) => {
+const Component: React.FC<ImportSeedPhraseProps> = ({ className }: ImportSeedPhraseProps) => {
   useAutoNavigateToCreatePassword();
 
   const { t } = useTranslation();
   const { goHome } = useDefaultNavigate();
   const notify = useNotification();
+  const [searchParams] = useSearchParams();
+
+  const importType = searchParams.get('type') || '';
+  const isTrustWallet = importType === TRUST_WALLET_MNEMONIC_TYPE;
+  const formName = isTrustWallet ? trustWalletFormName : defaultFormName;
+  const mnemonicType = isTrustWallet ? TRUST_WALLET_MNEMONIC_TYPE : DEFAULT_MNEMONIC_TYPE;
+  const phraseNumberOptions = isTrustWallet ? trustWalletPhraseNumberOptions : defaultPhraseNumberOptions;
 
   const onComplete = useCompleteCreateAccount();
   const onBack = useGoBackFromCreateAccount(IMPORT_ACCOUNT_MODAL);
@@ -64,12 +82,12 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const phraseNumberItems = useMemo(() => phraseNumberOptions.map((value) => ({
     label: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.numberWords', { replace: { number: value } }),
     value: `${value}`
-  })), [t]);
+  })), [t, phraseNumberOptions]);
 
   const formDefault: FormState = useMemo(() => ({
     phraseNumber: `${phraseNumberOptions[0]}`,
     trigger: 'trigger'
-  }), []);
+  }), [phraseNumberOptions]);
 
   const onFieldsChange: FormCallbacks<FormState>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields);
@@ -105,7 +123,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         console.error('Error updating phraseNumber field:', error);
       }
     }
-  }, [form]);
+  }, [form, phraseNumberOptions]);
 
   const onSubmit: FormCallbacks<FormState>['onFinish'] = useCallback((values: FormState) => {
     const { phraseNumber: _phraseNumber } = values;
@@ -132,10 +150,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       checkUnlock()
         .then(() => {
           setSubmitting(true);
-          validateSeedV2(seed).then((response) => {
+          validateSeedV2({
+            mnemonic: seed,
+            mnemonicType: mnemonicType
+          }).then((response) => {
             setSeedValidationResponse(response);
 
-            if (response.mnemonicTypes === 'general') {
+            if (response.mnemonicTypes === DEFAULT_MNEMONIC_TYPE) {
               alertModal.open({
                 closable: false,
                 title: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.incompatibleSeedPhrase'),
@@ -148,6 +169,46 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                     <br />
                     <div>
                       {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.tonIncompatibleSeedPhraseWarning')}
+                    </div>
+                  </>
+                ),
+                cancelButton: {
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.goBack'),
+                  icon: XCircle,
+                  iconWeight: 'fill',
+                  onClick: () => {
+                    alertModal.close();
+                    setSubmitting(false);
+                  },
+                  schema: 'secondary'
+                },
+                okButton: {
+                  text: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.import'),
+                  icon: CheckCircle,
+                  iconWeight: 'fill',
+                  onClick: () => {
+                    activeModal(accountNameModalId);
+                    alertModal.close();
+                  },
+                  schema: 'primary'
+                }
+              });
+            } else if (response.mnemonicTypes === TRUST_WALLET_MNEMONIC_TYPE) {
+              alertModal.open({
+                closable: false,
+                title: t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseWarningTitle'),
+                type: NotificationType.WARNING,
+                content: (
+                  <>
+                    <div>
+                      <Trans
+                        components={{ highlight: <strong /> }}
+                        i18nKey={detectTranslate('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseImportInfo')}
+                      />
+                    </div>
+                    <br />
+                    <div>
+                      {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.trustSeedPhraseImportWarning')}
                     </div>
                   </>
                 ),
@@ -191,7 +252,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           // Unlock is cancelled
         });
     }
-  }, [t, checkUnlock, alertModal, activeModal, notify]);
+  }, [t, checkUnlock, alertModal, activeModal, notify, mnemonicType]);
 
   const onCreateAccount = useCallback((accountName: string) => {
     if (!seedValidationResponse) {
@@ -202,7 +263,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     createAccountSuriV2({
       name: accountName,
       suri: seedValidationResponse.mnemonic,
-      type: seedValidationResponse.mnemonicTypes === 'ton' ? 'ton-native' : undefined,
+      types: seedValidationResponse.pairTypes,
       isAllowed: true
     })
       .then(() => {
@@ -251,11 +312,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             onClick: goHome
           }
         ]}
-        title={t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromSeedPhrase')}
+        title={ isTrustWallet
+          ? t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromTrustWallet')
+          : t<string>('ui.ACCOUNT.screen.Account.ImportSeedPhrase.importFromSeedPhrase')}
       >
         <div className='container'>
           <div className='description'>
-            {t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
+            { isTrustWallet
+              ? t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterTrustSeedToImport')
+              : t('ui.ACCOUNT.screen.Account.ImportSeedPhrase.enterSeedPhraseToImport')}
           </div>
           <Form
             className='form-container form-space-xs'
@@ -336,7 +401,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   );
 };
 
-const ImportSeedPhrase = styled(Component)<Props>(({ theme: { token } }: Props) => {
+const ImportSeedPhrase = styled(Component)<ImportSeedPhraseProps>(({ theme: { token } }: ImportSeedPhraseProps) => {
   return {
     '.container': {
       padding: token.padding

@@ -8,7 +8,7 @@ import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { Button, Checkbox, Icon, SwList, SwModal } from '@subwallet/react-ui';
 import { CheckboxChangeEvent } from '@subwallet/react-ui/es/checkbox';
 import CN from 'classnames';
-import { FadersHorizontal } from 'phosphor-react';
+import { ArrowCounterClockwise, FadersHorizontal } from 'phosphor-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -20,6 +20,8 @@ export type OptionType = {
 
 interface Props extends ThemeProps {
   id: string;
+  showResetButton?: boolean;
+  onResetFilter?: () => void;
   onCancel: () => void;
   title?: string;
   applyFilterButtonTitle?: string;
@@ -38,7 +40,7 @@ const renderEmpty = () => <GeneralEmptyList />;
 
 function Component (props: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
-  const { applyFilterButtonTitle, className = '', closeIcon, id, onApplyFilter, onCancel, onChangeOption, optionSelectionMap, options, searchBox, title } = props;
+  const { applyFilterButtonTitle, className = '', closeIcon, id, onApplyFilter, onCancel, onChangeOption, onResetFilter, optionSelectionMap, options, searchBox, showResetButton, title } = props;
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   const handleSearch = useCallback((value: string) => {
     setCurrentSearchText(value);
@@ -112,9 +114,19 @@ function Component (props: Props): React.ReactElement<Props> {
         '-has-search-box': !!searchBox
       })}
       closeIcon={closeIcon}
+      destroyOnClose={true}
       footer={filterModalFooter}
       id={id}
       onCancel={onCancel}
+      rightIconProps={showResetButton
+        ? {
+          icon: (<Icon
+            phosphorIcon={ArrowCounterClockwise}
+            size='md'
+          />),
+          onClick: onResetFilter
+        }
+        : undefined}
       title={title || t('ui.components.Modal.Filter.filter')}
     >
       {

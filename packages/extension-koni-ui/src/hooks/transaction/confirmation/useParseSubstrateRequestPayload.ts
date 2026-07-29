@@ -20,6 +20,7 @@ const registry = new TypeRegistry();
 
 interface Result {
   payload: ExtrinsicPayload | string;
+  payloadError: string | null;
   hashLoading: boolean;
   isMissingData: boolean;
   addExtraData: boolean;
@@ -61,29 +62,47 @@ const useParseSubstrateRequestPayload = (chain: Chain | null, request?: RequestS
   const [metadataHash, setMetadataHash] = useState<string>(''); // Have value only when missingData is true
   const [hashLoading, setHashLoading] = useState(true);
 
-  const payload = useMemo<ExtrinsicPayload | string>(() => {
+  const { payload, payloadError } = useMemo<Pick<Result, 'payload' | 'payloadError'>>(() => {
     if (!request) {
-      return '';
+      return {
+        payload: '',
+        payloadError: null
+      };
     } else {
       const payload = request.payload;
 
       if (isRawPayload(payload)) {
-        return payload.data;
-      } else {
-        const _registry = chain?.registry || registry;
-
-        _registry.setSignedExtensions(payload.signedExtensions, chain?.definition.userExtensions); // Important
-
-        const _payload: SignerPayloadJSON = {
-          ...payload
+        return {
+          payload: payload.data,
+          payloadError: null
         };
+      } else {
+        try {
+          const _registry = chain?.registry || registry;
 
-        if (metadataHash) {
-          _payload.mode = 1;
-          _payload.metadataHash = metadataHash as HexString;
+          _registry.setSignedExtensions(payload.signedExtensions, chain?.definition.userExtensions); // Important
+
+          const _payload: SignerPayloadJSON = {
+            ...payload
+          };
+
+          if (metadataHash) {
+            _payload.mode = 1;
+            _payload.metadataHash = metadataHash as HexString;
+          }
+
+          return {
+            payload: _registry.createType('ExtrinsicPayload', _payload, { version: _payload.version }),
+            payloadError: null
+          };
+        } catch (error) {
+          console.error('Error parsing substrate request payload', error);
+
+          return {
+            payload: '',
+            payloadError: (error as Error).message
+          };
         }
-
-        return _registry.createType('ExtrinsicPayload', _payload, { version: _payload.version });
       }
     }
   }, [chain, metadataHash, request]);
@@ -119,9 +138,10 @@ const useParseSubstrateRequestPayload = (chain: Chain | null, request?: RequestS
   return useMemo(() => ({
     hashLoading,
     payload,
+    payloadError,
     isMissingData: isMissingData,
     addExtraData
-  }), [addExtraData, hashLoading, isMissingData, payload]);
+  }), [addExtraData, hashLoading, isMissingData, payload, payloadError]);
 };
 
 export default useParseSubstrateRequestPayload;

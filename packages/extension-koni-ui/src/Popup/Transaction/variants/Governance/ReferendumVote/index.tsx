@@ -1,0 +1,79 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { PageWrapper } from '@subwallet/extension-koni-ui/components';
+import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
+import { useTransactionContext } from '@subwallet/extension-koni-ui/hooks';
+import { useGovReferendumVotes } from '@subwallet/extension-koni-ui/Popup/Home/Governance/hooks/useGovernanceView/useGovReferendumVotes';
+import { GovReferendumVoteParams, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { GovVoteStatus } from '@subwallet/extension-koni-ui/types/gov';
+import { getAccountVoteStatus } from '@subwallet/extension-koni-ui/utils';
+import CN from 'classnames';
+import React, { useContext, useMemo } from 'react';
+import { Outlet } from 'react-router';
+import styled from 'styled-components';
+
+type WrapperProps = ThemeProps;
+
+type ComponentProps = {
+  className?: string;
+};
+
+const Component = (props: ComponentProps): React.ReactElement<ComponentProps> => {
+  const { defaultData } = useTransactionContext<GovReferendumVoteParams>();
+
+  const { accountAddressItems, voteMap } = useGovReferendumVotes({
+    chain: defaultData.chain,
+    referendumId: defaultData.referendumId,
+    fromAccountProxy: defaultData.fromAccountProxy
+  });
+
+  const filteredAccountItems = useMemo(() => {
+    if (!accountAddressItems.length) {
+      return accountAddressItems;
+    }
+
+    return accountAddressItems.filter((item) => {
+      const status = getAccountVoteStatus(item.address, voteMap);
+
+      return status !== GovVoteStatus.DELEGATED;
+    });
+  }, [accountAddressItems, voteMap]);
+
+  return (
+    <>
+      <Outlet context={{ voteMap, accountAddressItems: filteredAccountItems }} />
+    </>
+  );
+};
+
+const Wrapper: React.FC<WrapperProps> = (props: WrapperProps) => {
+  const { className } = props;
+  const dataContext = useContext(DataContext);
+
+  return (
+    <PageWrapper
+      className={CN(className, 'referendum-vote-wrapper')}
+      resolve={dataContext.awaitStores(['openGov'])}
+    >
+      <Component />
+    </PageWrapper>
+
+  );
+};
+
+const ReferendumVote = styled(Wrapper)<WrapperProps>(({ theme: { token } }: WrapperProps) => {
+  return {
+    '&.referendum-vote-wrapper': {
+      overflow: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
+    },
+
+    '.free-balance': {
+      marginBottom: 0
+    }
+  };
+});
+
+export default ReferendumVote;

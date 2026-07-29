@@ -47,6 +47,7 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
 
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);
+  const isTanssiStaking = useMemo(() => _STAKING_CHAIN_GROUP.tanssi.includes(compound.chain), [compound.chain]);
 
   const canClaim = useMemo((): boolean => {
     switch (type) {
@@ -55,11 +56,11 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         return false;
       case YieldPoolType.SUBNET_STAKING:
       case YieldPoolType.NATIVE_STAKING:
-        return isDAppStaking || isMythosStaking;
+        return isDAppStaking || isMythosStaking || isTanssiStaking;
       case YieldPoolType.NOMINATION_POOL:
         return true;
     }
-  }, [isDAppStaking, isMythosStaking, type]);
+  }, [isDAppStaking, isMythosStaking, isTanssiStaking, type]);
 
   const title = useMemo(() => {
     if (type === YieldPoolType.NOMINATION_POOL) {
@@ -130,10 +131,10 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         </MetaInfo>
       </div>
 
-      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking))) && (
+      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking || isTanssiStaking))) && (
         <>
           <div className={'__claim-reward-area'}>
-            { type === YieldPoolType.NOMINATION_POOL || isMythosStaking
+            { type === YieldPoolType.NOMINATION_POOL || isMythosStaking || isTanssiStaking
               ? total
                 ? (
                   <Number

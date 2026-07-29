@@ -10,7 +10,7 @@ import { BaseApiRequestContext } from '@subwallet/extension-base/strategy/api-re
 import { ApiRequestContextProps } from '@subwallet/extension-base/strategy/api-request-strategy/types';
 import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api-request-strategy-v2';
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
-import {targetIsMobile, targetIsWeb, wait} from '@subwallet/extension-base/utils';
+import { targetIsMobile, targetIsWeb, wait } from '@subwallet/extension-base/utils';
 
 const QUERY_ROW = 100;
 

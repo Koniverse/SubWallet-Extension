@@ -208,12 +208,12 @@ const Component: React.FC<Props> = (props: Props) => {
               value={data.amount}
             />
           )}
-          <MetaInfo.Number
+          {!transaction.wrappingStatus && <MetaInfo.Number
             decimals={decimals}
             label={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.estimatedFee')}
             suffix={symbol}
             value={transaction.estimateFee?.value || 0}
-          />
+          />}
           {(compound && !isBittensorChain) && (
             <ValidatorGroupModal
               accounts={newValidatorAccounts}
@@ -268,12 +268,15 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       background: token.colorBgSecondary,
       borderRadius: token.borderRadiusLG,
       marginTop: token.marginSM,
-      marginBottom: token.marginSM,
       whiteSpace: 'nowrap'
     },
 
     '.form-space-sm .ant-form-item': {
       marginBottom: '0px'
+    },
+
+    '.alert-box': {
+      marginTop: token.marginSM
     },
 
     '.validator-group__info': {

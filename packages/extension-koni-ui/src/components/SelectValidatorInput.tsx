@@ -81,7 +81,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   return (
     <div
-      className={CN(className, {
+      className={CN('select-validator-input', className, {
         '-disabled': disabled,
         '-loading': loading
       })}

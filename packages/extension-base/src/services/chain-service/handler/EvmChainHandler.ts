@@ -155,6 +155,10 @@ export class EvmChainHandler extends AbstractChainHandler {
 
         name = _name;
         symbol = _symbol;
+
+        if (name === '') {
+          contractError = true;
+        }
       } else {
         tokenContract = new evmApi.api.eth.Contract(_ERC20_ABI, contractAddress);
 
@@ -170,10 +174,10 @@ export class EvmChainHandler extends AbstractChainHandler {
         name = _name;
         decimals = new BigN(_decimals).toNumber();
         symbol = _symbol;
-      }
 
-      if (name === '' || symbol === '') {
-        contractError = true;
+        if (name === '' || symbol === '') {
+          contractError = true;
+        }
       }
 
       return {

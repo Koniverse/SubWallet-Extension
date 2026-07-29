@@ -1,10 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _Address, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { _Address, AmountData, ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 
 import { BaseProcessRequestSign, BaseRequestSign, InternalRequestSign, TransactionData } from '../../../transaction';
-import { NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
+import { BittensorRootClaimType, NominationPoolInfo, ValidatorInfo, YieldPoolType, YieldPositionInfo } from '../../info';
 import { OptimalYieldPath } from './step';
 
 // Result after create extrinsic
@@ -15,6 +15,8 @@ export interface HandleYieldStepData {
   chainType: ChainType;
   txData: any;
   transferNativeAmount: string;
+  xcmStepFee?: string;
+  xcmDestinationFee?: AmountData;
 }
 
 export interface AbstractSubmitYieldJoinData {
@@ -107,7 +109,7 @@ export interface BondingSubmitParams extends BaseRequestSign {
 
 export type RequestBondingSubmit = InternalRequestSign<BondingSubmitParams>;
 
-export type SubmitChangeValidatorStaking = SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking;
+export type SubmitChangeValidatorStaking = InternalRequestSign<SubmitBittensorChangeValidatorStaking | SubmitJoinNativeStaking>;
 
 export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeStaking {
   originValidator: string;
@@ -117,3 +119,12 @@ export interface SubmitBittensorChangeValidatorStaking extends SubmitJoinNativeS
     subnetSymbol: string;
   }
 }
+
+export interface ChangeBittensorRootClaimTypeParams extends BaseRequestSign {
+  slug: string;
+  address: string;
+  chain: string;
+  bittensorRootClaimType: BittensorRootClaimType;
+}
+
+export type RequestChangeBittensorRootClaimType = InternalRequestSign<ChangeBittensorRootClaimTypeParams>;

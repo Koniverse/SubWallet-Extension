@@ -51,12 +51,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={data.amount}
         />
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.JoinPool.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.JoinPool.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
     </div>
   );

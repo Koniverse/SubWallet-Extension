@@ -15,7 +15,7 @@ interface Props extends ThemeProps {
 
 const Component: React.FC<Props> = (props: Props) => {
   const { data } = props;
-  const { fee } = data;
+  const { crossChainFeeInfo, fee } = data;
 
   const { t } = useTranslation();
 
@@ -27,22 +27,22 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [data.additionalInfo, data.type]);
 
-  if (xcmInfo) {
+  if (xcmInfo || crossChainFeeInfo) {
     return (
       <>
-        <MetaInfo.Number
+        {xcmInfo && <MetaInfo.Number
           decimals={fee?.decimals || undefined}
-          label={t('ui.HISTORY.screen.HistoryDetail.Fee.originChainFee')}
+          label={t('ui.HISTORY.screen.HistoryDetail.Fee.networkFee')}
           suffix={fee?.symbol || undefined}
           value={fee?.value || '0'}
-        />
+        />}
 
-        {/* {xcmInfo.fee && <MetaInfo.Number */}
-        {/*  decimals={xcmInfo.fee?.decimals || undefined} */}
-        {/*  label={('Destination fee')} */}
-        {/*  suffix={xcmInfo.fee?.symbol || undefined} */}
-        {/*  value={xcmInfo.fee?.value || '0'} */}
-        {/* />} */}
+        {crossChainFeeInfo && <MetaInfo.Number
+          decimals={crossChainFeeInfo?.decimals || undefined}
+          label={('Destination fee')}
+          suffix={crossChainFeeInfo?.symbol || undefined}
+          value={crossChainFeeInfo.value}
+        />}
       </>
     );
   }

@@ -50,12 +50,10 @@ export const convertLedgerError = (err: Error, t: TFunction, network: string, is
   }
 
   if (message.includes('Data is invalid')) {
-    if (!isGetAddress) {
-      return {
-        status: 'error',
-        message: t('ui.LEDGER.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
-      };
-    }
+    return {
+      status: 'error',
+      message: t('ui.LEDGER.util.connector.Ledger.unableToSignOpenLedgerApp', { replace: { network: network } })
+    };
   }
 
   // Required blind signing or sign on a not registry network

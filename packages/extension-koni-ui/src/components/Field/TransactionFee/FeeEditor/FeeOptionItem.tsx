@@ -44,6 +44,8 @@ const IconMap: Record<FeeOption, IconOption> = {
   }
 };
 
+const feeNumberMetadata = { maxNumberFormat: 8 };
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, feeValueInfo, isSelected, onClick, time, type } = props;
   const { t } = useTranslation();
@@ -104,6 +106,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Number
             className={'__fee-value'}
             decimal={feeValueInfo.decimals}
+            metadata={feeNumberMetadata}
             suffix={feeValueInfo.symbol}
             value={feeValueInfo.value}
           />

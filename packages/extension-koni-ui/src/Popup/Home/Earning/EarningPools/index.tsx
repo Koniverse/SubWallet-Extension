@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _getAssetDecimals } from '@subwallet/extension-base/services/chain-service/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { _STAKING_CHAIN_GROUP, RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
-import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { AccountProxyType, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { EmptyList, FilterModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EarningPoolItem } from '@subwallet/extension-koni-ui/components/Earning';
 import { BN_ZERO, DEFAULT_EARN_PARAMS, EARN_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
@@ -70,6 +70,8 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     return yieldPositions.map((p) => p.slug);
   }, [yieldPositions]);
 
+  const isMultisigAccount = useMemo(() => currentAccountProxy?.accountType === AccountProxyType.MULTISIG, [currentAccountProxy]);
+
   const items: YieldPoolInfo[] = useMemo(() => {
     if (!pools.length) {
       return [];
@@ -78,6 +80,10 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     const result: YieldPoolInfo[] = [];
 
     pools.forEach((poolInfo) => {
+      if (isMultisigAccount && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
+        return;
+      }
+
       if (poolInfo.chain === 'parallel' && poolInfo.type === YieldPoolType.LIQUID_STAKING) {
         return;
       }
@@ -86,7 +92,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
         return;
       }
 
-      if (poolInfo.type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.relay.includes(poolInfo.chain)) {
+      if (poolInfo.type === YieldPoolType.NATIVE_STAKING && RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(poolInfo.chain)) {
         let minJoinPool: string;
 
         if (poolInfo.statistic && !positionSlugs.includes(poolInfo.slug)) {
@@ -135,7 +141,7 @@ function Component ({ poolGroup, symbol }: ComponentProps) {
     });
 
     return result;
-  }, [assetRegistry, pools, positionSlugs, tokenBalanceMap]);
+  }, [assetRegistry, isMultisigAccount, pools, positionSlugs, tokenBalanceMap]);
 
   const filterFunction = useMemo<(item: YieldPoolInfo) => boolean>(() => {
     return (item) => {

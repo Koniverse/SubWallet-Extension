@@ -4,16 +4,18 @@
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { AmountData, AmountDataWithId, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainNativeTokenSlug } from '@subwallet/extension-base/services/chain-service/utils';
+import { BalanceType } from '@subwallet/extension-base/types';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import { cancelSubscription, getFreeBalance, subscribeFreeBalance, updateAssetSetting } from '@subwallet/extension-koni-ui/messaging';
+import { cancelSubscription, getAvailableBalanceByType, getFreeBalance, subscribeAvailableBalanceByType, subscribeFreeBalance, updateAssetSetting } from '@subwallet/extension-koni-ui/messaging';
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector } from '../common';
 
 const DEFAULT_BALANCE = { value: '0', symbol: '', decimals: 18 };
 
-const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = false, extrinsicType?: ExtrinsicType) => {
+const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = false, extrinsicType?: ExtrinsicType, balanceType?: BalanceType) => {
   const { t } = useTranslation();
+
   const { chainInfoMap, chainStateMap } = useSelector((state) => state.chainStore);
   const { assetRegistry, assetSettingMap } = useSelector((state) => state.assetRegistry);
 
@@ -105,11 +107,11 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
           const onTokenError = onCreateHandleError(setTokenBalance);
 
           if (isSubscribe) {
-            promiseList.push(subscribeFreeBalance({ address, networkKey: chain, extrinsicType }, onNativeBalanceSubscribe)
+            promiseList.push(subscribeAvailableBalanceByType({ address, networkKey: chain, balanceType, extrinsicType }, onNativeBalanceSubscribe)
               .then(onNativeBalanceSubscribe)
               .catch(onNativeError));
           } else {
-            promiseList.push(getFreeBalance({ address, networkKey: chain, extrinsicType })
+            promiseList.push(getAvailableBalanceByType({ address, networkKey: chain, balanceType, extrinsicType })
               .then(onNativeBalance)
               .catch(onNativeError));
           }
@@ -161,7 +163,7 @@ const useGetBalance = (chain = '', address = '', tokenSlug = '', isSubscribe = f
         cancelSubscription(id).catch(console.error);
       });
     };
-  }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType]);
+  }, [isRefresh, address, assetRegistry, chain, chainInfo?.name, isChainActive, isSubscribe, isTokenActive, nativeTokenActive, nativeTokenSlug, t, tokenSlug, extrinsicType, balanceType]);
 
   return { refreshBalance, tokenBalance, nativeTokenBalance, nativeTokenSlug, isLoading, error };
 };

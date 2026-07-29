@@ -4,7 +4,7 @@
 import { CommonAccountErrorType, MnemonicType, RequestAccountCreateSuriV2, RequestExportAccountProxyMnemonic, RequestMnemonicCreateV2, RequestMnemonicValidateV2, ResponseAccountCreateSuriV2, ResponseExportAccountProxyMnemonic, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, SWCommonAccountError } from '@subwallet/extension-base/types';
 import { createAccountProxyId, getSuri } from '@subwallet/extension-base/utils';
 import { tonMnemonicGenerate } from '@subwallet/keyring';
-import {BitcoinKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair} from '@subwallet/keyring/types';
+import { BitcoinKeypairTypes, EthereumKeypairTypes, KeypairType, KeyringPair } from '@subwallet/keyring/types';
 import { tonMnemonicValidate } from '@subwallet/keyring/utils';
 import { keyring } from '@subwallet/ui-keyring';
 import { t } from 'i18next';
@@ -27,7 +27,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
 
   /* Create seed */
   public async mnemonicCreateV2 ({ length = SEED_DEFAULT_LENGTH, mnemonic: _seed, type = 'general' }: RequestMnemonicCreateV2): Promise<ResponseMnemonicCreateV2> {
-    const types: KeypairType[] = type === 'general' ? ['sr25519', ...EthereumKeypairTypes, 'ton', 'cardano', ...BitcoinKeypairTypes] : ['ton-native'];
+    const types: KeypairType[] = type === 'general' ? ['sr25519', ...EthereumKeypairTypes, 'ton', ...BitcoinKeypairTypes] : ['ton-native'];
     const seed = _seed ||
     type === 'general'
       ? mnemonicGenerate(length)
@@ -42,7 +42,8 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
   }
 
   /* Validate seed */
-  public mnemonicValidateV2 ({ mnemonic }: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+  public mnemonicValidateV2 (request: RequestMnemonicValidateV2): ResponseMnemonicValidateV2 {
+    const { mnemonic, mnemonicType } = request;
     const { phrase } = keyExtractSuri(mnemonic);
     let mnemonicTypes: MnemonicType = 'general';
     let pairTypes: KeypairType[] = [];
@@ -56,8 +57,13 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       try {
         assert(mnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
 
-        mnemonicTypes = 'general';
-        pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...BitcoinKeypairTypes];
+        if (mnemonicType === 'trust-wallet') {
+          mnemonicTypes = 'trust-wallet';
+          pairTypes = ['ed25519-tw'];
+        } else {
+          mnemonicTypes = 'general';
+          pairTypes = ['sr25519', ...EthereumKeypairTypes, 'ton', ...BitcoinKeypairTypes];
+        }
       } catch (e) {
         assert(tonMnemonicValidate(phrase), t('bg.ACCOUNT.services.keyring.handler.Mnemonic.invalidSeedPhraseTryAgain'));
         mnemonicTypes = 'ton';
@@ -76,21 +82,20 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       rs.addressMap[type] = keyring.createFromUri(getSuri(mnemonic, type), {}, type).address;
     });
 
-    const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
+    const existingAccount = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!existingAccount, t('bg.ACCOUNT.services.keyring.handler.Mnemonic.accountAlreadyExistsWithName', { replace: { name: existingAccount?.name || existingAccount?.address || '' } }));
 
     return rs;
   }
 
   /* Add accounts from mnemonic */
   public accountsCreateSuriV2 (request: RequestAccountCreateSuriV2): ResponseAccountCreateSuriV2 {
-    const { isAllowed, name, password, suri: _suri, type } = request;
+    const { isAllowed, name, password, suri: _suri, types } = request;
+    const accountTypes = (types || []).filter((type) => type !== 'cardano');
     const addressDict = {} as Record<KeypairType, string>;
     let changedAccount = false;
     const hasMasterPassword = keyring.keyring.hasMasterPassword;
-    const types: KeypairType[] = type ? [type] : ['sr25519', ...EthereumKeypairTypes, 'ton', ...BitcoinKeypairTypes];
-
     if (!hasMasterPassword) {
       if (!password) {
         throw Error(t('bg.ACCOUNT.services.keyring.handler.Mnemonic.eachAccountPasswordNeeded'));
@@ -100,7 +105,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       }
     }
 
-    if (!types || !types.length) {
+    if (!accountTypes.length) {
       throw Error(t('bg.ACCOUNT.services.keyring.handler.Mnemonic.chooseAtLeastOneAccountType'));
     }
 
@@ -110,12 +115,12 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
       throw new SWCommonAccountError(CommonAccountErrorType.ACCOUNT_NAME_EXISTED);
     }
 
-    const multiChain = types.length > 1;
+    const multiChain = accountTypes.length > 1;
     const proxyId = multiChain ? createAccountProxyId(_suri) : '';
 
     const modifiedPairs = this.state.modifyPairs;
 
-    types.forEach((type) => {
+    accountTypes.forEach((type) => {
       const suri = getSuri(_suri, type);
       const pair = keyring.createFromUri(suri, {}, type);
       const address = pair.address;
@@ -136,7 +141,7 @@ export class AccountMnemonicHandler extends AccountBaseHandler {
     // Upsert modify pair before add account to keyring
     this.state.upsertModifyPairs(modifiedPairs);
 
-    types.forEach((type) => {
+    accountTypes.forEach((type) => {
       const suri = getSuri(_suri, type);
       const { derivePath } = keyExtractSuri(suri);
       const metadata = {

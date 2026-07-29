@@ -80,6 +80,10 @@ export function getPolygonBridgeClaimDescription (amount: string, symbol: string
 }
 /* Description */
 
+function getPolygonBridgeNetworkIds (isTestnet: boolean): number[] {
+  return isTestnet ? [0, 1, -1] : [0, -1];
+}
+
 export async function fetchPolygonBridgeTransactions (userAddress: string, isTestnet: boolean, pageSize = 500, page = 0) {
   const params = new URLSearchParams({
     userAddress,
@@ -87,7 +91,7 @@ export async function fetchPolygonBridgeTransactions (userAddress: string, isTes
     page: page.toString()
   });
 
-  const networkIds = [0, 1, -1];
+  const networkIds = getPolygonBridgeNetworkIds(isTestnet);
 
   networkIds.forEach((networkId) => {
     params.append('destinationNetworkIds', networkId.toString());

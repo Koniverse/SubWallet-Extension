@@ -3,8 +3,9 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { AssetSetting } from '@subwallet/extension-base/background/KoniTypes';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _isAssetFungibleToken, _isChainCompatibleLedgerEvm, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _isAssetFungibleToken, _isChainCompatibleLedgerEvm, _isNativeToken, _isSubstrateEvmCompatibleChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { isSubstrateEcdsaLedgerAssetSupported } from '@subwallet/extension-base/utils';
 
 export function isTokenAvailable (
@@ -58,4 +59,18 @@ export function getExcludedTokensForLedgerEvm (chainAssets: _ChainAsset[], chain
       return chainListAllowed.has(originChain);
     })
     .map((chainAsset) => chainAsset.slug);
+}
+
+// Get display string for asset
+export function getAssetDisplayName (assetInfo?: _ChainAsset, defaultDisplay?: string): string {
+  if (!assetInfo) {
+    return defaultDisplay || '';
+  }
+
+  // Is subnet token asset of bittensor chain
+  if (_BALANCE_CHAIN_GROUP.bittensor.includes(assetInfo.originChain) && !_isNativeToken(assetInfo) && assetInfo.metadata?.netuid != null) {
+    return `SN${assetInfo.metadata?.netuid} | ${assetInfo.name} ${assetInfo.symbol}`;
+  }
+
+  return defaultDisplay || '';
 }

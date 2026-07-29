@@ -80,8 +80,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
   }
 
   /* Import ethereum account with the private key  */
-  private _checkValidatePrivateKey ({ chainType,
-    privateKey }: RequestPrivateKeyValidateV2, autoAddPrefix = false): ResponsePrivateKeyValidateV2 {
+  private _checkValidatePrivateKey ({ chainType, privateKey }: RequestPrivateKeyValidateV2, autoAddPrefix = false): ResponsePrivateKeyValidateV2 {
     const { phrase } = keyExtractSuri(privateKey);
     const rs = { autoAddPrefix: autoAddPrefix, addressMap: {} } as ResponsePrivateKeyValidateV2;
     const types: KeypairType[] = [];
@@ -204,8 +203,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
     }
   }
 
-  public checkPublicAndSecretKey ({ publicKey,
-    secretKey }: RequestCheckPublicAndSecretKey): ResponseCheckPublicAndSecretKey {
+  public checkPublicAndSecretKey ({ publicKey, secretKey }: RequestCheckPublicAndSecretKey): ResponseCheckPublicAndSecretKey {
     let response: ResponseCheckPublicAndSecretKey = {
       address: '',
       isValid: true,

@@ -13,6 +13,7 @@ import { ACCOUNT_CHAIN_ADDRESSES_MODAL, SELECT_ACCOUNT_MODAL } from '@subwallet/
 import { useDefaultNavigate, useExtensionDisplayModes, useSetSessionLatest } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import { saveCurrentAccountAddress } from '@subwallet/extension-koni-ui/messaging';
+import { AssetsTab } from '@subwallet/extension-koni-ui/Popup/Home/Tokens';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { Theme } from '@subwallet/extension-koni-ui/themes';
 import { AccountDetailParam, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -114,6 +115,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     const result: ListItem[] = [];
     const masterAccounts: AccountProxy[] = [];
     const qrSignerAccounts: ListItem[] = [];
+    const multisigAccounts: ListItem[] = [];
     const watchOnlyAccounts: ListItem[] = [];
     const ledgerAccounts: ListItem[] = [];
     const injectedAccounts: ListItem[] = [];
@@ -136,6 +138,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         masterAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.QR) {
         qrSignerAccounts.push(ap);
+      } else if (ap.accountType === AccountProxyType.MULTISIG) {
+        multisigAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.READ_ONLY) {
         watchOnlyAccounts.push(ap);
       } else if (ap.accountType === AccountProxyType.LEDGER) {
@@ -158,6 +162,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       });
 
       result.push(...qrSignerAccounts);
+    }
+
+    if (multisigAccounts.length) {
+      multisigAccounts.unshift({
+        id: 'multisig',
+        groupLabel: t('ui.ACCOUNT.components.Layout.SelectAccount.Modal.multisigAccount')
+      });
+
+      result.push(...multisigAccounts);
     }
 
     if (watchOnlyAccounts.length) {
@@ -226,7 +239,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
             if (locationPaths[1] === 'home') {
               if (locationPaths.length >= 3) {
                 if (pathName.startsWith('/home/nfts')) {
-                  navigate('/home/nfts/collections');
+                  navigate('/home/tokens', {
+                    state: { switchToTab: AssetsTab.NFTS }
+                  });
                 } else if (pathName.startsWith('/home/tokens/detail')) {
                   navigate('/home/tokens');
                 } else {

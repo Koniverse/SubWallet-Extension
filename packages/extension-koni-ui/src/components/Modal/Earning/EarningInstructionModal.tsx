@@ -11,7 +11,7 @@ import { YieldPoolType } from '@subwallet/extension-base/types';
 import { balanceFormatter, detectTranslate, formatNumber } from '@subwallet/extension-base/utils';
 import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
-import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL, TANSSI_EARNING_DATA_RAW } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -318,6 +318,25 @@ const Component: React.FC<Props> = (props: Props) => {
 
                 return _item;
               });
+          }
+
+          if (_STAKING_CHAIN_GROUP.tanssi.includes(poolInfo.chain)) {
+            return TANSSI_EARNING_DATA_RAW.map((item) => {
+              const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
+
+              replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
+              replaceEarningValue(_item, '{validatorType}', label);
+              replaceEarningValue(_item, '{periodNumb}', unBondedTime);
+              replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
+              replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
+
+              if (paidOut !== undefined) {
+                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
+                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
+              }
+
+              return _item;
+            });
           }
 
           return EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) => {

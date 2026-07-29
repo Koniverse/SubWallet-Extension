@@ -47,7 +47,6 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
   const goHome = useDefaultNavigate().goHome;
 
   const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(chainSlug), [chainSlug]);
-
   const showNavigationButtons = useMemo(() => {
     return accountTokenAddresses.length > 1;
   }, [accountTokenAddresses]);

@@ -68,21 +68,13 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         }
 
-        <MetaInfo.Number
+        {!transaction.wrappingStatus && <MetaInfo.Number
           decimals={decimals}
-          label={t('ui.TRANSACTION.Confirmations.ClaimReward.estimatedFee')}
+          label={t('ui.TRANSACTION.Confirmations.ClaimReward.networkFee')}
           suffix={symbol}
           value={transaction.estimateFee?.value || 0}
-        />
+        />}
       </MetaInfo>
-
-      <span className={CN('text-light-4')}>
-        {
-          data.bondReward
-            ? t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsStakedBack')
-            : t('ui.TRANSACTION.Confirmations.ClaimReward.rewardsAddedToTransferable')
-        }
-      </span>
     </>
   );
 };
@@ -104,11 +96,7 @@ const Wrapper = (props: Props) => {
 
 const ClaimRewardTransactionConfirmation = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
   return {
-    textAlign: 'left',
-
-    '.meta-info': {
-      marginBottom: token.marginSM
-    }
+    textAlign: 'left'
   };
 });
 

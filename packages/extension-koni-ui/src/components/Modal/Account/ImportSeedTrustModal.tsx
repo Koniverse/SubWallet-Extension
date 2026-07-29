@@ -1,0 +1,34 @@
+// Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import { IMPORT_ACCOUNT_MODAL, IMPORT_SEED_TRUST_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-koni-ui/constants';
+import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { FileArrowDown } from 'phosphor-react';
+import React from 'react';
+import styled from 'styled-components';
+
+import AccountTypeModal from './AccountTypeModal';
+
+type Props = ThemeProps;
+
+const Component: React.FC<Props> = ({ className }: Props) => {
+  const { t } = useTranslation();
+
+  return (
+    <AccountTypeModal
+      className={className}
+      icon={FileArrowDown}
+      id={IMPORT_SEED_TRUST_MODAL}
+      label={t('ui.ACCOUNT.components.Modal.Account.ImportSeed.importAccount')}
+      previousId={IMPORT_ACCOUNT_MODAL}
+      url={`/accounts/import-seed-phrase?type=${TRUST_WALLET_MNEMONIC_TYPE}`}
+    />
+  );
+};
+
+const ImportSeedTrustModal = styled(Component)<Props>(({ theme: { token } }: Props) => {
+  return {};
+});
+
+export default ImportSeedTrustModal;

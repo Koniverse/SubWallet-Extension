@@ -93,7 +93,7 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
 
       '&.modal-full, &.ant-sw-qr-scanner': {
         '.ant-sw-modal-content': {
-          top: 1,
+          // top: 1,
           height: 600 - token.lineWidth * 2
         }
       }

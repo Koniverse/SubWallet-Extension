@@ -60,12 +60,6 @@ export class AccountJsonHandler extends AccountBaseHandler {
     if (isPasswordValidated) {
       try {
         const { address, meta, type } = keyring.createFromJson(json);
-
-        // Skip cardano accounts on mobile
-        if (type === 'cardano') {
-          throw new Error('Cardano accounts are not supported');
-        }
-
         const { name } = meta;
         const account = transformAccount(address, type, meta);
         const accountExists = this.state.checkAddressExists([address]);

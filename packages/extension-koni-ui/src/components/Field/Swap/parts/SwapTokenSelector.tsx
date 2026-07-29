@@ -83,6 +83,7 @@ const Component = (props: Props) => {
         key={item.slug}
         onClick={onClickItem(item)}
         showBalance={true}
+        tokenDisplayName={item.displayName}
         tokenSlug={item.slug}
         tokenSymbol={item.symbol}
       />
@@ -145,8 +146,10 @@ const Component = (props: Props) => {
     const searchTextLowerCase = searchText.toLowerCase();
     const chainName = chainInfoMap[item.originChain]?.name?.toLowerCase();
     const symbol = item.symbol.toLowerCase();
+    const displayName = item.displayName.toLowerCase();
 
     return (
+      displayName.includes(searchTextLowerCase) ||
       symbol.includes(searchTextLowerCase) ||
       chainName.includes(searchTextLowerCase)
     );
@@ -223,7 +226,7 @@ const Component = (props: Props) => {
                     token={selectedItem.slug.toLowerCase()}
                   />
                   <div className={'__item-token-info'}>
-                    <span className={'__item-token-symbol'}>{selectedItem.symbol}</span>
+                    <span className={'__item-token-symbol'}>{selectedItem.displayName || selectedItem.symbol}</span>
                     <span className={'__item-token-name'}>{chainInfoMap[selectedItem.originChain]?.name}</span>
                   </div>
                 </div>

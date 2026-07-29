@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { InfoItemBase } from './types';
 
 export interface StatusInfoItem extends InfoItemBase {
-  statusIcon: SwIconProps['phosphorIcon'],
+  statusIcon?: SwIconProps['phosphorIcon'],
   statusName: string,
 }
 
@@ -30,12 +30,12 @@ const Component: React.FC<StatusInfoItem> = (props: StatusInfoItem) => {
 
       <div className={'__col __value-col -to-right'}>
         <div className={`__status-item __value -is-wrapper -schema-${valueColorSchema}`}>
-          <Icon
+          {!!statusIcon && <Icon
             className={'__status-icon'}
             phosphorIcon={statusIcon}
             size={'sm'}
             weight={'fill'}
-          />
+          />}
           <div className={'__status-name ml-xxs'}>
             {statusName}
           </div>
