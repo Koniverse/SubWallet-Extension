@@ -20,7 +20,8 @@ export const _STAKING_CHAIN_GROUP = {
   bittensor: ['bittensor', 'bittensor_testnet'],
   energy: ['energy_web_x_testnet', 'energy_web_x'],
   mythos: ['mythos', 'muse_testnet'],
-  tanssi: ['tanssi', 'dancelight']
+  // Temporarily disable Tanssi staking for mobile because the network is shutting down.
+  tanssi: []
 };
 
 export const SUNSETTED_YIELD_POOL_SLUGS: string[] = [
