@@ -1591,6 +1591,8 @@
   "ui.WALLET_CONNECT.components.WalletConnect.NetworkSupported.supportedNetworks": "サポートネットワーク",
   "ui.NETWORK.hook.screen.useHandleChainConnection.errorExclamation": "Error!",
   "ui.DAPP.Confirmations.Sign.Substrate.errorExclamation": "Error!",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "",
   "ui.NETWORK.hook.screen.useHandleChainConnection.failedToGetData": "Failed to get data. Please try again later.",
   "ui.TRANSACTION.hook.transaction.useGetSwapStepContent.signMessageToAuthorizeProvider": "Sign message to authorize provider",
   "ui.TRANSACTION.hook.transaction.useGetTxStepText.signMessageToAuthorizeProvider": "Sign message to authorize provider",
