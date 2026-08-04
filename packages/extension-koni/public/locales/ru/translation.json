@@ -2790,6 +2790,7 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "",
   "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "",
   "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "",
   "ui.NFT.screen.nested.NftBundleItemDetail.description": "",
