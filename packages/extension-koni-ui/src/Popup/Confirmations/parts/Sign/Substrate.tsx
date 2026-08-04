@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
-import { RequestSign } from '@subwallet/extension-base/background/types';
+import { RequestSign, SubstratePayloadErrorType } from '@subwallet/extension-base/background/types';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
@@ -183,7 +183,9 @@ const Component: React.FC<Props> = (props: Props) => {
       return {
         type: 'error',
         title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
-        description: t('ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
+        description: t(payloadError.type === SubstratePayloadErrorType.RawDataInExtrinsic
+          ? 'ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest'
+          : 'ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
       };
     }
 

@@ -3,7 +3,7 @@
 
 import type { Chain } from '@subwallet/extension-chains/types';
 
-import { RequestSign } from '@subwallet/extension-base/background/types';
+import { RequestSign, SubstratePayloadErrorType } from '@subwallet/extension-base/background/types';
 import { _isRuntimeUpdated } from '@subwallet/extension-base/utils';
 import { getMetadataHash } from '@subwallet/extension-koni-ui/messaging';
 import { isRawPayload } from '@subwallet/extension-koni-ui/utils';
@@ -18,9 +18,14 @@ import { useGetChainInfoByGenesisHash } from '../../chain';
 
 const registry = new TypeRegistry();
 
+interface PayloadError {
+  message?: string;
+  type: SubstratePayloadErrorType;
+}
+
 interface Result {
   payload: ExtrinsicPayload | string;
-  payloadError: string | null;
+  payloadError: PayloadError | null;
   hashLoading: boolean;
   isMissingData: boolean;
   addExtraData: boolean;
@@ -68,6 +73,11 @@ const useParseSubstrateRequestPayload = (chain: Chain | null, request?: RequestS
         payload: '',
         payloadError: null
       };
+    } else if (request.isRawDataInExtrinsic) {
+      return {
+        payload: '',
+        payloadError: { type: SubstratePayloadErrorType.RawDataInExtrinsic }
+      };
     } else {
       const payload = request.payload;
 
@@ -100,7 +110,10 @@ const useParseSubstrateRequestPayload = (chain: Chain | null, request?: RequestS
 
           return {
             payload: '',
-            payloadError: (error as Error).message
+            payloadError: {
+              message: error instanceof Error ? error.message : String(error),
+              type: SubstratePayloadErrorType.Decode
+            }
           };
         }
       }
