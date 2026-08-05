@@ -44,7 +44,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.9](../stories/US-42.9-qc-release-webapp-v1-3-56-0.md) | Release Web App v1.3.56-0 (1356-0014) — recommend validator (#5024), dev/production gate | done |
 | [US-42.10](../stories/US-42.10-qc-release-mobile-v1-2-44-532-b-v16.md) | Release Mobile v1.2.44(532)b-v16 — recommend validator (#5024), iOS/Android beta+production gate | done |
 | [US-42.11](../stories/US-42.11-qc-extension-pr5043-and-issue5045.md) | Extension: PR #5043 signing prompt security fix + #5045 Bittensor deprecated function removal | in-progress |
-| [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | ready |
+| [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | done |
 
 More rows get added here as testing starts.
 
