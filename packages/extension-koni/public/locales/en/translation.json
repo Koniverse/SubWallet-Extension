@@ -2789,6 +2789,7 @@
   "ui.SETTINGS.screen.Setting.Chains.Manage.turnOffAllNetworksUnable": "Unable to turn off all networks. Please try again later",
   "ui.DAPP.Confirmations.Message.NotSupport.featureNotAvailableForAccountType": "Feature not available for <highlight>{{accountTitle}}</highlight>. Change to another account type and try again.",
   "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "Unable to decode this signing payload. Reject this request and try again after the dApp or network type definitions are updated.",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "This dApp sent a raw message through a transaction-signing request. No signature can be created. Reject this request and contact the dApp.",
   "ui.NFT.screen.nested.NftBundleItemDetail.level": "Level {{nestingLevel}}",
   "ui.NFT.screen.nested.NftBundleItemDetail.goToParent": "Go to Parent",
   "ui.NFT.screen.nested.NftBundleItemDetail.description": "Description",
