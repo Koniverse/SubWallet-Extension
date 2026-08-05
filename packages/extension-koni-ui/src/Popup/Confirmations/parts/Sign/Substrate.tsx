@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ExtrinsicType, NotificationType, POLKADOT_LEDGER_SCHEME } from '@subwallet/extension-base/background/KoniTypes';
-import { RequestSign } from '@subwallet/extension-base/background/types';
+import { RequestSign, SubstratePayloadErrorType } from '@subwallet/extension-base/background/types';
 import { AccountSignMode } from '@subwallet/extension-base/types';
 import { _isRuntimeUpdated, detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertBox, AlertModal } from '@subwallet/extension-koni-ui/components';
@@ -110,9 +110,9 @@ const Component: React.FC<Props> = (props: Props) => {
   const { chain, loadingChain } = useMetadata(genesisHash, requireSpecVersion);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
   const accountChainInfo = useGetChainInfoByGenesisHash(account?.genesisHash || '');
-  const { addExtraData, hashLoading, isMissingData, payload } = useParseSubstrateRequestPayload(chain, request, isLedger);
+  const { addExtraData, hashLoading, isMissingData, payload, payloadError } = useParseSubstrateRequestPayload(chain, request, isLedger);
 
-  const isMessage = isSubstrateMessage(payload);
+  const isMessage = !payloadError && isSubstrateMessage(payload);
 
   const approveIcon = useMemo((): PhosphorIcon => {
     switch (signMode) {
@@ -177,6 +177,16 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const alertData = useMemo((): AlertData | undefined => {
     const requireMetadata = isRequireMetadata(signMode, isRuntimeUpdated);
+
+    if (payloadError) {
+      return {
+        type: 'error',
+        title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
+        description: t(payloadError.type === SubstratePayloadErrorType.RawDataInExtrinsic
+          ? 'ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest'
+          : 'ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
+      };
+    }
 
     if (!isMessage && !loadingChain) {
       if (!chain || !chain.hasMetadata || isMetadataOutdated) {
@@ -268,7 +278,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return undefined;
-  }, [addExtraData, chain, isMessage, isMetadataOutdated, isMissingData, isRuntimeUpdated, loadingChain, networkName, signMode, t]);
+  }, [addExtraData, chain, isMessage, isMetadataOutdated, isMissingData, isRuntimeUpdated, loadingChain, networkName, payloadError, signMode, t]);
 
   const activeLedger = useMemo(() => isLedger && !loadingChain && alertData?.type !== 'error', [isLedger, loadingChain, alertData?.type]);
   const forceUseMigrationApp = useMemo(() => isRuntimeUpdated || (isMessage && chainSlug !== 'avail_mainnet'), [isRuntimeUpdated, isMessage, chainSlug]);
@@ -542,7 +552,7 @@ const Component: React.FC<Props> = (props: Props) => {
           {t('Cancel')}
         </Button>
         <Button
-          disabled={showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
+          disabled={!!payloadError || showQuoteExpired || loadingChain || hashLoading || (isMessage ? !modeCanSignMessage.includes(signMode) : alertData?.type === 'error')}
           icon={(
             <Icon
               phosphorIcon={approveIcon}
@@ -561,7 +571,7 @@ const Component: React.FC<Props> = (props: Props) => {
           }
         </Button>
         {
-          signMode === AccountSignMode.QR && (
+          signMode === AccountSignMode.QR && !payloadError && (
             <DisplayPayloadModal>
               <SubstrateQr
                 address={account?.address || address}
@@ -571,7 +581,7 @@ const Component: React.FC<Props> = (props: Props) => {
             </DisplayPayloadModal>
           )
         }
-        {signMode === AccountSignMode.QR && <ScanSignature onSignature={onApproveSignature} />}
+        {signMode === AccountSignMode.QR && !payloadError && <ScanSignature onSignature={onApproveSignature} />}
       </div>
     </>
   );

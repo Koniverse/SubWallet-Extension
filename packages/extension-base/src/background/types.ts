@@ -364,8 +364,14 @@ export type MessageTypesWithNoSubscriptions = Exclude<MessageTypes, keyof Subscr
 
 export interface RequestSign {
   readonly payload: SignerPayloadJSON | SignerPayloadRaw;
+  readonly isRawDataInExtrinsic?: boolean;
 
   sign (registry: TypeRegistry, pair: KeyringPair): { signature: HexString };
+}
+
+export enum SubstratePayloadErrorType {
+  Decode = 'decode',
+  RawDataInExtrinsic = 'rawDataInExtrinsic'
 }
 
 export interface RequestJsonRestore {
