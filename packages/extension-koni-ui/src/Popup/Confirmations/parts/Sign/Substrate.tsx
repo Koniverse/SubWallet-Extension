@@ -183,9 +183,9 @@ const Component: React.FC<Props> = (props: Props) => {
       return {
         type: 'error',
         title: t('ui.DAPP.Confirmations.Sign.Substrate.errorExclamation'),
-        description: t(payloadError.type === SubstratePayloadErrorType.RawDataInExtrinsic
-          ? 'ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest'
-          : 'ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
+        description: payloadError.type === SubstratePayloadErrorType.RawDataInExtrinsic
+          ? t('ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest')
+          : t('ui.DAPP.Confirmations.Sign.Substrate.unableToDecode')
       };
     }
 
