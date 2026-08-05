@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.85
+Build date: Aug 05, 2026.
+
+Bug fixes:
+- Update SubWallet — Signing Prompts Could Conceal the Actual Transaction (#5042)
+
+
 ## 1.3.84
 Build date: Jul 22, 2026.
 
