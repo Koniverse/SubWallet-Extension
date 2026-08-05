@@ -42,20 +42,20 @@ function Component ({ className, request }: Props) {
 
   const { chain } = useMetadata(genesisHash);
   const chainInfo = useGetChainInfoByGenesisHash(genesisHash);
-  const { payload } = useParseSubstrateRequestPayload(chain, request.request);
+  const { payload, payloadError } = useParseSubstrateRequestPayload(chain, request.request);
   const onClickDetail = useOpenDetailModal();
 
-  const isMessage = useMemo(() => isSubstrateMessage(payload), [payload]);
+  const isMessage = useMemo(() => !payloadError && isSubstrateMessage(payload), [payload, payloadError]);
 
   useEffect(() => {
-    if (!isMessage && chainInfo) {
+    if (!payloadError && !isMessage && chainInfo) {
       const chainState = chainStateMap[chainInfo.slug];
 
       !chainState.active && enableChain(chainInfo.slug, false)
         .then(noop)
         .catch(console.error);
     }
-  }, [chainStateMap, chainInfo, isMessage]);
+  }, [chainStateMap, chainInfo, isMessage, payloadError]);
 
   return (
     <>
@@ -73,39 +73,43 @@ function Component ({ className, request }: Props) {
           className='account-item'
           isSelected={true}
         />
-        <div>
-          <Button
-            icon={<ViewDetailIcon />}
-            onClick={onClickDetail}
-            size='xs'
-            type='ghost'
-          >
-            {t('ui.DAPP.Confirmations.Message.Sign.viewDetails')}
-          </Button>
-        </div>
+        {!payloadError && (
+          <div>
+            <Button
+              icon={<ViewDetailIcon />}
+              onClick={onClickDetail}
+              size='xs'
+              type='ghost'
+            >
+              {t('ui.DAPP.Confirmations.Message.Sign.viewDetails')}
+            </Button>
+          </div>
+        )}
       </div>
       <SubstrateSignArea
         id={request.id}
         isInternal={request.isInternal}
         request={request.request}
       />
-      <BaseDetailModal
-        title={isMessage ? t('ui.DAPP.Confirmations.Message.Sign.messageDetails') : t('ui.DAPP.Confirmations.Message.Sign.transactionDetails')}
-      >
-        {isMessage
-          ? (
-            <SubstrateMessageDetail bytes={payload as string} />
-          )
-          : (
-            <SubstrateExtrinsic
-              accountName={account?.name}
-              address={address}
-              payload={payload as ExtrinsicPayload}
-              request={request.request.payload as SignerPayloadJSON}
-            />
-          )
-        }
-      </BaseDetailModal>
+      {!payloadError && (
+        <BaseDetailModal
+          title={isMessage ? t('ui.DAPP.Confirmations.Message.Sign.messageDetails') : t('ui.DAPP.Confirmations.Message.Sign.transactionDetails')}
+        >
+          {isMessage
+            ? (
+              <SubstrateMessageDetail bytes={payload as string} />
+            )
+            : (
+              <SubstrateExtrinsic
+                accountName={account?.name}
+                address={address}
+                payload={payload as ExtrinsicPayload}
+                request={request.request.payload as SignerPayloadJSON}
+              />
+            )
+          }
+        </BaseDetailModal>
+      )}
     </>
   );
 }
