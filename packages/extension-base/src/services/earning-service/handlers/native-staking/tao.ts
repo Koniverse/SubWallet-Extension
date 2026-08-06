@@ -10,7 +10,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, BittensorRootClaimType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
@@ -440,13 +440,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const getPoolPosition = async () => {
       const rawDelegateStateInfo = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
       const delegateStateInfo: Array<[string, TaoStakeInfo[]]> = rawDelegateStateInfo.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-      const rootClaimType = await substrateApi.api.query.subtensorModule.rootClaimType.multi(useAddresses);
 
       if (!delegateStateInfo || delegateStateInfo.length === 0) {
         return;
       }
 
-      delegateStateInfo.forEach(([coldkey, stakeInfos], i) => {
+      delegateStateInfo.forEach(([coldkey, stakeInfos]) => {
         const owner = reformatAddress(coldkey, 42);
         const delegatorState: TaoStakingStakeOption[] = [];
         let bnTotalBalance = BN_ZERO;
@@ -486,10 +485,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           });
         }
 
-        const rawType = rootClaimType[i]?.toString();
-
-        const rootClaimForAddress: BittensorRootClaimType = rawType === 'Swap' || rawType === 'Keep' ? rawType : 'Others';
-
         if (delegateStateInfo && delegateStateInfo.length > 0) {
           this.parseNominatorMetadata(chainInfo, delegatorState)
             .then((nominatorMetadata) => {
@@ -497,9 +492,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                 ...defaultInfo,
                 ...nominatorMetadata,
                 address: owner,
-                metadata: {
-                  bittensorRootClaimType: rootClaimForAddress
-                },
                 type: this.type
               });
             })
@@ -785,18 +777,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     return chainApi.api.tx.subtensorModule.moveStake(originValidator, destValidator, netuid, netuid, amount);
   }
-
-  /* Others function  */
-  public async handleChangeRootClaimType (type: BittensorRootClaimType): Promise<TransactionData> {
-    if (type !== 'Keep' && type !== 'Swap') {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS));
-    }
-
-    const chainApi = await this.substrateApi.isReady;
-
-    return chainApi.api.tx.subtensorModule.setRootClaimType(type);
-  }
-  /* Others function  */
 
   /* Unimplemented function  */
   public override handleYieldWithdraw (address: string, unstakingInfo: UnstakingInfo): Promise<TransactionData> {
