@@ -149,7 +149,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const convertError = useCallback((error: string) => {
     if (error === 'Unable to decode using the supplied passphrase') {
-      return t('Wrong password');
+      return t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.wrongPassword');
     } else {
       return t(error);
     }
@@ -188,9 +188,9 @@ const Component: React.FC<Props> = (props: Props) => {
 
     switch (step) {
       case 'Introduction':
-        return t<string>('Apply master password');
+        return t<string>('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.applyMasterPassword');
       case 'Done':
-        return t<string>('Successful');
+        return t<string>('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.successful');
       case 'Migrate':
         return `${String(migrated + 1).padStart(2, '0')}/${String(canMigrate.length).padStart(2, '0')}`;
       default:
@@ -202,7 +202,7 @@ const Component: React.FC<Props> = (props: Props) => {
     switch (step) {
       case 'Introduction':
         return {
-          children: t('Apply master password now'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.applyMasterPasswordNow'),
           onClick: () => {
             checkUnlock().then(() => {
               setStep(needMigrate.length ? 'Migrate' : 'Done');
@@ -214,7 +214,7 @@ const Component: React.FC<Props> = (props: Props) => {
         };
       case 'Done':
         return {
-          children: t('Finish'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.finish'),
           onClick: () => {
             goHome();
           },
@@ -222,7 +222,7 @@ const Component: React.FC<Props> = (props: Props) => {
         };
       case 'Migrate':
         return {
-          children: t('Next'),
+          children: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.next'),
           onClick: () => {
             form.submit();
           },
@@ -347,29 +347,29 @@ const Component: React.FC<Props> = (props: Props) => {
               <Form.Item>
                 <Field
                   content={currentAccount.name || ''}
-                  label={t('Account name')}
-                  placeholder={t('Account name')}
+                  label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountName')}
+                  placeholder={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountName')}
                 />
               </Form.Item>
               <Form.Item>
                 <Field
                   content={toShort(currentAccount.address || '', 15, 17)}
-                  label={t('Account address')}
-                  placeholder={t('Account address')}
+                  label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountAddress')}
+                  placeholder={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.accountAddress')}
                 />
               </Form.Item>
               <Form.Item
                 name={FormFieldName.PASSWORD}
                 rules={[
                   {
-                    message: t('Current password is required'),
+                    message: t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.currentPasswordIsRequired'),
                     required: true
                   }
                 ]}
                 statusHelpAsTooltip={true}
               >
                 <Input.Password
-                  label={t('Current password')}
+                  label={t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.currentPassword')}
                   type='password'
                 />
               </Form.Item>
@@ -385,7 +385,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       size='xs'
                       type='ghost'
                     >
-                      {t('Remove this account')}
+                      {t('ui.ACCOUNT.screen.Keyring.ApplyMasterPassword.removeThisAccount')}
                     </Button>
                   </Form.Item>
                 )

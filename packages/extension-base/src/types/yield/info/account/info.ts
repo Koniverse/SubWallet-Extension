@@ -57,11 +57,21 @@ export interface AbstractYieldPositionInfo extends BaseYieldPositionInfo {
   unstakings: UnstakingInfo[];
 
   /* Special info */
+  // TODO: merge with metadata
   subnetData?: {
     subnetSymbol: string;
     subnetShortName: string;
     originalTotalStake: string;
   };
+
+  metadata?: TanssiStakingMetadata;
+}
+
+export interface TanssiStakingMetadata {
+  isShowActiveStakeDetails?: boolean;
+  pendingStake?: string;
+  compoundingStake?: string;
+  manualStake?: string;
 }
 
 /**

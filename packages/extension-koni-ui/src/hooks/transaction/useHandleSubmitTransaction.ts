@@ -19,10 +19,10 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
   const { closeAlert, onDone, openAlert, openRecheckChainConnectionModal } = useTransactionContext<ClaimRewardParams>();
 
   const onSuccess = useCallback((rs: SWTransactionResponse) => {
-    const { errors, estimateFee, id, warnings } = rs;
+    const { address, errors, estimateFee, id, warnings } = rs;
 
     if (errors.length || warnings.length) {
-      if (![t('Rejected by user'), 'Rejected by user'].includes(errors[0]?.message)) {
+      if (![t('ui.TRANSACTION.hook.transaction.useHandleSubmit.rejectedByUser'), 'Rejected by user'].includes(errors[0]?.message)) {
         if (errors[0]?.message?.startsWith('Unable to fetch staking data.')) {
           openRecheckChainConnectionModal(errors[0].message.split('"')[1]);
         } else if (
@@ -33,7 +33,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           )
         ) {
           notify({
-            message: t('Your selected network has lost connection. Update it by re-enabling it or changing network provider'),
+            message: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.selectedNetworkLostConnection'),
             type: 'error',
             duration: 8
           });
@@ -45,12 +45,11 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
           const _data = handleDataForInsufficientAlert(estimateFee);
 
           openAlert({
-            title: t('Insufficient balance'),
+            title: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.insufficientBalance'),
             type: NotificationType.ERROR,
-            content: t('You don\'t have enough {{symbol}} ({{chainName}}) to pay gas fee. Top up your transferable balance and try again',
-              { replace: { ..._data } }),
+            content: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.notEnoughGasFee', { replace: { ..._data } }),
             okButton: {
-              text: t('I understand'),
+              text: t('ui.TRANSACTION.hook.transaction.useHandleSubmit.iUnderstand'),
               onClick: () => {
                 closeAlert();
               }
@@ -69,7 +68,7 @@ const useHandleSubmitTransaction = (setIgnoreWarnings?: (value: boolean) => void
         warnings[0] && setIgnoreWarnings?.(true);
       }
     } else if (id) {
-      onDone(id);
+      onDone(id, address);
     }
   }, [t, handleDataForInsufficientAlert, openRecheckChainConnectionModal, notify, openAlert, closeAlert, setIgnoreWarnings, onDone]);
 

@@ -23,3 +23,4 @@ export * from './TokenTypeSelector';
 export * from './Earning';
 export * from './TransactionFee';
 export * from './LedgerAccountTypeSelector';
+export * from './Governance';

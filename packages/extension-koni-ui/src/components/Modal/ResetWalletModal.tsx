@@ -76,7 +76,7 @@ const Component: React.FC<Props> = (props: Props) => {
       className={CN(className)}
       id={modalId}
       onCancel={onClose}
-      title={t('Forgot password ?')}
+      title={t('ui.SETTING.components.Modal.ResetWallet.forgotPassword')}
     >
       <div className='container'>
         <div className='page-icon-container'>
@@ -86,7 +86,7 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='description'>
-          {t('We do not keep a copy of your password. If you’re having trouble unlocking your account, you will need to reset your wallet using the Secret Recovery Phrase')}
+          {t('ui.SETTING.components.Modal.ResetWallet.passwordNotStoredResetInfo')}
         </div>
         <div className='footer-area'>
           <Button
@@ -103,7 +103,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onReset(false)}
             schema='secondary'
           >
-            {t('Reset account')}
+            {t('ui.SETTING.components.Modal.ResetWallet.resetAccount')}
           </Button>
           <Button
             block={true}
@@ -119,7 +119,7 @@ const Component: React.FC<Props> = (props: Props) => {
             onClick={onReset(true)}
             schema='danger'
           >
-            {t('Erase all')}
+            {t('ui.SETTING.components.Modal.ResetWallet.eraseAll')}
           </Button>
         </div>
       </div>

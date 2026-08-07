@@ -44,14 +44,16 @@ const IconMap: Record<FeeOption, IconOption> = {
   }
 };
 
+const feeNumberMetadata = { maxNumberFormat: 8 };
+
 const Component: React.FC<Props> = (props: Props) => {
   const { className, feeValueInfo, isSelected, onClick, time, type } = props;
   const { t } = useTranslation();
 
   const feeTypeNameMap = useMemo<Record<FeeOption, string>>(() => ({
-    slow: t('Low'),
-    average: t('Medium'),
-    fast: t('High')
+    slow: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.low'),
+    average: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.medium'),
+    fast: t('ui.TRANSACTION.components.Field.FeeEditor.FeeOptionItem.high')
   }), [t]);
 
   // todo: i18n this, may convert to util
@@ -104,6 +106,7 @@ const Component: React.FC<Props> = (props: Props) => {
           <Number
             className={'__fee-value'}
             decimal={feeValueInfo.decimals}
+            metadata={feeNumberMetadata}
             suffix={feeValueInfo.symbol}
             value={feeValueInfo.value}
           />

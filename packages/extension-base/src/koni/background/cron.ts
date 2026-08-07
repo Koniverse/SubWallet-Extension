@@ -167,7 +167,6 @@ export class KoniCron {
     if (Object.keys(this.state.getSubstrateApiMap()).length !== 0 || Object.keys(this.state.getEvmApiMap()).length !== 0) {
       this.resetNft(currentAccountInfo.proxyId);
       this.addCron('refreshNft', this.refreshNft(currentAccountInfo.proxyId, this.state.getApiMap(), this.state.getSmartContractNfts(), this.state.getActiveChainInfoMap()), CRON_REFRESH_NFT_INTERVAL);
-      // this.addCron('refreshStakingReward', this.refreshStakingReward(currentAccountInfo.address), CRON_REFRESH_STAKING_REWARD_INTERVAL);
       this.addCron('syncMantaPay', this.syncMantaPay, CRON_SYNC_MANTA_PAY);
     }
 

@@ -84,16 +84,16 @@ const Component: React.FC<Props> = (props: Props) => {
       {(assetTo.originChain === assetFrom.originChain) && (
         <MetaInfo.Chain
           chain={data.chain}
-          label={t('Network')}
+          label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.network')}
         />
       )}
       <MetaInfo.DisplayType
-        label={t('Transaction type')}
+        label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionType')}
         typeName={t(TxTypeNameMap[data.type])}
       />
       <MetaInfo.Status
         className={CN('__transaction-status')}
-        label={t('Transaction status')}
+        label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.transactionStatus')}
         statusIcon={HistoryStatusMap[data.status].icon}
         statusName={t(HistoryStatusMap[data.status].name)}
         valueColorSchema={HistoryStatusMap[data.status].schema}
@@ -102,15 +102,15 @@ const Component: React.FC<Props> = (props: Props) => {
         <MetaInfo.Number
           className={'__estimate-transaction-fee'}
           decimals={0}
-          label={'Estimated fee'}
+          label={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.estimatedFee')}
           prefix={(currencyData.isPrefix && currencyData.symbol) || ''}
           suffix={(!currencyData.isPrefix && currencyData.symbol) || ''}
           value={estimatedFeeValue}
         />
         <AlertBox
           className={'__swap-quote-warning'}
-          description={t('You can view your swap process and details by clicking View on explorer')}
-          title={t('Helpful tip')}
+          description={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.viewSwapOnExplorer')}
+          title={t('ui.HISTORY.screen.HistoryDetail.SwapLayout.helpfulTip')}
           type='info'
         />
       </>

@@ -5,6 +5,9 @@ import BaseMigrationJob from '../Base';
 import ClearMetadataDatabase from './databases/ClearMetadataDatabase';
 import ClearMetadataForMythos from './databases/ClearMetadataForMythos';
 import MigrateAssetSetting from './databases/MigrateAssetSetting';
+import MigrateAssetSetting20251027 from './databases/MigrateAssetSetting20251027';
+import MigrateAssetSetting20251107 from './databases/MigrateAssetSetting20251107';
+import MigrateAssetSetting20251223 from './databases/MigrateAssetSetting20251223';
 import MigrateEarningVersion from './databases/MigrateEarningVersion';
 import ReloadMetadata from './databases/ReloadMetadata';
 import MigrateLedgerAccount from './keyring/MigrateLedgerAccount';
@@ -19,9 +22,11 @@ import DeleteChain from './DeleteChain';
 import DeleteChainStaking from './DeleteChainStaking';
 import DeleteEarningData from './DeleteEarningData';
 import DeleteEarningData20251010 from './DeleteEarningData20251010';
+import DeleteEarningData20251105 from './DeleteEarningData20251105';
 import DisableZeroBalanceTokens from './DisableZeroBalanceTokens';
 import EnableVaraChain from './EnableVaraChain';
 import MigrateAuthUrls from './MigrateAuthUrls';
+import MigrateChainPatrol from './MigrateChainPatrol';
 import MigrateImportedToken from './MigrateImportedToken';
 import MigrateNetworkSettings from './MigrateNetworkSettings';
 import MigrateNewUnifiedAccount from './MigrateNewUnifiedAccount';
@@ -29,7 +34,11 @@ import MigrateTokenDecimals from './MigrateTokenDecimals';
 import MigrateTransactionHistory from './MigrateTransactionHistory';
 import MigrateTransactionHistoryBridge from './MigrateTransactionHistoryBridge';
 import MigrateTransactionHistoryBySymbol from './MigrateTransactionHistoryBySymbol';
+import MigrateTransactionHistoryBySymbol20251027 from './MigrateTransactionHistoryBySymbol20251027';
+import MigrateTransactionHistoryBySymbol20251107 from './MigrateTransactionHistoryBySymbol20251107';
+import MigrateTransactionHistoryBySymbol20251223 from './MigrateTransactionHistoryBySymbol20251223';
 import MigrateWalletReference from './MigrateWalletReference';
+import OptimizeEnableToken from './OptimizeEnableToken';
 
 export const EVERYTIME = '__everytime__';
 
@@ -71,5 +80,14 @@ export default <Record<string, typeof BaseMigrationJob>>{
   // [`${EVERYTIME}-1.1.42-02`]: MigrateTransactionHistoryBySymbol
   // [`${EVERYTIME}-1`]: AutoEnableChainsTokens
   '1.3.42-01': MigrateNewUnifiedAccount,
-  '1.3.62-01': DeleteEarningData20251010
+  '1.3.54-01': MigrateChainPatrol,
+  '1.3.62-01': DeleteEarningData20251010,
+  '1.3.58-01': OptimizeEnableToken,
+  '1.3.64-01': MigrateAssetSetting20251027,
+  '1.3.64-02': MigrateTransactionHistoryBySymbol20251027,
+  '1.3.65-01': DeleteEarningData20251105,
+  '1.3.66-01': MigrateAssetSetting20251107,
+  '1.3.66-02': MigrateTransactionHistoryBySymbol20251107,
+  '1.3.72-01': MigrateAssetSetting20251223,
+  '1.3.72-02': MigrateTransactionHistoryBySymbol20251223
 };

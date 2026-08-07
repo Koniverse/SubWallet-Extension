@@ -25,11 +25,11 @@ function Component (props: Props): React.ReactElement<Props> {
 
   const timeline = useMemo<string>(() => {
     if (!data.start_time && !data.end_time) {
-      return t('TBD');
+      return t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
     }
 
-    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('TBD');
-    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('TBD');
+    const start = data.start_time ? customFormatDate(new Date(data.start_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
+    const end = data.end_time ? customFormatDate(new Date(data.end_time), '#DD# #MMM# #YYYY#') : t('ui.SETTINGS.screen.Setting.MissionPool.Item.tbd');
 
     return `${start} - ${end}`;
   }, [data.end_time, data.start_time, t]);
@@ -46,7 +46,7 @@ function Component (props: Props): React.ReactElement<Props> {
     const tagSlug = data.tags[0];
     const tagCategory = data?.categories?.[0];
     const theme = tagMap[tagSlug]?.theme || 'gray';
-    const name = tagMap[tagSlug]?.name || t(capitalize(tagSlug.replace('_', ' ')));
+    const name = t(tagMap[tagSlug]?.name) || capitalize(tagSlug.replace('_', ' '));
     const iconWeight = tagMap[tagSlug]?.iconWeight;
     const icon = tagMap[tagSlug]?.icon || MagicWand;
     let missionTheme, missionName, missionIconWeight, missionIcon;
@@ -54,7 +54,7 @@ function Component (props: Props): React.ReactElement<Props> {
 
     if (missionStatus) {
       missionTheme = tagMap[missionStatus]?.theme || 'gray';
-      missionName = tagMap[missionStatus]?.name;
+      missionName = t(tagMap[missionStatus]?.name);
       missionIconWeight = tagMap[missionStatus]?.iconWeight;
       missionIcon = tagMap[missionStatus]?.icon;
     }
@@ -71,7 +71,7 @@ function Component (props: Props): React.ReactElement<Props> {
             phosphorIcon={icon}
             weight={iconWeight}
           />
-          {t(`${name}`)}
+          {name}
         </Tag>
         {
           !!missionStatus && !!missionName && (
@@ -85,7 +85,7 @@ function Component (props: Props): React.ReactElement<Props> {
                 phosphorIcon={missionIcon}
                 weight={missionIconWeight}
               />
-              {t(`${missionName}`)}
+              {missionName}
             </Tag>
           )
         }
@@ -134,7 +134,7 @@ function Component (props: Props): React.ReactElement<Props> {
           </div>
           <div className={'__item-timeline'}>{timeline}</div>
           <div className={'__item-rewards'}>
-            <div className='__item-label'>{t('Rewards')}:&nbsp;</div>
+            <div className='__item-label'>{t('ui.SETTINGS.screen.Setting.MissionPool.Item.rewards')}:&nbsp;</div>
             <div className='__item-value'>
               {data.reward}
             </div>

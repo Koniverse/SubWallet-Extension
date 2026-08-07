@@ -40,6 +40,10 @@ const filterOptions = [
   {
     label: 'Watch-only account',
     value: AccountSignMode.READ_ONLY
+  },
+  {
+    label: 'Multisig account',
+    value: AccountSignMode.MULTISIG
   }
 ];
 const renderEmpty = () => <GeneralEmptyList />;
@@ -94,6 +98,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         } else if (filter === AccountProxyType.QR && accountType === AccountProxyType.QR) {
           return true;
         } else if (filter === AccountProxyType.READ_ONLY && accountType === AccountProxyType.READ_ONLY) {
+          return true;
+        } else if (filter === AccountProxyType.MULTISIG && accountType === AccountProxyType.MULTISIG) {
           return true;
         }
       }
@@ -206,7 +212,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             )}
             onClick={exportAllAccounts}
           >
-            {getNumberAccount > 1 ? t(`Export ${getNumberAccount} accounts`) : t(`Export ${getNumberAccount} account`)}
+            {getNumberAccount > 1 ? t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportMultipleAccounts', { replace: { getNumberAccount: getNumberAccount } }) : t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportSingleAccount', { replace: { getNumberAccount: getNumberAccount } })}
           </Button>
         )}
         id={id}
@@ -217,9 +223,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             weight={'fill'}
           />,
           tooltipPlacement: 'bottomRight',
-          tooltip: t('SubWallet doesn’t support exporting Ledger accounts')
+          tooltip: t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportLedgerNotSupported')
         }}
-        title={t('Export account')}
+        title={t('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.exportAccount')}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
@@ -232,7 +238,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchAccountProxyFunction}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Account name')}
+          searchPlaceholder={t<string>('ui.ACCOUNT.components.Layout.SelectAccount.ExportAllSelector.accountName')}
           showActionBtn
         />
       </SwModal>

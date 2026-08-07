@@ -80,8 +80,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
   }
 
   /* Import ethereum account with the private key  */
-  private _checkValidatePrivateKey ({ chainType,
-    privateKey }: RequestPrivateKeyValidateV2, autoAddPrefix = false): ResponsePrivateKeyValidateV2 {
+  private _checkValidatePrivateKey ({ chainType, privateKey }: RequestPrivateKeyValidateV2, autoAddPrefix = false): ResponsePrivateKeyValidateV2 {
     const { phrase } = keyExtractSuri(privateKey);
     const rs = { autoAddPrefix: autoAddPrefix, addressMap: {} } as ResponsePrivateKeyValidateV2;
     const types: KeypairType[] = [];
@@ -120,7 +119,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
 
     const exists = this.state.checkAddressExists(Object.values(rs.addressMap));
 
-    assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
+    assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
     return rs;
   }
@@ -171,7 +170,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       const _address = keyringPair.address;
       const exists = this.state.checkAddressExists([_address]);
 
-      assert(!exists, t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
+      assert(!exists, t('bg.ACCOUNT.services.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } }));
 
       const nameExists = this.state.checkNameExists(name);
 
@@ -204,8 +203,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
     }
   }
 
-  public checkPublicAndSecretKey ({ publicKey,
-    secretKey }: RequestCheckPublicAndSecretKey): ResponseCheckPublicAndSecretKey {
+  public checkPublicAndSecretKey ({ publicKey, secretKey }: RequestCheckPublicAndSecretKey): ResponseCheckPublicAndSecretKey {
     let response: ResponseCheckPublicAndSecretKey = {
       address: '',
       isValid: true,
@@ -262,7 +260,7 @@ export class AccountSecretHandler extends AccountBaseHandler {
       const exists = this.state.checkAddressExists([response.address]);
 
       if (exists) {
-        response.errorMessage = t('bg.ACCOUNT.types.error.account.common.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } });
+        response.errorMessage = t('bg.ACCOUNT.services.keyring.handler.Secret.accountAlreadyExistsWithName', { replace: { name: exists?.name || exists?.address || '' } });
         response.isValid = false;
       }
     }

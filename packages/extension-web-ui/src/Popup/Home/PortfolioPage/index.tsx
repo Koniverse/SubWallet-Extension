@@ -120,7 +120,7 @@ function Component ({ className }: Props): React.ReactElement<Props> {
     return (TAB_LIST.map((tab) => tab.toLowerCase())).indexOf(currentTab);
   }, [TAB_LIST, pathname]);
 
-  const isDetail = useMemo(() => pathname.includes('detail'), [pathname]);
+  const isDetail = useMemo(() => pathname.includes('detail') || pathname.startsWith('/home/nfts/view-structure'), [pathname]);
 
   useEffect(() => {
     searchInputRef.current?.setValue('');

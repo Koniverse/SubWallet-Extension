@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset, _MultiChainAsset } from '@subwallet/chain-list/types';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _getAssetOriginChain } from '@subwallet/extension-base/services/chain-service/utils';
 import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
@@ -9,7 +10,7 @@ import { AccountProxyType, YieldPoolInfo, YieldPoolType } from '@subwallet/exten
 import { isAccountAll } from '@subwallet/extension-base/utils';
 import { BN_TEN, BN_ZERO } from '@subwallet/extension-web-ui/constants';
 import { useAccountBalance, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector, useTokenGroup } from '@subwallet/extension-web-ui/hooks';
-import { BalanceValueInfo, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
+import { BalanceValueInfo, TokenBalanceItemType, YieldGroupInfo } from '@subwallet/extension-web-ui/types';
 import { getExtrinsicTypeByPoolInfo, getTransactionActionsByAccountProxy, isRelatedToAstar } from '@subwallet/extension-web-ui/utils';
 import BigN from 'bignumber.js';
 import { useMemo } from 'react';
@@ -43,6 +44,36 @@ function calculateTotalValueStaked (poolInfo: YieldPoolInfo, assetRegistry: Reco
     .multipliedBy(price);
 }
 
+function getAvailableEarningBalance (balanceItem: TokenBalanceItemType | undefined, chainSlug: string): BalanceValueInfo {
+  const result: BalanceValueInfo = {
+    value: BN_ZERO,
+    convertedValue: BN_ZERO,
+    pastConvertedValue: BN_ZERO
+  };
+
+  if (!balanceItem) {
+    return result;
+  }
+
+  if (_BALANCE_CHAIN_GROUP.notSupportGetBalanceByType.includes(chainSlug)) {
+    result.value = result.value.plus(balanceItem.free.value);
+  } else {
+    const reserved = new BigN(balanceItem.lockedDetails?.reserved || 0);
+    const staking = new BigN(balanceItem.lockedDetails?.staking || 0);
+    const subtractAmount = BigN.max(reserved, staking);
+
+    result.value = result.value
+      .plus(balanceItem.free.value)
+      .plus(balanceItem.locked.value)
+      .minus(subtractAmount);
+  }
+
+  result.convertedValue = result.convertedValue.plus(balanceItem.free.convertedValue);
+  result.pastConvertedValue = result.pastConvertedValue.plus(balanceItem.free.pastConvertedValue);
+
+  return result;
+}
+
 const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const { poolInfoMap } = useSelector((state) => state.earning);
   const { assetRegistry, multiChainAssetMap } = useSelector((state) => state.assetRegistry);
@@ -50,7 +81,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
   const { accountProxies, currentAccountProxy } = useSelector((state) => state.accountState);
   const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
   const { tokenGroupMap } = useTokenGroup(allowedChains, excludedTokens);
-  const { tokenBalanceMap, tokenGroupBalanceMap } = useAccountBalance(tokenGroupMap, true);
+  const { tokenBalanceMap } = useAccountBalance(tokenGroupMap, true);
   const { priceMap } = useSelector((state) => state.price);
 
   const extrinsicTypeSupported = useMemo(() => {
@@ -126,6 +157,19 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           exists.isTestnet = exists.isTestnet || chainInfo.isTestnet;
           exists.poolSlugs.push(pool.slug);
 
+          const inputAsset = pool.metadata.inputAsset;
+
+          if (!exists.assetSlugs.includes(inputAsset)) {
+            exists.assetSlugs.push(inputAsset);
+
+            const balanceItem = tokenBalanceMap[inputAsset];
+            const earningBalance = getAvailableEarningBalance(balanceItem, chainInfo.slug);
+
+            exists.balance.value = exists.balance.value.plus(earningBalance.value);
+            exists.balance.convertedValue = exists.balance.convertedValue.plus(earningBalance.convertedValue);
+            exists.balance.pastConvertedValue = exists.balance.pastConvertedValue.plus(earningBalance.pastConvertedValue);
+          }
+
           if (exists.isRelatedToRelayChain) {
             if (pool.type === YieldPoolType.NATIVE_STAKING) {
               exists.totalValueStaked = calculateTotalValueStaked(pool, assetRegistry, priceMap);
@@ -139,13 +183,6 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           if (!token) {
             continue;
           }
-
-          const balance = tokenGroupBalanceMap[group] || tokenBalanceMap[group];
-          const freeBalance: BalanceValueInfo = balance?.free || {
-            value: BN_ZERO,
-            convertedValue: BN_ZERO,
-            pastConvertedValue: BN_ZERO
-          };
 
           let apy: undefined | number;
 
@@ -164,6 +201,7 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
           }
 
           const checkRelatedRelaChain = isRelatedToRelayChain(group, assetRegistry, multiChainAssetMap);
+          const freeBalance = getAvailableEarningBalance(tokenBalanceMap[inputAsset], chainInfo.slug);
 
           result[group] = {
             group: group,
@@ -181,14 +219,15 @@ const useYieldGroupInfo = (): YieldGroupInfo[] => {
               ? BN_ZERO
               : calculateTotalValueStaked(pool, assetRegistry, priceMap),
             minJoin: pool.statistic?.earningThreshold?.join,
-            isRelatedToRelayChain: checkRelatedRelaChain
+            isRelatedToRelayChain: checkRelatedRelaChain,
+            assetSlugs: [inputAsset]
           };
         }
       }
     }
 
     return Object.values(result);
-  }, [allowedChains, assetRegistry, chainInfoMap, excludedTokens, extrinsicTypeSupported, hasWatchOnlyAccount, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap, tokenGroupBalanceMap]);
+  }, [allowedChains, assetRegistry, chainInfoMap, excludedTokens, extrinsicTypeSupported, hasWatchOnlyAccount, multiChainAssetMap, poolInfoMap, priceMap, tokenBalanceMap]);
 };
 
 export default useYieldGroupInfo;

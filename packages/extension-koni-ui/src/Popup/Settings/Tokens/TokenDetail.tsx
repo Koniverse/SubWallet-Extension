@@ -13,6 +13,7 @@ import useFetchChainInfo from '@subwallet/extension-koni-ui/hooks/screen/common/
 import useGetChainAssetInfo from '@subwallet/extension-koni-ui/hooks/screen/common/useGetChainAssetInfo';
 import { deleteCustomAssets, upsertCustomToken } from '@subwallet/extension-koni-ui/messaging';
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import { Button, ButtonProps, Col, Field, Icon, Input, Logo, Row, Tooltip } from '@subwallet/react-ui';
 import SwAvatar from '@subwallet/react-ui/es/sw-avatar';
 import { CheckCircle, Copy, Trash } from 'phosphor-react';
@@ -33,6 +34,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const { token } = useTheme() as Theme;
   const goBack = useDefaultNavigate().goBack;
   const showNotification = useNotification();
+  const displayName = getAssetDisplayName(tokenInfo, tokenInfo.symbol);
 
   const originChainInfo = useFetchChainInfo(tokenInfo.originChain);
 
@@ -40,13 +42,13 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
   const [loading, setLoading] = useState(false);
 
   const { handleSimpleConfirmModal } = useConfirmModal({
-    title: t<string>('Delete token'),
+    title: t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.deleteToken'),
     maskClosable: true,
     closable: true,
     type: 'error',
-    subTitle: t<string>('You are about to delete this token'),
-    content: t<string>('Confirm delete this token'),
-    okText: t<string>('Remove')
+    subTitle: t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.aboutToDeleteToken'),
+    content: t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.confirmDeleteToken'),
+    okText: t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.remove')
   });
 
   const handleDeleteToken = useCallback(() => {
@@ -56,17 +58,17 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
           if (result) {
             goBack();
             showNotification({
-              message: t('Deleted token successfully')
+              message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.deletedTokenSuccessfully')
             });
           } else {
             showNotification({
-              message: t('Deleted token unsuccessfully')
+              message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.deletedTokenUnsuccessfully')
             });
           }
         })
         .catch(() => {
           showNotification({
-            message: t('Deleted token unsuccessfully')
+            message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.deletedTokenUnsuccessfully')
           });
         });
     }).catch(console.log);
@@ -115,7 +117,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
     navigator.clipboard.writeText(contractAddress).then().catch(console.error);
 
     showNotification({
-      message: t('Copied to clipboard')
+      message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.copiedToClipboard')
     });
   }, [showNotification, t, tokenInfo]);
 
@@ -158,14 +160,14 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         } else {
           setLoading(false);
           showNotification({
-            message: t('Error')
+            message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.error')
           });
         }
       })
       .catch(() => {
         setLoading(false);
         showNotification({
-          message: t('Error')
+          message: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.error')
         });
       });
   }, [goBack, priceId, showNotification, t, tokenInfo]);
@@ -178,7 +180,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
     return _isCustomAsset(tokenInfo.slug)
       ? {
         onClick: goBackToSettingList,
-        children: t('Cancel')
+        children: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.cancel')
       }
       : undefined;
   }, [goBackToSettingList, tokenInfo.slug, t]);
@@ -196,7 +198,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         ),
         loading,
         onClick: onSubmit,
-        children: t('Save')
+        children: t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.save')
       }
       : undefined;
   }, [isSubmitDisabled, loading, onSubmit, t, tokenInfo.slug]);
@@ -213,7 +215,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Token detail')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.tokenDetail')}
       >
         <div className={'token_detail__container'}>
           <div className={'token_detail__header_container'}>
@@ -225,7 +227,7 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             </div>
 
             <div className={'token_detail__header_text_container'}>
-              {tokenInfo.symbol}
+              {displayName}
             </div>
           </div>
 
@@ -233,16 +235,16 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
             {
               _isSmartContractToken(tokenInfo) && <Field
                 content={contractAddressInfo()}
-                label={t<string>('Contract address')}
-                placeholder={t<string>('Contract address')}
+                label={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.contractAddress')}
+                placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.contractAddress')}
                 prefix={contractAddressIcon()}
                 suffix={contractAddressSuffix()}
               />
             }
             <Field
               content={originChainInfo.name}
-              label={t<string>('Network')}
-              placeholder={t<string>('Network')}
+              label={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.network')}
+              placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.network')}
               prefix={<Logo
                 network={originChainInfo.slug}
                 size={20}
@@ -253,12 +255,12 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Symbol')}
+                  title={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.symbol')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.symbol}
-                      placeholder={t<string>('Symbol')}
+                      placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.symbol')}
                       prefix={(
                         <Logo
                           size={20}
@@ -272,12 +274,12 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Token name')}
+                  title={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.tokenName')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.name}
-                      placeholder={t<string>('Token name')}
+                      placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.tokenName')}
                     />
                   </div>
                 </Tooltip>
@@ -287,13 +289,13 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Price ID')}
+                  title={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.priceId')}
                 >
                   <div>
                     <Input
                       disabled={!_isCustomAsset(tokenInfo.slug)}
                       onChange={onChangePriceId}
-                      placeholder={t('Price ID')}
+                      placeholder={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.priceId')}
                       value={priceId}
                     />
                   </div>
@@ -302,12 +304,12 @@ function Component ({ tokenInfo }: ComponentProps): React.ReactElement<Component
               <Col span={12}>
                 <Tooltip
                   placement={'topLeft'}
-                  title={t('Decimals')}
+                  title={t('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.decimals')}
                 >
                   <div>
                     <Field
                       content={tokenInfo.decimals}
-                      placeholder={t<string>('Decimals')}
+                      placeholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.TokenDetail.decimals')}
                     />
                   </div>
                 </Tooltip>

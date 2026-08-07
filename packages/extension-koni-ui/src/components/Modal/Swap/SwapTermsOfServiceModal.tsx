@@ -62,7 +62,7 @@ const Component = ({ className, onOk }: Props) => {
       className={CN(className)}
       closable={false}
       id={modalId}
-      title={t('Terms of service')}
+      title={t('ui.SWAP.components.Modal.Swap.Terms.termsOfService')}
     >
       <div className={'__content-title'}>You’re using third-party swap providers, which may contain inherent risks. Please read the following carefully</div>
       <div className={'__content-wrapper'}>
@@ -103,7 +103,7 @@ const Component = ({ className, onOk }: Props) => {
           className={'__content-footer-checkbox'}
           onChange={onCheckedInput}
         >
-          {t('I understand the associated risk and will act under caution')}
+          {t('ui.SWAP.components.Modal.Swap.Terms.understandAssociatedRisk')}
         </Checkbox>
         <div className={'__content-footer-button-group'}>
           <Button
@@ -118,7 +118,7 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            {t('Confirm and continue swapping')}
+            {t('ui.SWAP.components.Modal.Swap.Terms.confirmAndContinueSwapping')}
           </Button>
           <div className={'__content-footer-label'}>Scroll to read all sections</div>
         </div>

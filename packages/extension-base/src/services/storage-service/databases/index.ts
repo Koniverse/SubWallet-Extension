@@ -7,6 +7,8 @@ import { _NotificationInfo } from '@subwallet/extension-base/services/inapp-noti
 import { BalanceItem, ProcessTransactionData, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
 import Dexie, { Table, Transaction } from 'dexie';
 
+import { GovVotingInfo } from '../../open-gov/interface';
+
 export const DEFAULT_DATABASE = 'SubWalletDB_v2';
 
 export interface DefaultChainDoc {
@@ -85,6 +87,8 @@ export default class KoniDatabase extends Dexie {
 
   private schemaVersion: number;
 
+  public govLockedInfos!: Table<GovVotingInfo, object>;
+
   public constructor (name = DEFAULT_DATABASE, schemaVersion = 11) {
     super(name);
     this.schemaVersion = schemaVersion;
@@ -138,6 +142,10 @@ export default class KoniDatabase extends Dexie {
 
     this.conditionalVersion(9, {
       processTransactions: 'id, address'
+    });
+
+    this.conditionalVersion(10, {
+      govLockedInfos: '[chain+address], chain, address'
     });
   }
 

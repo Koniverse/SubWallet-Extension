@@ -8,7 +8,8 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useDefaultNavigate, useFilterModal, useTranslation } from '@subwallet/extension-koni-ui/hooks';
 import { useChainAssets } from '@subwallet/extension-koni-ui/hooks/assets';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
-import { ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { ChainAssetDisplay, ThemeProps } from '@subwallet/extension-koni-ui/types';
+import { getAssetDisplayName } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Icon, ModalContext, SwList } from '@subwallet/react-ui';
 import { FadersHorizontal, Plus } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useMemo } from 'react';
@@ -38,6 +39,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { assetSettingMap } = useSelector((state: RootState) => state.assetRegistry);
 
   const assetItems = useChainAssets({ isFungible: true }).chainAssets;
+  const assetDisplayItems: ChainAssetDisplay[] = useMemo(() => {
+    return assetItems.map((asset) => ({
+      ...asset,
+      displayName: getAssetDisplayName(asset, asset.symbol)
+    }));
+  }, [assetItems]);
   const { filterSelectionMap, onApplyFilter, onChangeFilterOption, onCloseFilterModal, selectedFilters } = useFilterModal(FILTER_MODAL_ID);
   const filterFunction = useMemo<(item: _ChainAsset) => boolean>(() => {
     return (chainAsset) => {
@@ -66,21 +73,22 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [assetSettingMap, selectedFilters]);
 
   const FILTER_OPTIONS = useMemo((): OptionType[] => ([
-    { label: t('Enabled tokens'), value: FilterValue.ENABLED },
-    { label: t('Disabled tokens'), value: FilterValue.DISABLED },
-    { label: t('Custom tokens'), value: FilterValue.CUSTOM }
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.enabledTokens'), value: FilterValue.ENABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.disabledTokens'), value: FilterValue.DISABLED },
+    { label: t('ui.SETTINGS.screen.Setting.Tokens.Manage.customTokens'), value: FilterValue.CUSTOM }
   ]), [t]);
 
-  const searchToken = useCallback((token: _ChainAsset, searchText: string) => {
+  const searchToken = useCallback((token: ChainAssetDisplay, searchText: string) => {
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
-      token.name.toLowerCase().includes(searchTextLowerCase) ||
-      token.symbol.toLowerCase().includes(searchTextLowerCase)
+      token.displayName.toLowerCase().includes(searchTextLowerCase) ||
+      token.symbol.toLowerCase().includes(searchTextLowerCase) ||
+      token.name.toLowerCase().includes(searchTextLowerCase)
     );
   }, []);
 
-  const renderTokenItem = useCallback((tokenInfo: _ChainAsset) => {
+  const renderTokenItem = useCallback((tokenInfo: ChainAssetDisplay) => {
     return (
       <TokenToggleItem
         assetSettingMap={assetSettingMap}
@@ -125,7 +133,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         subHeaderCenter={true}
         subHeaderIcons={subHeaderButton}
         subHeaderPaddingVertical={true}
-        title={t<string>('Manage tokens')}
+        title={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.manageTokens')}
       >
         <SwList.Section
           actionBtnIcon={(
@@ -141,7 +149,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           enableSearchInput={true}
           filterBy={filterFunction}
           gridGap={'14px'}
-          list={assetItems}
+          list={assetDisplayItems}
           minColumnWidth={'172px'}
           mode={'boxed'}
           onClickActionBtn={openFilterModal}
@@ -149,7 +157,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           renderWhenEmpty={renderEmpty}
           searchFunction={searchToken}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search token')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Tokens.Manage.searchToken')}
           showActionBtn={true}
         />
 

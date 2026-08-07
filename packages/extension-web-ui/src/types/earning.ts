@@ -49,6 +49,7 @@ export interface YieldGroupInfo {
   totalValueStaked: BigN;
   minJoin?: string;
   isRelatedToRelayChain: boolean;
+  assetSlugs: string[];
 }
 
 export interface EarningTagType {

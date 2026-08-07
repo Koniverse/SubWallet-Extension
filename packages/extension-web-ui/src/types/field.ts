@@ -8,6 +8,7 @@ export type TokenSelectorItemType = {
   name: string;
   slug: string;
   symbol: string;
+  displayName?: string;
   originChain: string;
   balanceInfo?: {
     isReady: boolean;

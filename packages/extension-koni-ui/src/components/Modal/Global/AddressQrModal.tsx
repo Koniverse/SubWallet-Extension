@@ -6,6 +6,7 @@ import type { ButtonProps } from '@subwallet/react-ui/es/button/button';
 import { getExplorerLink } from '@subwallet/extension-base/services/transaction-service/utils';
 import { AccountActions } from '@subwallet/extension-base/types';
 import { CloseIcon, TonWalletContractSelectorModal } from '@subwallet/extension-koni-ui/components';
+import { RELAY_CHAINS_TO_MIGRATE } from '@subwallet/extension-koni-ui/constants';
 import { ADDRESS_QR_MODAL, TON_WALLET_CONTRACT_SELECTOR_MODAL } from '@subwallet/extension-koni-ui/constants/modal';
 import { useDefaultNavigate, useFetchChainInfo, useGetAccountByAddress } from '@subwallet/extension-koni-ui/hooks';
 import useNotification from '@subwallet/extension-koni-ui/hooks/common/useNotification';
@@ -45,6 +46,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
   const isTonWalletContactSelectorModalActive = checkActive(tonWalletContractSelectorModalId);
   const goHome = useDefaultNavigate().goHome;
 
+  const isRelayChainToMigrate = useMemo(() => RELAY_CHAINS_TO_MIGRATE.includes(chainSlug), [chainSlug]);
   const showNavigationButtons = useMemo(() => {
     return accountTokenAddresses.length > 1;
   }, [accountTokenAddresses]);
@@ -113,7 +115,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
     inactiveModal(tonWalletContractSelectorModalId);
   }, [inactiveModal]);
 
-  const onClickCopyButton = useCallback(() => notify({ message: t('Copied to clipboard') }), [notify, t]);
+  const onClickCopyButton = useCallback(() => notify({ message: t('ui.ACCOUNT.components.Modal.Global.AddressQr.copiedToClipboard') }), [notify, t]);
 
   const tonWalletContactSelectorButtonProps = useMemo<ButtonProps>(() => {
     return {
@@ -124,7 +126,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
       ),
       type: 'ghost',
       onClick: onChangeTonWalletContact,
-      tooltip: t('Click to change wallet address'),
+      tooltip: t('ui.ACCOUNT.components.Modal.Global.AddressQr.clickToChangeWalletAddress'),
       tooltipPlacement: 'topRight'
     };
   }, [onChangeTonWalletContact, t]);
@@ -159,7 +161,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                 />
               }
               onClick={handleClickViewOnExplorer}
-            >{t('View on explorer')}</Button>
+            >{t('ui.ACCOUNT.components.Modal.Global.AddressQr.viewOnExplorer')}</Button>
           )
           : (
             <Button
@@ -176,7 +178,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               }
               onClick={onGoHome}
               schema={'secondary'}
-            >{t('Back to home')}</Button>
+            >{t('ui.ACCOUNT.components.Modal.Global.AddressQr.backToHome')}</Button>
           )}
         id={modalId}
         onCancel={onBack || onCancel}
@@ -189,7 +191,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
         }
         title={(
           <>
-            {t<string>('Your address')}
+            {t<string>('ui.ACCOUNT.components.Modal.Global.AddressQr.yourAddress')}
             {onBack && isRelatedToTon && (
               <Button
                 {...tonWalletContactSelectorButtonProps}
@@ -215,7 +217,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
               />
             )}
             <SwQRCode
-              className='__qr-code'
+              className={CN('__qr-code', { '-is-relay-chain': isRelayChainToMigrate })}
               color='#000'
               errorLevel='H'
               icon={''}
@@ -269,7 +271,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
 
               <CopyToClipboard text={currentAddress}>
                 <Button
-                  className='__copy-button'
+                  className={CN('__copy-button', { '-is-relay-chain': isRelayChainToMigrate })}
                   icon={
                     <Icon
                       phosphorIcon={CopySimple}
@@ -278,7 +280,7 @@ const Component: React.FC<Props> = ({ accountTokenAddresses = [], address: initi
                   }
                   onClick={onClickCopyButton}
                   size='xs'
-                  tooltip={t('Copy address')}
+                  tooltip={t('ui.ACCOUNT.components.Modal.Global.AddressQr.copyAddress')}
                   type='ghost'
                 />
               </CopyToClipboard>
@@ -324,6 +326,10 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
       '.__qr-code ': {
         marginLeft: 0,
         marginRight: 0
+      },
+
+      '& .-is-relay-chain': {
+        filter: 'blur(10px)'
       }
     },
 
@@ -395,6 +401,10 @@ const AddressQrModal = styled(Component)<Props>(({ theme: { token } }: Props) =>
 
     '.__copy-button': {
       color: token.colorTextLight3,
+
+      '&.-is-relay-chain': {
+        display: 'none'
+      },
 
       '&:hover': {
         color: token.colorTextLight2

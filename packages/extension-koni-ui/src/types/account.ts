@@ -3,7 +3,7 @@
 
 import type { KeypairType } from '@subwallet/keyring/types';
 
-import { AccountActions, AccountProxyType } from '@subwallet/extension-base/types';
+import { AccountActions, AccountProxyType, SubstrateProxyType } from '@subwallet/extension-base/types';
 
 export interface WordItem {
   index: number;
@@ -56,4 +56,12 @@ export type AccountAddressItemType = {
    * The original `address` remains the source of truth for identity, selection, and comparison.
    */
   displayAddress?: string;
+}
+
+export interface WrappedTransactionSigner {
+  kind: 'substrate_proxy' | 'signatory';
+  address: string;
+  proxyId?: string;
+  isProxiedAccount?: boolean;
+  substrateProxyType?: SubstrateProxyType;
 }

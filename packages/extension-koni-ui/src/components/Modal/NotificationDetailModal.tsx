@@ -8,7 +8,7 @@ import { NotificationInfoItem } from '@subwallet/extension-koni-ui/Popup/Setting
 import { Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { BackgroundIcon, ModalContext, SwModal } from '@subwallet/react-ui';
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
-import { Checks, Coins, DownloadSimple, Eye, Gift, X } from 'phosphor-react';
+import { ArrowSquareOut, Checks, Coins, DownloadSimple, Gift } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -69,7 +69,7 @@ function Component (props: Props): React.ReactElement<Props> {
       default:
         return {
           title: 'View details',
-          icon: Eye
+          icon: ArrowSquareOut
         };
     }
   };
@@ -104,7 +104,7 @@ function Component (props: Props): React.ReactElement<Props> {
       className={className}
       id={NOTIFICATION_DETAIL_MODAL}
       onCancel={_onCancel}
-      title={t('Actions')}
+      title={t('ui.components.Modal.NotificationDetail.actions')}
     >
       <div className={'__button-container'}>
         <div
@@ -128,12 +128,12 @@ function Component (props: Props): React.ReactElement<Props> {
           <div className={'__left-part'}>
             <BackgroundIcon
               backgroundColor={readNotification ? token['gray-3'] : token['green-6']}
-              phosphorIcon={readNotification ? Checks : X}
+              phosphorIcon={Checks}
               size='sm'
               weight='fill'
             />
           </div>
-          <div className={'__right-part'}>{readNotification ? t('Mark as unread') : t('Mark as read')}</div>
+          <div className={'__right-part'}>{readNotification ? t('ui.components.Modal.NotificationDetail.markAsUnread') : t('ui.components.Modal.NotificationDetail.markAsRead')}</div>
         </div>
       </div>
 

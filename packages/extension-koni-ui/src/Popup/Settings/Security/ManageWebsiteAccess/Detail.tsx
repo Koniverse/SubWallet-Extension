@@ -47,8 +47,6 @@ const isValidAccountChainType = (chainType: AccountChainType, conditions: Accoun
     case AccountChainType.CARDANO: return accountAuthTypes.includes('cardano');
     case AccountChainType.BITCOIN: return accountAuthTypes.includes('bitcoin');
   }
-
-  return false;
 };
 
 const dAppConfigurationModalId = DAPP_CONFIGURATION_MODAL;
@@ -152,8 +150,8 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
   const renderEmptyList = useCallback(() => {
     return (
       <EmptyList
-        emptyMessage={t('Your accounts will appear here.')}
-        emptyTitle={t('No account found')}
+        emptyMessage={t('ui.SETTINGS.screen.Setting.Security.WebsiteAccessDetail.yourAccountsWillAppearHere')}
+        emptyTitle={t('ui.SETTINGS.screen.Setting.Security.WebsiteAccessDetail.noAccountFound')}
         phosphorIcon={MagnifyingGlass}
       />
     );
@@ -186,7 +184,7 @@ function Component ({ accountAuthTypes, authInfo, className = '', goBack, origin
           renderWhenEmpty={renderEmptyList}
           searchFunction={searchFunc}
           searchMinCharactersCount={2}
-          searchPlaceholder={t<string>('Search account')}
+          searchPlaceholder={t<string>('ui.SETTINGS.screen.Setting.Security.WebsiteAccessDetail.searchAccount')}
         />
 
         <DAppConfigurationModal

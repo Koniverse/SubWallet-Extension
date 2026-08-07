@@ -46,7 +46,7 @@ const createDoneUrl = '/create-done';
 const settingImportNetwork = '/settings/chains/import';
 
 const baseAccountPath = '/accounts';
-const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
+const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-seed-phrase-trust', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
 const allowBlackScreenWS = [welcomeUrl, loginUrl];
 const allowImportAccountUrls = allowImportAccountPaths.map((path) => `${baseAccountPath}/${path}`);
 
@@ -117,6 +117,10 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
     return undefined;
   }, [isAcknowledgedUnifiedAccountMigration, isPopupMode, isUnifiedAccountMigrationInProgress]);
 
+  const internalConfirmationPath = useMemo(() => {
+    return currentPage?.startsWith('/transaction/') ? currentPage : null;
+  }, [currentPage]);
+
   const redirectPath = useMemo<string | null>(() => {
     const pathName = location.pathname;
     let redirectTarget: string | null = null;
@@ -172,6 +176,8 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
       openPModal(null);
     } else if (hasInternalConfirmations && pathName === settingImportNetwork) {
       openPModal(null);
+    } else if (hasInternalConfirmations && internalConfirmationPath && pathName !== internalConfirmationPath) {
+      redirectTarget = internalConfirmationPath;
     } else if (hasInternalConfirmations) {
       openPModal('confirmations');
     } else if (!hasInternalConfirmations && isOpenPModal('confirmations')) {
@@ -193,7 +199,7 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
     } else {
       return null;
     }
-  }, [location.pathname, dataLoaded, needMasterPasswordMigration, hasMasterPassword, needUnlock, noAccount, hasInternalConfirmations, isOpenPModal, hasConfirmations, activePriorityPath, currentPage, openPModal]);
+  }, [location.pathname, dataLoaded, needMasterPasswordMigration, hasMasterPassword, needUnlock, noAccount, hasInternalConfirmations, isOpenPModal, hasConfirmations, activePriorityPath, currentPage, internalConfirmationPath, openPModal]);
 
   useEffect(() => {
     initDataRef.current.then(() => {

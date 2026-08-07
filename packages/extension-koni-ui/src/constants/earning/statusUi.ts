@@ -11,27 +11,27 @@ export const EarningStatusUi: Record<EarningStatus, EarningStatusUiProps> = {
   [EarningStatus.EARNING_REWARD]: {
     schema: 'success' as InfoItemBase['valueColorSchema'],
     icon: CheckCircle,
-    name: detectTranslate('Earning reward')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.earningReward')
   },
   [EarningStatus.PARTIALLY_EARNING]: {
     schema: 'warning' as InfoItemBase['valueColorSchema'],
     icon: ListChecks,
-    name: detectTranslate('Earning reward')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.earningReward')
   },
   [EarningStatus.NOT_EARNING]: {
     schema: 'danger' as InfoItemBase['valueColorSchema'],
     icon: XCircle,
-    name: detectTranslate('Not earning')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.notEarning')
   },
   [EarningStatus.WAITING]: {
     schema: 'success' as InfoItemBase['valueColorSchema'],
     icon: CheckCircle,
-    name: detectTranslate('Waiting')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.waiting')
   },
   [EarningStatus.NOT_STAKING]: {
     schema: 'danger' as InfoItemBase['valueColorSchema'],
     icon: XCircle,
-    name: detectTranslate('Not earning')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.notEarning')
   }
 };
 
@@ -39,24 +39,24 @@ export const NominationPoolsEarningStatusUi: Record<NominationPoolState['state']
   Open: {
     schema: 'success' as InfoItemBase['valueColorSchema'],
     icon: CheckCircle,
-    name: detectTranslate('Open')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.open')
   },
   Locked: {
     schema: 'gray' as InfoItemBase['valueColorSchema'],
     icon: LockSimple,
-    name: detectTranslate('Locked')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.locked')
   },
   Destroying: {
     schema: 'warning' as InfoItemBase['valueColorSchema'],
     icon: ListChecks,
-    name: detectTranslate('Destroying')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.destroying')
   },
   Blocked: {
     schema: 'danger' as InfoItemBase['valueColorSchema'],
     icon: XCircle,
-    name: detectTranslate('Blocked')
+    name: detectTranslate('ui.EARNING.constant.earningStatusUi.blocked')
   }
 };
 
 // @ts-ignore
-const stakingValidatorLabel = [detectTranslate('dapp'), detectTranslate('validator'), detectTranslate('collator')];
+const stakingValidatorLabel = [detectTranslate('ui.EARNING.constant.earningStatusUi.dapp'), detectTranslate('ui.EARNING.constant.earningStatusUi.validator'), detectTranslate('ui.EARNING.constant.earningStatusUi.collator')];

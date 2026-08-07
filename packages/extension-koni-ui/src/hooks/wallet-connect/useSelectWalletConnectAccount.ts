@@ -28,7 +28,7 @@ const useSelectWalletConnectAccount = (params: ProposalTypes.Struct) => {
   const { accounts } = useSelector((state) => state.accountState);
   const { chainInfoMap } = useSelector((state) => state.chainStore);
 
-  const noAllAccount = useMemo(() => accounts.filter(({ address, signMode }) => !isAccountAll(address) && signMode !== AccountSignMode.ECDSA_SUBSTRATE_LEDGER), [accounts]);
+  const noAllAccount = useMemo(() => accounts.filter(({ address, signMode }) => !isAccountAll(address) && ![AccountSignMode.ECDSA_SUBSTRATE_LEDGER, AccountSignMode.MULTISIG].includes(signMode)), [accounts]);
 
   const accountTypeMap = useMemo(() => {
     const availableNamespaces: Record<string, string[]> = {};

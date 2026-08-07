@@ -5,7 +5,7 @@ import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { subscribeCrowdloan } from '@subwallet/extension-base/koni/api/dotsama/crowdloan';
 import { NftHandler } from '@subwallet/extension-base/koni/api/nft';
 import { _EvmApi, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { COMMON_RELOAD_EVENTS, EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
+import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { waitTimeout } from '@subwallet/extension-base/utils';
 
@@ -66,30 +66,6 @@ export class KoniSubscription {
 
   async start () {
     await Promise.all([this.state.eventService.waitCryptoReady, this.state.eventService.waitKeyringReady, this.state.eventService.waitAssetReady]);
-    const currentAddress = this.state.keyringService.context.currentAccount?.proxyId;
-
-    if (currentAddress) {
-      this.subscribeCrowdloans(currentAddress, this.state.getSubstrateApiMap());
-    }
-
-    this.eventHandler = (events, eventTypes) => {
-      const serviceInfo = this.state.getServiceInfo();
-      const needReload = eventTypes.some((eventType) => COMMON_RELOAD_EVENTS.includes(eventType));
-
-      if (!needReload) {
-        return;
-      }
-
-      const address = serviceInfo.currentAccountInfo?.proxyId;
-
-      if (!address) {
-        return;
-      }
-
-      this.subscribeCrowdloans(address, serviceInfo.chainApiMap.substrate);
-    };
-
-    this.state.eventService.onLazy(this.eventHandler.bind(this));
   }
 
   async stop () {

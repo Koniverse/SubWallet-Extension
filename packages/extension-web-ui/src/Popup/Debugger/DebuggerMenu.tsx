@@ -37,10 +37,6 @@ const MENU_DATA: MenuItem[] = [
             name: 'nfts'
           },
           {
-            url: '/home/crowdloans',
-            name: 'crowdloans'
-          },
-          {
             url: '/home/staking',
             name: 'staking'
           },

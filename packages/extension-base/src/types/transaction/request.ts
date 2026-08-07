@@ -7,6 +7,7 @@ import { TransactionWarningType } from './warning';
 export type BaseRequestSign = {
   ignoreWarnings?: TransactionWarningType[];
 };
+
 export type InternalRequestSign<T> = T & BaseRequestSign;
 
 export interface RequestBaseTransfer {

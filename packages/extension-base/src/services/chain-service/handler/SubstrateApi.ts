@@ -13,7 +13,7 @@ import { _ApiOptions } from '@subwallet/extension-base/services/chain-service/ha
 import { _ChainConnectionStatus, _SubstrateAdapterQueryArgs, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { goldbergRpc, goldbergTypes, spec as availSpec } from 'avail-js-sdk';
-import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, Observable, of, Subscription } from 'rxjs';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
@@ -394,9 +394,15 @@ export class SubstrateApi implements _SubstrateApi {
         observables[key] = apiRx[section][module][method]
           .multi(args)
           .pipe(
+            // tap((codecs) => console.log('raw data', key, codecs)), // this line is used to debug data before transformation
             map((codecs) => codecs.map(
               (codec) => codec.toPrimitive()
-            ))
+            )),
+            catchError((error, caught) => {
+              console.error(`RxJS pipe() error for key ${key}`, error);
+
+              return of([]);
+            })
           );
       }
     });

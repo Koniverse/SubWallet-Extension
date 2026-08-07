@@ -22,7 +22,7 @@ export default function useAssetChecker () {
   useEffect(() => {
     if (enablingAsset && assetSettingMap[enablingAsset]?.visible) {
       const assetInfo = assetRegistry[enablingAsset];
-      const message = t('{{name}} is turned on.', { replace: { name: assetInfo?.symbol } });
+      const message = t('ui.NETWORK.hook.chain.useAssetChecker.nameIsTurnedOn', { replace: { name: assetInfo?.symbol } });
 
       notify({ message, type: NotificationType.SUCCESS, duration: 1 });
       setEnablingAsset(null);
@@ -42,7 +42,7 @@ export default function useAssetChecker () {
     const chainStatus = chainStatusMap[assetInfo.originChain];
 
     if ((assetInfo && !assetSetting) || !assetSetting.visible) {
-      const message = t('{{name}} on {{chainName}} is not ready to use, do you want to turn it on?', {
+      const message = t('ui.NETWORK.hook.chain.useAssetChecker.confirmTurnOnNetwork', {
         replace: {
           name: assetInfo?.symbol,
           chainName: chainInfo?.name
@@ -56,7 +56,7 @@ export default function useAssetChecker () {
           autoEnableNativeToken: false
         }).then(() => {
           setEnablingAsset(assetSlug);
-          notify({ message: t('{{name}} is turning on.', { replace: { name: assetInfo?.symbol } }), duration: 1.5 });
+          notify({ message: t('ui.NETWORK.hook.chain.useAssetChecker.nameIsTurningOn', { replace: { name: assetInfo?.symbol } }), duration: 1.5 });
         }).catch(console.error);
       };
 
@@ -66,7 +66,7 @@ export default function useAssetChecker () {
         schema={'warning'}
         size={'xs'}
       >
-        {t('Turn it on')}
+        {t('ui.NETWORK.hook.chain.useAssetChecker.turnItOn')}
       </Button>;
 
       notify({
@@ -78,7 +78,7 @@ export default function useAssetChecker () {
     } else if (!!assetSetting?.visible && !chainState?.active) {
       enableChain(assetInfo.originChain, false).catch(console.error);
     } else if (chainStatus && chainStatus.connectionStatus === _ChainConnectionStatus.DISCONNECTED) {
-      const message = t('Chain {{name}} is disconnected', { replace: { name: chainInfo?.name } });
+      const message = t('ui.NETWORK.hook.chain.useAssetChecker.chainIsDisconnected', { replace: { name: chainInfo?.name } });
 
       notify({
         message,

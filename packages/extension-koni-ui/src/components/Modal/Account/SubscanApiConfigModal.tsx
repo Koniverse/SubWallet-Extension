@@ -55,7 +55,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         setSubscanApiKey(normalizedCurrent);
         inactiveModal(SUBSCAN_API_CONFIG_MODAL);
         notify({
-          message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess')
+          message: t('ui.SETTINGS.screen.Setting.Account.SubscanApiConfigModal.saveSuccess'),
+          type: NotificationType.SUCCESS
         });
       })
       .catch((error) => {

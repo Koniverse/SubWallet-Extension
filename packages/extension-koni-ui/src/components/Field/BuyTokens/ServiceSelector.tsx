@@ -107,12 +107,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>): React.ReactElemen
         items={items}
         label={label}
         onSelect={onSelect}
-        placeholder={placeholder || t('Select service')}
+        placeholder={placeholder || t('ui.components.Field.BuyTokens.ServiceSelector.selectService')}
         renderItem={renderItem}
         renderSelected={renderSelected}
         selected={value || ''}
         statusHelp={statusHelp}
-        title={label || placeholder || t('Select service')}
+        title={label || placeholder || t('ui.components.Field.BuyTokens.ServiceSelector.selectService')}
       />
     </>
   );

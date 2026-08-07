@@ -28,6 +28,8 @@ export interface TransferParams extends TransactionFormBaseProps {
   orderId?: string;
   service?: string;
   isReadonly?: boolean;
+  fromValidator?: string;
+  toValidator?: string;
 }
 
 export interface SendNftParams extends TransactionFormBaseProps {

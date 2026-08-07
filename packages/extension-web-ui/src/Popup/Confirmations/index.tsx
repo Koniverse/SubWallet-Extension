@@ -381,13 +381,13 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.swapConfirmation');
         case ExtrinsicType.CLAIM_BRIDGE:
           return t('ui.Confirmations.claimConfirmation');
-        case ExtrinsicType.SET_FEE_TOKEN:
-          return t('ui.CONFIRMATIONS.Popup.Confirmations.changeFeeTokenConfirm');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
       }
+
+      return t('ui.Confirmations.transactionConfirm');
     } else {
       return t(titleMap[confirmation.type] || '');
     }

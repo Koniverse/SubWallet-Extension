@@ -71,6 +71,8 @@ const TokenDetailList = new LazyLoader('TokenDetailList', () => import('@subwall
 const NftItemDetail = new LazyLoader('NftItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftItemDetail'));
 const NftCollections = new LazyLoader('NftCollections', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollections'));
 const NftCollectionDetail = new LazyLoader('NftCollectionDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftCollectionDetail'));
+const NftBundleItemDetail = new LazyLoader('NftBundleItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/nested-nft/NftBundleItemDetail'));
+const NftViewStructure = new LazyLoader('NftViewStructure', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/nested-nft/NftViewStructure'));
 const NftImport = new LazyLoader('NftImport', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftImport'));
 const NftEntry = new LazyLoader('NftEntry', () => import('@subwallet/extension-web-ui/Popup/Home/Nfts/NftEntry'));
 
@@ -78,7 +80,6 @@ const InscriptionItems = new LazyLoader('InscriptionItems', () => import('@subwa
 const InscriptionItemDetail = new LazyLoader('InscriptionItemDetail', () => import('@subwallet/extension-web-ui/Popup/Home/Inscriptions/InscriptionItemDetail'));
 
 const History = new LazyLoader('History', () => import('@subwallet/extension-web-ui/Popup/Home/History'));
-const Crowdloans = new LazyLoader('Crowdloans', () => import('@subwallet/extension-web-ui/Popup/Home/Crowdloans'));
 const Home = new LazyLoader('Home', () => import('@subwallet/extension-web-ui/Popup/Home'));
 const Statistics = new LazyLoader('Statistics', () => import('@subwallet/extension-web-ui/Popup/Home/Statistics'));
 
@@ -217,7 +218,9 @@ export const router = createBrowserRouter([
             children: [
               NftCollections.generateRouterObject('collections'),
               NftCollectionDetail.generateRouterObject('collection-detail'),
-              NftItemDetail.generateRouterObject('item-detail')
+              NftItemDetail.generateRouterObject('item-detail'),
+              NftBundleItemDetail.generateRouterObject('bundle-item-detail'),
+              NftViewStructure.generateRouterObject('view-structure')
             ]
           },
           {
@@ -228,7 +231,6 @@ export const router = createBrowserRouter([
               InscriptionItemDetail.generateRouterObject('item-detail')
             ]
           },
-          Crowdloans.generateRouterObject('crowdloans'),
           {
             path: 'earning',
             element: <Outlet />,

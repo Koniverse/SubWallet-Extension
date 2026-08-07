@@ -6,6 +6,7 @@ import { fetchStaticData } from '@subwallet/extension-base/utils/fetchStaticData
 import { BaseModal } from '@subwallet/extension-web-ui/components';
 import { EARNING_TERM_AND_CONDITION_MODAL } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
+import useTranslation from '@subwallet/extension-web-ui/hooks/common/useTranslation';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { Button, Checkbox, Icon, ModalContext, Typography } from '@subwallet/react-ui';
 import { CheckboxChangeEvent } from '@subwallet/react-ui/es/checkbox';
@@ -27,6 +28,7 @@ interface StaticDataInterface {
 
 const Component = ({ className, onOk }: Props) => {
   const { inactiveModal } = useContext(ModalContext);
+  const { t } = useTranslation();
   const { isWebUI } = useContext(ScreenContext);
   const [staticData, setStaticData] = useState({} as StaticDataInterface);
   const [isChecked, setIsChecked] = useState(false);
@@ -68,7 +70,7 @@ const Component = ({ className, onOk }: Props) => {
       })}
       closable={false}
       id={modalId}
-      title={'Compliance Confirmation'}
+      title={t('ui.TERM.components.Modal.Terms.Earning.complianceConfirmation')}
       width={isWebUI ? 784 : undefined}
     >
       <div
@@ -77,7 +79,7 @@ const Component = ({ className, onOk }: Props) => {
         ref={scrollRef}
       >
         <Typography.Text className={'term-subheading'}>
-          Before using staking, earning, or any third-party protocol services through SubWallet, please review and confirm the following:
+          {t('ui.TERM.components.Modal.Terms.Earning.reviewAndConfirm')}
         </Typography.Text>
         <Typography.Text>
           <Markdown>{staticData && staticData.md}</Markdown>
@@ -98,7 +100,7 @@ const Component = ({ className, onOk }: Props) => {
           checked={isChecked}
           className={'term-footer-checkbox'}
           onChange={onCheckedInput}
-        >I have read, understood, and agree to the above, and confirm that all representations made by me are true, accurate, and complete to the best of my knowledge.</Checkbox>
+        >{t('ui.TERM.components.Modal.Terms.Earning.agreeAndConfirm')}</Checkbox>
         <div className={'term-footer-button-group'}>
           <Button
             block={true}
@@ -112,9 +114,9 @@ const Component = ({ className, onOk }: Props) => {
             )}
             onClick={onConfirm}
           >
-            I Agree & Continue
+            {t('ui.TERM.components.Modal.Terms.Earning.agreeAndContinue')}
           </Button>
-          <span className={'term-footer-annotation'}>Scroll to read all sections</span>
+          <span className={'term-footer-annotation'}>{t('ui.TERM.components.Modal.Terms.General.scrollToReadAll')}</span>
         </div>
       </div>
     </BaseModal>

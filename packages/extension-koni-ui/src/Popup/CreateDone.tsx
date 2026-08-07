@@ -24,7 +24,7 @@ const Component: React.FC<Props> = (props: Props) => {
   return (
     <Layout.WithSubHeaderOnly
       rightFooterButton={{
-        children: t('Go to home'),
+        children: t('ui.screen.CreateDone.goToHome'),
         onClick: goHome,
         icon: <Icon
           phosphorIcon={ArrowCircleRight}
@@ -38,7 +38,7 @@ const Component: React.FC<Props> = (props: Props) => {
           size='md'
         />
       )}
-      title={t('Successful')}
+      title={t('ui.screen.CreateDone.successful')}
     >
       <div className={CN(className)}>
         <div className='page-icon'>
@@ -51,10 +51,10 @@ const Component: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className='title'>
-          {t('All done!')}
+          {t('ui.screen.CreateDone.allDone')}
         </div>
         <div className='description'>
-          {t('Follow along with product updates or reach out if you have any questions.')}
+          {t('ui.screen.CreateDone.followProductUpdates')}
         </div>
         <SocialButtonGroup />
       </div>

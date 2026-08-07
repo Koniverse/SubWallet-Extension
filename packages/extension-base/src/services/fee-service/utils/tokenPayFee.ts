@@ -21,12 +21,28 @@ export async function getAssetHubTokensCanPayFee (request: RequestAssetHubTokens
 
   // ensure nativeTokenInfo and localTokenInfo have multi-location metadata beforehand to improve performance.
   const tokensHasBalanceSlug = Object.keys(tokensHasBalanceInfoMap);
-  const tokenInfos = tokensHasBalanceSlug.map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
-    token.originChain === substrateApi.chainSlug &&
-    token.assetType !== _AssetType.NATIVE &&
-    token.metadata &&
-    token.metadata.multilocation
-  ));
+  const tokenInfos = tokensHasBalanceSlug
+    .map((tokenSlug) => {
+      const token = chainService.getAssetBySlug(tokenSlug);
+
+      if (!token) {
+        console.error(`[getAssetHubTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+      }
+
+      return token;
+    })
+    .filter((token) => {
+      if (!token) {
+        return false;
+      }
+
+      return (
+        token.originChain === substrateApi.chainSlug &&
+        token.assetType !== _AssetType.NATIVE &&
+        token.metadata &&
+        token.metadata.multilocation
+      );
+    });
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
     try {
@@ -79,23 +95,40 @@ export async function getHydrationTokensCanPayFee (request: RequestHydrationToke
     return tokensList;
   }
 
-  const tokenInfos = Object.keys(tokensHasBalanceInfoMap).map((tokenSlug) => chainService.getAssetBySlug(tokenSlug)).filter((token) => (
-    token.originChain === substrateApi.chainSlug &&
-    token.assetType !== _AssetType.NATIVE &&
-    !!token.metadata?.assetId &&
-    !!_getAssetPriceId(token) &&
-    supportedAssetIds.includes(_getTokenOnChainAssetId(token)))
-  );
+  const tokenInfos = Object.keys(tokensHasBalanceInfoMap)
+    .map((tokenSlug) => {
+      const token = chainService.getAssetBySlug(tokenSlug);
+
+      if (!token) {
+        console.error(`[getHydrationTokensCanPayFee] Token not found for slug: ${tokenSlug}`);
+      }
+
+      return token;
+    })
+    .filter((token) => {
+      if (!token) {
+        return false;
+      }
+
+      return (
+        token.originChain === substrateApi.chainSlug &&
+        token.assetType !== _AssetType.NATIVE &&
+        !!token.metadata?.assetId
+      );
+    });
 
   await Promise.all(tokenInfos.map(async (tokenInfo) => {
+    const priceId = _getAssetPriceId(tokenInfo);
     const rate = await getHydrationRate(address, nativeTokenInfo, tokenInfo);
 
-    if (rate) {
-      tokensList.push({
-        slug: tokenInfo.slug,
-        free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
-        rate: rate.toString()
-      });
+    if (priceId && rate) {
+      if (supportedAssetIds.includes(_getTokenOnChainAssetId(tokenInfo))) {
+        tokensList.push({
+          slug: tokenInfo.slug,
+          free: tokensHasBalanceInfoMap[tokenInfo.slug].free,
+          rate: rate.toString()
+        });
+      }
     }
   }));
 

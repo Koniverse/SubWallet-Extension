@@ -205,7 +205,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
 
     if (!ledger_) {
       return new Promise((resolve, reject) => {
-        reject(new Error(t("Can't find Ledger device")));
+        reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
       });
     }
 
@@ -232,7 +232,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
 
     if (!ledger_) {
       return new Promise((resolve, reject) => {
-        reject(new Error(t("Can't find Ledger device")));
+        reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
       });
     }
 
@@ -254,7 +254,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
       ledger.getAddress(false, accountOffset, addressOffset, accountOption)
         .then((addressOnCurrentLedger) => {
           if (address && !isSameAddress(addressOnCurrentLedger.address, address)) {
-            throw new Error(t('Wrong device. Connect your previously used Ledger and try again'));
+            throw new Error(t('ui.LEDGER.hook.ledger.useLedger.wrongLedgerDevice'));
           }
 
           ledger.signTransaction(message, metadata, accountOffset, addressOffset, accountOption)
@@ -271,8 +271,8 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
           reject(error);
         });
     } else {
-      reject(new Error(t("Can't find Ledger device")));
-      handleError(new Error(t("Can't find Ledger device")));
+      reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
+      handleError(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
     }
 
     return promise;
@@ -286,7 +286,7 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
       ledger.getAddress(false, accountOffset, addressOffset, accountOption)
         .then((addressOnCurrentLedger) => {
           if (address && !isSameAddress(addressOnCurrentLedger.address, address)) {
-            throw new Error(t('Wrong device. Connect your previously used Ledger and try again'));
+            throw new Error(t('ui.LEDGER.hook.ledger.useLedger.wrongLedgerDevice'));
           }
 
           ledger.signMessage(message, accountOffset, addressOffset, accountOption)
@@ -303,8 +303,8 @@ export function useLedger (chainSlug?: string, active = true, isSigning = false,
           reject(error);
         });
     } else {
-      reject(new Error(t("Can't find Ledger device")));
-      handleError(new Error(t("Can't find Ledger device")));
+      reject(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
+      handleError(new Error(t('ui.LEDGER.hook.ledger.useLedger.cantFindLedgerDevice')));
     }
 
     return promise;

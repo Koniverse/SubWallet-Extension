@@ -14,6 +14,7 @@ import useClickOutSide from '@subwallet/extension-web-ui/hooks/dom/useClickOutSi
 import { createAccountSuriV2, createSeedV2 } from '@subwallet/extension-web-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
 import { renderModalSelector } from '@subwallet/extension-web-ui/utils/common/dom';
+import { BitcoinKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
 import { Button, Icon, ModalContext } from '@subwallet/react-ui';
 import CN from 'classnames';
 import { CheckCircle } from 'phosphor-react';
@@ -72,6 +73,7 @@ const Component: React.FC<Props> = ({ className, modalId, onBack, onSubmitSucces
         createAccountSuriV2({
           name: accountName,
           suri: seedPhrase,
+          types: ['sr25519', ...EthereumKeypairTypes, 'ton', ...CardanoKeypairTypes, ...BitcoinKeypairTypes],
           isAllowed: true
         })
           .then(() => {

@@ -183,7 +183,7 @@ export const EARNING_DATA_RAW = {
       iconColor: '#008dff'
     }
   ],
-  BITTENOSR_STAKING: [
+  BITTENSOR_STAKING: [
     {
       icon: 'ThumbsUp',
       title: 'Select {validatorNumber} {validatorType}',
@@ -223,6 +223,16 @@ export const EARNING_DATA_RAW = {
   [YieldPoolType.PARACHAIN_STAKING]: [],
   [YieldPoolType.SINGLE_FARMING]: []
 };
+
+export const TANSSI_EARNING_DATA_RAW = EARNING_DATA_RAW[YieldPoolType.NATIVE_STAKING].map((item) =>
+  item.icon === 'Coins'
+    ? {
+      ...item,
+      description:
+        'Once staked, your funds will be locked. Unstake your funds anytime and they will be <strong>automatically withdrawn</strong> to your account <strong>within 12 hours</strong>. Keep in mind that the unstaking action will incur network fees.'
+    }
+    : item
+);
 
 export const STAKE_ALERT_DATA = {
   title: 'Pay attention!',
@@ -270,3 +280,24 @@ export const UNSTAKE_BITTENSOR_ALERT_DATA = UNSTAKE_ALERT_DATA.filter((_, index)
   icon: 'Coins',
   iconColor: '#e6dc25'
 }));
+
+export const UNSTAKE_TANSSI_ALERT_DATA = [
+  {
+    title: 'Unstake order',
+    description: 'Your Manual stake will be unstaked first, then your Compounding stake',
+    icon: 'DownloadSimple',
+    iconColor: '#2595e6'
+  },
+  {
+    title: 'Wait time',
+    description: 'Once unstaked, the funds will be automatically withdrawn to your account after 12 hours maximum',
+    icon: 'ClockClockwise',
+    iconColor: '#2595e6'
+  },
+  {
+    title: 'No rewards',
+    description: 'During the unstaking period of {unBondedTime}, your tokens produce no rewards',
+    icon: 'Coins',
+    iconColor: '#e6dc25'
+  }
+];

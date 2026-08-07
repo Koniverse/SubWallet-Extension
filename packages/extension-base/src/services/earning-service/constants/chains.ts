@@ -1,8 +1,10 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { STELLA_SWAP_LIQUID_STAKING_SLUG } from '../handlers/liquid-staking/stella-swap';
+
 export const _STAKING_CHAIN_GROUP = {
-  relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'paseoTest'],
+  relay: ['polkadot', 'kusama', 'aleph', 'polkadex', 'ternoa', 'alephTest', 'polkadexTest', 'westend', 'kate', 'edgeware', 'creditcoin', 'vara_network', 'goldberg_testnet', 'availTuringTest', 'avail_mainnet', 'vara_testnet', 'dentnet', 'cere', 'zkverify', 'zkverify_testnet', 'paseoTest'],
   assetHub: ['statemine', 'statemint', 'westend_assethub', 'paseo_assethub'],
   para: ['moonbeam', 'moonriver', 'moonbase', 'turing', 'turingStaging', 'bifrost', 'bifrost_testnet', 'calamari_test', 'calamari', 'manta_network', 'polimec'],
   astar: ['astar', 'shiden', 'shibuya'],
@@ -16,9 +18,15 @@ export const _STAKING_CHAIN_GROUP = {
   krest_network: ['krest_network'],
   manta: ['manta_network'],
   bittensor: ['bittensor', 'bittensor_testnet'],
-  energy: ['energy_web_x', 'energy_web_x_testnet'],
-  mythos: ['mythos', 'muse_testnet']
+  energy: ['energy_web_x_testnet', 'energy_web_x'],
+  mythos: ['mythos', 'muse_testnet'],
+  tanssi: ['tanssi', 'dancelight']
 };
+
+export const SUNSETTED_YIELD_POOL_SLUGS: string[] = [
+  STELLA_SWAP_LIQUID_STAKING_SLUG,
+  'MANTA___native_staking___manta_network'
+];
 
 export const RELAY_HANDLER_DIRECT_STAKING_CHAINS = [
   ..._STAKING_CHAIN_GROUP.relay,
@@ -38,9 +46,8 @@ export const MANTA_MIN_DELEGATION = 500;
 export const CHANNEL_ID = 7;
 
 export const STAKING_IDENTITY_API_SLUG: Record<string, string> = {
-// @TODO: Remove polkadot then migrate
-  polkadot: 'polkadot_people',
-
   statemine: 'peopleKusama',
   statemint: 'polkadot_people'
 };
+
+export const MIN_XCM_LIQUID_STAKING_DOT = '15000000000';

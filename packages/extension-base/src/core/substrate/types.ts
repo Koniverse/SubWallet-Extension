@@ -25,6 +25,23 @@ export type FrameSystemAccountInfoV1 = {
   }
 }
 
+export interface FrameBalancesLocksInfo {
+  id: string | Record<string, unknown>;
+  amount: string | number | bigint;
+  reasons?: string;
+}
+
+export interface FrameBalancesHoldsInfo {
+  id: string | Record<string, unknown>;
+  amount: string | number | bigint;
+  reason?: string;
+}
+
+export interface FrameBalancesFreezesInfo {
+  id: string | Record<string, unknown>;
+  amount: string;
+}
+
 export type FrameSystemAccountInfo = FrameSystemAccountInfoV1 | FrameSystemAccountInfoV2;
 
 export type OrmlTokensAccountData = {

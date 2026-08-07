@@ -28,7 +28,7 @@ import { ActivityIndicator, Button, Icon, ModalContext, SwList, SwSubHeader } fr
 import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, XCircle } from 'phosphor-react';
+import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, UserSwitch, XCircle } from 'phosphor-react';
 import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -75,7 +75,8 @@ export enum NotificationIconBackgroundColorMap {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM = 'yellow-7',
   CLAIM_POLYGON_BRIDGE = 'yellow-7',
   SWAP = 'blue-8',
-  EARNING = 'blue-8'
+  EARNING = 'blue-8',
+  MULTISIG_APPROVAL = 'geekblue-9'
 }
 
 export const NotificationIconMap = {
@@ -87,7 +88,8 @@ export const NotificationIconMap = {
   CLAIM_AVAIL_BRIDGE_ON_ETHEREUM: Coins,
   CLAIM_POLYGON_BRIDGE: Coins,
   SWAP: ArrowsLeftRight,
-  EARNING: Database
+  EARNING: Database,
+  MULTISIG_APPROVAL: UserSwitch
 };
 
 function Component ({ isInModal,
@@ -571,7 +573,10 @@ function Component ({ isInModal,
   }, [loadingNotification, onEnableNotification, t]);
 
   const handleSwitchClick = useCallback(() => {
-    markAllReadNotification(currentProxyId || ALL_ACCOUNT_KEY)
+    markAllReadNotification({
+      proxyId: currentProxyId || ALL_ACCOUNT_KEY,
+      excludeNotificationIds: []
+    })
       .catch(console.error);
 
     setLoading(true);

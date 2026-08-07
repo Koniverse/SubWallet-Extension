@@ -192,6 +192,12 @@ export interface WalletConnectStore extends BaseReduxStore {
   sessions: Record<string, SessionTypes.Struct>;
 }
 
+export type WalletConnectSessionsSubscription = {
+  promise: Promise<SessionTypes.Struct[]>;
+  start: () => void;
+  unsub: () => void;
+};
+
 export interface MantaPayStore {
   configs: MantaPayConfig[],
   isSyncing: boolean,

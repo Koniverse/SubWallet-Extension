@@ -51,7 +51,7 @@ function Component (props: Props): React.ReactElement<Props> {
   );
 }
 
-export const WebsiteAccessItem = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => {
+export const WebsiteAccessItem = styled(React.memo(Component))<Props>(({ theme: { token } }: ThemeProps) => {
   return ({
     padding: 0,
     paddingLeft: token.sizeSM,

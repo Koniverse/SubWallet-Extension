@@ -109,6 +109,7 @@ function Component (props: Props): React.ReactElement<Props> {
         case YieldPoolType.LIQUID_STAKING:
           return 'Earn up to {{apy}} yearly from {{minActiveStake}} with {{shortName}}';
         case YieldPoolType.LENDING:
+        default:
           return 'Earn up to {{apy}} yearly from {{minActiveStake}} with {{shortName}}';
       }
     };

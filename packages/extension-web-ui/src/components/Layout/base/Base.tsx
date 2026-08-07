@@ -12,7 +12,7 @@ import { computeStatus } from '@subwallet/extension-web-ui/utils';
 import { Icon, SwScreenLayout, SwScreenLayoutProps } from '@subwallet/react-ui';
 import { SwTabBarItem } from '@subwallet/react-ui/es/sw-tab-bar';
 import CN from 'classnames';
-import { Aperture, Clock, Globe, Parachute, Rocket, Vault, Wallet } from 'phosphor-react';
+import { Aperture, Clock, Globe, Parachute, Vault, Wallet } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -113,16 +113,6 @@ const Component = ({ children, className, headerIcons, isSetTitleContext = true,
       label: t('ui.components.Layout.Base.missions'),
       key: 'mission-pools',
       url: '/home/mission-pools'
-    },
-    {
-      icon: {
-        type: 'phosphor',
-        phosphorIcon: Rocket,
-        weight: 'fill'
-      },
-      label: t('ui.components.Layout.Base.crowdloans'),
-      key: 'crowdloans',
-      url: '/home/crowdloans'
     },
     {
       icon: {

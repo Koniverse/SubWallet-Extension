@@ -3,10 +3,11 @@
 
 import { ExtrinsicType, TransactionAdditionalInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { PendingMultisigTxRequest } from '@subwallet/extension-base/types/multisig';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps, TransactionHistoryDisplayItem } from '@subwallet/extension-koni-ui/types';
-import { isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
+import { isTypeMultisig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -32,6 +33,18 @@ const Component: React.FC<Props> = (props: Props) => {
     return undefined;
   }, [data.additionalInfo, data.type]);
 
+  const isMultisig = isTypeMultisig(data.type);
+
+  const senderLabel = useMemo(() => {
+    switch (data.type) {
+      case ExtrinsicType.ADD_SUBSTRATE_PROXY_ACCOUNT:
+      case ExtrinsicType.REMOVE_SUBSTRATE_PROXY_ACCOUNT:
+        return t('ui.HISTORY.screen.HistoryDetail.Header.fromAccount');
+      default:
+        return undefined;
+    }
+  }, [data.type, t]);
+
   if (xcmInfo) {
     return (
       <MetaInfo.Transfer
@@ -56,13 +69,40 @@ const Component: React.FC<Props> = (props: Props) => {
       <>
         <MetaInfo.Chain
           chain={data.chain}
-          label={t('Network')}
+          label={t('ui.HISTORY.screen.HistoryDetail.Header.network')}
         />
         <MetaInfo.Account
           address={data.from}
-          label={t('From account')}
+          label={t('ui.HISTORY.screen.HistoryDetail.Header.fromAccount')}
           name={data.fromName}
           networkPrefix={chainInfoMap[data.chain]?.substrateInfo?.addressPrefix}
+        />
+      </>
+    );
+  }
+
+  if (isMultisig) {
+    const additionalInfo = data.additionalInfo as PendingMultisigTxRequest;
+    const multisigAddress = additionalInfo.multisigMetadata.multisigAddress;
+
+    return (
+      <>
+        <MetaInfo.Chain
+          chain={data.chain}
+          label={t('ui.HISTORY.screen.HistoryDetail.Header.network')}
+        />
+        <MetaInfo.Account
+          address={data.from}
+          label={t('ui.HISTORY.screen.HistoryDetail.Header.fromAccount')}
+          name={data.fromName}
+          networkPrefix={chainInfoMap[data.chain]?.substrateInfo?.addressPrefix}
+          onlyShowName={true}
+        />
+        <MetaInfo.Account
+          address={multisigAddress}
+          label={t('ui.HISTORY.screen.HistoryDetail.Header.multisigAccount')}
+          networkPrefix={chainInfoMap[data.chain]?.substrateInfo?.addressPrefix}
+          onlyShowName={true}
         />
       </>
     );
@@ -72,7 +112,7 @@ const Component: React.FC<Props> = (props: Props) => {
     <>
       {data.to && <MetaInfo.Chain
         chain={data.chain}
-        label={t('Network')}
+        label={t('ui.HISTORY.screen.HistoryDetail.Header.network')}
       />}
 
       <MetaInfo.Transfer
@@ -87,6 +127,7 @@ const Component: React.FC<Props> = (props: Props) => {
         recipientAddress={data.to}
         recipientName={data.toName}
         senderAddress={data.from}
+        senderLabel={senderLabel}
         senderName={data.fromName}
       />
 

@@ -388,7 +388,7 @@ export default function useCoreReceiveModalHelper (tokenGroupSlug?: string): Hoo
               setSelectedAccountAddressItem(undefined);
             });
           } else {
-            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, () => {
+            openAddressQrModal(reformatedAddress, accountJson.type, currentAccountProxy.id, chainSlug, tokenSlug, () => {
               setSelectedAccountAddressItem(undefined);
             }, false);
           }

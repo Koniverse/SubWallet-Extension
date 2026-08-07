@@ -3,7 +3,7 @@
 
 import { ChainRecommendValidator } from '@subwallet/extension-base/constants';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { RELAY_HANDLER_DIRECT_STAKING_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { NominationInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { detectTranslate, fetchStaticData } from '@subwallet/extension-base/utils';
 import { SelectValidatorInput, StakingValidatorItem } from '@subwallet/extension-koni-ui/components';
@@ -20,7 +20,7 @@ import { getValidatorKey } from '@subwallet/extension-koni-ui/utils/transaction/
 import { Badge, Button, Icon, InputRef, ModalContext, SwList, SwModal, useExcludeModal } from '@subwallet/react-ui';
 import { SwListSectionRef } from '@subwallet/react-ui/es/sw-list';
 import BigN from 'bignumber.js';
-import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending } from 'phosphor-react';
+import { CaretLeft, CheckCircle, FadersHorizontal, SortAscending, ThumbsUp } from 'phosphor-react';
 import React, { ForwardedRef, forwardRef, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -101,11 +101,11 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   // const cachedNominations = useMemo(() => compound?.nominations || [], [compound]);
 
   const [nominations] = useState<NominationInfo[]>(compound?.nominations || []); // Remove set Nomination
-  const isRelayChain = useMemo(() => _STAKING_CHAIN_GROUP.relay.includes(chain), [chain]);
+  const isRelayChain = useMemo(() => RELAY_HANDLER_DIRECT_STAKING_CHAINS.includes(chain), [chain]);
   const isSingleSelect = useMemo(() => _isSingleSelect || !isRelayChain, [_isSingleSelect, isRelayChain]);
   const hasReturn = useMemo(() => items[0]?.expectedReturn !== undefined, [items]);
 
-  const [defaultPoolMap, setDefaultPoolMap] = useState<Record<string, ChainRecommendValidator>>({});
+  const [defaultValidatorMap, setDefaultValidatorMap] = useState<Record<string, ChainRecommendValidator>>({});
 
   const maxPoolMembersValue = useMemo(() => {
     if (poolInfo.type === YieldPoolType.NATIVE_STAKING) { // todo: should also check chain group for pool
@@ -119,7 +119,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     const result: SortOption[] = [
       {
         desc: false,
-        label: t('Lowest commission'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestCommission'),
         value: SortKey.COMMISSION
       }
     ];
@@ -127,7 +127,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (hasReturn) {
       result.push({
         desc: true,
-        label: t('Highest annual return'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.highestAnnualReturn'),
         value: SortKey.RETURN
       });
     }
@@ -135,14 +135,14 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (nominations && nominations.length > 0) {
       result.push({
         desc: true,
-        label: t('Nomination'),
+        label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.nomination'),
         value: SortKey.NOMINATING
       });
     }
 
     result.push({
       desc: false,
-      label: t('Lowest min active stake'),
+      label: t('ui.EARNING.components.Field.Earning.ValidatorSelector.lowestMinActiveStake'),
       value: SortKey.MIN_STAKE
     });
 
@@ -168,20 +168,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     if (!fewValidators) {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApp');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneDapp');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneCollator');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validator');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyOneValidator');
       }
     } else {
       switch (label) {
         case 'dApp':
-          return detectTranslate('Apply {{number}} dApps');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberDapps');
         case 'Collator':
-          return detectTranslate('Apply {{number}} collators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberCollators');
         case 'Validator':
-          return detectTranslate('Apply {{number}} validators');
+          return detectTranslate('ui.EARNING.components.Field.Earning.ValidatorSelector.applyNumberValidators');
       }
     }
   }, [chain, fewValidators]);
@@ -229,6 +229,24 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
       }
     });
   }, [items, sortSelection, sortValidator]);
+
+  const validatorResultList = useMemo(() => {
+    const recommendedAddresses = defaultValidatorMap[chain]?.preSelectValidators?.split(',') || [];
+    const recommendedItems = resultList.filter((item) => recommendedAddresses.includes(item.address));
+    const otherItems = resultList.filter((item) => !recommendedAddresses.includes(item.address));
+
+    if (!recommendedItems.length) {
+      return otherItems;
+    }
+
+    const recommendedHeader = { isSectionHeader: true, identity: 'Recommended' };
+
+    if (!otherItems.length) {
+      return [recommendedHeader, ...recommendedItems];
+    }
+
+    return [recommendedHeader, ...recommendedItems, { isSectionHeader: true, identity: 'Others' }, ...otherItems];
+  }, [chain, defaultValidatorMap, resultList]);
 
   const filterFunction = useMemo<(item: ValidatorDataType) => boolean>(() => {
     return (item) => {
@@ -278,6 +296,28 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [handleValidatorLabel, items.length, setForceFetchValidator, t]);
 
   const renderItem = useCallback((item: ValidatorDataType) => {
+    if (item.isSectionHeader) {
+      const isRecommended = item.identity === 'Recommended';
+
+      return (
+        <div
+          className={'__section-header'}
+          key={item.identity}
+        >
+          {item.identity?.toUpperCase()}
+          {isRecommended && (
+            <Icon
+              className={'__selected-icon'}
+              iconColor={'#4cd9ac'}
+              phosphorIcon={ThumbsUp}
+              size='xs'
+              weight='fill'
+            />
+          )}
+        </div>
+      );
+    }
+
     if (item.address === originValidator) {
       return null;
     }
@@ -308,6 +348,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
   }, [activeModal]);
 
   const searchFunction = useCallback((item: ValidatorDataType, searchText: string) => {
+    if (item.isSectionHeader) {
+      return false;
+    }
+
     const searchTextLowerCase = searchText.toLowerCase();
 
     return (
@@ -349,12 +393,12 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   useEffect(() => {
     fetchStaticData<Record<string, ChainRecommendValidator>>('direct-nomination-validator').then((earningPoolRecommendation) => {
-      setDefaultPoolMap(earningPoolRecommendation);
+      setDefaultValidatorMap(earningPoolRecommendation);
     }).catch(console.error);
   }, []);
 
   useEffect(() => {
-    const recommendValidator = defaultPoolMap[chain];
+    const recommendValidator = defaultValidatorMap[chain];
 
     if (recommendValidator) {
       setAutoValidator((old) => {
@@ -374,7 +418,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     } else {
       setAutoValidator('');
     }
-  }, [items, chain, defaultPoolMap]);
+  }, [items, chain, defaultValidatorMap]);
 
   useEffect(() => {
     const _default = nominations?.map((item) => getValidatorKey(item.validatorAddress, item.validatorIdentity)).join(',') || autoValidator || '';
@@ -407,7 +451,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         chain={chain}
         disabled={!chain || !from}
         identPrefix={networkPrefix}
-        label={label || t('Select') + ' ' + t(handleValidatorLabel)}
+        label={label || t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
         loading={loading}
         onClick={onActiveValidatorSelector}
         value={value || ''}
@@ -450,13 +494,13 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
             activeModal(SORTING_MODAL_ID);
           }
         }}
-        title={t('Select') + ' ' + t(handleValidatorLabel)}
+        title={t('ui.EARNING.components.Field.Earning.ValidatorSelector.select') + ' ' + t(handleValidatorLabel)}
       >
         <SwList.Section
           actionBtnIcon={<Icon phosphorIcon={FadersHorizontal} />}
           enableSearchInput={true}
           filterBy={filterFunction}
-          list={resultList}
+          list={validatorResultList}
           onClickActionBtn={onClickActionBtn}
           ref={sectionRef}
           renderItem={renderItem}
@@ -526,6 +570,18 @@ const EarningValidatorSelector = styled(forwardRef(Component))<Props>(({ theme: 
 
     '.pool-item:not(:last-child)': {
       marginBottom: token.marginXS
+    },
+
+    '.__section-header': {
+      fontSize: token.fontSizeSM,
+      color: token.colorTextSecondary,
+      fontWeight: token.fontWeightStrong,
+      marginBottom: token.marginXXS,
+      lineHeight: token.lineHeightSM
+    },
+
+    '.__selected-icon': {
+      paddingLeft: token.paddingXXS
     }
   };
 });

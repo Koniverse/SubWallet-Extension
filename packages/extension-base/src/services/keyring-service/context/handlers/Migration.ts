@@ -3,6 +3,7 @@
 
 import { RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestPingSession, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, SoloAccountToBeMigrated } from '@subwallet/extension-base/background/KoniTypes';
 import { AccountBaseHandler } from '@subwallet/extension-base/services/keyring-service/context/handlers/Base';
+import { isTWAccount } from '@subwallet/extension-base/services/keyring-service/utils';
 import { AccountChainType, AccountProxy, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@subwallet/extension-base/types';
 import { createAccountProxyId, getDefaultKeypairTypeFromAccountChainType, getSuri } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
@@ -41,7 +42,8 @@ export class AccountMigrationHandler extends AccountBaseHandler {
   public async migrateUnifiedAndFetchEligibleSoloAccounts (request: RequestMigrateUnifiedAndFetchEligibleSoloAccounts, setMigratingModeFn: () => void): Promise<ResponseMigrateUnifiedAndFetchEligibleSoloAccounts> {
     // Migrate unified -> unified
     const password = request.password;
-    const allAccountProxies = Object.values(this.state.accounts);
+    const _allAccountProxies = Object.values(this.state.accounts);
+    const allAccountProxies = _allAccountProxies.filter((acc) => !isTWAccount(acc)); // Prevent migrate TrustWallet solo account
     const UACanBeMigrated = this.getUACanBeMigrated(allAccountProxies);
     const UACanBeMigratedSortedByParent = this.sortUAByParent(UACanBeMigrated); // master account must be migrated before derived account
     const migratedUnifiedAccountIds = await this.migrateUnifiedToUnifiedAccount(password, UACanBeMigratedSortedByParent, setMigratingModeFn);

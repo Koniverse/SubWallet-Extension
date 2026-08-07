@@ -97,10 +97,20 @@ export default function useHistorySelection () {
     }
   }, [chainInfoMap, chainItems]);
 
-  // NOTE: This hook doesn't handle selected address manually,
-  // because it's now controlled via the `autoSelectFirstItem` prop
-  // in the AccountAddressSelector component. This is the best approach for now;
-  // can be revised if a better solution arises in the future.
+  useEffect(() => {
+    const doFunc = () => {
+      if (accountAddressItems.length === 1) {
+        setSelectedAddress(accountAddressItems[0].address);
+      }
+    };
+
+    doFunc();
+  }, [accountAddressItems]);
+
+  // NOTE: This hook doesn't manage the selected address manually when `accountAddressItems`
+  // contains more than one item, because selection is now controlled via the
+  // `autoSelectFirstItem` prop in the AccountAddressSelector component. This is the best
+  // approach for now, but we can revisit it if a better solution emerges in the future.
 
   return {
     chainItems,

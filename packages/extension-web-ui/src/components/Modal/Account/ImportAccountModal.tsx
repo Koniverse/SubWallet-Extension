@@ -1,8 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import DefaultLogosMap from '@subwallet/extension-web-ui/assets/logo';
 import { BaseModal } from '@subwallet/extension-web-ui/components/Modal/BaseModal';
-import { IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL } from '@subwallet/extension-web-ui/constants';
+import { IMPORT_ACCOUNT_MODAL, IMPORT_SEED_MODAL, IMPORT_SEED_TRUST_MODAL, TRUST_WALLET_MNEMONIC_TYPE } from '@subwallet/extension-web-ui/constants';
 import { ScreenContext } from '@subwallet/extension-web-ui/contexts/ScreenContext';
 import { useClickOutSide, useGoBackSelectAccount, useIsPopup, useTranslation } from '@subwallet/extension-web-ui/hooks';
 import usePreloadView from '@subwallet/extension-web-ui/hooks/router/usePreloadView';
@@ -25,7 +26,7 @@ type Props = ThemeProps;
 interface ImportAccountItem {
   label: string;
   key: string;
-  icon: PhosphorIcon;
+  icon: PhosphorIcon | React.ReactNode;
   backgroundColor: string;
   onClick: () => void;
 }
@@ -83,6 +84,16 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     }
   }, [activeModal, inactiveModal, isWebUI, navigate]);
 
+  const onClickSeedTrust = useCallback(() => {
+    inactiveModal(modalId);
+
+    if (isWebUI) {
+      navigate(`/accounts/import-seed-phrase?type=${TRUST_WALLET_MNEMONIC_TYPE}`);
+    } else {
+      activeModal(IMPORT_SEED_TRUST_MODAL);
+    }
+  }, [activeModal, inactiveModal, isWebUI, navigate]);
+
   const items = useMemo((): ImportAccountItem[] => [
     {
       backgroundColor: token['green-7'],
@@ -111,16 +122,33 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       key: 'import-by-qr',
       label: t('ui.ACCOUNT.components.Modal.Account.Import.importByQrCode'),
       onClick: onClickItem('/accounts/import-by-qr')
+    },
+    {
+      backgroundColor: token.colorTextBase,
+      icon: (
+        <img
+          alt=''
+          src={DefaultLogosMap.trust}
+          style={{ width: '24px', height: '24px', objectFit: 'contain', display: 'block', borderRadius: '50%' }}
+        />
+      ),
+      key: 'import-seed-phrase-trust',
+      label: t('ui.ACCOUNT.components.Modal.Account.Import.importFromSeedPhraseTrust'),
+      onClick: onClickSeedTrust
     }
-  ], [token, t, onClickSeed, onClickJson, onClickItem]);
+  ], [token, t, onClickSeed, onClickJson, onClickItem, onClickSeedTrust]);
 
   const renderIcon = useCallback((item: ImportAccountItem) => {
+    const isNode = React.isValidElement(item.icon);
+
     return (
       <BackgroundIcon
         backgroundColor={item.backgroundColor}
+        customIcon={isNode ? item.icon as React.ReactNode : undefined}
         iconColor={token.colorText}
-        phosphorIcon={item.icon}
+        phosphorIcon={isNode ? undefined : item.icon as PhosphorIcon}
         size='sm'
+        type={isNode ? 'customIcon' : 'phosphor'}
         weight='fill'
       />
     );
