@@ -101,9 +101,6 @@ export interface GovUnlockVoteParams extends TransactionFormBaseProps {
   tracks: number[];
 }
 
-export interface ChangeBittensorRootClaimType extends TransactionFormBaseProps {
-  bittensorRootClaimType: string;
-}
 export interface AddSubstrateProxyAccountParams extends TransactionFormBaseProps {
   substrateProxyAddress: string;
   substrateProxyType: SubstrateProxyType;
