@@ -237,10 +237,6 @@ function Component (): React.ReactElement {
     }
   }, [accountProxies, currentAccountProxy, isAllAccount]);
 
-  const isSupportSendFund = useMemo(() => {
-    return !excludedTokens.length || tokenBalanceItems.some(({ slug }) => !excludedTokens.includes(slug));
-  }, [excludedTokens, tokenBalanceItems]);
-
   const isReadonlyAccount = useMemo(() => {
     return currentAccountProxy && currentAccountProxy.accountType === AccountProxyType.READ_ONLY;
   }, [currentAccountProxy]);
