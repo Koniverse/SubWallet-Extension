@@ -488,7 +488,7 @@ const Component: React.FC = () => {
               chain={chainValue}
               defaultValue={persistValidator}
               disabled={!fromValue}
-              label={`${t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel')} ${t(handleValidatorLabel)}`}
+              label={t('ui.TRANSACTION.screen.Transaction.Unbond.selectValidatorLabel', { replace: { handleValidatorLabel: t(handleValidatorLabel) } })}
               nominators={nominators}
               poolInfo={poolInfo}
             />

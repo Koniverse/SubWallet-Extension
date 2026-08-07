@@ -2495,5 +2495,7 @@
   "ui.NFT.screen.nested.NftViewStructure.parent": "",
   "ui.NFT.screen.nested.NftViewStructure.nestedInParent": "",
   "ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount": "",
-  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": ""
+  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": ""
 }

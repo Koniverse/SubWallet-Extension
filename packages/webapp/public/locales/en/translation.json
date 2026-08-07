@@ -2495,5 +2495,7 @@
   "ui.NFT.screen.nested.NftViewStructure.parent": "Parent",
   "ui.NFT.screen.nested.NftViewStructure.nestedInParent": "Nested in {{parentId}}",
   "ui.NFT.screen.nested.NftViewStructure.nftStructureWithCount": "NFT Structure ({{totalCount}})",
-  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found"
+  "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "This dApp sent a raw message through a transaction-signing request. No signature can be created. Reject this request and contact the dApp.",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "Unable to decode this signing payload. Reject this request and try again after the dApp or network type definitions are updated."
 }

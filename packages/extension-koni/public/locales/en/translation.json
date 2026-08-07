@@ -2808,5 +2808,7 @@
   "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found",
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
-  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
+  "ui.DAPP.Confirmations.Sign.Substrate.dappSentRawDataInExtrinsicRequest": "This dApp sent a raw message through a transaction-signing request. No signature can be created. Reject this request and contact the dApp.",
+  "ui.DAPP.Confirmations.Sign.Substrate.unableToDecode": "Unable to decode this signing payload. Reject this request and try again after the dApp or network type definitions are updated."
 }
