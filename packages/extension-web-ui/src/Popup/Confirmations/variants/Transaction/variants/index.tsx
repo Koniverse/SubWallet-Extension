@@ -18,7 +18,6 @@ export { default as JoinYieldPoolConfirmation } from './JoinYieldPool';
 export { default as TokenApproveConfirmation } from './TokenApprove';
 export { default as SwapTransactionConfirmation } from './Swap';
 export { default as ChangeEarningValidatorTransactionConfirmation } from './ChangeEarningValidator';
-export { default as ChangeBittensorRootClaimRewardTypeTransactionConfirmation } from './ChangeBittensorRootClaimRewardType';
 
 export * from './TransferBlock';
 export * from './Process';

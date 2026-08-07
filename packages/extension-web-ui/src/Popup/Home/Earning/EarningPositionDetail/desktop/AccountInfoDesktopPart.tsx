@@ -2,23 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
-import { BittensorRootClaimType, BittensorStakingMetadata, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { Avatar, EarningBittensorClaimRewardTypeModal, EarningNominationModal, EmptyList, MetaInfo } from '@subwallet/extension-web-ui/components';
+import { Avatar, EarningNominationModal, EmptyList, MetaInfo } from '@subwallet/extension-web-ui/components';
 import EarningValidatorSelectedModal from '@subwallet/extension-web-ui/components/Modal/Earning/EarningValidatorSelectedModal';
 import Table from '@subwallet/extension-web-ui/components/Table/Table';
-import { CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS, EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL, EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
+import { EARNING_NOMINATION_MODAL, EARNING_SELECTED_VALIDATOR_MODAL, EarningStatusUi } from '@subwallet/extension-web-ui/constants';
 import { useGetAccountByAddress, useSelector, useTranslation } from '@subwallet/extension-web-ui/hooks';
-import { RootState } from '@subwallet/extension-web-ui/stores';
 import { ThemeProps } from '@subwallet/extension-web-ui/types';
-import { findNetworkJsonByGenesisHash, getTransactionFromAccountProxyValue, reformatAddress, toShort } from '@subwallet/extension-web-ui/utils';
+import { findNetworkJsonByGenesisHash, reformatAddress, toShort } from '@subwallet/extension-web-ui/utils';
 import { Button, Icon, ModalContext, Number } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
-import { ArrowSquareOut, Database, PencilSimpleLine } from 'phosphor-react';
+import { ArrowSquareOut, Database } from 'phosphor-react';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useLocalStorage } from 'usehooks-ts';
 
 interface Props extends ThemeProps {
   positionItems: YieldPositionInfo[];
@@ -67,12 +65,6 @@ const RowAccountComponent = ({ address }: RowAccountComponentProp) => {
   );
 };
 
-const getBittensorRootClaimType = (item?: YieldPositionInfo): BittensorRootClaimType => {
-  const rootClaimType = (item?.metadata as BittensorStakingMetadata | undefined)?.bittensorRootClaimType;
-
-  return rootClaimType === 'Swap' || rootClaimType === 'Keep' ? rootClaimType : 'Others';
-};
-
 const Component: React.FC<Props> = ({ className, compound,
   inputAsset, poolInfo,
   positionItems }: Props) => {
@@ -82,8 +74,6 @@ const Component: React.FC<Props> = ({ className, compound,
   const { type } = compound;
 
   const { assetRegistry } = useSelector((state) => state.assetRegistry);
-  const currentAccountProxy = useSelector((state: RootState) => state.accountState.currentAccountProxy);
-  const [, setClaimTypeStorage] = useLocalStorage(CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_TRANSACTION, DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS);
 
   const [selectedAddress, setSelectedAddress] = useState('');
 
@@ -122,29 +112,9 @@ const Component: React.FC<Props> = ({ className, compound,
     };
   }, [activeModal]);
 
-  const createOpenBittensorRootClaimTypeModal = useCallback((item: YieldPositionInfo) => {
-    return () => {
-      setSelectedAddress(item.address);
-      setClaimTypeStorage({
-        ...DEFAULT_CHANGE_BITTENSOR_ROOT_CLAIM_TYPE_PARAMS,
-        fromAccountProxy: getTransactionFromAccountProxyValue(currentAccountProxy),
-        chain: item.chain,
-        from: item.address,
-        asset: inputAsset?.slug || '',
-        bittensorRootClaimType: getBittensorRootClaimType(item)
-      });
-
-      activeModal(EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL);
-    };
-  }, [activeModal, currentAccountProxy, inputAsset?.slug, setClaimTypeStorage]);
-
   const canChangeValidator = useMemo(() => {
     return poolInfo.metadata.availableMethod.changeValidator;
   }, [poolInfo]);
-
-  const isBittensorRootStaking = useMemo(() => {
-    return (poolInfo.chain === 'bittensor' || poolInfo.chain === 'bittensor_testnet') && type === YieldPoolType.NATIVE_STAKING;
-  }, [poolInfo.chain, type]);
 
   const columns = useMemo(() => {
     const accountCol = {
@@ -172,31 +142,6 @@ const Component: React.FC<Props> = ({ className, compound,
               valueColorSchema={EarningStatusUi[row.status].schema}
             />
           </MetaInfo>
-        );
-      }
-    };
-
-    const claimRewardTypeCol = {
-      title: t('ui.EARNING.screen.EarningPositionDetail.AccountInfoPart.claimRewardsType'),
-      key: 'claim-reward-type',
-      className: '__table-claim-reward-type-col',
-      render: (row: YieldPositionInfo) => {
-        return (
-          <div className='__row-claim-reward-type'>
-            <span>{getBittensorRootClaimType(row)}</span>
-            <Button
-              className='__row-claim-reward-type-button'
-              icon={
-                <Icon
-                  customSize='18px'
-                  phosphorIcon={PencilSimpleLine}
-                />
-              }
-              onClick={createOpenBittensorRootClaimTypeModal(row)}
-              size='xs'
-              type='ghost'
-            />
-          </div>
         );
       }
     };
@@ -350,10 +295,6 @@ const Component: React.FC<Props> = ({ className, compound,
       totalStakeCol
     ];
 
-    if (isBittensorRootStaking) {
-      result.splice(2, 0, claimRewardTypeCol);
-    }
-
     if (type === YieldPoolType.NOMINATION_POOL) {
       result.push(poolCol);
     } else if (type === YieldPoolType.NATIVE_STAKING || isSubnetStaking) {
@@ -361,7 +302,7 @@ const Component: React.FC<Props> = ({ className, compound,
     }
 
     return result;
-  }, [canChangeValidator, createOpenBittensorRootClaimTypeModal, createOpenChangeValidatorModal, createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isBittensorRootStaking, isSpecial, isSubnetStaking, t, type]);
+  }, [canChangeValidator, createOpenChangeValidatorModal, createOpenNomination, deriveAsset?.decimals, deriveAsset?.symbol, inputAsset?.decimals, inputAsset?.symbol, isSpecial, isSubnetStaking, t, type]);
 
   const getRowKey = useCallback((item: YieldPositionInfo) => {
     return item.address;
@@ -408,17 +349,6 @@ const Component: React.FC<Props> = ({ className, compound,
           nominations={selectedItem?.nominations}
           slug={compound.slug}
         />)}
-
-      {!!selectedItem && isBittensorRootStaking && (
-        <EarningBittensorClaimRewardTypeModal
-          address={selectedItem.address}
-          bittensorRootClaimType={getBittensorRootClaimType(selectedItem)}
-          chain={selectedItem.chain}
-          className={className}
-          modalId={EARNING_BITTENSOR_ROOT_CLAIM_TYPE_MODAL}
-          poolSlug={selectedItem.slug}
-        />
-      )}
     </>
   );
 };
@@ -441,11 +371,6 @@ const AccountInfoDesktopPart = styled(Component)<Props>(({ theme: { token } }: P
       display: 'flex',
       justifyContent: 'flex-start',
       flex: 0.8
-    },
-    '.__table-claim-reward-type-col': {
-      display: 'flex',
-      justifyContent: 'flex-start',
-      flex: 0.7
     },
 
     ['.__earning-status-col, .__table-active-stake-col, ' +
@@ -487,20 +412,6 @@ const AccountInfoDesktopPart = styled(Component)<Props>(({ theme: { token } }: P
 
     '.__row-nomination-button': {
       color: token.colorWhite
-    },
-
-    '.__row-claim-reward-type': {
-      display: 'flex',
-      alignItems: 'center',
-      gap: token.sizeXXS,
-      color: token.colorWhite
-    },
-
-    '.__row-claim-reward-type-button': {
-      color: token.colorTextLight4,
-      '&:hover': {
-        color: token.colorTextLight2
-      }
     },
 
     '.__derivative-title': {
