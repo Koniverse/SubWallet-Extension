@@ -349,8 +349,6 @@ const Component = function ({ className }: Props) {
           }
 
           return t('ui.Confirmations.changeValidatorConfirm');
-        case ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE:
-          return t('ui.Confirmations.changeClaimTypeConfirm');
         case ExtrinsicType.MINT_VDOT:
           return t('ui.Confirmations.mintVDotConfirm');
         case ExtrinsicType.MINT_VMANTA:
@@ -411,6 +409,7 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.substrateProxyInitConfirmation');
         case ExtrinsicType.CROWDLOAN:
         case ExtrinsicType.EVM_EXECUTE:
+        case ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE: // deprecated, no longer creatable - handled only for exhaustiveness
         case ExtrinsicType.UNKNOWN:
           return t('ui.Confirmations.transactionConfirm');
         case ExtrinsicType.MULTISIG_APPROVE_TX:

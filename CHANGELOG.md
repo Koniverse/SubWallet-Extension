@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## 1.3.86
+Build date: Aug 06, 2026.
+
+Bug fixes:
+- Remove Bittensor root claim type function (#5045)
+
+
+## 1.3.85
+Build date: Aug 05, 2026.
+
+Bug fixes:
+- Update SubWallet — Signing Prompts Could Conceal the Actual Transaction (#5042)
+
+
+## 1.3.84
+Build date: Jul 22, 2026.
+
+Features & Updates:
+- Add recommend validator for native and subnet staking (#5024)
+- Update chainlist 0.2.129
+  - Add XCM support for MYTH token between PAH <> Hydration
+  - Support TUSDT on Bittensor
+  - Add support for Cypress token
+  - Add support for Polkadot Hub EVM
+
+Bug fixes:
+- Fix some issues are open when upgrade version (#5013)
+
+
 ## 1.3.83
 Build date: Jul 08, 2026.
 
