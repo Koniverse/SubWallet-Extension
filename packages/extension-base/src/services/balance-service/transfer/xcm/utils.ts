@@ -80,7 +80,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v1';
+const version = '/v2';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
