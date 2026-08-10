@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-10 04:27:09 UTC
-> Total stories: 287
+> Last generated: 2026-08-10 04:49:05 UTC
+> Total stories: 288
 
 ## 📋 Backlog (70)
 
@@ -103,12 +103,13 @@
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (6)
+## 👀 Review (7)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W33 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
@@ -332,7 +333,7 @@ _No stories_
 - 📋 **Backlog**: 70
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 10
-- 👀 **Review**: 6
+- 👀 **Review**: 7
 - ✅ **Done**: 196
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1

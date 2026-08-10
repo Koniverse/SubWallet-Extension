@@ -130,6 +130,19 @@ Eight tracker issues here have children and no delivery of their own. They are *
 any story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would
 double-count work its children already carry.
 
+> **Count children with the API, and read two fields, not one.** All eight rows were re-derived on
+> 2026-08-10 with `gh api repos/Koniverse/SubWallet-Extension/issues/<N>/sub_issues`. Two were
+> wrong, each in a different way, and both ways are invisible if you only browse the issue in a
+> browser:
+>
+> - **#4791 said 1 child; it has 3.** The two missing ones live in **`SubWallet-Monorepos`** — a
+>   child does not have to be in this repository. That row was claiming Phase 2 was all there was,
+>   when Phase 1 had already shipped elsewhere.
+> - **#4096 lists 12 children but `sub_issues_summary.total` says 13.** The listing endpoint
+>   returns only what the caller can see; the summary counts what exists. **A gap between the two
+>   is a child in a private repository, not a bug.** Record the visible count and say the summary
+>   disagrees — never silently adopt either number.
+
 | Issue | Title | State | Children |
 |---|---|---|---|
 | [#4407](https://github.com/Koniverse/SubWallet-Extension/issues/4407) | Integrate swap providers | closed | 13 — the whole first swap programme, 12 of them rows in this epic |
@@ -137,9 +150,9 @@ double-count work its children already carry.
 | [#4207](https://github.com/Koniverse/SubWallet-Extension/issues/4207) | Manage supported XCM pairs & Swap pairs | closed | 2 — #4208 (XCM, closed) and #4209 (swap, open) |
 | [#4156](https://github.com/Koniverse/SubWallet-Extension/issues/4156) | 1 Click cross chain Swap | open | 5 — rounds 1–3 of the cross-chain UX programme |
 | [#4227](https://github.com/Koniverse/SubWallet-Extension/issues/4227) | [Round 3] Improve UX for swap cross-chain | open | 15 — nested under #4156; 9 rows here, 6 in other areas' ledgers |
-| [#4096](https://github.com/Koniverse/SubWallet-Extension/issues/4096) | Integrate Bitcoin into SubWallet and support cross-chain swap | open | 12 — a **Bitcoin programme**, only 2 of them swap |
+| [#4096](https://github.com/Koniverse/SubWallet-Extension/issues/4096) | Integrate Bitcoin into SubWallet and support cross-chain swap | open | 12 visible — a **Bitcoin programme**, only 2 of them swap. `sub_issues_summary.total` reports **13**: one child sits in a repository this token cannot read, so it can be counted but not named (checked 2026-08-10) |
 | [#4517](https://github.com/Koniverse/SubWallet-Extension/issues/4517) | Add support for 1-click swap between native BTC & tBTC on Hydration | open | 2 — #4573 (shipped 1.3.51) and #4595 (open) |
-| [#4791](https://github.com/Koniverse/SubWallet-Extension/issues/4791) | Improve the algorithm to support more swap path | open | 1 — #4865, explicitly *"[Phase 2]"* |
+| [#4791](https://github.com/Koniverse/SubWallet-Extension/issues/4791) | Improve the algorithm to support more swap path | open | **3, of which 2 are closed COMPLETED** — Phase 1 shipped as `SubWallet-Monorepos#151` (extension) and `#154` (mobile); only `#4865`, explicitly *"[Phase 2]"*, is open. Re-derived 2026-08-10; the previous count of 1 saw only the same-repo child |
 
 > **#4096 is an umbrella that is mostly not this epic's.** Ten of its twelve children are Bitcoin
 > account, transfer, dApp and indexing work already owned by other areas' stories; only #4467
