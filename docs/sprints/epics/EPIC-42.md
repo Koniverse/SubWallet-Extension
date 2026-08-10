@@ -45,6 +45,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.10](../stories/US-42.10-qc-release-mobile-v1-2-44-532-b-v16.md) | Release Mobile v1.2.44(532)b-v16 — recommend validator (#5024), iOS/Android beta+production gate | done |
 | [US-42.11](../stories/US-42.11-qc-extension-pr5043-and-issue5045.md) | Extension: PR #5043 signing prompt security fix + #5045 Bittensor deprecated function removal | done |
 | [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | done |
+| [US-42.13](../stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) | Gavun's Grid Miner dApp added to dApp list (#5050) — Web App + Mobile, dev → production | done |
 
 More rows get added here as testing starts.
 
