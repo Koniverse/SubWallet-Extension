@@ -21,9 +21,24 @@ import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
 import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from './bittensorBridge';
 
+export type DryRunError = {
+  reason: string
+  subReason?: string
+  instructionIndex?: number
+  instruction?: object
+}
+
+export type DryRunChainKind = 'origin' | 'destination' | 'hop'
+
+// Top-level dry-run error: same shape as DryRunError, plus which chain it came from
+export interface DryRunFailure extends DryRunError {
+  chainKind?: DryRunChainKind
+  chain?: string
+}
+
 export type DryRunNodeFailure = {
   success: false,
-  failureReason: string
+  dryRunError: DryRunError
 }
 
 export type DryRunNodeSuccess = {
@@ -31,16 +46,18 @@ export type DryRunNodeSuccess = {
   fee: string
   forwardedXcms: any
   // destParaId?: number
-  // currency: string
 }
 
 export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
 
 export type THopInfo = {
-  result: DryRunNodeResult & { currency?: string }
+  chain?: string
+  result: DryRunNodeResult
 }
 
 export type DryRunResult = {
+  success: boolean
+  dryRunError?: DryRunFailure
   origin: DryRunNodeResult
   destination?: DryRunNodeResult
   hops: THopInfo[]
@@ -55,18 +72,33 @@ export interface GetXcmFeeRequest {
   fromTokenInfo: _ChainAsset
 }
 
-export type XcmFeeType = 'dryRun' | 'paymentInfo'
+export type XcmFeeType = 'dryRun' | 'paymentInfo' | 'noFeeRequired'
+
+export interface ParaSpellAssetInfo {
+  [p: string]: any
+  symbol: string
+  decimals: number
+}
 
 export interface XcmFeeDetail {
-  fee: string
-  currency: string
-  feeType: XcmFeeType
-  dryRunError?: string
+  fee?: string
+  feeType?: XcmFeeType
+  sufficient?: boolean
+  asset: ParaSpellAssetInfo
+  dryRunError?: DryRunError
+}
+
+export type XcmFeeHopInfo = {
+  chain?: string
+  result: XcmFeeDetail
 }
 
 export type GetXcmFeeResult = {
+  success: boolean
+  dryRunError?: DryRunFailure
   origin: XcmFeeDetail
   destination: XcmFeeDetail
+  hops: XcmFeeHopInfo[]
 }
 
 interface ParaSpellCurrency {
@@ -241,12 +273,7 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    return {
-      origin: {
-        success: false,
-        failureReason: error.message
-      }
-    } as DryRunResult;
+    return createDryRunFailure(error.message);
   }
 
   return await response.json() as DryRunResult;
@@ -289,12 +316,7 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    return {
-      origin: {
-        success: false,
-        failureReason: error.message
-      }
-    } as DryRunResult;
+    return createDryRunFailure(error.message);
   }
 
   return await response.json() as DryRunResult;
@@ -355,8 +377,8 @@ export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) 
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -378,7 +400,25 @@ export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) 
     }
   );
 
-  return await response.json() as string;
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return String(await response.json());
+}
+
+function createDryRunFailure (reason: string): DryRunResult {
+  return {
+    success: false,
+    dryRunError: { reason },
+    origin: {
+      success: false,
+      dryRunError: { reason }
+    },
+    hops: []
+  };
 }
 
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {

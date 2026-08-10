@@ -144,6 +144,10 @@ export const getMinXcmTransferableAmount = async (request: GetXcmFeeRequest): Pr
   }
 };
 
+const isIgnorableDryRunFailure = (reason: string): boolean => {
+  return isChainNotSupportDryRun(reason) || isChainNotSupportPolkadotApi(reason);
+};
+
 export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isPreview = false): Promise<boolean> => {
   try {
     const dryRunResult = isPreview ? await dryRunPreviewXcm(request) : await dryRunXcm(request);
@@ -160,14 +164,14 @@ export const dryRunXcmExtrinsicV2 = async (request: CreateXcmExtrinsicProps, isP
 
       if (destination?.success === false) {
         // pass dry-run in these cases
-        return isChainNotSupportDryRun(destination.failureReason) || isChainNotSupportPolkadotApi(destination.failureReason);
+        return isIgnorableDryRunFailure(destination.dryRunError.reason);
       }
 
       return true;
     }
 
     // pass dry-run in these cases
-    return isChainNotSupportDryRun(originDryRunRs.failureReason) || isChainNotSupportPolkadotApi(originDryRunRs.failureReason);
+    return isIgnorableDryRunFailure(originDryRunRs.dryRunError.reason);
   } catch (e) {
     return false;
   }
