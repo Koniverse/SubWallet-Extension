@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-29 08:22:09 UTC
-> Total stories: 283
+> Last generated: 2026-08-10 04:27:09 UTC
+> Total stories: 287
 
 ## 📋 Backlog (70)
 
@@ -92,8 +92,8 @@
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
-| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W31 | bluezdot |
+| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
+| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W31 | nulllpc |
@@ -101,20 +101,20 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W31 | frenkie-ng |
+| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
 ## 👀 Review (6)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
-| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W31 | tunghp2002 |
-| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W31 | tunghp2002 |
-| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
-| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
-| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
+| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
+| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
+| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (192)
+## ✅ Done (196)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -254,6 +254,9 @@
 | US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
+| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | — |
+| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
+| US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -263,6 +266,7 @@
 | US-5.7 | Camera-access + One-Sign toggles | EPIC-5 | P0 | 3 | sprint-2025-M02 | S2kael |
 | US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | S2kael |
 | US-5.13 | Security fixes recovered from Uncategorized | EPIC-5 | P3 | 2 | sprint-2024-M11 | bluezdot |
+| US-5.15 | Signing-prompt mode confusion — a dApp must not render an extrinsic as an inert message | EPIC-5 | P0 | 2 | sprint-2026-W32 | tunghp2002 |
 | US-6.1 | Dark-only responsive UI: popup and full-page expand view | EPIC-6 | P2 | 3 | sprint-2023-M03 | lw-cdm |
 | US-6.2 | Web app (standalone browser app) with feature parity to the extension | EPIC-6 | P2 | 5 | sprint-2024-M02 | saltict |
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
@@ -329,7 +333,7 @@ _No stories_
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 10
 - 👀 **Review**: 6
-- ✅ **Done**: 192
+- ✅ **Done**: 196
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 

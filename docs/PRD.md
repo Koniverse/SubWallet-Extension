@@ -13,8 +13,10 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-06-11'
+lastEdited: '2026-08-10'
 editHistory:
+  - date: '2026-08-10'
+    changes: 'Version header 1.3.83 → 1.3.86 after merging subwallet-dev (releases 1.3.84, 1.3.85, 1.3.86). No requirement change — the three releases materialize no new FR.'
   - date: '2026-06-11'
     changes: 'Restructure: chain-management above security + absorbs chain-abstraction; split DeFi/Governance groups; new Utilities epic (onboarding+campaign+notification); renumber all EPIC (1-19) and FR (1-161)'
   - date: '2026-06-10'
@@ -25,7 +27,7 @@ editHistory:
 
 # SubWallet — Product Requirements Document
 
-**Version:** 1.3.83
+**Version:** 1.3.86
 **Date:** 2026-06-04
 **Status:** Live (browser extension, web app, mobile)
 **Dual-Audience:** Human stakeholders + LLM implementation agents
@@ -642,7 +644,7 @@ This project is **requirement-centric**: stories link back to the PRD through `p
 | NFR-21 | Data cache & CDN proxy layer: market data (token prices, exchange rates, EVM gas) is served through SubWallet cache proxies (`api-cache`, with `static-cache` / `chain-data` JSON fallback); online chain-list and token/asset metadata come from `static-data` / `chain-list-assets`; NFT media is fetched via the `ipfs-files` IPFS gateway — these front upstream providers to reduce rate-limit exposure, enable release-free data updates, and provide fallbacks when an upstream is unavailable | Performance / Availability |
 | NFR-22 | **Financial-figure accuracy:** every monetary figure the wallet displays — balance, reward, APY/APR, fee, swap quote — either matches its source of truth (chain state, or the aggregator the figure is sourced from) or is shown as **unavailable**. A figure that cannot be computed reliably is never rendered as a confident number. **Defended by** [US-12.13](sprints/stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) (rewards/APY) and [US-8.12](sprints/stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) (fees). | Correctness |
 | NFR-23 | **Responsiveness under account scale:** wallet-wide operations (submit, close, list render, balance fan-out) stay responsive as the account count grows — no operation blocks the main thread long enough to freeze the UI, and per-account work is batched rather than issued one call per account. **Defended by** [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) (submit/close, main thread) and [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) (list render). | Performance |
-| NFR-24 | **Degrade, never blank:** a malformed, unexpected, or undecodable payload from any external source (dApp, chain, indexer, aggregator) degrades to an explicit error state the user can act on — never a blank screen, a silent no-op, or a crashed popup. Applies first to the confirmation screen, where the user is being asked to sign. **Defended by** [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md). | Reliability |
+| NFR-24 | **Degrade, never blank:** a malformed, unexpected, or undecodable payload from any external source (dApp, chain, indexer, aggregator) degrades to an explicit error state the user can act on — never a blank screen, a silent no-op, or a crashed popup. Applies first to the confirmation screen, where the user is being asked to sign. **Defended by** [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md) (reliability instance — a payload that fails to decode) and [US-5.15](sprints/stories/US-5.15-signing-prompt-mode-confusion.md) (security instance — a payload of the wrong *kind*, where the degraded state must also be *unsignable*). **Neither covers the stronger property at stake in #5042** — *a signature is only ever produced over the artefact the prompt displayed* — which no FR or NFR currently states; see [US-5.15](sprints/stories/US-5.15-signing-prompt-mode-confusion.md) § "Open". | Reliability |
 | NFR-25 | **Web-surface hardening:** the web app and web-runner enforce a Content-Security-Policy, and every externally-controlled link opens with `noopener`/`noreferrer` (reverse-tabnabbing). The extension's MV3 CSP (NFR-8) does not cover these surfaces — they are separately built and separately exposed. **Defended by** [US-5.10](sprints/stories/US-5.10-verichains-audit-remediation-hardening.md). | Security |
 
 > **The bar a requirement must clear to be on this page** ([CONTEXT D96](CONTEXT.md), [D98](CONTEXT.md)):

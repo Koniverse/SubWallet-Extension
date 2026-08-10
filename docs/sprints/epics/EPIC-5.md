@@ -76,6 +76,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | 4 | **Inbound threat defence** | [US-5.1](../stories/US-5.1-phishing-site-and-address-protection.md), [US-5.8](../stories/US-5.8-blockaid-transaction-risk-scanning.md), [US-5.9](../stories/US-5.9-anti-scam-address-screening.md) | Block phishing sites/addresses, scan transactions/signatures for risk, screen recipient addresses for scam association |
 | 5 | **Audit hardening** | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Remediate security audit and false-positive findings (UX-bounty audit, secret hygiene, web hardening, phishing accuracy) |
 | 6 | **Second factor** *(unscoped)* | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Authenticate the *person* approving an outgoing transfer, not just the transaction (#4125) |
+| 7 | **Signing-prompt integrity** | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | A signature may only be produced over the artefact the confirmation prompt displayed — a dApp cannot render an extrinsic as an inert message (#5042) |
 
 ### Out of scope
 
@@ -135,6 +136,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.12](../stories/US-5.12-earlier-security-audit-rounds.md) | Earlier security audit rounds (2022–2025) | The four audit/hardening rounds that closed before US-5.10's scope was written | ✅ done | 1.3.28 |
 | [US-5.13](../stories/US-5.13-security-fixes-recovered-from-uncategorized.md) | Security fixes recovered from Uncategorized | Reset/ZK-mode/block-action from the triage bucket | ✅ done | 1.3.7 |
 | [US-5.14](../stories/US-5.14-open-security-improvements-recovered-from-uncategorized.md) | Open security improvements (recovered) | Open security work not yet delivered (rule 9) | 📋 backlog | — |
+| [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | Signing-prompt mode confusion | Refuse to sign an extrinsic request carrying a raw-message payload, and name it to the user (#5042) | ✅ done | 1.3.85 |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is
