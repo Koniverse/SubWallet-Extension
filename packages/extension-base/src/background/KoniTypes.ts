@@ -20,7 +20,7 @@ import { AuthUrls } from '@subwallet/extension-base/services/request-service/typ
 import { CrowdloanContributionsResponse } from '@subwallet/extension-base/services/subscan-service/types';
 import { BitcoinTransactionData, SWTransactionResponse, SWTransactionResult } from '@subwallet/extension-base/services/transaction-service/types';
 import { WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
-import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BalanceType, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleSubstrateProxyWrappedTxResponse, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeBittensorRootClaimType, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequest, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountsWithCurrentAddress, AddressJson, BalanceJson, BalanceType, BaseRequestSign, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CurrentAccountInfo, EarningRewardHistoryItem, EarningRewardJson, EarningStatus, HandleSubstrateProxyWrappedTxResponse, HandleYieldStepParams, InternalRequestSign, LeavePoolAdditionalData, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestAccountProxyEdit, RequestAccountProxyForget, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckCrossChainTransfer, RequestCheckPublicAndSecretKey, RequestCheckTransfer, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestTransfer, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseEarlyValidateYield, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StorageDataInterface, SubmitChangeValidatorStaking, SubmitYieldJoinData, SubmitYieldStepData, SubnetYieldPositionInfo, SwapPair, SwapQuoteResponse, SwapRequestResult, SwapRequestV2, SwapSubmitParams, SwapTxData, TokenSpendingApprovalParams, UnlockDotTransactionNft, UnstakingStatus, ValidateSwapProcessParams, ValidateYieldProcessParams, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { RequestClaimBridge } from '@subwallet/extension-base/types/bridge';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, InitMultisigTxResponse, PrepareMultisigSignRequest, PrepareMultisigSignResponse, RequestGetSignableAccountInfos, ResponseGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
@@ -268,6 +268,11 @@ export interface NftItem extends NftItemExtraInfo {
   rarity?: string;
   description?: string;
   properties?: Record<any, any> | null;
+  isBundle?: boolean;
+  nestingLevel?: number;
+  nestingTokens?: NftItem[]
+  parent?: NftItem;
+  parentId?: string;
 }
 
 interface NftItemExtraInfo {
@@ -557,7 +562,7 @@ export enum ExtrinsicType {
 
   JOIN_YIELD_POOL = 'earn.join_pool', // TODO: review this
   CHANGE_EARNING_VALIDATOR = 'earn.nominate',
-  CHANGE_BITTENSOR_ROOT_CLAIM_TYPE = 'earn.change_bittensor_root_claim_type',
+  CHANGE_BITTENSOR_ROOT_CLAIM_TYPE = 'earn.change_bittensor_root_claim_type', // deprecated, removed in Bittensor v4.4.1 - kept to render legacy history records
 
   MINT_VDOT = 'earn.mint_vdot',
   MINT_LDOT = 'earn.mint_ldot',
@@ -631,7 +636,7 @@ export interface ExtrinsicDataTypeMap {
   [ExtrinsicType.STAKING_CANCEL_COMPOUNDING]: RequestTuringCancelStakeCompound,
   [ExtrinsicType.STAKING_CANCEL_UNSTAKE]: RequestStakeCancelWithdrawal,
   [ExtrinsicType.STAKING_POOL_WITHDRAW]: any,
-  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: RequestChangeBittensorRootClaimType,
+  [ExtrinsicType.CHANGE_BITTENSOR_ROOT_CLAIM_TYPE]: any, // deprecated
 
   // Yield
   [ExtrinsicType.JOIN_YIELD_POOL]: RequestYieldStepSubmit,
@@ -1073,9 +1078,16 @@ export interface NftTransactionRequest extends BaseRequestSign {
 }
 
 export interface NftFullListRequest {
-  contractAddress: string;
+  collectionId: string;
   owners: string[];
-  chainInfo: _ChainInfo
+  chainInfo: _ChainInfo;
+  tokenIds?: string[]
+}
+
+export interface NftDetailRequest {
+  collectionId: string;
+  chainSlug: string;
+  tokenId: string
 }
 
 export interface EvmNftTransaction extends ValidateTransactionResponse {
@@ -2428,11 +2440,10 @@ export interface KoniRequestSignatures {
   'pri(evmNft.getTransaction)': [NftTransactionRequest, EvmNftTransaction];
   'pri(substrateNft.submitTransaction)': [NftTransactionRequest, SWTransactionResponse];
   'pri(substrateNft.getTransaction)': [NftTransactionRequest, SubstrateNftTransaction];
-  'pri(nft.getNft)': [null, NftJson];
   'pri(nft.getSubscription)': [RequestSubscribeNft, NftJson, NftJson];
-  'pri(nftCollection.getNftCollection)': [null, NftCollectionJson];
   'pri(nftCollection.getSubscription)': [null, NftCollection[], NftCollection[]];
   'pri(nft.getFullList)': [NftFullListRequest, boolean];
+  'pri(nft.getNftdetail)': [NftDetailRequest, NftItem];
 
   // Staking functions
   'pri(staking.getStaking)': [null, StakingJson];
@@ -2627,7 +2638,6 @@ export interface KoniRequestSignatures {
   'pri(yield.claimReward.submit)': [RequestStakeClaimReward, SWTransactionResponse];
   'pri(yield.getEarningImpact)': [RequestEarningImpact, EarningImpactResult];
   'pri(yield.changeValidator.submit)': [SubmitYieldJoinData, SWTransactionResponse];
-  'pri(yield.changeBittensorRootClaimType.submit)': [RequestChangeBittensorRootClaimType, SWTransactionResponse]
   /* Other */
 
   /* Actions */
@@ -2798,10 +2808,10 @@ export interface KoniRequestSignatures {
 
   /* Swap */
   'pri(swapService.subscribePairs)': [null, SwapPair[], SwapPair[]];
-  'pri(swapService.handleSwapRequest)': [SwapRequest, SwapRequestResult];
+  'pri(swapService.handleSwapRequest)': [SwapRequestV2, SwapRequestResult];
   'pri(swapService.handleSwapRequestV2)': [SwapRequestV2, SwapRequestResult];
   'pri(swapService.handleSwapStep)': [SwapSubmitParams, SWTransactionResponse];
-  'pri(swapService.getLatestQuote)': [SwapRequest, SwapQuoteResponse];
+  'pri(swapService.getLatestQuote)': [SwapRequestV2, SwapQuoteResponse];
   'pri(swapService.validateSwapProcess)': [ValidateSwapProcessParams, TransactionError[]];
   /* Swap */
 

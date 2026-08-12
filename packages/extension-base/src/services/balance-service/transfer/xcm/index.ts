@@ -116,7 +116,7 @@ export const createPolygonBridgeExtrinsic = async ({ destinationChain,
   const sourceChain = originChain.slug;
 
   const createExtrinsic = isPolygonBridgeXcm
-    ? (sourceChain === 'polygonzkEvm_cardona' || sourceChain === 'polygonZkEvm')
+    ? sourceChain === 'polygonzkEvm_cardona'
       ? _createPolygonBridgeL2toL1Extrinsic
       : _createPolygonBridgeL1toL2Extrinsic
     : (sourceChain === 'polygon_amoy' || sourceChain === 'polygon')

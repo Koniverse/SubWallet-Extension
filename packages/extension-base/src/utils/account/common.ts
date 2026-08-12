@@ -56,18 +56,57 @@ export function reformatAddress (address: string, networkPrefix = 42, isEthereum
   }
 }
 
-export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo): string => {
+/**
+ * @private
+ * Reformats a wallet address based on the provided chain information.
+ *
+ * This function checks the chain type (Substrate, TON, Cardano, or others)
+ * and applies the corresponding formatting logic:
+ * 1. **Substrate**: Reformats the Substrate address using the chain's specific prefix.
+ * If the current `address` is an EVM address, it attempts to use the `alternativeAddress`
+ * (which is currently **always** expected to be the Substrate address) for Substrate
+ * formatting, as direct EVM-to-Substrate reformatting is not possible here.
+ * 2. **TON/Cardano**: Uses a simple prefix logic based on whether the chain is a testnet or a mainnet.
+ * 3. **Default (EVM/Others)**: Returns the original address without reformatting.
+ *
+ * @param address The current wallet address string.
+ * @param chainInfo An object containing chain details (e.g., chain type, testnet status, prefix).
+ * @param alternativeAddress An optional alternative address, which is currently expected to be the Substrate
+ * address associated with the account. It is used as a fallback for Substrate formatting when the main `address` is EVM.
+ * @returns The reformatted wallet address, or the original address if no reformatting is needed or possible.
+ *
+ * @todo This function currently lacks logic to reformat a Substrate address into an EVM address format.
+ */
+export const _reformatAddressWithChain = (address: string, chainInfo: _ChainInfo, alternativeAddress?: string): string => {
   const chainType = _chainInfoToAccountChainType(chainInfo);
 
   if (chainType === AccountChainType.SUBSTRATE) {
-    return reformatAddress(address, _getChainSubstrateAddressPrefix(chainInfo));
-  } else if (chainType === AccountChainType.TON || chainType === AccountChainType.CARDANO) {
-    const isTestnet = chainInfo.isTestnet;
+    const addressPrefix = _getChainSubstrateAddressPrefix(chainInfo);
 
-    return reformatAddress(address, isTestnet ? 0 : 1);
-  } else { // EVM, Bitcoin
-    return address;
+    if (addressPrefix < 0) {
+      // not a valid address prefix for substrate chain type
+      return address;
+    }
+
+    if (isEthereumAddress(address)) {
+      if (alternativeAddress) {
+        // reformat using alternativeAddress of that account. Because can not reformat from evm address to substrate address
+        return reformatAddress(alternativeAddress, addressPrefix);
+      }
+
+      // can not reformat without substrateAddress info
+      return address;
+    }
+
+    // reformat as usual with substrate address
+    return reformatAddress(address, addressPrefix);
   }
+
+  if (chainType === AccountChainType.TON || chainType === AccountChainType.CARDANO) {
+    return reformatAddress(address, chainInfo.isTestnet ? 0 : 1);
+  }
+
+  return address;
 };
 
 export const getAccountChainTypeForAddress = (address: string): AccountChainType => {

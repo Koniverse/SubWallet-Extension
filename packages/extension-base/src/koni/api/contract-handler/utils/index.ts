@@ -14,6 +14,8 @@ export const _TEST_ERC721_ABI = require('./test_erc721_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PSP22_ABI: Record<string, any> = require('./psp22_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const _BITTENSOR_PSP22_TUSDT_ABI: Record<string, any> = require('./bittensor-psp22-tusdt_abi.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PSP34_ABI: Record<string, any> = require('./psp34_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PINK_PSP34_ABI: Record<string, any> = require('./pink_psp34_abi.json');
@@ -64,14 +66,11 @@ export function isAvailBridgeGatewayContract (contractAddress: _Address) {
   return [AVAILBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS, AVAILBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS].includes(contractAddress);
 }
 
-const POLYGONBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS = '0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe';
 const POLYGONBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS = '0x528e26b25a34a4A5d0dbDa1d57D318153d2ED582';
 
 export function getPolygonBridgeContract (chain: string): string {
   if (chain === 'polygonzkEvm_cardona' || chain === COMMON_CHAIN_SLUGS.ETHEREUM_SEPOLIA) {
     return POLYGONBRIDGE_GATEWAY_SEPOLIA_CONTRACT_ADDRESS;
-  } else if (chain === 'polygonZkEvm' || chain === COMMON_CHAIN_SLUGS.ETHEREUM) {
-    return POLYGONBRIDGE_GATEWAY_ETHEREUM_CONTRACT_ADDRESS;
   }
 
   throw new Error('Invalid chain');

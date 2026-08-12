@@ -1,5 +1,89 @@
 # CHANGELOG
 
+## 1.3.86
+Build date: Aug 06, 2026.
+
+Bug fixes:
+- Remove Bittensor root claim type function (#5045)
+
+
+## 1.3.85
+Build date: Aug 05, 2026.
+
+Bug fixes:
+- Update SubWallet — Signing Prompts Could Conceal the Actual Transaction (#5042)
+
+
+## 1.3.84
+Build date: Jul 22, 2026.
+
+Features & Updates:
+- Add recommend validator for native and subnet staking (#5024)
+- Update chainlist 0.2.129
+  - Add XCM support for MYTH token between PAH <> Hydration
+  - Support TUSDT on Bittensor
+  - Add support for Cypress token
+  - Add support for Polkadot Hub EVM
+
+Bug fixes:
+- Fix some issues are open when upgrade version (#5013)
+
+
+## 1.3.83
+Build date: Jul 08, 2026.
+
+Features & Updates:
+- Add earning term and condition display mechanism (#5007)
+
+
+## 1.3.82
+Build date: Jul 06, 2026.
+
+Features & Updates:
+- Remove Polygon zkEVM support due to network sunset (#5002)
+
+Bug fixes:
+- Signing popup crashes with "Unable to create Enum via index 9" when SignerPayload.assetId is a V5 cross-consensus Location (#4989)
+
+
+## 1.3.81
+Build date: Jul 03, 2026 => This version was skipped due to a release issue.
+
+
+## 1.3.80
+Build date: Jun 02, 2026.
+
+Features & Updates:
+- Extension - Re-check transaction failed in case transfer max with balance = ED (#2641)
+- Extension - Show incorrect network address on XCM confirmation screen when perform Swap, Earning (#3936)
+- Re-check logic approve token when perform XCM (#4830)
+- Implement NFTService + Migrate EVM & Unique Network NFT logic (Phase 1) (#4884)
+
+
+## 1.3.79
+Build date: May 21, 2026.
+
+Features & Updates:
+- Alpha price calculation mismatch vs TaoStats (#4987)
+- Update ParaSpell API integration to v1 (#4979)
+- Extension – Some issues when merging in version 1.3.78 (#4988)
+- Refactor Swap Service interface and redundant code (#4826)
+
+
+## 1.3.78
+Build date: May 14, 2026.
+
+Features & Updates:
+- Extension - Support display destination fee for transfer XCM (#4278)
+- Calculate exactly estimate fee for bridge step in liquid staking (#4803)
+- Disable all networks' switch to Manage Networks page (#4970)
+- Update for chain-list stable v0.2.127
+  - Support Transfer Alpha Token (#4900)
+  - Bridge native TAO <-> Subtensor EVM (#4901)
+  - Support bittensor on-chain swap (#4899)
+  - [Subtensor EVM] Add support for some alpha tokens
+
+
 ## 1.3.77
 Build date: Apr 09, 2026.
 

@@ -711,10 +711,10 @@ export class BalanceService implements StoppableServiceInterface {
     }
 
     const destChainInfo = this.state.chainService.getChainInfoByKey(params.destChain);
+    const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
 
     // xcm
     if (!_isXcmWithinSameConsensus(originChainInfo, destChainInfo) && _isPureEvmChain(originChainInfo)) {
-      const evmApi = this.state.chainService.getEvmApi(originChainInfo.slug);
       const tokenInfo = this.state.chainService.getAssetBySlug(params.tokenSlug);
 
       return getSnowbridgeTransferProcessFromEvm(params.address, evmApi, tokenInfo, params.amount);
@@ -749,7 +749,7 @@ export class BalanceService implements StoppableServiceInterface {
           throw new Error('Failed to fetch Across Bridge Data. Please try again later');
         }
 
-        return getAcrossbridgeTransferProcessFromEvm(data.to);
+        return getAcrossbridgeTransferProcessFromEvm(data.to, params.address, originTokenInfo, evmApi, params.amount);
       }
     }
 

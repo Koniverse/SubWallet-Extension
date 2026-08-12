@@ -15,7 +15,7 @@ import Search from '@subwallet/extension-koni-ui/components/Search';
 import { BN_ZERO, CLAIM_BRIDGE_TRANSACTION, CLAIM_REWARD_TRANSACTION, DEFAULT_CLAIM_AVAIL_BRIDGE_PARAMS, DEFAULT_CLAIM_REWARD_PARAMS, DEFAULT_UN_STAKE_PARAMS, DEFAULT_WITHDRAW_PARAMS, NOTI_MULTISIG_PENDINGTX_ID, NOTIFICATION_DETAIL_MODAL, WITHDRAW_TRANSACTION } from '@subwallet/extension-koni-ui/constants';
 import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
-import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
 import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
 import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
@@ -79,6 +79,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { goHome } = useDefaultNavigate();
+  const notify = useNotification();
   const { token } = useTheme() as Theme;
   const { alertProps, closeAlert, openAlert, updateAlertProps } = useAlert(alertModalId);
   const { allowedChains, excludedTokens } = useGetChainAndExcludedTokenByCurrentAccountProxy();
@@ -406,13 +407,18 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
                 showWarningModal('claimed');
               }
             } catch (error) {
-              console.error(error);
+              notify({
+                message: (error as Error).message,
+                type: 'error',
+                duration: 8
+              });
             }
           };
 
           handleClaimPolygonBridge().catch((err) => {
             console.error('Error:', err);
           });
+
           break;
         }
 
@@ -469,7 +475,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
+  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, notify, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (
@@ -617,19 +623,21 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           onSelect={onSelectFilterTab}
           selectedItem={selectedFilterTab}
         />
-        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) && <Button
-          className={'mark-read-btn'}
-          icon={(
-            <Icon
-              phosphorIcon={Checks}
-              weight={'fill'}
-            />
-          )}
-          onClick={handleSwitchClick}
-          size='xs'
-          tooltip={t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
-          type='ghost'
-        />}
+        {(selectedFilterTab === NotificationTab.UNREAD || selectedFilterTab === NotificationTab.ALL || selectedFilterTab === NotificationTab.MULTISIG) && (
+          <Button
+            className={'mark-read-btn'}
+            icon={(
+              <Icon
+                phosphorIcon={Checks}
+                weight={'fill'}
+              />
+            )}
+            onClick={handleSwitchClick}
+            size='xs'
+            tooltip={t('ui.SETTINGS.screen.Setting.Notifications.markAllAsRead')}
+            type='ghost'
+          />
+        )}
       </div>
 
       {enableNotification

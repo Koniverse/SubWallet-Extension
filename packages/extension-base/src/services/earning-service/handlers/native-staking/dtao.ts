@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, TransactionData, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -42,6 +41,11 @@ interface SubnetsInfo {
   maxAllowedValidators: number;
 }
 
+interface SubnetPriceData {
+  netuid: number;
+  price: string | number;
+}
+
 export interface EarningImpactResult {
   slippage: number;
   rate: number;
@@ -54,26 +58,24 @@ interface SubnetPosition {
   originalTotalStake: BigN;
 }
 
-const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi): Promise<Record<number, string>> => {
-  const allSubnets = (await substrateApi.api.call.subnetInfoRuntimeApi.getAllDynamicInfo()).toJSON() as RateSubnetData[] | undefined;
-
-  if (!allSubnets || allSubnets.length === 0) {
-    return {};
-  }
-
+const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecimals = 9): Promise<Record<number, string>> => {
   const result = Object.create(null) as Record<number, string>;
+  const PRICE_SCALE = new BigN(10).pow(priceScaleDecimals);
 
-  for (const subnet of allSubnets) {
-    const netuid = subnet?.netuid;
+  const allSubnetPrices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toJSON() as SubnetPriceData[] | undefined;
 
-    if (netuid === undefined) {
-      continue;
+  if (allSubnetPrices && allSubnetPrices.length > 0) {
+    for (const subnetPrice of allSubnetPrices) {
+      const netuid = subnetPrice?.netuid;
+
+      if (netuid === undefined) {
+        continue;
+      }
+
+      const rawPrice = subnetPrice?.price ? new BigN(subnetPrice.price) : new BigN(0);
+
+      result[netuid] = netuid === 0 ? '1' : rawPrice.dividedBy(PRICE_SCALE).toFixed();
     }
-
-    const taoIn = subnet?.taoIn ? new BigN(subnet.taoIn) : new BigN(0);
-    const alphaIn = subnet?.alphaIn ? new BigN(subnet.alphaIn) : new BigN(0);
-
-    result[netuid] = netuid === 0 || alphaIn.lte(0) ? '1' : taoIn.dividedBy(alphaIn).toString();
   }
 
   return result;
@@ -297,7 +299,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
       const delegateStateInfos = rawDelegateStateInfos.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
 
-      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi);
+      const alphaToTaoRateMap = await getAlphaToTaoRateMap(this.substrateApi, this.getAlphaPriceScaleDecimals());
 
       if (!delegateStateInfos || delegateStateInfos.length === 0) {
         return;
@@ -417,12 +419,4 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
   }
 
   /* Subscribe pool position */
-
-  /* Unimplemented function  */
-
-  public override handleChangeRootClaimType (): Promise<TransactionData> {
-    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-  }
-
-  /* Unimplemented function  */
 }

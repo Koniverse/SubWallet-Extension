@@ -1,13 +1,30 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { _AZERO_DOMAIN_REGISTRY_ABI, _NEUROGUNS_PSP34_ABI, _PINK_PSP34_ABI, _PSP22_ABI, _PSP34_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { _AZERO_DOMAIN_REGISTRY_ABI, _BITTENSOR_PSP22_TUSDT_ABI, _NEUROGUNS_PSP34_ABI, _PINK_PSP34_ABI, _PSP22_ABI, _PSP34_ABI } from '@subwallet/extension-base/koni/api/contract-handler/utils';
+import { _BALANCE_CHAIN_GROUP } from '@subwallet/extension-base/services/chain-service/constants';
 
 import { ApiPromise } from '@polkadot/api';
 import { ContractPromise } from '@polkadot/api-contract';
 
-export function getPSP22ContractPromise (apiPromise: ApiPromise, contractAddress: string) {
+export function isBittensorChain (chainSlug: string) {
+  return _BALANCE_CHAIN_GROUP.bittensor.includes(chainSlug);
+}
+
+export function getPSP22ContractPromise (apiPromise: ApiPromise, contractAddress: string, chainSlug: string) {
+  if (isBittensorChain(chainSlug)) {
+    return new ContractPromise(apiPromise, _BITTENSOR_PSP22_TUSDT_ABI, contractAddress);
+  }
+
   return new ContractPromise(apiPromise, _PSP22_ABI, contractAddress);
+}
+
+export function getPSP22BalanceOfMethod (chainSlug: string) {
+  return isBittensorChain(chainSlug) ? 'balanceOf' : 'psp22::balanceOf';
+}
+
+export function getPSP22TransferMethod (chainSlug: string) {
+  return isBittensorChain(chainSlug) ? 'transfer' : 'psp22::transfer';
 }
 
 export function isPinkRoboNft (contractAddress: string) {
