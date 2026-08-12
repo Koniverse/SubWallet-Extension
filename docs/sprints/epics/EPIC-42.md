@@ -46,6 +46,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.11](../stories/US-42.11-qc-extension-pr5043-and-issue5045.md) | Extension: PR #5043 signing prompt security fix + #5045 Bittensor deprecated function removal | done |
 | [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | done |
 | [US-42.13](../stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) | Gavun's Grid Miner dApp added to dApp list (#5050) — Web App + Mobile, dev → production | done |
+| [US-42.14](../stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) | DOT nomination pool unstake period 28d → 2d (#5055); stake/unstake recheck | done |
 
 More rows get added here as testing starts.
 
