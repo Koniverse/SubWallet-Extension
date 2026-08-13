@@ -36,8 +36,17 @@ Release history for **SubWallet Extension**, in the koni-docs changelog format.
 (empty — track unreleased changes here; new version sections are inserted above the
 previous version, anchored on this block, per the koni-docs changelog template)
 
-<!-- No version drift: the newest entry below is 1.3.86, and VERSION and PRD.md
-     both read 1.3.86 (synced 2026-08-10 — see docs/notes/2026-08-10.md). -->
+<!-- No version drift: the newest entry below is 1.3.87, and VERSION and PRD.md
+     both read 1.3.87 (synced 2026-08-13 — see docs/notes/2026-08-13.md). -->
+
+---
+
+## [1.3.87] — 2026-08-12 — Release 1.3.87 (Koni) — v1.3.87
+
+### Changed
+- Read the nominator unstaking period from `nominatorFastUnbondDuration` when nominators are not slashable, so relay-chain native staking and nomination pools show the fast unbonding window instead of `bondingDuration` — 2 days rather than 28 on Polkadot (#5055)
+
+**Commit**: 5f9a703b72
 
 ---
 

@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-10 04:49:05 UTC
-> Total stories: 288
+> Last generated: 2026-08-13 02:35:34 UTC
+> Total stories: 291
 
 ## 📋 Backlog (70)
 
@@ -79,13 +79,14 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (4)
+## 🟢 Ready (5)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
+| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
 ## 🟡 In Progress (10)
@@ -115,7 +116,7 @@
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (196)
+## ✅ Done (198)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -169,6 +170,7 @@
 | US-12.19 | Earning on the WebApp & Avail Space | EPIC-12 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
 | US-12.20 | Earning rewards & APY accuracy (settled) | EPIC-12 | P2 | 3 | sprint-2024-M01 | bluezdot |
 | US-12.21 | Earning fixes recovered from Uncategorized | EPIC-12 | P3 | 3 | sprint-2026-M04 | tunghp2002 |
+| US-12.22 | Nominator fast-unbond duration — read the unstaking window the runtime actually enforces | EPIC-12 | P1 | 2 | sprint-2026-W33 | tunghp2002 |
 | US-13.1 | XCM cross-chain parachain transfers (fee estimation + per-route toggle) | EPIC-13 | P1 | 8 | sprint-2022-M06 | saltict |
 | US-13.2 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | EPIC-13 | P1 | 5 | sprint-2024-M06 | nulllpc |
 | US-13.3 | Avail Bridge: Avail ↔ Ethereum | EPIC-13 | P2 | 5 | sprint-2024-M10 | bluezdot |
@@ -258,6 +260,7 @@
 | US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | — |
 | US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
+| US-42.14 | QC — Update nominator unstaking eras for DOT nomination pool (#5055) | EPIC-42 | P2 | 2 | sprint-2026-W33 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -331,10 +334,10 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 70
-- 🟢 **Ready**: 4
+- 🟢 **Ready**: 5
 - 🟡 **In Progress**: 10
 - 👀 **Review**: 7
-- ✅ **Done**: 196
+- ✅ **Done**: 198
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 

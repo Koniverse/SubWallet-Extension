@@ -183,6 +183,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.19](../stories/US-12.19-earning-on-the-webapp-and-avail-space.md) | Earning on the WebApp & Avail Space | Staking / earning / crowdloan on the non-extension surfaces | ✅ done | 1.2.26 |
 | [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |
 | [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
+| [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | Nominator fast-unbond duration | Quote the unstaking window the runtime enforces, not `bondingDuration` (28d → 2d on DOT) | ✅ done | 1.3.87 |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**
@@ -239,6 +240,7 @@ the work its children already carry.
 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | New per-network staking handler subclasses (Enjin / Phala / xx) on the existing native tree; targets from static cache (AD-23) | FR-125 |
 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) | Reward/APY-figure accuracy verified at the `BasePoolHandler` seam (AD-22) across every pool type | NFR-22 |
 | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK aggregation (AD-24), removed-account invalidation | NFR-12, NFR-21 |
+| [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | `getNominatorUnstakingEras()` at the relay unstaking-period seam — `NominationPoolHandler` + `RelayNativeStakingPoolHandler` (AD-22) and both legacy `relayChain.ts` metadata entry points | FR-114 (defends), FR-115 (defends) |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 

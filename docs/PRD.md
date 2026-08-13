@@ -13,8 +13,10 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-08-10'
+lastEdited: '2026-08-13'
 editHistory:
+  - date: '2026-08-13'
+    changes: 'Version header 1.3.86 → 1.3.87 (release 1.3.87, #5055). No requirement change — the release corrects how an existing capability reads the unstaking period; FR-114 / FR-115 already own it.'
   - date: '2026-08-10'
     changes: 'Version header 1.3.83 → 1.3.86 after merging subwallet-dev (releases 1.3.84, 1.3.85, 1.3.86). No requirement change — the three releases materialize no new FR.'
   - date: '2026-06-11'
@@ -27,7 +29,7 @@ editHistory:
 
 # SubWallet — Product Requirements Document
 
-**Version:** 1.3.86
+**Version:** 1.3.87
 **Date:** 2026-06-04
 **Status:** Live (browser extension, web app, mobile)
 **Dual-Audience:** Human stakeholders + LLM implementation agents

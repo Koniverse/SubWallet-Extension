@@ -21,8 +21,8 @@ cites it but a same-epic story shares its capability (inferred — a link to ver
 **routed** when only the epic area is clear; **unowned** when even that is not. The last
 two buckets — **the residue** — are the only issues a genuinely-new story could be about.
 
-- Issues cited across **228 of 306** release sections: **1128**
-- **Cited** by a story (certain — every row checked by command): **1104**
+- Issues cited across **229 of 307** release sections: **1129**
+- **Cited** by a story (certain — every row checked by command): **1105**
 - **Linked** to an existing story (inferred by capability): **24**
 - **Routed** to an epic, no story: **0**
 - **Unowned** (needs triage): **0**
@@ -1148,6 +1148,7 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024) | Add recommended validators for native and subnet staking (#5024) | 1.3.84 | 2026-07-22 | US-12.6 |
 | [#5042](https://github.com/Koniverse/SubWallet-Extension/issues/5042) | Reject signing prompts that could conceal the actual transaction from the user (#5042) | 1.3.85 | 2026-08-05 | US-5.15 |
 | [#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045) | Remove Bittensor root claim type function, deprecated by the Bittensor v4.4.1 chain upgrade (#5045) | 1.3.86 | 2026-08-06 | US-12.6 |
+| [#5055](https://github.com/Koniverse/SubWallet-Extension/issues/5055) | Read the nominator unstaking period from `nominatorFastUnbondDuration` when nominators are not slashable (#5055) | 1.3.87 | 2026-08-12 | US-12.22 |
 
 ## Linked — no citation, but an existing story owns the capability (inferred)
 

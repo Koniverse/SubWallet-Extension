@@ -47,17 +47,19 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | done |
 | [US-42.13](../stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) | Gavun's Grid Miner dApp added to dApp list (#5050) — Web App + Mobile, dev → production | done |
 | [US-42.14](../stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) | DOT nomination pool unstake period 28d → 2d (#5055); stake/unstake recheck | done |
+| [US-42.15](../stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | WUD Universe dApp logo updated in dApp list (#5054) — Web App + Mobile, dev → production | ready |
 
 More rows get added here as testing starts.
 
 ## What this epic actually became — and the two holes it left
 
 > **The stated rule is not the practice.** "Each dev epic gets **one** QA page named
-> `US-42.<epic-number>`" describes a per-epic index. The 12 pages above are numbered
-> **sequentially** and are three different kinds of thing: per-issue QC (42.1–42.5, 42.7, 42.13),
-> per-release gate QC (42.6, 42.9, 42.10) and per-PR QC (42.11, 42.12). Neither the naming nor the
-> one-page-per-epic promise survived contact. Recorded, not "fixed" — renumbering 12 pages to
-> match a sentence would break every link to them, and the sentence is the cheaper thing to change.
+> `US-42.<epic-number>`" describes a per-epic index. The 14 pages above are numbered
+> **sequentially** and are three different kinds of thing: per-issue QC (42.1–42.5, 42.7, 42.13,
+> 42.14, 42.15), per-release gate QC (42.6, 42.9, 42.10) and per-PR QC (42.11, 42.12). Neither the
+> naming nor the one-page-per-epic promise survived contact. Recorded, not "fixed" — renumbering
+> 14 pages to match a sentence would break every link to them, and the sentence is the cheaper
+> thing to change.
 
 **The sequence skips 8** — it runs 42.1…42.7, then 42.9. Nothing was deleted:
 `git log --diff-filter=D` finds no such file in any branch, and no document references it. The
