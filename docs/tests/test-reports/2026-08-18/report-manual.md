@@ -9,7 +9,7 @@ Not tied to one epic — this covers today's test tasks only.
 | Environment | PR build |
 | Runner | manual (extension) |
 | Build under test | Koniverse/SubWallet-Extension @ koni-qc-epic42-sync |
-| Tasks tested | US-42.16, US-42.17 |
+| Tasks tested | US-42.16, US-42.17, US-42.18 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -51,9 +51,26 @@ None found. All checks passed:
 
 ---
 
+## US-42.18 — Remove XCM routes dropped in ParaSpell v2 ([ChainList #705](https://github.com/Koniverse/SubWallet-ChainList/issues/705))
+
+Clean-up half of the ParaSpell v2 work. Checked on fresh install and on an upgraded install, mainnet and testnet.
+
+### Bugs
+
+None found. All checks passed:
+
+- Every route listed in the issue is gone — Moonbeam/Moonriver group, Manta group, amplitude, karura, and the Rococo testnet routes.
+- The XCM screen still behaves normally for tokens that lost a route: no blank list, no crash, no stuck loading.
+- Routes ParaSpell v2 still supports were not touched — sent a real XCM to confirm.
+- Affected tokens still show correct balances and send normally on their own chain.
+- Older transfers on removed routes still display correctly in transaction history.
+
+---
+
 ## Summary
 
 | Task | Bugs found | Status |
 |---|---|---|
 | US-42.16 | 0 | done |
 | US-42.17 | 0 | done |
+| US-42.18 | 0 | done |
