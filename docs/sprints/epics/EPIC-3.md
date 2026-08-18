@@ -135,7 +135,7 @@ policy belongs to EPIC-5 (security) and signing/submission to EPIC-8
 | [US-3.9](../stories/US-3.9-unified-to-solo-account-split.md) | Unified → Solo account split | Split a unified account back into per-chain solo accounts (FR-23, forward) | 📋 backlog | — |
 | [US-3.10](../stories/US-3.10-account-screens-in-the-1-0-2-rewrite.md) | Account screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — list / add / export / select screens | ✅ done | 1.0.2 |
 | [US-3.11](../stories/US-3.11-account-on-the-webapp-and-avail-space.md) | Account on the WebApp & Avail Space | Create / import / attach / derive / manage on the non-extension surfaces | ✅ done | 1.2.26 |
-| [US-3.12](../stories/US-3.12-open-account-improvements.md) | Open account improvements | The open account work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-3.12](../stories/US-3.12-open-account-improvements.md) | Open account improvements | The open account work no `done` story can carry (rule 9) | 📋 backlog | — |
 | [US-3.13](../stories/US-3.13-account-fixes-recovered-from-uncategorized.md) | Account fixes recovered from Uncategorized | Address/contact/state fixes from the triage bucket | ✅ done | 1.3.44 |
 
 > The FR-bearing stories are US-3.1–3.9 above — sizes follow scope. The `📋 backlog` status is the

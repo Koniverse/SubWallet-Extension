@@ -13,8 +13,12 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-06-11'
+lastEdited: '2026-08-13'
 editHistory:
+  - date: '2026-08-13'
+    changes: 'Version header 1.3.86 → 1.3.87 (release 1.3.87, #5055). No requirement change — the release corrects how an existing capability reads the unstaking period; FR-114 / FR-115 already own it.'
+  - date: '2026-08-10'
+    changes: 'Version header 1.3.83 → 1.3.86 after merging subwallet-dev (releases 1.3.84, 1.3.85, 1.3.86). No requirement change — the three releases materialize no new FR.'
   - date: '2026-06-11'
     changes: 'Restructure: chain-management above security + absorbs chain-abstraction; split DeFi/Governance groups; new Utilities epic (onboarding+campaign+notification); renumber all EPIC (1-19) and FR (1-161)'
   - date: '2026-06-10'
@@ -25,7 +29,7 @@ editHistory:
 
 # SubWallet — Product Requirements Document
 
-**Version:** 1.3.83
+**Version:** 1.3.87
 **Date:** 2026-06-04
 **Status:** Live (browser extension, web app, mobile)
 **Dual-Audience:** Human stakeholders + LLM implementation agents
@@ -582,8 +586,7 @@ SubWallet's longer-term trajectory is to become the default multi-chain access l
 | NFR-12 — Cold-start: cached-first paint, progressive refresh | 📋 [US-20.1](sprints/stories/US-20.1-core-structure-and-lifecycle-refactor.md) |
 | NFR-20 — Services SDK aggregation; reduce per-chain RPC fan-out | ✅ [US-20.9](sprints/stories/US-20.9-aggregated-data-via-services-sdk.md) · 📋 [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
 | NFR-21 — Cache / CDN proxy layer for market/metadata/media | ✅ [US-20.8](sprints/stories/US-20.8-api-request-strategy-v2.md) · 📋 [US-20.2](sprints/stories/US-20.2-api-call-optimization.md) |
-| NFR-23 — Many-account submit/close must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) |
-| NFR-23 — List render performance on heavy selection/collection screens | [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) |
+| NFR-23 — Responsiveness under account scale: submit/close and heavy-list rendering must not block the main thread | [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) (submit/close) · [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) (list rendering) |
 | NFR-17 (shared) — Web-surface portability/performance (webapp / web-runner) | [US-20.6](sprints/stories/US-20.6-webapp-and-web-runner-performance.md) |
 | NFR-19 — Dependency auditability: Yarn 3 lockfile, npm-only registry | [US-1.5](sprints/stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) |
 
@@ -643,7 +646,7 @@ This project is **requirement-centric**: stories link back to the PRD through `p
 | NFR-21 | Data cache & CDN proxy layer: market data (token prices, exchange rates, EVM gas) is served through SubWallet cache proxies (`api-cache`, with `static-cache` / `chain-data` JSON fallback); online chain-list and token/asset metadata come from `static-data` / `chain-list-assets`; NFT media is fetched via the `ipfs-files` IPFS gateway — these front upstream providers to reduce rate-limit exposure, enable release-free data updates, and provide fallbacks when an upstream is unavailable | Performance / Availability |
 | NFR-22 | **Financial-figure accuracy:** every monetary figure the wallet displays — balance, reward, APY/APR, fee, swap quote — either matches its source of truth (chain state, or the aggregator the figure is sourced from) or is shown as **unavailable**. A figure that cannot be computed reliably is never rendered as a confident number. **Defended by** [US-12.13](sprints/stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) (rewards/APY) and [US-8.12](sprints/stories/US-8.12-fee-bigint-and-gas-estimation-hardening.md) (fees). | Correctness |
 | NFR-23 | **Responsiveness under account scale:** wallet-wide operations (submit, close, list render, balance fan-out) stay responsive as the account count grows — no operation blocks the main thread long enough to freeze the UI, and per-account work is batched rather than issued one call per account. **Defended by** [US-20.4](sprints/stories/US-20.4-many-account-submit-performance.md) (submit/close, main thread) and [US-20.5](sprints/stories/US-20.5-list-rendering-performance.md) (list render). | Performance |
-| NFR-24 | **Degrade, never blank:** a malformed, unexpected, or undecodable payload from any external source (dApp, chain, indexer, aggregator) degrades to an explicit error state the user can act on — never a blank screen, a silent no-op, or a crashed popup. Applies first to the confirmation screen, where the user is being asked to sign. **Defended by** [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md). | Reliability |
+| NFR-24 | **Degrade, never blank:** a malformed, unexpected, or undecodable payload from any external source (dApp, chain, indexer, aggregator) degrades to an explicit error state the user can act on — never a blank screen, a silent no-op, or a crashed popup. Applies first to the confirmation screen, where the user is being asked to sign. **Defended by** [US-8.13](sprints/stories/US-8.13-payload-decode-error-handling.md) (reliability instance — a payload that fails to decode) and [US-5.15](sprints/stories/US-5.15-signing-prompt-mode-confusion.md) (security instance — a payload of the wrong *kind*, where the degraded state must also be *unsignable*). **Neither covers the stronger property at stake in #5042** — *a signature is only ever produced over the artefact the prompt displayed* — which no FR or NFR currently states; see [US-5.15](sprints/stories/US-5.15-signing-prompt-mode-confusion.md) § "Open". | Reliability |
 | NFR-25 | **Web-surface hardening:** the web app and web-runner enforce a Content-Security-Policy, and every externally-controlled link opens with `noopener`/`noreferrer` (reverse-tabnabbing). The extension's MV3 CSP (NFR-8) does not cover these surfaces — they are separately built and separately exposed. **Defended by** [US-5.10](sprints/stories/US-5.10-verichains-audit-remediation-hardening.md). | Security |
 
 > **The bar a requirement must clear to be on this page** ([CONTEXT D96](CONTEXT.md), [D98](CONTEXT.md)):

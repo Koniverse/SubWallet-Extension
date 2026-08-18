@@ -48,9 +48,8 @@ This is the wallet's daily-home screen and the most-opened surface in the
 product. The cross-chain aggregation itself is the **engine** layer: the
 `BalanceService` and the SubWallet Services SDK
 ([AD-24](../../ARCHITECTURE.md#architecture-decisions)) fan transferable/locked
-detection across all accounts and 200+ chains, riding the lightweight WsProvider
-read path ([AD-07](../../ARCHITECTURE.md#architecture-decisions)) to stay
-memory-bounded. That engine is owned by [EPIC-2](../epics/EPIC-2.md)
+detection across all accounts and 200+ chains through the current ChainService/API
+path. That engine is owned by [EPIC-2](../epics/EPIC-2.md)
 ([US-2.5](US-2.5-balance-detection-and-aggregation-engine.md)); this story
 *consumes* the aggregated RxJS subjects and renders the dashboard.
 
@@ -73,7 +72,7 @@ version reconciliation.
   ≤ 300 ms with skeletons on not-yet-refreshed rows (NFR-12), never a blank screen.
 - [x] **AC-3** — **Given** a selected account context (all-accounts vs a single
   account), **When** the user switches it, **Then** the aggregated total recomputes
-  to the selected scope without forcing a full ApiPromise on the read path (AD-07).
+  to the selected scope through the existing background data path.
 - [x] **AC-4** — **Given** one chain's data source is unreachable, **When** the
   portfolio refreshes, **Then** the reachable chains still aggregate and the
   degraded chain is shown as stale/unavailable rather than failing the whole view.
@@ -84,8 +83,8 @@ version reconciliation.
   - [x] Consume the multi-account/multi-chain subject exposed by [US-2.5](US-2.5-balance-detection-and-aggregation-engine.md); do not re-derive per-chain.
 - [x] **TASK-7.1.2** — Cached-first render with progressive refresh + skeletons (AC: 2)
   - [x] Serve `redux-persist` last-known snapshot on open; replace rows as fresh data arrives.
-- [x] **TASK-7.1.3** — Account-scope selector recompute on the read path (AC: 3). *("Lightweight" in the original wording is inherited from AD-07 and is not what the code does — see the banner.)*
-  - [x] Assert no full `@polkadot/api` ApiPromise is instantiated for the read (AD-07).
+- [x] **TASK-7.1.3** — Account-scope selector recompute on the read path (AC: 3).
+  - [x] The obsolete AD-07 no-`ApiPromise` assertion is not a shipped property; see the retirement banner.
 - [x] **TASK-7.1.4** — Per-chain degraded-source handling (AC: 4)
   - [x] Mark unreachable chains stale; keep aggregate sum over reachable chains.
 
@@ -94,7 +93,7 @@ version reconciliation.
 ### Architecture constraints
 
 - [AD-24](../../ARCHITECTURE.md#architecture-decisions) — balance aggregation is fetched through the Services SDK backend, not computed entirely on-device; this screen consumes it.
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance/token queries use the lightweight WsProvider; the read path must stay memory-bounded (≤ 72 MB, NFR-11) regardless of chain count.
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — balance/token queries use the lightweight WsProvider; the read path must stay memory-bounded (≤ 72 MB, NFR-11) regardless of chain count.~~ **Retired:** this was never implemented and NFR-11 is no longer a requirement ([CONTEXT D96](../../CONTEXT.md)).
 - This story does NOT introduce new AD entries.
 
 ### Cross-story dependencies
@@ -106,7 +105,7 @@ version reconciliation.
 
 - Home-screen first paint: cached portfolio visible ≤ 300 ms on popup open (NFR-12).
 - ~~Aggregation read memory: ≤ 72 MB~~ — **RETIRED** (CONTEXT D96): the budget was never measured and its mechanism never built.
-- Story PR description must explicitly confirm both budgets are met.
+- Story PR description must explicitly confirm the cached-first budget is met; there is no read-path memory budget.
 
 ### Points justification
 
@@ -128,7 +127,7 @@ price-feed integration sizes at 5 per the epic sizing guidance.
 |---|---|
 | AC-1 | Manual: hold tokens on 3+ chains/accounts → portfolio total equals sum of rows |
 | AC-2 | Manual: idle until background evicts → reopen popup → cached total paints with skeletons, no blank |
-| AC-3 | Component test: account-scope switch recomputes total; assert no full ApiPromise on the read path |
+| AC-3 | Component test: account-scope switch recomputes total through the existing background data path |
 | AC-4 | Manual: disable one chain's RPC → reachable chains still aggregate; degraded chain shown stale |
 
 ## Changelog entry

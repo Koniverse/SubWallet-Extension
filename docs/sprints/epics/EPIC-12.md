@@ -178,11 +178,12 @@ power, not yield — owned by EPIC-15).
 | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning performance & cache hardening | Keep the earning surface fast, memory-bounded and cache-fresh across many pools | 📋 backlog | — |
 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | Earning term & condition display | Display earning T&Cs before user commits to a staking/earning position | ✅ done | 1.3.83 |
 | [US-12.16](../stories/US-12.16-crowdloan-contribution-and-portfolio.md) | Crowdloan contribution & portfolio | A retired feature's whole arc — contribute, show, and remove | ✅ done | 1.3.73 |
-| [US-12.17](../stories/US-12.17-open-earning-improvements.md) | Open earning improvements | The open earning work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-12.17](../stories/US-12.17-open-earning-improvements.md) | Open earning improvements | The open earning work no `done` story can carry (rule 9) | 📋 backlog | — |
 | [US-12.18](../stories/US-12.18-earning-screens-in-the-1-0-2-rewrite.md) | Earning screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite | ✅ done | 1.0.2 |
 | [US-12.19](../stories/US-12.19-earning-on-the-webapp-and-avail-space.md) | Earning on the WebApp & Avail Space | Staking / earning / crowdloan on the non-extension surfaces | ✅ done | 1.2.26 |
 | [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |
 | [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
+| [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | Nominator fast-unbond duration | Quote the unstaking window the runtime enforces, not `bondingDuration` (28d → 2d on DOT) | ✅ done | 1.3.87 |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**
@@ -238,7 +239,8 @@ the work its children already carry.
 | [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | Trusted Stake partner-curated alpha-index position (handler-backed) on the native Subtensor path | FR-124 |
 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | New per-network staking handler subclasses (Enjin / Phala / xx) on the existing native tree; targets from static cache (AD-23) | FR-125 |
 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) | Reward/APY-figure accuracy verified at the `BasePoolHandler` seam (AD-22) across every pool type | NFR-22 |
-| [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK / lightweight WsProvider (AD-24 / AD-07), removed-account invalidation | NFR-12, NFR-21 |
+| [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK aggregation (AD-24), removed-account invalidation | NFR-12, NFR-21 |
+| [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | `getNominatorUnstakingEras()` at the relay unstaking-period seam — `NominationPoolHandler` + `RelayNativeStakingPoolHandler` (AD-22) and both legacy `relayChain.ts` metadata entry points | FR-114 (defends), FR-115 (defends) |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).
 
@@ -304,7 +306,7 @@ sequenceDiagram
 | --- | --- | --- | --- |
 | **Earning list first paint** | Cached positions visible ≤ 300 ms on popup open (NFR-12) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | The earning tab is a daily surface; a blank wait while many pool subjects resolve reads as a broken wallet |
 | **Pool data fetch** | Pool info / targets read from static cache, not live RPC per render (NFR-21, AD-23) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Live per-render RPC across many pools rate-limits the chain and stalls the list |
-| **Earning aggregation memory** | Read path stays on the lightweight WsProvider / Services-SDK aggregation (≤ 72 MB, NFR-11) | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Instantiating a full ApiPromise per earning chain to read positions blows the memory budget |
+| ~~**Earning aggregation memory**~~ **retired** | ~~Lightweight WsProvider / Services-SDK aggregation (≤ 72 MB, NFR-11)~~ — no memory budget is stated | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | AD-07's read-path claim was never implemented; a future memory concern must be measured before it becomes work ([CONTEXT D96](../../CONTEXT.md)). |
 
 ## Acceptance criteria (propagated from stories)
 

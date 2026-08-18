@@ -3,7 +3,7 @@ id: sprint-2025-M10
 status: closed
 start: 2025-10-01
 end: 2025-10-31
-goal: "Reconstructed window — 1 story/stories shipped in release 1.3.63 (EPIC-11). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 5 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,12 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.3.63 (EPIC-
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-11.9 | In-wallet swap via Optimex | EPIC-11 | P1 | 8 | ✅ done | — | [link](stories/US-11.9-in-wallet-swap-via-optimex.md) |
+| US-11.14 | Swap pair catalogue & operational tooling (out-of-repo) | EPIC-11 | P3 | 2 | ✅ done | — | [link](stories/US-11.14-swap-pair-catalogue-and-tooling.md) |
+| US-4.28 | Chains, tokens & data recovered from Uncategorized | EPIC-4 | P3 | 5 | ✅ done | — | [link](stories/US-4.28-chains-tokens-and-data-recovered-from-uncategorized.md) |
+| US-6.8 | Number, decimal & value display | EPIC-6 | P3 | 2 | ✅ done | — | [link](stories/US-6.8-number-and-value-display.md) |
+| US-8.14 | Send-fund form & recipient validation | EPIC-8 | P3 | 3 | ✅ done | — | [link](stories/US-8.14-send-fund-form-and-recipient-validation.md) |
 
-**Releases in this window:** 1.3.63 · **Points (retroactive):** 8
+**Releases represented by stories in this window:** 1.3.63, 1.3.61, 1.3.64, 1.3.62 · **Points (retroactive):** 20
 
 ## Per-Epic Retrospective
 

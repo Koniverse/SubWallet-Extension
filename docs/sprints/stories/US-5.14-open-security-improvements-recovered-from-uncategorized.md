@@ -2,7 +2,7 @@
 id: US-5.14
 title: "Open security improvements (recovered from Uncategorized)"
 epic: EPIC-5
-status: in-progress
+status: backlog
 priority: P3
 points: 1
 sprint:
@@ -13,7 +13,7 @@ depends_on:
 assignee:
 commit:
 created: 2026-07-24
-updated: 2026-07-24
+updated: 2026-07-29
 ---
 
 ## Goal
@@ -22,7 +22,7 @@ The security work asked for and not delivered that the triage bucket held.
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 3 rows below are **open on the tracker**, recovered from the former **Uncategorized** maintenance ledger on 2026-07-24. `commit`, `sprint` and `version_shipped` stay empty until work lands.
+> **📋 backlog — nothing here has shipped or been committed to a sprint.** All 3 rows below are **open on the tracker**, recovered from the former **Uncategorized** maintenance ledger on 2026-07-24. `commit`, `sprint` and `version_shipped` stay empty until work lands.
 
 ## Scope
 

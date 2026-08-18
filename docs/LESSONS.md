@@ -1150,3 +1150,20 @@ that would have caught it: what does git already know, before what does an exter
 
 **Cost of learning it**: 367 `done` stories carried a blank release for a day while the exact version
 sat one `git tag --contains` away — and the recheck had written *"unrecoverable"* over it.
+
+---
+
+## 71. Import runs the unified-account migration inline, and its cost is per keypair — interrupting it leaves accounts that cannot sign
+
+**What happened**: A batch import of roughly 30 accounts left the import screen spinning long past the point where the accounts had actually been created. Reloading the extension while it spins ends the migration abruptly, and although every imported account still lists afterwards, signing can fail from then on — the only recovery is to re-import and let the affected account migrate again.
+
+**Why**: Import does not just create accounts — it also runs the unified-account migration, and that migration is priced per keypair, not per account. `migrateUnifiedToUnifiedAccount` walks master accounts in a serial loop; for each one it exports the mnemonic, then derives and stores a keypair for every chain type the account does not already have. `SUPPORTED_ACCOUNT_CHAIN_TYPES` covers Substrate, Ethereum, TON, Cardano and Bitcoin, and `getDefaultKeypairTypeFromAccountChainType` maps Bitcoin alone to six types (`bitcoin-44/84/86`, `bittest-44/84/86`), so a single account can cost up to ten derive-and-encrypt rounds. Each type is derived **twice** — once via `keyring.createFromUri` to obtain the address for `modifyPairs`, then again via `keyring.addUri` to store it. A hardcoded `setTimeout(1800)` separates the master and derived loops regardless of how much work ran, carrying its own `todo` to replace it with a real promise. Because `upsertModifyPairs` is called inside the loop, an interrupted run persists a partially migrated set, and the `catch` only logs `Migration unified account failed with error:` before returning the ids collected so far — so a half-migrated wallet looks complete and reports nothing. The encryption itself lives in `@subwallet/keyring`, a separate repository, so the per-keypair cost cannot be reduced from here.
+
+**How to avoid**:
+- Price account-model migrations per keypair, not per account, and say so in any progress UI: thirty accounts is up to three hundred derive-and-encrypt rounds, not thirty units of work.
+- Never let a migration loop persist partial state without a resume marker. If it can be interrupted, it must be restartable — record which accounts completed, so the next unlock finishes the rest instead of leaving keypairs that were counted but never stored.
+- Surface migration failures. A `catch` that logs and returns the successful ids turns a signing bug into a mystery that surfaces weeks later, instead of a defect caught at the point of failure.
+- Do not derive the same suri twice per keypair type when one pass can supply the address the other needs — check this before reaching for the keyring repository, since it needs no upstream change.
+- Treat a hardcoded wait between migration phases as a defect, not a workaround: it is simultaneously too long for a one-account wallet and too short as a correctness guarantee for a large one.
+
+See [`Migration.ts`](../packages/extension-base/src/services/keyring-service/context/handlers/Migration.ts#L72-L144) (`migrateUnifiedToUnifiedAccount`, reached from `pri(migrate.migrateUnifiedAndFetchEligibleSoloAccounts)` via [`Extension.ts:6061`](../packages/extension-base/src/koni/background/handlers/Extension.ts#L6061) and [`account-context.ts:294`](../packages/extension-base/src/services/keyring-service/context/account-context.ts#L294)), and [`getDefaultKeypairTypeFromAccountChainType`](../packages/extension-base/src/utils/account/transform.ts#L61). No tracker issue exists for this as of 2026-08-04 — see [notes/2026-08-04.md](notes/2026-08-04.md) §B. Distinct from [§43](#43-unified-master-account-migration-is-a-data-model-rewrite--version-the-json-both-ways-recompute-suffixcount), which is about the migration's data format; this is its cost and its failure mode.

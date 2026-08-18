@@ -5,7 +5,7 @@ epic: EPIC-5
 status: in-progress
 priority: P1
 points: 5
-sprint: sprint-2026-W31
+sprint: sprint-2026-W33
 version_shipped:
 prd_ref: [NFR-16, NFR-25, FR-52]
 arch_ref: [AD-04, AD-03, AD-19]
@@ -13,7 +13,7 @@ depends_on: [US-5.1, US-5.2]
 assignee: frenkie-ng
 commit:
 created: 2026-06-12
-updated: 2026-07-24
+updated: 2026-08-10
 ---
 
 ## Goal

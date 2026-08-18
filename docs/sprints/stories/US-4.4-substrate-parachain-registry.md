@@ -45,14 +45,11 @@ The Substrate side of the wallet is not a handful of chains — it is the whole
 Polkadot/Kusama relay + parachain set, 200+ networks. Each enabled chain is a
 `SubstrateApi` object wrapping `@polkadot/api`
 ([AD-02](../../ARCHITECTURE.md#architecture-decisions)). Doing that naïvely is a
-memory problem: a full `ApiPromise` for 20 chains consumed ~264 MB, so balance/
-token queries use the lightweight WsProvider connector and the full `ApiPromise`
-is deferred to extrinsic construction
-([AD-07](../../ARCHITECTURE.md#architecture-decisions)). The registry surfaces a
+memory concern, but AD-07's lightweight-WsProvider design was never implemented
+and NFR-11 is retired ([CONTEXT D96](../../CONTEXT.md)). The registry surfaces a
 live connectivity indicator per chain so users see which endpoints are healthy.
 
-This is the largest single-ecosystem surface in the epic and the reason the
-AD-07 memory budget exists; the planned light-client fallback
+This is the largest single-ecosystem surface in the epic; the planned light-client fallback
 ([US-4.9](US-4.9-substrate-light-client-fallback.md)) extends it for chains with
 no reachable RPC.
 
@@ -66,9 +63,10 @@ already shipped.
 - [x] **AC-2** — **Given** an enabled Substrate chain, **When** it connects via
   `SubstrateApi`, **Then** a live connectivity status (connected / connecting /
   unavailable) is shown.
-- [x] **AC-3** — **Given** many enabled Substrate chains, **When** the wallet runs,
+- [x] ~~**AC-3** — **Given** many enabled Substrate chains, **When** the wallet runs,
   **Then** balance/token queries use the lightweight WsProvider so RAM does not
-  scale with the full ApiPromise per chain (AD-07).
+  scale with the full ApiPromise per chain (AD-07).~~ **Retired historical claim:**
+  this assertion is false in the shipped code and NFR-11 is no longer a requirement.
 - [x] **AC-4** — **Given** a chain whose endpoint is unreachable, **When** connection
   is attempted, **Then** its status shows unavailable without blocking the rest of
   the registry.
@@ -84,7 +82,7 @@ already shipped.
 ### Architecture constraints
 
 - [AD-02](../../ARCHITECTURE.md#architecture-decisions) — each enabled Substrate chain is a managed `SubstrateApi` object.
-- [AD-07](../../ARCHITECTURE.md#architecture-decisions) — lightweight WsProvider for balance queries; full ApiPromise only on extrinsic construction (memory ceiling).
+- ~~[AD-07](../../ARCHITECTURE.md#architecture-decisions) — lightweight WsProvider for balance queries; full ApiPromise only on extrinsic construction (memory ceiling).~~ **Retired:** this design was never implemented and NFR-11 is no longer a requirement ([CONTEXT D96](../../CONTEXT.md)).
 - This story introduces no new AD entries.
 
 ### Cross-story dependencies
@@ -94,8 +92,8 @@ already shipped.
 
 ### Performance budget
 
-- WsProvider-only mode: RAM ~constant regardless of enabled-chain count (full ApiPromise hit ~264 MB for 20 chains).
-- Story PR must confirm balance/token queries do not instantiate a full ApiPromise per chain.
+- ~~WsProvider-only mode: RAM ~constant regardless of enabled-chain count (full ApiPromise hit ~264 MB for 20 chains).~~ **Retired:** no memory budget is stated.
+- Story PRs must not claim the retired AD-07 memory contract.
 
 ### Dev notes — points
 
@@ -115,7 +113,7 @@ already shipped.
 |---|---|
 | AC-1 | Manual: browse registry → 200+ Substrate networks searchable |
 | AC-2, AC-4 | Manual: enable a chain → live status; unreachable chain → unavailable, registry usable |
-| AC-3 | ⚠️ Unverifiable as written — there is no WsProvider-only mode and no memory probe. [US-20.3](US-20.3-read-path-memory-budget.md) owns measuring the real ceiling. |
+| AC-3 | ⚠️ Superseded — there is no WsProvider-only mode, and NFR-11 / [US-20.3](US-20.3-read-path-memory-budget.md) are retired. |
 
 ## Changelog entry
 

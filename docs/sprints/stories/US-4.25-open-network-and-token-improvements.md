@@ -2,7 +2,7 @@
 id: US-4.25
 title: "Open network & token improvements"
 epic: EPIC-4
-status: in-progress
+status: backlog
 priority: P3
 points: 5
 sprint:
@@ -11,7 +11,7 @@ prd_ref: []
 assignee:
 commit:
 created: 2026-07-24
-updated: 2026-07-24
+updated: 2026-07-29
 ---
 
 ## Goal
@@ -22,7 +22,7 @@ carry without becoming a mix of done and open rows.
 
 ## Status
 
-> **🚧 in-progress — nothing here has shipped.** All 37 rows below are **open on the tracker**. No
+> **📋 backlog — nothing here has shipped or been committed to a sprint.** All 37 rows below are **open on the tracker**. No
 > acceptance criterion is ticked, and `commit`, `sprint` and `version_shipped` stay empty until work
 > lands in a release.
 

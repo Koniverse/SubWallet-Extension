@@ -13,6 +13,7 @@ goal: "Launch EPIC-21 docs conformance program — contributor map, history back
 | US-21.1 | Contributor identity map | EPIC-21 | P1 | 3 | ✅ done | new | [link](stories/US-21.1-contributor-identity-map.md) |
 | US-21.2 | History backfill | EPIC-21 | P1 | 13 | ✅ done | new | [link](stories/US-21.2-history-backfill.md) |
 | US-21.3 | Conformance close-out | EPIC-21 | P1 | 5 | ✅ done | new | [link](stories/US-21.3-conformance-close-out.md) |
+| US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | ⏸ deprecated | — | [link](stories/US-20.3-read-path-memory-budget.md) |
 
 **Closed 2026-07-13** — 21/21 points delivered, all three stories `done`. Retrospective below.
 

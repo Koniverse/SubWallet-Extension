@@ -3,7 +3,7 @@ id: sprint-2024-M06
 status: closed
 start: 2024-06-01
 end: 2024-06-30
-goal: "Reconstructed window — 3 story/stories shipped in releases 1.2.5, 1.2.7, 1.2.9 (EPIC-1, EPIC-8, EPIC-13). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 4 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -30,8 +30,9 @@ goal: "Reconstructed window — 3 story/stories shipped in releases 1.2.5, 1.2.7
 | US-1.1 | MV3 service-worker background for Chrome/Firefox compliance | EPIC-1 | P0 | 8 | ✅ done | — | [link](stories/US-1.1-mv3-service-worker-background.md) |
 | US-8.8 | Metadata-hash signing | EPIC-8 | P1 | 5 | ✅ done | — | [link](stories/US-8.8-metadata-hash-signing.md) |
 | US-13.2 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | EPIC-13 | P1 | 5 | ✅ done | — | [link](stories/US-13.2-snowbridge-eth-asset-hub.md) |
+| US-6.7 | The 1.0.2 UI upgrade programme | EPIC-6 | P3 | 8 | ✅ done | — | [link](stories/US-6.7-the-1-0-2-ui-upgrade-programme.md) |
 
-**Releases in this window:** 1.2.5, 1.2.7, 1.2.9 · **Points (retroactive):** 18
+**Releases represented by stories in this window:** 1.2.7, 1.2.5, 1.2.9, 1.2.10 · **Points (retroactive):** 26
 
 ## Per-Epic Retrospective
 

@@ -201,7 +201,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 | [US-4.22](../stories/US-4.22-rpc-and-endpoint-management-hardening.md) | RPC & endpoint-management hardening | Accurate connectivity, endpoint fallback/retry, custom-RPC validation (#4216) | 👀 review | — |
 | [US-4.23](../stories/US-4.23-bitcoin-api-path-hardening.md) | Bitcoin-API path hardening | Bitcoin indexer timeouts/retries/provider-drift behind the backend proxy | 👀 review | — |
 | [US-4.24](../stories/US-4.24-remove-polygon-zkevm.md) | Remove Polygon zkEVM | Remove Polygon zkEVM network support and update chainlist/domain config | ✅ done | 1.3.82 |
-| [US-4.25](../stories/US-4.25-open-network-and-token-improvements.md) | Open network & token improvements | The open network/token work no `done` story can carry (rule 9) | 🚧 in-progress | — |
+| [US-4.25](../stories/US-4.25-open-network-and-token-improvements.md) | Open network & token improvements | The open network/token work no `done` story can carry (rule 9) | 📋 backlog | — |
 | [US-4.26](../stories/US-4.26-network-and-token-screens-in-the-1-0-2-rewrite.md) | Network & token screens in the 1.0.2 UI rewrite | This epic's share of the 1.0.2 rewrite — Settings/Networks, token list, logos | ✅ done | 1.0.2 |
 | [US-4.27](../stories/US-4.27-network-and-token-on-the-webapp-and-avail-space.md) | Network & token on the WebApp & Avail Space | Manage networks / tokens on the non-extension surfaces | ✅ done | 1.2.14 |
 | [US-4.28](../stories/US-4.28-chains-tokens-and-data-recovered-from-uncategorized.md) | Chains, tokens & data recovered from Uncategorized | Chain/token adds, chainlist train, data-indexer | ✅ done | 1.3.61 |
@@ -294,7 +294,7 @@ US-4.13..US-4.17) introduce a new API-object type before this flow applies.
 
 - **One ecosystem = one `ChainService` API-object type ([AD-02](../../ARCHITECTURE.md#architecture-decisions)):** every chain family connects through a dedicated API object (`SubstrateApi` / `EvmApi` / Bitcoin / TON / Cardano, and planned Starknet / Midnight / Flow / Cosmos / Solana). Adding an ecosystem is a new API-object + handler, never an ad-hoc chain lookup. Enforced by [US-4.5](../stories/US-4.5-evm-network-support.md) onward.
 - **Data updates ship without a release ([FR-34](../../PRD.md#epic-4--chain-management), AD-23, AD-25):** chain list and token metadata are served from the static-data cache / CDN proxy, never hard-coded into the bundle. A PR that hard-codes a new chain spec instead of the registry is rejected. Enforced by [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md).
-- **Memory ceiling under chain count ([AD-07](../../ARCHITECTURE.md#architecture-decisions)):** balance/token queries use the lightweight WsProvider; the full `ApiPromise` is instantiated only for extrinsic construction. Enabling many networks must not scale RAM linearly. Enforced by [US-4.4](../stories/US-4.4-substrate-parachain-registry.md).
+- ~~**Memory ceiling under chain count ([AD-07](../../ARCHITECTURE.md#architecture-decisions)):** balance/token queries use the lightweight WsProvider; the full `ApiPromise` is instantiated only for extrinsic construction. Enabling many networks must not scale RAM linearly.~~ **Retired:** AD-07's mechanism was never built and NFR-11 is no longer a requirement ([CONTEXT D96](../../CONTEXT.md)).
 - **Third-party keys never ship in the bundle ([AD-19](../../ARCHITECTURE.md#architecture-decisions), AD-25):** Blockfrost (Cardano) and the Bitcoin indexer route through the Koni backend proxy. A provider key in client code is rejected. Enforced by [US-4.8](../stories/US-4.8-cardano-network-integration.md), [US-4.13](../stories/US-4.13-bitcoin-utxo-multi-asset-transfer.md).
 - **Every ecosystem rides the one-seed account ([AD-11](../../ARCHITECTURE.md#architecture-decisions)):** a newly added chain family must derive from the unified multi-chain account; adding a chain must not force a separate seed/backup. Owned by EPIC-3, asserted at integration time by each ecosystem story.
 
@@ -314,7 +314,7 @@ US-4.13..US-4.17) introduce a new API-object type before this flow applies.
 
 | Concern | Budget | Story | Rationale |
 | --- | --- | --- | --- |
-| **Multi-chain RAM** | WsProvider-only mode ~constant regardless of enabled-chain count (full ApiPromise only on extrinsic build) | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | Full ApiPromise hit ~264 MB for 20 chains; the registry must stay usable at 200+ networks (AD-07) |
+| ~~**Multi-chain RAM**~~ **retired** | ~~WsProvider-only mode ~constant regardless of enabled-chain count (full ApiPromise only on extrinsic build)~~ — no memory budget is stated | [US-4.4](../stories/US-4.4-substrate-parachain-registry.md) | AD-07's 2022 comparison was never implemented or re-measured under MV3 ([CONTEXT D96](../../CONTEXT.md)). |
 | **Chain-list refresh** | Served from cache / CDN proxy, with a bundled JSON fallback | [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) | Live metadata updates must not hammer RPCs or block first paint (AD-23, AD-25) |
 
 ## Acceptance criteria (propagated from stories)

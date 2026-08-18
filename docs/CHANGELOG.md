@@ -36,8 +36,48 @@ Release history for **SubWallet Extension**, in the koni-docs changelog format.
 (empty — track unreleased changes here; new version sections are inserted above the
 previous version, anchored on this block, per the koni-docs changelog template)
 
-<!-- Version drift: the newest entry below is 1.3.82, but VERSION and PRD.md
-     still read 1.3.79. Bumping them is Wave 2 of docs/notes/2026-07-09.md. -->
+<!-- No version drift: the newest entry below is 1.3.87, and VERSION and PRD.md
+     both read 1.3.87 (synced 2026-08-13 — see docs/notes/2026-08-13.md). -->
+
+---
+
+## [1.3.87] — 2026-08-12 — Release 1.3.87 (Koni) — v1.3.87
+
+### Changed
+- Read the nominator unstaking period from `nominatorFastUnbondDuration` when nominators are not slashable, so relay-chain native staking and nomination pools show the fast unbonding window instead of `bondingDuration` — 2 days rather than 28 on Polkadot (#5055)
+
+**Commit**: 5f9a703b72
+
+---
+
+## [1.3.86] — 2026-08-06 — Release 1.3.86 (Koni) — v1.3.86
+
+### Removed
+- Remove Bittensor root claim type function, deprecated by the Bittensor v4.4.1 chain upgrade (#5045)
+
+**Commit**: 1c54913c64
+
+---
+
+## [1.3.85] — 2026-08-05 — Release 1.3.85 (Koni) — v1.3.85
+
+### Fixed
+- Reject signing prompts that could conceal the actual transaction from the user (#5042)
+
+**Commit**: 3a7e29e404
+
+---
+
+## [1.3.84] — 2026-07-22 — Release 1.3.84 (Koni) — v1.3.84
+
+### Added
+- Add recommended validators for native and subnet staking (#5024)
+- Update chain-list to 0.2.129 — XCM support for MYTH between Polkadot Asset Hub and Hydration ([ChainList #301](https://github.com/Koniverse/SubWallet-ChainList/issues/301)); TUSDT on Bittensor ([ChainList #699](https://github.com/Koniverse/SubWallet-ChainList/issues/699)); Cypress token on Base Mainnet ([ChainList #703](https://github.com/Koniverse/SubWallet-ChainList/issues/703)); Polkadot Hub EVM ([ChainList #701](https://github.com/Koniverse/SubWallet-ChainList/issues/701))
+
+### Fixed
+- Fix issues that surface after a version upgrade (#5013)
+
+**Commit**: 784d77a474
 
 ---
 

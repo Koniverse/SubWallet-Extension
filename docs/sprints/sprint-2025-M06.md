@@ -3,7 +3,7 @@ id: sprint-2025-M06
 status: closed
 start: 2025-06-01
 end: 2025-06-30
-goal: "Reconstructed window — 1 story/stories shipped in release 1.3.42 (EPIC-4). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 4 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,11 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.3.42 (EPIC-
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-4.6 | Bitcoin network integration | EPIC-4 | P1 | 5 | ✅ done | — | [link](stories/US-4.6-bitcoin-network-integration.md) |
+| US-1.13 | Backend, middleware & platform refactors | EPIC-1 | P3 | 4 | ✅ done | — | [link](stories/US-1.13-backend-middleware-and-platform-refactors.md) |
+| US-20.7 | MV3 wake-depth split (pub → partial, pri → full) | EPIC-20 | P1 | 5 | ✅ done | — | [link](stories/US-20.7-mv3-wake-depth-split.md) |
+| US-3.13 | Account fixes recovered from Uncategorized | EPIC-3 | P3 | 2 | ✅ done | — | [link](stories/US-3.13-account-fixes-recovered-from-uncategorized.md) |
 
-**Releases in this window:** 1.3.42 · **Points (retroactive):** 5
+**Releases represented by stories in this window:** 1.3.42, 1.3.41, 1.3.44 · **Points (retroactive):** 16
 
 ## Per-Epic Retrospective
 

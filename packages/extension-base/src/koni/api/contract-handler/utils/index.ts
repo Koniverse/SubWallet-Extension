@@ -14,6 +14,8 @@ export const _TEST_ERC721_ABI = require('./test_erc721_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PSP22_ABI: Record<string, any> = require('./psp22_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
+export const _BITTENSOR_PSP22_TUSDT_ABI: Record<string, any> = require('./bittensor-psp22-tusdt_abi.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PSP34_ABI: Record<string, any> = require('./psp34_abi.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires,@typescript-eslint/no-unsafe-assignment
 export const _PINK_PSP34_ABI: Record<string, any> = require('./pink_psp34_abi.json');

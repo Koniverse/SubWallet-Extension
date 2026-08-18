@@ -1,34 +1,41 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-07-28 11:48:27 UTC
-> Total stories: 283
+> Last generated: 2026-08-13 02:35:34 UTC
+> Total stories: 291
 
-## 📋 Backlog (56)
+## 📋 Backlog (70)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.7 | Firefox background-lifecycle recheck (improvement on US-1.1) | EPIC-1 | P3 | 1 | — | Thiendekaco |
 | US-1.8 | Firefox CORS follow-up & dev-build test tooling (improvement on US-1.5) | EPIC-1 | P3 | 1 | — | saltict |
 | US-1.9 | Out-of-repo tooling not yet started (improvement on US-1.6) | EPIC-1 | P3 | 1 | — | — |
+| US-1.15 | Open platform improvements | EPIC-1 | P3 | 4 | — | — |
 | US-10.5 | Bitcoin dApp connection (PSBT) | EPIC-10 | P1 | 5 | — | — |
 | US-10.6 | TON dApp connection | EPIC-10 | P1 | 5 | — | — |
 | US-10.10 | Multi-wallet coexistence hardening | EPIC-10 | P1 | 3 | — | — |
 | US-10.12 | WebApp injected-account caching | EPIC-10 | P2 | 3 | — | — |
+| US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
 | US-11.10 | In-wallet swap via PiperX | EPIC-11 | P2 | 5 | — | — |
 | US-11.11 | In-wallet swap via StellaSwap | EPIC-11 | P3 | 5 | — | — |
+| US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
+| US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
 | US-12.10 | Bittensor alpha-token liquid staking | EPIC-12 | P3 | 5 | — | — |
 | US-12.12 | Staking for additional networks (Enjin/Phala/xx) | EPIC-12 | P3 | 8 | — | — |
 | US-12.13 | Earning reward & APY-accuracy hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.14 | Earning performance & cache hardening | EPIC-12 | P2 | 5 | — | — |
+| US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
 | US-13.8 | Bittensor alpha-token bridges (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | EPIC-13 | P2 | 8 | — | — |
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
+| US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
 | US-14.3 | Additional on-ramp providers | EPIC-14 | P3 | 5 | — | — |
 | US-14.4 | Off-ramp flow improvements (improvement on US-14.2) | EPIC-14 | P3 | 1 | — | — |
 | US-15.5 | Web-app governance surface | EPIC-15 | P3 | 8 | — | — |
 | US-16.9 | Ledger connection & derivation improvements (improvement on US-16.5) | EPIC-16 | P3 | 3 | — | — |
 | US-16.10 | Ledger on the WebApp & Avail Space (improvement on US-16.5) | EPIC-16 | P3 | 2 | — | — |
+| US-16.11 | QR-device signing defects (improvement on US-16.2) | EPIC-16 | P3 | 2 | — | — |
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
@@ -38,22 +45,29 @@
 | US-19.11 | Onboarding gate follow-ups (improvement on US-19.1) | EPIC-19 | P3 | 1 | — | — |
 | US-19.12 | i18n coverage & key hygiene (improvement on US-19.2) | EPIC-19 | P3 | 1 | — | — |
 | US-19.13 | Avail Space mission pool improvement (improvement on US-19.7) | EPIC-19 | P3 | 1 | — | — |
+| US-19.15 | Open onboarding & engagement (recovered from Uncategorized) | EPIC-19 | P3 | 1 | — | — |
+| US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.5 | List rendering performance | EPIC-20 | P2 | 5 | — | — |
 | US-20.6 | WebApp & web-runner performance | EPIC-20 | P2 | 5 | — | — |
 | US-3.8 | Account recovery & identity (roadmap) | EPIC-3 | P3 | 8 | — | — |
 | US-3.9 | Unified → Solo account split | EPIC-3 | P0 | 3 | — | — |
+| US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
 | US-4.10 | Starknet ecosystem integration | EPIC-4 | P1 | 5 | — | — |
 | US-4.13 | Bitcoin UTXO multi-asset transfer & custom fee | EPIC-4 | P1 | 5 | — | — |
 | US-4.16 | Cosmos ecosystem support | EPIC-4 | P1 | 5 | — | — |
 | US-4.17 | Solana support | EPIC-4 | P1 | 5 | — | — |
 | US-4.18 | Chain-abstraction SDK (developer-facing) | EPIC-4 | P2 | 8 | — | — |
+| US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
 | US-5.8 | Blockaid tx/signature risk scanning | EPIC-5 | P0 | 5 | — | — |
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
 | US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
+| US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
 | US-6.6 | Design-system & UX hardening: cross-platform consistency and responsive regressions | EPIC-6 | P2 | 5 | — | — |
+| US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
 | US-7.6 | Balance history (portfolio value over time) | EPIC-7 | P1 | 5 | — | — |
 | US-7.7 | Balance-cache invalidation hardening | EPIC-7 | P2 | 3 | — | — |
 | US-8.11 | Export transaction history | EPIC-8 | P1 | 3 | — | — |
+| US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
 | US-9.4 | ERC-1155 NFT support (display & transfer) | EPIC-9 | P2 | 5 | — | — |
 | US-9.7 | Bitcoin Ordinals / inscriptions display | EPIC-9 | P2 | 5 | — | — |
 | US-9.9 | Additional NFT collections & standards (ERC-6551) | EPIC-9 | P2 | 5 | — | — |
@@ -65,57 +79,44 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (4)
+## 🟢 Ready (5)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
+| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (25)
+## 🟡 In Progress (10)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-1.15 | Open platform improvements | EPIC-1 | P3 | 4 | — | — |
-| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
-| US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
-| US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
-| US-11.17 | Swap coverage expansion (improvement on the provider stories) | EPIC-11 | P3 | 3 | — | — |
-| US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
-| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W31 | bluezdot |
-| US-13.17 | Open XCM route & bridge coverage (improvement on US-13.12) | EPIC-13 | P3 | 3 | — | — |
+| US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
+| US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
-| US-16.11 | QR-device signing defects (improvement on US-16.2) | EPIC-16 | P3 | 2 | — | — |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
-| US-19.15 | Open onboarding & engagement (recovered from Uncategorized) | EPIC-19 | P3 | 1 | — | — |
-| US-20.1 | Lifecycle P2/P3 — chain-granular wake, ZK-Asset removal, cron/subscription as services | EPIC-20 | P1 | 5 | — | — |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W31 | nulllpc |
-| US-3.12 | Open account improvements | EPIC-3 | P3 | 5 | — | — |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
-| US-42.10 | QC — Release SubWallet Mobile v1.2.xx(xxx)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
-| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W31 | frenkie-ng |
-| US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
-| US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
-| US-8.20 | Open transaction improvements (improvement on US-8.1 … US-8.18) | EPIC-8 | P3 | 5 | — | — |
+| US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (6)
+## 👀 Review (7)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
-| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W31 | tunghp2002 |
-| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W31 | tunghp2002 |
-| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
-| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
-| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W31 | frenkie-ng |
+| US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W33 | tunghp2002 |
+| US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
+| US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
+| US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (191)
+## ✅ Done (198)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -169,6 +170,7 @@
 | US-12.19 | Earning on the WebApp & Avail Space | EPIC-12 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
 | US-12.20 | Earning rewards & APY accuracy (settled) | EPIC-12 | P2 | 3 | sprint-2024-M01 | bluezdot |
 | US-12.21 | Earning fixes recovered from Uncategorized | EPIC-12 | P3 | 3 | sprint-2026-M04 | tunghp2002 |
+| US-12.22 | Nominator fast-unbond duration — read the unstaking window the runtime actually enforces | EPIC-12 | P1 | 2 | sprint-2026-W33 | tunghp2002 |
 | US-13.1 | XCM cross-chain parachain transfers (fee estimation + per-route toggle) | EPIC-13 | P1 | 8 | sprint-2022-M06 | saltict |
 | US-13.2 | Snowbridge: ETH ↔ Polkadot Asset Hub bridge | EPIC-13 | P1 | 5 | sprint-2024-M06 | nulllpc |
 | US-13.3 | Avail Bridge: Avail ↔ Ethereum | EPIC-13 | P2 | 5 | sprint-2024-M10 | bluezdot |
@@ -254,6 +256,11 @@
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
 | US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
+| US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
+| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | — |
+| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
+| US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
+| US-42.14 | QC — Update nominator unstaking eras for DOT nomination pool (#5055) | EPIC-42 | P2 | 2 | sprint-2026-W33 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -263,6 +270,7 @@
 | US-5.7 | Camera-access + One-Sign toggles | EPIC-5 | P0 | 3 | sprint-2025-M02 | S2kael |
 | US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | S2kael |
 | US-5.13 | Security fixes recovered from Uncategorized | EPIC-5 | P3 | 2 | sprint-2024-M11 | bluezdot |
+| US-5.15 | Signing-prompt mode confusion — a dApp must not render an extrinsic as an inert message | EPIC-5 | P0 | 2 | sprint-2026-W32 | tunghp2002 |
 | US-6.1 | Dark-only responsive UI: popup and full-page expand view | EPIC-6 | P2 | 3 | sprint-2023-M03 | lw-cdm |
 | US-6.2 | Web app (standalone browser app) with feature parity to the extension | EPIC-6 | P2 | 5 | sprint-2024-M02 | saltict |
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
@@ -319,18 +327,18 @@ _No stories_
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
-| US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | — | — |
+| US-20.3 | Read-path memory budget | EPIC-20 | P1 | 0 | sprint-2026-W28 | — |
 
 ---
 
 ## Summary
 
-- 📋 **Backlog**: 56
-- 🟢 **Ready**: 4
-- 🟡 **In Progress**: 25
-- 👀 **Review**: 6
-- ✅ **Done**: 191
+- 📋 **Backlog**: 70
+- 🟢 **Ready**: 5
+- 🟡 **In Progress**: 10
+- 👀 **Review**: 7
+- ✅ **Done**: 198
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 25 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).

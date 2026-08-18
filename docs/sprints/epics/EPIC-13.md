@@ -147,7 +147,8 @@ it bridges.
 | [US-13.14](../stories/US-13.14-xcm-fee-dry-run-and-validation.md) | XCM fee, dry-run & transfer validation | What it costs and whether it will arrive — answered by simulation from 1.3.31 | ✅ done | 1.3.80 |
 | [US-13.15](../stories/US-13.15-xcm-ui-history-and-token-selection.md) | XCM UI, history & token selection | The screen, the warning, and a history entry that proves the transfer happened | ✅ done | 1.2.14 |
 | [US-13.16](../stories/US-13.16-asset-hub-migration-and-relay-chain-wind-down.md) | Asset Hub Migration & relay-chain wind-down | Disable, re-point, re-enable — surviving an ecosystem event the wallet did not control | ✅ done | 1.3.66 |
-| [US-13.17](../stories/US-13.17-open-xcm-route-and-bridge-coverage.md) | Open XCM route & bridge coverage | Corridors and bridge options asked for and never delivered | 🚧 in-progress | — |
+| [US-13.17](../stories/US-13.17-open-xcm-route-and-bridge-coverage.md) | Open XCM route & bridge coverage | Corridors and bridge options asked for and never delivered | 📋 backlog | — |
+| [US-13.18](../stories/US-13.18-paraspell-http-api-v2.md) | ParaSpell HTTP API v2 migration | Move the six ParaSpell endpoints off `/v1` before it is retired (#5051) | 👀 review | — |
 
 > **US-13.12 … US-13.17 carry no FR.** They hold the incremental work, fixes and chores that landed
 > on this epic — **115 tracker issues**, folded in from the former one-issue-per-story maintenance

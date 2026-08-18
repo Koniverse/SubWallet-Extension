@@ -5,7 +5,7 @@ epic: EPIC-4
 status: review
 priority: P1
 points: 3
-sprint: sprint-2026-W31
+sprint: sprint-2026-W33
 version_shipped:
 prd_ref: [NFR-16, FR-37]
 arch_ref: [AD-19]
@@ -13,7 +13,7 @@ depends_on: [US-4.6]
 assignee: frenkie-ng
 commit:
 created: 2026-06-12
-updated: 2026-07-15
+updated: 2026-08-10
 ---
 
 ## Status refresh — 2026-07-15

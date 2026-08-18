@@ -3,7 +3,7 @@ id: sprint-2022-M01
 status: closed
 start: 2019-05-20
 end: 2022-01-11
-goal: "Inheritance boundary — the polkadot-js capabilities SubWallet forked. No work by this team: the 6 stories here were built upstream over 32 months and reached a SubWallet user in 0.2.1."
+goal: "Reconstructed window — 7 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🧬 This is not a sprint. It is the inheritance boundary.
@@ -58,8 +58,9 @@ goal: "Inheritance boundary — the polkadot-js capabilities SubWallet forked. N
 | US-10.2 | Substrate inject API (injectedWeb3) | EPIC-10 | P1 | 5 | ✅ done | — | [link](stories/US-10.2-substrate-inject-api-injectedweb3.md) |
 | US-10.7 | dApp authorization UI (per-origin) | EPIC-10 | P1 | 3 | ✅ done | — | [link](stories/US-10.7-dapp-authorization-ui-per-origin.md) |
 | US-10.8 | Arbitrary message signing | EPIC-10 | P1 | 3 | ✅ done | — | [link](stories/US-10.8-arbitrary-message-signing.md) |
+| US-12.16 | Crowdloan contribution & portfolio | EPIC-12 | P3 | 3 | ✅ done | — | [link](stories/US-12.16-crowdloan-contribution-and-portfolio.md) |
 
-**Releases in this window:** none — this window ships nothing. These capabilities reached a
+**Releases represented by stories in this window:** 0.2.1, 1.3.73 · **Points (retroactive):** 25
 SubWallet user in **0.2.1**, in [sprint-2022-M02](sprint-2022-M02.md)'s month.
 · **Points (inherited, not spent):** 22
 

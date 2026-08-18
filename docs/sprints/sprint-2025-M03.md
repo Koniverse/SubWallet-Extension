@@ -3,7 +3,7 @@ id: sprint-2025-M03
 status: closed
 start: 2025-03-01
 end: 2025-03-31
-goal: "Reconstructed window — 3 story/stories shipped in releases 1.3.23, 1.3.24, 1.3.25 (EPIC-4, EPIC-8, EPIC-12). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 4 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -30,8 +30,9 @@ goal: "Reconstructed window — 3 story/stories shipped in releases 1.3.23, 1.3.
 | US-4.8 | Cardano network integration | EPIC-4 | P1 | 5 | ✅ done | — | [link](stories/US-4.8-cardano-network-integration.md) |
 | US-8.3 | Custom fee / tip | EPIC-8 | P1 | 5 | ✅ done | — | [link](stories/US-8.3-custom-fee-and-tip.md) |
 | US-12.6 | Bittensor dTAO subnet staking | EPIC-12 | P2 | 5 | ✅ done | — | [link](stories/US-12.6-bittensor-dtao-subnet-staking.md) |
+| US-10.16 | Add token & network from a dApp | EPIC-10 | P3 | 2 | ✅ done | — | [link](stories/US-10.16-add-token-and-network-from-a-dapp.md) |
 
-**Releases in this window:** 1.3.23, 1.3.24, 1.3.25 · **Points (retroactive):** 15
+**Releases represented by stories in this window:** 1.3.23, 1.3.24, 1.3.25 · **Points (retroactive):** 17
 
 ## Per-Epic Retrospective
 

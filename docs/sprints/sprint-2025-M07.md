@@ -3,7 +3,7 @@ id: sprint-2025-M07
 status: closed
 start: 2025-07-01
 end: 2025-07-31
-goal: "Reconstructed window — 1 story/stories shipped in release 1.3.47 (EPIC-20). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 3 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -28,8 +28,10 @@ goal: "Reconstructed window — 1 story/stories shipped in release 1.3.47 (EPIC-
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-20.8 | API request strategy v2 — response cache, group cancellation, adaptive backoff | EPIC-20 | P1 | 5 | ✅ done | — | [link](stories/US-20.8-api-request-strategy-v2.md) |
+| US-10.20 | dApp fixes recovered from Uncategorized | EPIC-10 | P3 | 2 | ✅ done | — | [link](stories/US-10.20-dapp-fixes-recovered-from-uncategorized.md) |
+| US-16.6 | Ledger signing across wallet features | EPIC-16 | P3 | 3 | ✅ done | — | [link](stories/US-16.6-ledger-signing-across-wallet-features.md) |
 
-**Releases in this window:** 1.3.47 · **Points (retroactive):** 5
+**Releases represented by stories in this window:** 1.3.47, 1.3.46, 1.3.49 · **Points (retroactive):** 10
 
 ## Per-Epic Retrospective
 

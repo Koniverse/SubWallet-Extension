@@ -3,7 +3,7 @@ id: sprint-2026-M02
 status: closed
 start: 2026-02-01
 end: 2026-02-28
-goal: "Reconstructed window — 2 story/stories shipped in release 1.3.74 (EPIC-18). Derived from the CHANGELOG, not planned."
+goal: "Reconstructed window — 3 stories located here. Derived after the fact from CHANGELOG and story evidence, not planned."
 ---
 
 > ## 🕰️ Reconstructed window — this was never a planned sprint
@@ -29,8 +29,9 @@ goal: "Reconstructed window — 2 story/stories shipped in release 1.3.74 (EPIC-
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-18.1 | Multisig account creation (deterministic off-chain) & management | EPIC-18 | P2 | 3 | ✅ done | — | [link](stories/US-18.1-multisig-account-creation-and-management.md) |
 | US-18.2 | Pending-tx detection + role-differentiated approval | EPIC-18 | P2 | 5 | ✅ done | — | [link](stories/US-18.2-pending-transaction-detection-and-approval.md) |
+| US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | ✅ done | — | [link](stories/US-9.20-client-side-nft-service-and-sdk-migration.md) |
 
-**Releases in this window:** 1.3.74 · **Points (retroactive):** 8
+**Releases represented by stories in this window:** 1.3.74, 1.3.80 · **Points (retroactive):** 9
 
 ## Per-Epic Retrospective
 
