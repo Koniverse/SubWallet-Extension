@@ -21,29 +21,75 @@ import { assert, compactToU8a, isHex, u8aConcat, u8aEq } from '@polkadot/util';
 
 import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from './bittensorBridge';
 
-export type DryRunNodeFailure = {
-  success: false,
-  failureReason: string
+export type ParaSpellDryRunError = {
+  reason: string
+  subReason?: string
+  instructionIndex?: number
+  instruction?: object
 }
 
-export type DryRunNodeSuccess = {
+export type ParaSpellDryRunChainKind = 'origin' | 'destination' | 'hop'
+
+// Top-level dry-run error: same shape as ParaSpellDryRunError, plus which chain it came from
+export interface ParaSpellDryRunFailure extends ParaSpellDryRunError {
+  chainKind?: ParaSpellDryRunChainKind
+  chain?: string
+}
+
+export type ParaSpellDryRunChainFailure = {
+  success: false,
+  dryRunError: ParaSpellDryRunError
+}
+
+export type ParaSpellDryRunChainSuccess = {
   success: true
   fee: string
   forwardedXcms: any
   // destParaId?: number
-  // currency: string
 }
 
-export type DryRunNodeResult = DryRunNodeSuccess | DryRunNodeFailure;
+export type ParaSpellDryRunChainResult = ParaSpellDryRunChainSuccess | ParaSpellDryRunChainFailure;
 
-export type THopInfo = {
-  result: DryRunNodeResult & { currency?: string }
+export type ParaSpellDryRunHopInfo = {
+  chain?: string
+  result: ParaSpellDryRunChainResult
 }
 
-export type DryRunResult = {
-  origin: DryRunNodeResult
-  destination?: DryRunNodeResult
-  hops: THopInfo[]
+export type ParaSpellDryRunResult = {
+  success: boolean
+  dryRunError?: ParaSpellDryRunFailure
+  origin: ParaSpellDryRunChainResult
+  destination?: ParaSpellDryRunChainResult
+  hops: ParaSpellDryRunHopInfo[]
+}
+
+export type ParaSpellXcmFeeType = 'dryRun' | 'paymentInfo' | 'noFeeRequired'
+
+export interface ParaSpellAssetInfo {
+  [p: string]: any
+  symbol: string
+  decimals: number
+}
+
+export interface ParaSpellXcmFeeDetail {
+  fee?: string
+  feeType?: ParaSpellXcmFeeType
+  sufficient?: boolean
+  asset: ParaSpellAssetInfo
+  dryRunError?: ParaSpellDryRunError
+}
+
+export type ParaSpellXcmFeeHopInfo = {
+  chain?: string
+  result: ParaSpellXcmFeeDetail
+}
+
+export type ParaSpellXcmFeeResult = {
+  success: boolean
+  dryRunError?: ParaSpellDryRunFailure
+  origin: ParaSpellXcmFeeDetail
+  destination: ParaSpellXcmFeeDetail
+  hops: ParaSpellXcmFeeHopInfo[]
 }
 
 export interface GetXcmFeeRequest {
@@ -53,20 +99,6 @@ export interface GetXcmFeeRequest {
   fromChainInfo: _ChainInfo,
   toChainInfo: _ChainInfo,
   fromTokenInfo: _ChainAsset
-}
-
-export type XcmFeeType = 'dryRun' | 'paymentInfo'
-
-export interface XcmFeeDetail {
-  fee: string
-  currency: string
-  feeType: XcmFeeType
-  dryRunError?: string
-}
-
-export type GetXcmFeeResult = {
-  origin: XcmFeeDetail
-  destination: XcmFeeDetail
 }
 
 interface ParaSpellCurrency {
@@ -80,7 +112,7 @@ interface ParaSpellError {
   statusCode: number
 }
 
-const version = '/v1';
+const version = '/v2';
 
 const paraSpellApi = {
   buildXcm: `${version}/x-transfer`,
@@ -241,15 +273,10 @@ export async function dryRunXcm (request: CreateXcmExtrinsicProps) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    return {
-      origin: {
-        success: false,
-        failureReason: error.message
-      }
-    } as DryRunResult;
+    return createParaSpellDryRunFailure(error.message);
   }
 
-  return await response.json() as DryRunResult;
+  return await response.json() as ParaSpellDryRunResult;
 }
 
 export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
@@ -289,15 +316,10 @@ export async function dryRunPreviewXcm (request: CreateXcmExtrinsicProps) {
   if (!response.ok) {
     const error = await response.json() as ParaSpellError;
 
-    return {
-      origin: {
-        success: false,
-        failureReason: error.message
-      }
-    } as DryRunResult;
+    return createParaSpellDryRunFailure(error.message);
   }
 
-  return await response.json() as DryRunResult;
+  return await response.json() as ParaSpellDryRunResult;
 }
 
 export async function estimateXcmFee (request: GetXcmFeeRequest) {
@@ -342,7 +364,7 @@ export async function estimateXcmFee (request: GetXcmFeeRequest) {
     return undefined;
   }
 
-  return await response.json() as GetXcmFeeResult;
+  return await response.json() as ParaSpellXcmFeeResult;
 }
 
 export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) {
@@ -355,8 +377,8 @@ export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) 
   }
 
   const bodyData = {
-    senderAddress: sender,
-    address: recipient,
+    sender,
+    recipient,
     from: paraSpellChainMap[originChain.slug],
     to: paraSpellChainMap[destinationChain.slug],
     currency: createParaSpellCurrency(paraSpellIdentifyV4, sendingValue),
@@ -378,7 +400,25 @@ export async function fetchMinXcmTransferableAmount (request: GetXcmFeeRequest) 
     }
   );
 
-  return await response.json() as string;
+  if (!response.ok) {
+    const error = await response.json() as ParaSpellError;
+
+    throw new Error(error.message);
+  }
+
+  return String(await response.json());
+}
+
+function createParaSpellDryRunFailure (reason: string): ParaSpellDryRunResult {
+  return {
+    success: false,
+    dryRunError: { reason },
+    origin: {
+      success: false,
+      dryRunError: { reason }
+    },
+    hops: []
+  };
 }
 
 function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amount: string): ParaSpellCurrency {
@@ -388,14 +428,16 @@ function createParaSpellCurrency (paraSpellIdentifyV4: Record<string, any>, amou
   };
 }
 
-export function isChainNotSupportPolkadotApi (str: string): boolean {
-  const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i; // Example: The node Interlay is not yet supported by the Polkadot API.
+// Matches ParaSpell error strings only — do not reuse for another XCM provider.
+export function isParaSpellChainNotSupportPolkadotApi (str: string): boolean {
+  const regex = /(?=.*not yet supported)(?=.*Polkadot API).*/i; // Example: The chain Interlay is not yet supported by the Polkadot API.
 
   return regex.test(str);
 }
 
-export function isChainNotSupportDryRun (str: string): boolean {
-  const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on node Acala
+// Matches ParaSpell error strings only — do not reuse for another XCM provider.
+export function isParaSpellChainNotSupportDryRun (str: string): boolean {
+  const regex = /(?=.*DryRunApi)(?=.*not available).*/i; // Example: DryRunApi is not available on chain Acala
 
   return regex.test(str);
 }
