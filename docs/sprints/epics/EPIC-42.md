@@ -49,7 +49,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.14](../stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) | DOT nomination pool unstake period 28d → 2d (#5055); stake/unstake recheck | done |
 | [US-42.15](../stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | WUD Universe dApp logo updated in dApp list (#5054) — Web App + Mobile, dev → production | ready |
 | [US-42.16](../stories/US-42.16-qc-chainlist-update-prdctr-chain-and-tusdt-symbol.md) | Chainlist update: add PRDCTR chain (#708) + TUSDT symbol fix (#707) | done |
-| [US-42.17](../stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | ParaSpell API v2 (#5051) — XCM regression QC; dev story is US-13.18 | ready |
+| [US-42.17](../stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | ParaSpell API v2 (#5051) — XCM regression QC; dev story is US-13.18 | done |
 
 More rows get added here as testing starts.
 

@@ -9,7 +9,7 @@ Not tied to one epic — this covers today's test tasks only.
 | Environment | PR build |
 | Runner | manual (extension) |
 | Build under test | Koniverse/SubWallet-Extension @ koni-qc-epic42-sync |
-| Tasks tested | US-42.16 |
+| Tasks tested | US-42.16, US-42.17 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -34,8 +34,26 @@ None found. All checks passed:
 
 ---
 
+## US-42.17 — ParaSpell API integration v2 ([#5051](https://github.com/Koniverse/SubWallet-Extension/issues/5051))
+
+XCM regression pass after the ParaSpell v2 migration. Checked on fresh install and on an upgraded install.
+
+### Bugs
+
+None found. All checks passed:
+
+- XCM transfers work on all three route types: relay to parachain, parachain to relay, and parachain to parachain.
+- Network fee shows correctly on the confirm screen for every route tested.
+- Balances update correctly on both source and destination chains after each transfer.
+- Transfer history records the XCM transfers correctly.
+- Error cases (not enough balance, amount below minimum, unsupported route) show a clear message with no stuck screen.
+- XCM deposit into an earning position still works.
+
+---
+
 ## Summary
 
 | Task | Bugs found | Status |
 |---|---|---|
 | US-42.16 | 0 | done |
+| US-42.17 | 0 | done |
