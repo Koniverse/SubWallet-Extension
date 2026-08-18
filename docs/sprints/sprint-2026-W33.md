@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W33
-status: in-progress
+status: closed
 start: 2026-08-10
 end: 2026-08-16
 goal: "The live window. Land the EPIC-4 Bitcoin-API / RPC / Asset-Hub hardening cluster (#4451), the WalletConnect and submit-performance fixes in review (#4995, #4984), Trusted Stake (#4946), ParaSpell-version XCM hardening (#4424) and the two open security findings (#4889) — the eight stories the GitHub board carried forward from W31 — plus the work that arrived mid-window: the nominator fast-unbond fix shipped as v1.3.87 (#5055) and QC on the two dApp-list changes (#5050, #5054)."
@@ -17,12 +17,12 @@ goal: "The live window. Land the EPIC-4 Bitcoin-API / RPC / Asset-Hub hardening 
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | in-progress | ← W31 | [link](stories/US-10.11-walletconnect-session-and-dashboard-hardening.md) |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | review | ← W31 | [link](stories/US-12.11-trusted-stake-alpha-index.md) |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | in-progress | ← W31 | [link](stories/US-13.11-xcm-runtime-upgrade-paraspell-version-hardening.md) |
-| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | review | new | [link](stories/US-13.18-paraspell-http-api-v2.md) |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | review | → W34 | [link](stories/US-13.18-paraspell-http-api-v2.md) |
 | US-12.22 | Nominator fast-unbond duration (28d → 2d) | EPIC-12 | P1 | 2 | done | new | [link](stories/US-12.22-nominator-fast-unbond-duration.md) |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | review | ← W31 | [link](stories/US-20.4-many-account-submit-performance.md) |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | done | new | [link](stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) |
 | US-42.14 | QC — DOT nomination pool unstake period 28d → 2d (#5055) | EPIC-42 | P2 | 2 | done | new | [link](stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) |
-| US-42.15 | QC — WUD Universe dApp logo in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | ready | new | [link](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) |
+| US-42.15 | QC — WUD Universe dApp logo in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | ready | → W34 | [link](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) |
 
 **13 stories · 43 points.** Eight carried from [W31](sprint-2026-W31.md) on board evidence
 (below), plus five written inside the window: [US-13.18](stories/US-13.18-paraspell-http-api-v2.md)
@@ -124,3 +124,54 @@ The 2026-08-10 scope was derived from Projects board #2. That query **could not 
 `read:project`. So this resync is built from `gh issue view`, `gh pr view` and git — evidence that
 does not depend on the board — and **no board column is claimed as current**. If a card moved this
 week, nothing here would show it.
+
+---
+
+## Closeout — 2026-08-18
+
+The window ended **2026-08-16**. Closed two days later from `gh issue view` / `gh pr view` / git;
+the board still could not be read (see the caveat above, unchanged).
+
+### What the window actually delivered
+
+**3 of 13 stories · 7 of 43 points.**
+
+| Outcome | Stories | Pts | |
+| --- | --- | --- | --- |
+| **Done** | US-12.22, US-42.13, US-42.14 | 7 | One release (v1.3.87, #5055) and two dApp-list QC passes |
+| **→ [W34](sprint-2026-W34.md)** | US-13.18, US-42.15 | 4 | The only two with a reason to move — see below |
+| **Did not move** | US-4.21, US-4.22, US-4.23, US-5.10, US-10.11, US-12.11, US-13.11, US-20.4 | 32 | Eight stories, six anchors, **zero tracker events all window** |
+
+Everything that completed was written **inside** the window. **Nothing carried in from W31 closed.**
+
+### The eight that did not move — and why they were not carried
+
+Re-checked 2026-08-18. Every carried anchor is still OPEN, and **not one was touched at any point
+during the window**:
+
+| Anchor | State | Last touched | Stale by |
+| --- | --- | --- | --- |
+| [#4451](https://github.com/Koniverse/SubWallet-Extension/issues/4451) Bitcoin API Optimization | OPEN | 2025-11-18 | ~9 months |
+| [#4995](https://github.com/Koniverse/SubWallet-Extension/issues/4995) EVM tx misleading error | OPEN | 2026-05-21 | ~3 months |
+| [#4946](https://github.com/Koniverse/SubWallet-Extension/issues/4946) Auto-Rebalancing Index | OPEN | 2026-03-24 | ~5 months |
+| [#4984](https://github.com/Koniverse/SubWallet-Extension/issues/4984) Many-account submit perf | OPEN | 2026-04-08 | ~4 months |
+| [#4889](https://github.com/Koniverse/SubWallet-Extension/issues/4889) Phishing Detection screen | OPEN | 2026-01-19 | ~7 months |
+| [#4424](https://github.com/Koniverse/SubWallet-Extension/issues/4424) Critical Across update | OPEN | 2026-01-19 | ~7 months |
+
+**These eight were deliberately not rolled into [W34](sprint-2026-W34.md).** Rolling them would
+assert they are active work in the new window, and the evidence says the opposite — they have been
+carried from W31 to W33 already, and a second carry would turn a stale claim into a standing one.
+[2026-08-13 §D](../notes/2026-08-13.md) named their `review` / `in-progress` statuses as *carried
+claims, not fresh evidence*; a week later that is no longer a caveat, it is the finding.
+
+They keep `sprint: sprint-2026-W33` and their existing statuses. **This is the same open planning
+call as the 12 W31 stories** ([2026-08-10 §D](../notes/2026-08-10.md)) — now a second instance, and
+that repetition is itself the signal: the carry-forward is where the docs and the work come apart.
+Resolving it is a planning decision, not a documentation one.
+
+### The two that moved, and why
+
+| Story | Evidence |
+| --- | --- |
+| [US-13.18](stories/US-13.18-paraspell-http-api-v2.md) | #5051 commented **2026-08-18**, PR #5053 gained commits through 08-17, and QC started on a build. The only W33 anchor with *any* activity |
+| [US-42.15](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | Real pending work, not stalled work — #5054 is closed and its QC has simply never been run. Unblocked and small |

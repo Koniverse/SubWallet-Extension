@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-13 02:35:34 UTC
-> Total stories: 291
+> Last generated: 2026-08-18 07:32:46 UTC
+> Total stories: 293
 
-## 📋 Backlog (70)
+## 📋 Backlog (71)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -62,6 +62,7 @@
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
 | US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
 | US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
+| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 1 | — | — |
 | US-6.6 | Design-system & UX hardening: cross-platform consistency and responsive regressions | EPIC-6 | P2 | 5 | — | — |
 | US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
 | US-7.6 | Balance history (portfolio value over time) | EPIC-7 | P1 | 5 | — | — |
@@ -86,10 +87,10 @@
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
-| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | — |
+| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W34 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (10)
+## 🟡 In Progress (11)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -102,6 +103,7 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
+| US-42.16 | QC — ParaSpell API v2 migration (#5051 / PR #5053) | EPIC-42 | P2 | 3 | sprint-2026-W34 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
 ## 👀 Review (7)
@@ -110,7 +112,7 @@
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
-| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W33 | tunghp2002 |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W34 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
@@ -333,12 +335,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 70
+- 📋 **Backlog**: 71
 - 🟢 **Ready**: 5
-- 🟡 **In Progress**: 10
+- 🟡 **In Progress**: 11
 - 👀 **Review**: 7
 - ✅ **Done**: 198
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 11 stories in-progress (limit: 3).
