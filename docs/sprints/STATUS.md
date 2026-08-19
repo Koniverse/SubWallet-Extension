@@ -254,11 +254,11 @@
 | US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
-| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
-| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
-| US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
-| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | — |
-| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
+| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | MaiThuongNinni |
+| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | MaiThuongNinni |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
 | US-42.14 | QC — Update nominator unstaking eras for DOT nomination pool (#5055) | EPIC-42 | P2 | 2 | sprint-2026-W33 | MaiThuongNinni |
 | US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | MaiThuongNinni |
