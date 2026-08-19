@@ -4,7 +4,7 @@ title: "QA Coverage Tracking"
 status: done
 prd_ref: []
 created: 2026-07-16
-updated: 2026-07-20
+updated: 2026-08-19
 ---
 
 ## Goal
@@ -51,6 +51,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.16](../stories/US-42.16-qc-chainlist-update-prdctr-chain-and-tusdt-symbol.md) | Chainlist update: add PRDCTR chain (#708) + TUSDT symbol fix (#707) | done |
 | [US-42.17](../stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | ParaSpell API v2 (#5051) — XCM regression QC; dev story is US-13.18 | done |
 | [US-42.18](../stories/US-42.18-qc-issue-705-remove-dropped-xcm-routes.md) | Remove XCM routes dropped in ParaSpell v2 (#705) | done |
+| [US-42.19](../stories/US-42.19-qc-release-extension-v1-3-88.md) | Release extension v1.3.88 — ParaSpell v2 (#5051) + chainlist (#708, #707, #705); dev, master, draft, production gate | in-progress |
 
 More rows get added here as testing starts.
 
