@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.87
+Build date: Aug 12, 2026.
+
+Features & Updates:
+- Update nominator unstaking eras (#5055)
+
+
 ## 1.3.86
 Build date: Aug 06, 2026.
 
