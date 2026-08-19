@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.86
+Build date: Aug 06, 2026.
+
+Bug fixes:
+- Remove Bittensor root claim type function (#5045)
+
+
 ## 1.3.85
 Build date: Aug 05, 2026.
 
