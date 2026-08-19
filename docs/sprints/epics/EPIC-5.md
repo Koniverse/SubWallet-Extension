@@ -77,6 +77,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | 5 | **Audit hardening** | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Remediate security audit and false-positive findings (UX-bounty audit, secret hygiene, web hardening, phishing accuracy) |
 | 6 | **Second factor** *(unscoped)* | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Authenticate the *person* approving an outgoing transfer, not just the transaction (#4125) |
 | 7 | **Signing-prompt integrity** | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | A signature may only be produced over the artefact the confirmation prompt displayed — a dApp cannot render an extrinsic as an inert message (#5042) |
+| 8 | **Alternative unlock** *(unscoped)* | [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | A biometric / passkey path into the wallet, plugging into the same master-password gate the rest of the epic publishes (#5058) |
 
 ### Out of scope
 
@@ -137,6 +138,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.13](../stories/US-5.13-security-fixes-recovered-from-uncategorized.md) | Security fixes recovered from Uncategorized | Reset/ZK-mode/block-action from the triage bucket | ✅ done | 1.3.7 |
 | [US-5.14](../stories/US-5.14-open-security-improvements-recovered-from-uncategorized.md) | Open security improvements (recovered) | Open security work not yet delivered (rule 9) | 📋 backlog | — |
 | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | Signing-prompt mode confusion | Refuse to sign an extrinsic request carrying a raw-message payload, and name it to the user (#5042) | ✅ done | 1.3.85 |
+| [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | Biometric / passkey login for the extension | Placeholder for #5058 — the tracker issue is a title with an **empty body**, so the story records open questions instead of invented ACs | 📋 backlog | — |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is
