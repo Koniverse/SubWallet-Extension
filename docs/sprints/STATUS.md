@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-18 07:32:46 UTC
-> Total stories: 293
+> Last generated: 2026-08-19 05:03:16 UTC
+> Total stories: 296
 
 ## 📋 Backlog (71)
 
@@ -80,17 +80,16 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (5)
+## 🟢 Ready (4)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
-| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W34 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (11)
+## 🟡 In Progress (10)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -103,7 +102,6 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-42.16 | QC — ParaSpell API v2 migration (#5051 / PR #5053) | EPIC-42 | P2 | 3 | sprint-2026-W34 | — |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
 ## 👀 Review (7)
@@ -118,7 +116,7 @@
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (198)
+## ✅ Done (203)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -256,13 +254,18 @@
 | US-42.4 | Test — TUSDT token on Bittensor shows correctly in wallet (#699) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.5 | Retest — XCM support for MYTH token between PAH and Hydration (#301) | EPIC-42 | P3 | 3 | sprint-2026-W30 | MaiThuongNinni |
 | US-42.6 | QC — Release SubWallet Extension v1.3.84 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
-| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
-| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | — |
-| US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | — |
-| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | — |
-| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
+| US-42.7 | QC — Add recommend validator for native and subnet staking (#5024) | EPIC-42 | P2 | 5 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.9 | QC — Release SubWallet Web App v1.3.56-0 (build 1356-0014) | EPIC-42 | P2 | 5 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.10 | QC — Release SubWallet Mobile v1.2.44(532)b-v16 | EPIC-42 | P2 | 8 | sprint-2026-W30 | MaiThuongNinni |
+| US-42.11 | QC — Extension: PR #5043 (signing prompt security fix) + #5045 (Bittensor deprecated root claim type removal) | EPIC-42 | P2 | 5 | sprint-2026-W32 | MaiThuongNinni |
+| US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | MaiThuongNinni |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
 | US-42.14 | QC — Update nominator unstaking eras for DOT nomination pool (#5055) | EPIC-42 | P2 | 2 | sprint-2026-W33 | MaiThuongNinni |
+| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | MaiThuongNinni |
+| US-42.16 | QC — Chainlist update on Extension: add PRDCTR chain (#708) + TUSDT symbol fix (#707) | EPIC-42 | P3 | 3 | sprint-2026-W34 | MaiThuongNinni |
+| US-42.17 | QC — Update ParaSpell API integration to v2 on Extension (#5051) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
+| US-42.18 | QC — Remove XCM routes for chains dropped in ParaSpell XCM API v2 (#705) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
+| US-42.19 | QC — Release SubWallet Extension v1.3.88 | EPIC-42 | P2 | 8 | sprint-2026-W34 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -336,11 +339,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 71
-- 🟢 **Ready**: 5
-- 🟡 **In Progress**: 11
+- 🟢 **Ready**: 4
+- 🟡 **In Progress**: 10
 - 👀 **Review**: 7
-- ✅ **Done**: 198
+- ✅ **Done**: 203
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 11 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).

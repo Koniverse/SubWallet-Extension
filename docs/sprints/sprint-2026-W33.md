@@ -22,7 +22,7 @@ goal: "The live window. Land the EPIC-4 Bitcoin-API / RPC / Asset-Hub hardening 
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | review | ← W31 | [link](stories/US-20.4-many-account-submit-performance.md) |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | done | new | [link](stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) |
 | US-42.14 | QC — DOT nomination pool unstake period 28d → 2d (#5055) | EPIC-42 | P2 | 2 | done | new | [link](stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) |
-| US-42.15 | QC — WUD Universe dApp logo in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | ready | → W34 | [link](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) |
+| US-42.15 | QC — WUD Universe dApp logo in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | done | —    | [link](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) |
 
 **13 stories · 43 points.** Eight carried from [W31](sprint-2026-W31.md) on board evidence
 (below), plus five written inside the window: [US-13.18](stories/US-13.18-paraspell-http-api-v2.md)
@@ -111,7 +111,7 @@ claims, not fresh evidence, and nothing this week has refreshed them.
 | Issue | Closed | Delivery | Now owned by |
 | --- | --- | --- | --- |
 | [#5055](https://github.com/Koniverse/SubWallet-Extension/issues/5055) Update nominator unstaking eras | 2026-08-12 | PR [#5056](https://github.com/Koniverse/SubWallet-Extension/pull/5056) → `d7e7d847e5` → **v1.3.87** | [US-12.22](stories/US-12.22-nominator-fast-unbond-duration.md) (code) + [US-42.14](stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) (QC) |
-| [#5054](https://github.com/Koniverse/SubWallet-Extension/issues/5054) Update WUD Universe dApp logo | 2026-08-11 | none in this repo — remote dApp-list content | [US-42.15](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md), `ready` |
+| [#5054](https://github.com/Koniverse/SubWallet-Extension/issues/5054) Update WUD Universe dApp logo | 2026-08-11 | none in this repo — remote dApp-list content | [US-42.15](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md), `done` |
 
 #5055 repeated the [2026-08-10 §B](../notes/2026-08-10.md) pattern exactly: the QC page
 (US-42.14) was written the day the fix merged, and the **code had no owning feature story** until
@@ -138,8 +138,8 @@ the board still could not be read (see the caveat above, unchanged).
 
 | Outcome | Stories | Pts | |
 | --- | --- | --- | --- |
-| **Done** | US-12.22, US-42.13, US-42.14 | 7 | One release (v1.3.87, #5055) and two dApp-list QC passes |
-| **→ [W34](sprint-2026-W34.md)** | US-13.18, US-42.15 | 4 | The only two with a reason to move — see below |
+| **Done** | US-12.22, US-42.13, US-42.14, US-42.15 | 9 | One release (v1.3.87, #5055) and three dApp-list QC passes |
+| **→ [W34](sprint-2026-W34.md)** | US-13.18 | 2 | The only one with a reason to move — see below |
 | **Did not move** | US-4.21, US-4.22, US-4.23, US-5.10, US-10.11, US-12.11, US-13.11, US-20.4 | 32 | Eight stories, six anchors, **zero tracker events all window** |
 
 Everything that completed was written **inside** the window. **Nothing carried in from W31 closed.**
@@ -169,9 +169,12 @@ call as the 12 W31 stories** ([2026-08-10 §D](../notes/2026-08-10.md)) — now 
 that repetition is itself the signal: the carry-forward is where the docs and the work come apart.
 Resolving it is a planning decision, not a documentation one.
 
-### The two that moved, and why
+### The one that moved, and why
 
 | Story | Evidence |
 | --- | --- |
 | [US-13.18](stories/US-13.18-paraspell-http-api-v2.md) | #5051 commented **2026-08-18**, PR #5053 gained commits through 08-17, and QC started on a build. The only W33 anchor with *any* activity |
-| [US-42.15](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | Real pending work, not stalled work — #5054 is closed and its QC has simply never been run. Unblocked and small |
+
+[US-42.15](stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) was listed here as moving to
+W34 when this section was written. It did not move — the QC ran on 2026-08-13, inside this window,
+and passed 8 / 8. It is counted under **Done** above.
