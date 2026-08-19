@@ -80,14 +80,13 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (5)
+## 🟢 Ready (4)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
-| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W34 | — |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
 ## 🟡 In Progress (10)
@@ -117,7 +116,7 @@
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (202)
+## ✅ Done (203)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -262,6 +261,7 @@
 | US-42.12 | QC — Web App: PR #5043 (signing prompt security fix for #5042) | EPIC-42 | P2 | 3 | sprint-2026-W32 | — |
 | US-42.13 | QC — Gavun's Grid Miner dApp added to SubWallet dApp list (#5050) | EPIC-42 | P3 | 3 | sprint-2026-W33 | MaiThuongNinni |
 | US-42.14 | QC — Update nominator unstaking eras for DOT nomination pool (#5055) | EPIC-42 | P2 | 2 | sprint-2026-W33 | MaiThuongNinni |
+| US-42.15 | QC — WUD Universe dApp logo updated in SubWallet dApp list (#5054) | EPIC-42 | P3 | 2 | sprint-2026-W33 | MaiThuongNinni |
 | US-42.16 | QC — Chainlist update on Extension: add PRDCTR chain (#708) + TUSDT symbol fix (#707) | EPIC-42 | P3 | 3 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.17 | QC — Update ParaSpell API integration to v2 on Extension (#5051) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.18 | QC — Remove XCM routes for chains dropped in ParaSpell XCM API v2 (#705) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
@@ -339,10 +339,10 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 71
-- 🟢 **Ready**: 5
+- 🟢 **Ready**: 4
 - 🟡 **In Progress**: 10
 - 👀 **Review**: 7
-- ✅ **Done**: 202
+- ✅ **Done**: 203
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 

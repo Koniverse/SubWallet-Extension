@@ -47,7 +47,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.12](../stories/US-42.12-qc-webapp-pr5043-signing-prompt-security.md) | Web App: PR #5043 signing prompt security fix (#5042) | done |
 | [US-42.13](../stories/US-42.13-qc-issue-5050-gavuns-grid-miner-dapp.md) | Gavun's Grid Miner dApp added to dApp list (#5050) — Web App + Mobile, dev → production | done |
 | [US-42.14](../stories/US-42.14-qc-issue-5055-nominator-unstaking-eras-dot-2-days.md) | DOT nomination pool unstake period 28d → 2d (#5055); stake/unstake recheck | done |
-| [US-42.15](../stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | WUD Universe dApp logo updated in dApp list (#5054) — Web App + Mobile, dev → production | ready |
+| [US-42.15](../stories/US-42.15-qc-issue-5054-wud-universe-dapp-logo.md) | WUD Universe dApp logo updated in dApp list (#5054) — Web App + Mobile, dev → production | done |
 | [US-42.16](../stories/US-42.16-qc-chainlist-update-prdctr-chain-and-tusdt-symbol.md) | Chainlist update: add PRDCTR chain (#708) + TUSDT symbol fix (#707) | done |
 | [US-42.17](../stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | ParaSpell API v2 (#5051) — XCM regression QC; dev story is US-13.18 | done |
 | [US-42.18](../stories/US-42.18-qc-issue-705-remove-dropped-xcm-routes.md) | Remove XCM routes dropped in ParaSpell v2 (#705) | done |
