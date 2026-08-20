@@ -4066,7 +4066,8 @@ export default class KoniExtension {
     }
 
     this.#koniState.updateKeyringState();
-    void this.setPasskeyUnlockAction(false);
+    this.setPasskeyUnlockAction(false).catch(console.error);
+
     return {
       status: true,
       errors: []
