@@ -62,6 +62,16 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    // The browser passkey prompt needs a wider popup than the wallet uses, so the layout stretches
+    // with it - left at its own width it would sit between two bars of bare body background.
+    '.-passkey-prompt-mode': {
+      '.main-page-container': {
+        '.main-layout-content': {
+          width: '100%'
+        }
+      }
+    },
+
     '.-side-panel-mode': {
       '.main-page-container': {
         height: '100%',

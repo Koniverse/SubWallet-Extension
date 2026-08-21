@@ -1,24 +1,26 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
+import { PasskeyUnlockContext, WalletUnlockType } from '@subwallet/extension-base/background/KoniTypes';
 import { Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
 import { EDIT_AUTO_LOCK_TIME_MODAL, EDIT_UNLOCK_TYPE_MODAL } from '@subwallet/extension-koni-ui/constants';
 import { DEFAULT_ROUTER_PATH } from '@subwallet/extension-koni-ui/constants/router';
 import { useExtensionDisplayModes, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useDefaultNavigate from '@subwallet/extension-koni-ui/hooks/router/useDefaultNavigate';
-import { saveAllowOneSign, saveAutoLockTime, saveCameraSetting, saveEnableChainPatrol, saveUnlockType, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { keyringUnlock, passkeyUnlockEnroll, passkeyUnlockGetContext, passkeyUnlockRemove, saveAllowOneSign, saveAutoLockTime, saveCameraSetting, saveEnableChainPatrol, saveUnlockType, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { EnterPasswordModal, enterPasswordModalId } from '@subwallet/extension-koni-ui/Popup/MigrateAccount/EnterPasswordModal';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { noop } from '@subwallet/extension-koni-ui/utils';
 import { isNoAccount } from '@subwallet/extension-koni-ui/utils/account/account';
+import { forgetPasskeyCredential, registerPasskeyCredential, supportsPasskeyUnlock } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
 import { BackgroundIcon, Icon, ModalContext, SettingItem, Switch, SwModal } from '@subwallet/react-ui';
 import CN from 'classnames';
-import { Camera, CaretRight, CheckCircle, Key, LockKeyOpen, LockLaminated, PenNib, ShieldStar } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { Camera, CaretRight, CheckCircle, Fingerprint, Key, LockKeyOpen, LockLaminated, PenNib, ShieldStar } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 type Props = ThemeProps;
@@ -60,9 +62,11 @@ const Component: React.FC<Props> = (props: Props) => {
   const { goBack } = useDefaultNavigate();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const canGoBack = !!location.state;
   const { isExpanseMode, isSidePanelMode } = useExtensionDisplayModes();
   const { closeSidePanel } = useSidePanelUtils();
+  const isPasskeySetupView = searchParams.get('passkeySetup') === 'true';
 
   const { activeModal, inactiveModal } = useContext(ModalContext);
 
@@ -117,6 +121,11 @@ const Component: React.FC<Props> = (props: Props) => {
   const [loadingCamera, setLoadingCamera] = useState(false);
   const [loadingChainPatrol, setLoadingChainPatrol] = useState(false);
   const [loadingSignOnce, setLoadingSignOnce] = useState(false);
+  const [loadingPasskeyUnlock, setLoadingPasskeyUnlock] = useState(false);
+  const [passkeyUnlockAvailable, setPasskeyUnlockAvailable] = useState(false);
+  const [passkeyUnlockContext, setPasskeyUnlockContext] = useState<PasskeyUnlockContext | null>(null);
+  const [showPasskeyUnlockPasswordModal, setShowPasskeyUnlockPasswordModal] = useState(false);
+  const passkeySetupTriggered = useRef(false);
 
   const onBack = useCallback(() => {
     if (canGoBack) {
@@ -200,6 +209,67 @@ const Component: React.FC<Props> = (props: Props) => {
     inactiveModal(editUnlockTypeModalId);
   }, [inactiveModal]);
 
+  const onClosePasskeyUnlockPasswordModal = useCallback(() => {
+    inactiveModal(enterPasswordModalId);
+    setShowPasskeyUnlockPasswordModal(false);
+  }, [inactiveModal]);
+
+  const onTogglePasskeyUnlock = useCallback(async () => {
+    if (passkeyUnlockContext) {
+      setLoadingPasskeyUnlock(true);
+
+      try {
+        await passkeyUnlockRemove();
+        await forgetPasskeyCredential(passkeyUnlockContext.credentialId);
+        setPasskeyUnlockContext(null);
+      } finally {
+        setLoadingPasskeyUnlock(false);
+      }
+    } else {
+      if (!isExpanseMode) {
+        const opened = await windowOpen({
+          allowedPath: '/settings/security',
+          params: { passkeySetup: 'true' }
+        });
+
+        if (opened) {
+          window.close();
+
+          return;
+        }
+      }
+
+      setShowPasskeyUnlockPasswordModal(true);
+      activeModal(enterPasswordModalId);
+    }
+  }, [activeModal, isExpanseMode, passkeyUnlockContext]);
+
+  const onClickPasskeyUnlock = useCallback(() => {
+    onTogglePasskeyUnlock().catch(console.error);
+  }, [onTogglePasskeyUnlock]);
+
+  const onEnablePasskeyUnlock = useCallback(async (password: string) => {
+    const passwordCheck = await keyringUnlock({ password });
+
+    if (!passwordCheck.status) {
+      throw new Error(passwordCheck.errors[0]);
+    }
+
+    const credential = await registerPasskeyCredential();
+    const response = await passkeyUnlockEnroll({ ...credential, password });
+
+    if (!response.status) {
+      await forgetPasskeyCredential(credential.credentialId);
+      throw new Error(response.errors[0]);
+    }
+
+    setPasskeyUnlockContext({
+      credentialId: credential.credentialId,
+      prfInput: credential.prfInput
+    });
+    onClosePasskeyUnlockPasswordModal();
+  }, [onClosePasskeyUnlockPasswordModal]);
+
   const onClickItem = useCallback((item: SecurityItem) => {
     return () => {
       switch (item.key) {
@@ -276,6 +346,21 @@ const Component: React.FC<Props> = (props: Props) => {
     }
   }, [camera]);
 
+  useEffect(() => {
+    supportsPasskeyUnlock().then(setPasskeyUnlockAvailable).catch(console.error);
+    passkeyUnlockGetContext().then(setPasskeyUnlockContext).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (!isPasskeySetupView || passkeyUnlockContext || passkeySetupTriggered.current) {
+      return;
+    }
+
+    passkeySetupTriggered.current = true;
+    setShowPasskeyUnlockPasswordModal(true);
+    activeModal(enterPasswordModalId);
+  }, [activeModal, isPasskeySetupView, passkeyUnlockContext]);
+
   return (
     <PageWrapper className={CN(className)}>
       <Layout.WithSubHeaderOnly
@@ -287,34 +372,64 @@ const Component: React.FC<Props> = (props: Props) => {
             {items.map(onRenderItem)}
           </div>
           <div className='setting-config-container'>
-            {showChainPatrol && (<div
-              className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
-            >
-              <div className='__item-left-part'>
-                <BackgroundIcon
-                  backgroundColor={'var(--icon-bg-color)'}
-                  phosphorIcon={ShieldStar}
-                  size='sm'
-                  type='phosphor'
-                  weight='fill'
-                />
-              </div>
-              <div className='__item-center-part'>
-                <div className='__item-title'>
-                  {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
+            {!noAccount && (passkeyUnlockAvailable || passkeyUnlockContext) && (
+              <div className={CN('security-item', 'custom-security-item', 'security-type-passkey-unlock')}>
+                <div className='__item-left-part'>
+                  <BackgroundIcon
+                    backgroundColor={'var(--icon-bg-color)'}
+                    phosphorIcon={Fingerprint}
+                    size='sm'
+                    type='phosphor'
+                    weight='fill'
+                  />
                 </div>
-                <div className='__item-description'>
-                  {t('ui.SETTINGS.screen.Setting.Security.showPhishingWarningsProtectAssets')}
+                <div className='__item-center-part'>
+                  <div className='__item-title'>
+                    {t('ui.SETTINGS.screen.Setting.Security.passkeyUnlock')}
+                  </div>
+                  <div className='__item-description'>
+                    {t('ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription')}
+                  </div>
+                </div>
+                <div className='__item-right-part'>
+                  <Switch
+                    checked={!!passkeyUnlockContext}
+                    loading={loadingPasskeyUnlock}
+                    onClick={onClickPasskeyUnlock}
+                  />
                 </div>
               </div>
-              <div className='__item-right-part'>
-                <Switch
-                  checked={enableChainPatrol}
-                  loading={loadingChainPatrol}
-                  onClick={updateChainPatrolEnable(enableChainPatrol)}
-                />
+            )}
+            {showChainPatrol && (
+              <div
+                className={CN('security-item', 'custom-security-item', `security-type-${SecurityType.CHAIN_PATROL_SERVICE}`)}
+              >
+                <div className='__item-left-part'>
+                  <BackgroundIcon
+                    backgroundColor={'var(--icon-bg-color)'}
+                    phosphorIcon={ShieldStar}
+                    size='sm'
+                    type='phosphor'
+                    weight='fill'
+                  />
+                </div>
+                <div className='__item-center-part'>
+                  <div className='__item-title'>
+                    {t('ui.SETTINGS.screen.Setting.Security.advancedPhishingDetection')}
+                  </div>
+                  <div className='__item-description'>
+                    {t('ui.SETTINGS.screen.Setting.Security.showPhishingWarningsProtectAssets')}
+                  </div>
+                </div>
+                <div className='__item-right-part'>
+                  <Switch
+                    checked={enableChainPatrol}
+                    loading={loadingChainPatrol}
+                    onClick={updateChainPatrolEnable(enableChainPatrol)}
+                  />
+                </div>
               </div>
-            </div>)}
+            )}
             <SettingItem
               className={CN('security-item', `security-type-${SecurityType.CAMERA_ACCESS}`)}
               leftItemIcon={(
@@ -449,6 +564,12 @@ const Component: React.FC<Props> = (props: Props) => {
             />
           </div>
         </SwModal>
+        {showPasskeyUnlockPasswordModal && (
+          <EnterPasswordModal
+            onClose={onClosePasskeyUnlockPasswordModal}
+            onSubmit={onEnablePasskeyUnlock}
+          />
+        )}
       </Layout.WithSubHeaderOnly>
     </PageWrapper>
   );
@@ -514,6 +635,14 @@ const SecurityList = styled(Component)<Props>(({ theme: { token } }: Props) => {
       }
     },
 
+    '.security-type-passkey-unlock': {
+      '--icon-bg-color': token['cyan-7'],
+
+      '&:hover': {
+        '--icon-bg-color': token['cyan-8']
+      }
+    },
+
     '.security-item': {
       '.ant-web3-block-right-item': {
         marginRight: 0,
@@ -548,7 +677,7 @@ const SecurityList = styled(Component)<Props>(({ theme: { token } }: Props) => {
 
       },
       '.__item-center-part': {
-
+        flex: 1
       },
       '.__item-right-part': {
 

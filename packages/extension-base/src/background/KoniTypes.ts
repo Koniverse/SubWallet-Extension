@@ -1997,6 +1997,26 @@ export interface ResponseUnlockKeyring {
   errors: string[];
 }
 
+export interface PasskeyUnlockContext {
+  credentialId: string;
+  prfInput: string;
+}
+
+export interface RequestPasskeyUnlockEnroll extends PasskeyUnlockContext {
+  password: string;
+  unlockSecret: string;
+}
+
+export interface RequestPasskeyUnlockAuthenticate {
+  unlockSecret: string;
+  nextUnlockSecret?: string;
+  nextPrfInput?: string;
+}
+
+export interface ResponsePasskeyUnlockAuthenticate extends ResponseUnlockKeyring {
+  enrolled: boolean;
+}
+
 // Export mnemonic
 
 export interface RequestKeyringExportMnemonic {
@@ -2543,6 +2563,10 @@ export interface KoniRequestSignatures {
   'pri(keyring.change)': [RequestChangeMasterPassword, ResponseChangeMasterPassword];
   'pri(keyring.migrate)': [RequestMigratePassword, ResponseMigratePassword];
   'pri(keyring.unlock)': [RequestUnlockKeyring, ResponseUnlockKeyring];
+  'pri(keyring.passkeyUnlock.get)': [null, PasskeyUnlockContext | null];
+  'pri(keyring.passkeyUnlock.enroll)': [RequestPasskeyUnlockEnroll, ResponseUnlockKeyring];
+  'pri(keyring.passkeyUnlock.authenticate)': [RequestPasskeyUnlockAuthenticate, ResponsePasskeyUnlockAuthenticate];
+  'pri(keyring.passkeyUnlock.remove)': [null, void];
   'pri(keyring.lock)': [null, void];
   'pri(keyring.export.mnemonic)': [RequestKeyringExportMnemonic, ResponseKeyringExportMnemonic];
   'pri(keyring.reset)': [RequestResetWallet, ResponseResetWallet];

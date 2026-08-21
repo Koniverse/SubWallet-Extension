@@ -17,7 +17,7 @@ import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { isNoAccount, removeStorage } from '@subwallet/extension-koni-ui/utils';
 import { changeHeaderLogo } from '@subwallet/react-ui';
 import { NotificationProps } from '@subwallet/react-ui/es/notification/NotificationProvider';
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
@@ -44,6 +44,9 @@ const accountNewSeedPhrase = '/accounts/new-seed-phrase';
 const securityUrl = '/settings/security';
 const createDoneUrl = '/create-done';
 const settingImportNetwork = '/settings/chains/import';
+
+// Never leave the user staring at the spinner if the redirect never settles.
+const PLACEHOLDER_MAX_WAIT = 5000;
 
 const baseAccountPath = '/accounts';
 const allowImportAccountPaths = ['new-seed-phrase', 'import-seed-phrase', 'import-seed-phrase-trust', 'import-private-key', 'restore-json', 'import-by-qr', 'attach-read-only', 'connect-polkadot-vault', 'connect-keystone', 'connect-ledger'];
@@ -96,6 +99,14 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const navigate = useNavigate();
   const { isPopupMode } = useExtensionDisplayModes();
+  const placeholderRemoved = useRef(false);
+
+  const removePlaceholder = useCallback((animation: boolean) => {
+    if (!placeholderRemoved.current) {
+      placeholderRemoved.current = true;
+      removeLoadingPlaceholder(animation);
+    }
+  }, []);
 
   const needMasterPasswordMigration = useMemo(
     () => !!accounts
@@ -187,7 +198,6 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
     // Remove loading on finished first compute
     firstRender.current && setRootLoading((val) => {
       if (val) {
-        removeLoadingPlaceholder(!needUnlock);
         firstRender.current = false;
       }
 
@@ -279,6 +289,24 @@ function DefaultRoute ({ children }: { children: React.ReactNode }): React.React
       navigate(redirectPath);
     }
   }, [shouldRedirect, redirectPath, navigate]);
+
+  // The first compute only decides where to go - the route it navigates to is lazy and still has to
+  // be fetched, while this component renders nothing meanwhile. Dropping the placeholder there left
+  // the popup blank between the spinner and the screen, so it stays up until there is something to
+  // show instead.
+  useEffect(() => {
+    if (rootLoading || shouldRedirect) {
+      return;
+    }
+
+    removePlaceholder(!needUnlock);
+  }, [needUnlock, removePlaceholder, rootLoading, shouldRedirect]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => removePlaceholder(false), PLACEHOLDER_MAX_WAIT);
+
+    return () => clearTimeout(timeout);
+  }, [removePlaceholder]);
 
   if (rootLoading || shouldRedirect) {
     return <></>;
