@@ -25,6 +25,62 @@ interface PrfResult {
   };
 }
 
+// Chrome draws its passkey prompt inside whichever surface asked for it and clips it there, so in
+// the extension popup everything past the 388px body is cut off - the Cancel button included. The
+// popup is sized from its own document, so widening the body is the only lever there is. The page
+// is left to fill that width: pinning it to its own size instead just exposes the body behind it as
+// bars down the sides.
+const PROMPT_MIN_WIDTH = 480;
+const PROMPT_BODY_CLASS = '-passkey-prompt-mode';
+
+function nextFrame (): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+}
+
+// Returns a callback that puts the width back, or null when the surface already has the room - the
+// side panel is sized by the browser and the expanded view is wide enough on its own.
+function reservePromptWidth (): (() => void) | null {
+  const body = document.body;
+
+  if (window.location.pathname.includes('side-panel.html') || body.clientWidth >= PROMPT_MIN_WIDTH) {
+    return null;
+  }
+
+  const previousWidth = body.style.width;
+
+  body.style.width = `${PROMPT_MIN_WIDTH}px`;
+  body.classList.add(PROMPT_BODY_CLASS);
+
+  return () => {
+    body.classList.remove(PROMPT_BODY_CLASS);
+    body.style.width = previousWidth;
+  };
+}
+
+// Holds the width for as long as the caller keeps the returned callback unused. The unlock screen
+// uses this so the popup is already the size the prompt needs the moment it opens: resizing once
+// the prompt is on screen shifts the popup sideways under the user, since the browser keeps it
+// anchored to the toolbar icon.
+export function holdPasskeyPromptWidth (): () => void {
+  const restore = reservePromptWidth();
+
+  return () => restore?.();
+}
+
+async function withPromptRoom<T> (ceremony: () => Promise<T>): Promise<T> {
+  const restore = reservePromptWidth();
+
+  // The popup needs a moment to settle at its new size and the prompt is measured against it as it
+  // opens, so wait either way - the width may have been reserved a frame ago by the unlock screen.
+  await nextFrame();
+
+  try {
+    return await ceremony();
+  } finally {
+    restore?.();
+  }
+}
+
 function randomBytes (size = 32): Uint8Array {
   return crypto.getRandomValues(new Uint8Array(size));
 }
@@ -70,7 +126,7 @@ export function isPasskeyPromptCancelled (error: unknown): boolean {
 
 export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {
   const initialInput = randomBytes();
-  const credential = await navigator.credentials.create({
+  const credential = await withPromptRoom(() => navigator.credentials.create({
     publicKey: {
       rp: { name: 'SubWallet', id: chrome.runtime.id },
       user: {
@@ -94,7 +150,7 @@ export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {
         prf: { eval: { first: toBufferSource(initialInput) } }
       } as AuthenticationExtensionsClientInputs
     }
-  }) as PublicKeyCredential | null;
+  })) as PublicKeyCredential | null;
 
   if (!credential) {
     throw new Error('Passkey unlock setup was cancelled');
@@ -124,7 +180,7 @@ export async function evaluatePasskeyCredential (credentialId: string, encodedIn
   const currentInput = hexToU8a(encodedInput);
 
   try {
-    const credential = await navigator.credentials.get({
+    const credential = await withPromptRoom(() => navigator.credentials.get({
       publicKey: {
         challenge: toBufferSource(randomBytes()),
         rpId: chrome.runtime.id,
@@ -134,7 +190,7 @@ export async function evaluatePasskeyCredential (credentialId: string, encodedIn
           prf: { eval: { first: toBufferSource(currentInput) } }
         } as AuthenticationExtensionsClientInputs
       }
-    }) as PublicKeyCredential | null;
+    })) as PublicKeyCredential | null;
 
     const result = credential && (credential.getClientExtensionResults() as unknown as { prf?: PrfResult }).prf;
     const output = result?.results?.first && new Uint8Array(result.results.first);

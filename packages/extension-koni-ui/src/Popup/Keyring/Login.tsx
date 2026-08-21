@@ -2,18 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PasskeyUnlockContext } from '@subwallet/extension-base/background/KoniTypes';
-import { PASSKEY_UNLOCK_WINDOW_FLAG } from '@subwallet/extension-base/services/keyring-service/passkeyUnlock';
 import { Layout, PageWrapper, ResetWalletModal } from '@subwallet/extension-koni-ui/components';
 import { RESET_WALLET_MODAL } from '@subwallet/extension-koni-ui/constants';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useUILock, { isManualLockRequested } from '@subwallet/extension-koni-ui/hooks/common/useUILock';
-import useExtensionDisplayModes from '@subwallet/extension-koni-ui/hooks/dom/useExtensionDisplayModes';
 import useFocusById from '@subwallet/extension-koni-ui/hooks/form/useFocusById';
-import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext, passkeyUnlockOpenWindow, passkeyUnlockReturnToPopup } from '@subwallet/extension-koni-ui/messaging';
+import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext } from '@subwallet/extension-koni-ui/messaging';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils/form/form';
-import { evaluatePasskeyCredential, isPasskeyPromptCancelled } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
+import { evaluatePasskeyCredential, holdPasskeyPromptWidth, isPasskeyPromptCancelled } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
 import { Button, Form, Icon, Image, Input, ModalContext } from '@subwallet/react-ui';
 import { Fingerprint } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,8 +29,6 @@ interface LoginFormState {
 
 const passwordInputId = 'login-password';
 
-const isPasskeyUnlockWindow = () => window.location.hash.includes(`${PASSKEY_UNLOCK_WINDOW_FLAG}=true`);
-
 const Component: React.FC<Props> = ({ className }: Props) => {
   const { t } = useTranslation();
   const { activeModal } = useContext(ModalContext);
@@ -45,28 +41,8 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const [passkeyUnlockError, setPasskeyUnlockError] = useState('');
   const [passkeyUnlockContext, setPasskeyUnlockContext] = useState<PasskeyUnlockContext | null>(null);
   const passkeyAutoTriggered = useRef(false);
-  const passkeyWindowRequested = useRef(false);
-  const { isPopupMode } = useExtensionDisplayModes();
   const isManualLock = useMemo(isManualLockRequested, []);
   const { unlock } = useUILock();
-  const isUnlockWindow = useMemo(isPasskeyUnlockWindow, []);
-
-  // The wide window is only there to host the browser passkey prompt, so once the keyring is
-  // open the wallet goes back to the toolbar popup instead of staying in an oversized window.
-  // Closing this window is left to the background: the popup is dismissed by any focus change,
-  // so it can only be opened once this window is already gone.
-  const onUnlocked = useCallback(() => {
-    // isUILocked is persisted and shared by every extension window, so this has to run even though
-    // this window is about to be replaced - skipping it leaves the popup thinking the wallet is
-    // still locked, which sends it straight back to this screen.
-    unlock();
-
-    if (isUnlockWindow) {
-      chrome.windows.getCurrent()
-        .then(({ id }) => passkeyUnlockReturnToPopup({ windowId: id }))
-        .catch(console.error);
-    }
-  }, [isUnlockWindow, unlock]);
 
   const onUpdate: FormCallbacks<LoginFormState>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields);
@@ -89,7 +65,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           if (!data.status) {
             onError(t(data.errors[0]));
           } else {
-            onUnlocked();
+            unlock();
           }
         })
         .catch((e: Error) => {
@@ -99,7 +75,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
           setLoading(false);
         });
     }, 500);
-  }, [onError, onUnlocked, t]);
+  }, [onError, t, unlock]);
 
   const onReset = useCallback(() => {
     activeModal(RESET_WALLET_MODAL);
@@ -118,7 +94,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       const response = await passkeyUnlockAuthenticate(evaluation);
 
       if (response.status) {
-        onUnlocked();
+        unlock();
       } else {
         !response.enrolled && setPasskeyUnlockContext(null);
         setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.passkeyUnlockFailed'));
@@ -132,38 +108,25 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     } finally {
       setPasskeyUnlockLoading(false);
     }
-  }, [onUnlocked, passkeyUnlockContext, passkeyUnlockLoading, t]);
+  }, [passkeyUnlockContext, passkeyUnlockLoading, t, unlock]);
 
   const onClickPasskeyUnlock = useCallback(() => {
-    if (isPopupMode) {
-      passkeyUnlockOpenWindow().then(() => window.close()).catch(console.error);
-
-      return;
-    }
-
     onPasskeyUnlock().catch(console.error);
-  }, [isPopupMode, onPasskeyUnlock]);
+  }, [onPasskeyUnlock]);
 
   useEffect(() => {
     passkeyUnlockGetContext().then(setPasskeyUnlockContext).catch(console.error);
   }, []);
 
-  // The browser passkey prompt is wider than the extension popup and closes it as soon as it
-  // takes focus, so the popup hands the flow over to a dedicated window instead of prompting.
-  // Not after a manual lock though: the user asked for the unlock screen, so it stays until they
-  // pick passkey themselves.
+  // Take the width the browser prompt needs up front, so it is already in place if the user asks
+  // for passkey unlock. Released when this screen goes away, which is once the wallet is open.
   useEffect(() => {
-    if (isManualLock || !isPopupMode || !passkeyUnlockContext || passkeyWindowRequested.current) {
-      return;
-    }
-
-    passkeyWindowRequested.current = true;
-    passkeyUnlockOpenWindow().then(() => window.close()).catch(console.error);
-  }, [isManualLock, isPopupMode, passkeyUnlockContext]);
+    return passkeyUnlockContext ? holdPasskeyPromptWidth() : undefined;
+  }, [passkeyUnlockContext]);
 
   useEffect(() => {
     const trigger = () => {
-      if (isPopupMode || passkeyAutoTriggered.current || !passkeyUnlockContext || passkeyUnlockLoading || document.visibilityState !== 'visible' || !document.hasFocus()) {
+      if (isManualLock || passkeyAutoTriggered.current || !passkeyUnlockContext || passkeyUnlockLoading || document.visibilityState !== 'visible' || !document.hasFocus()) {
         return;
       }
 
@@ -175,7 +138,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     window.addEventListener('focus', trigger);
 
     return () => window.removeEventListener('focus', trigger);
-  }, [isPopupMode, onPasskeyUnlock, passkeyUnlockContext, passkeyUnlockLoading]);
+  }, [isManualLock, onPasskeyUnlock, passkeyUnlockContext, passkeyUnlockLoading]);
 
   useFocusById(passwordInputId);
 
@@ -282,7 +245,7 @@ const Login = styled(Component)<Props>(({ theme }: Props) => {
       top: 0
     },
 
-    '.-side-panel-mode & .bg-image': {
+    '.-side-panel-mode & .bg-image, .-passkey-prompt-mode & .bg-image': {
       backgroundSize: 'cover'
     },
 

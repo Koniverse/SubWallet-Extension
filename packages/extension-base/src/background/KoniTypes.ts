@@ -2013,10 +2013,6 @@ export interface RequestPasskeyUnlockAuthenticate {
   nextPrfInput?: string;
 }
 
-export interface RequestPasskeyUnlockReturnToPopup {
-  windowId?: number;
-}
-
 export interface ResponsePasskeyUnlockAuthenticate extends ResponseUnlockKeyring {
   enrolled: boolean;
 }
@@ -2571,8 +2567,6 @@ export interface KoniRequestSignatures {
   'pri(keyring.passkeyUnlock.enroll)': [RequestPasskeyUnlockEnroll, ResponseUnlockKeyring];
   'pri(keyring.passkeyUnlock.authenticate)': [RequestPasskeyUnlockAuthenticate, ResponsePasskeyUnlockAuthenticate];
   'pri(keyring.passkeyUnlock.remove)': [null, void];
-  'pri(keyring.passkeyUnlock.openWindow)': [null, void];
-  'pri(keyring.passkeyUnlock.returnToPopup)': [RequestPasskeyUnlockReturnToPopup, boolean];
   'pri(keyring.lock)': [null, void];
   'pri(keyring.export.mnemonic)': [RequestKeyringExportMnemonic, ResponseKeyringExportMnemonic];
   'pri(keyring.reset)': [RequestResetWallet, ResponseResetWallet];

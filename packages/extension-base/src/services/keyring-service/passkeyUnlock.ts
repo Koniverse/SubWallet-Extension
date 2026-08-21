@@ -5,9 +5,6 @@ import type { PasskeyUnlockContext, RequestPasskeyUnlockEnroll } from '../../bac
 
 import { hexToU8a, u8aToHex } from '@polkadot/util';
 
-// Marks the standalone unlock window so it can hand the session back to the toolbar popup.
-export const PASSKEY_UNLOCK_WINDOW_FLAG = 'passkey-window';
-
 const RECORD_KEY = 'subwallet:passkey-unlock:v1';
 const AUTHENTICATED_CONTEXT = new TextEncoder().encode('SubWallet passkey unlock v1');
 const PRF_SIZE = 32;

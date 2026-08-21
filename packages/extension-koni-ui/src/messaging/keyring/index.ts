@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { KeyringState, PasskeyUnlockContext, RequestChangeMasterPassword, RequestKeyringExportMnemonic, RequestMigratePassword, RequestPasskeyUnlockAuthenticate, RequestPasskeyUnlockEnroll, RequestPasskeyUnlockReturnToPopup, RequestResetWallet, RequestUnlockKeyring, ResponseChangeMasterPassword, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponsePasskeyUnlockAuthenticate, ResponseResetWallet, ResponseUnlockKeyring } from '@subwallet/extension-base/background/KoniTypes';
+import { KeyringState, PasskeyUnlockContext, RequestChangeMasterPassword, RequestKeyringExportMnemonic, RequestMigratePassword, RequestPasskeyUnlockAuthenticate, RequestPasskeyUnlockEnroll, RequestResetWallet, RequestUnlockKeyring, ResponseChangeMasterPassword, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponsePasskeyUnlockAuthenticate, ResponseResetWallet, ResponseUnlockKeyring } from '@subwallet/extension-base/background/KoniTypes';
 
 import { sendMessage } from '../base';
 
@@ -36,14 +36,6 @@ export async function passkeyUnlockAuthenticate (request: RequestPasskeyUnlockAu
 
 export async function passkeyUnlockRemove (): Promise<void> {
   return sendMessage('pri(keyring.passkeyUnlock.remove)', null);
-}
-
-export async function passkeyUnlockOpenWindow (): Promise<void> {
-  return sendMessage('pri(keyring.passkeyUnlock.openWindow)', null);
-}
-
-export async function passkeyUnlockReturnToPopup (request: RequestPasskeyUnlockReturnToPopup): Promise<boolean> {
-  return sendMessage('pri(keyring.passkeyUnlock.returnToPopup)', request);
 }
 
 export async function keyringLock (): Promise<void> {

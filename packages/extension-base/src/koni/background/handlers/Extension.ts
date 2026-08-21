@@ -8,7 +8,7 @@ import { _AssetRef, _AssetType, _ChainAsset, _ChainInfo, _MultiChainAsset } from
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { withErrorLog } from '@subwallet/extension-base/background/handlers/helpers';
 import { createSubscription } from '@subwallet/extension-base/background/handlers/subscriptions';
-import { AccountExternalError, AccountMultisigError, AddressBookInfo, AmountData, AmountDataWithId, AssetSetting, AssetSettingUpdateReq, BondingOptionParams, BrowserConfirmationType, CampaignBanner, CampaignData, CampaignDataType, ChainType, CronReloadRequest, CrowdloanJson, ExternalRequestPromiseStatus, ExtrinsicType, FeeData, HistoryTokenPriceJSON, KeyringState, MantaPayEnableMessage, MantaPayEnableParams, MantaPayEnableResponse, MantaPaySyncState, NftCollection, NftDetailRequest, NftFullListRequest, NftItem, NftJson, NftTransactionRequest, NftTransactionResponse, PasskeyUnlockContext, PriceJson, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateMultisig, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestAddInjectedAccounts, RequestApproveConnectWalletSession, RequestApproveWalletConnectNotSupport, RequestAuthorization, RequestAuthorizationBlock, RequestAuthorizationPerAccount, RequestAuthorizationPerSite, RequestAuthorizeApproveV2, RequestAvailableBalanceByType, RequestBondingSubmit, RequestCameraSettings, RequestCampaignBannerComplete, RequestChangeEnableChainPatrol, RequestChangeLanguage, RequestChangeMasterPassword, RequestChangePriceCurrency, RequestChangeShowBalance, RequestChangeShowZeroBalance, RequestChangeTimeAutoLock, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestConnectWalletConnect, RequestCrowdloanContributions, RequestDeleteContactAccount, RequestDisconnectWalletConnectSession, RequestEditContactAccount, RequestFindRawMetadata, RequestForgetSite, RequestFreeBalance, RequestGetHistoryTokenPriceData, RequestGetTransaction, RequestKeyringExportMnemonic, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestParseEvmContractInput, RequestParseTransactionSubstrate, RequestPasskeyUnlockAuthenticate, RequestPasskeyUnlockEnroll, RequestPasskeyUnlockReturnToPopup, RequestPassPhishingPage, RequestPingSession, RequestQrParseRLP, RequestQrSignEvm, RequestQrSignSubstrate, RequestRejectConnectWalletSession, RequestRejectExternalRequest, RequestRejectWalletConnectNotSupport, RequestRemoveInjectedAccounts, RequestResetWallet, RequestResolveExternalRequest, RequestSaveAppConfig, RequestSaveBrowserConfig, RequestSaveMigrationAcknowledgedStatus, RequestSaveOSConfig, RequestSaveRecentAccount, RequestSaveSubscanApiKey, RequestSaveUnifiedAccountMigrationInProgress, RequestSettingsType, RequestSigningApprovePasswordV2, RequestStakePoolingBonding, RequestStakePoolingUnbonding, RequestSubscribeHistory, RequestSwitchCurrentNetworkAuthorization, RequestTuringCancelStakeCompound, RequestTuringStakeCompound, RequestUnbondingSubmit, RequestUnlockKeyring, RequestUnlockType, ResolveAddressToDomainRequest, ResolveDomainRequest, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseFindRawMetadata, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseNftImport, ResponseParseEvmContractInput, ResponseParseTransactionSubstrate, ResponsePasskeyUnlockAuthenticate, ResponseQrParseRLP, ResponseQrSignEvm, ResponseQrSignSubstrate, ResponseRejectExternalRequest, ResponseResetWallet, ResponseResolveExternalRequest, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, ResponseUnlockKeyring, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, StakingType, ThemeNames, TokenPriorityDetails, TransactionHistoryItem, TransactionResponse, UiSettings, ValidateNetworkRequest, ValidateNetworkResponse, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { AccountExternalError, AccountMultisigError, AddressBookInfo, AmountData, AmountDataWithId, AssetSetting, AssetSettingUpdateReq, BondingOptionParams, BrowserConfirmationType, CampaignBanner, CampaignData, CampaignDataType, ChainType, CronReloadRequest, CrowdloanJson, ExternalRequestPromiseStatus, ExtrinsicType, FeeData, HistoryTokenPriceJSON, KeyringState, MantaPayEnableMessage, MantaPayEnableParams, MantaPayEnableResponse, MantaPaySyncState, NftCollection, NftDetailRequest, NftFullListRequest, NftItem, NftJson, NftTransactionRequest, NftTransactionResponse, PasskeyUnlockContext, PriceJson, RequestAccountCreateExternalV2, RequestAccountCreateHardwareMultiple, RequestAccountCreateHardwareV2, RequestAccountCreateMultisig, RequestAccountCreateWithSecretKey, RequestAccountExportPrivateKey, RequestAddInjectedAccounts, RequestApproveConnectWalletSession, RequestApproveWalletConnectNotSupport, RequestAuthorization, RequestAuthorizationBlock, RequestAuthorizationPerAccount, RequestAuthorizationPerSite, RequestAuthorizeApproveV2, RequestAvailableBalanceByType, RequestBondingSubmit, RequestCameraSettings, RequestCampaignBannerComplete, RequestChangeEnableChainPatrol, RequestChangeLanguage, RequestChangeMasterPassword, RequestChangePriceCurrency, RequestChangeShowBalance, RequestChangeShowZeroBalance, RequestChangeTimeAutoLock, RequestConfirmationComplete, RequestConfirmationCompleteBitcoin, RequestConfirmationCompleteCardano, RequestConfirmationCompleteTon, RequestConnectWalletConnect, RequestCrowdloanContributions, RequestDeleteContactAccount, RequestDisconnectWalletConnectSession, RequestEditContactAccount, RequestFindRawMetadata, RequestForgetSite, RequestFreeBalance, RequestGetHistoryTokenPriceData, RequestGetTransaction, RequestKeyringExportMnemonic, RequestMigratePassword, RequestMigrateSoloAccount, RequestMigrateUnifiedAndFetchEligibleSoloAccounts, RequestParseEvmContractInput, RequestParseTransactionSubstrate, RequestPasskeyUnlockAuthenticate, RequestPasskeyUnlockEnroll, RequestPassPhishingPage, RequestPingSession, RequestQrParseRLP, RequestQrSignEvm, RequestQrSignSubstrate, RequestRejectConnectWalletSession, RequestRejectExternalRequest, RequestRejectWalletConnectNotSupport, RequestRemoveInjectedAccounts, RequestResetWallet, RequestResolveExternalRequest, RequestSaveAppConfig, RequestSaveBrowserConfig, RequestSaveMigrationAcknowledgedStatus, RequestSaveOSConfig, RequestSaveRecentAccount, RequestSaveSubscanApiKey, RequestSaveUnifiedAccountMigrationInProgress, RequestSettingsType, RequestSigningApprovePasswordV2, RequestStakePoolingBonding, RequestStakePoolingUnbonding, RequestSubscribeHistory, RequestSwitchCurrentNetworkAuthorization, RequestTuringCancelStakeCompound, RequestTuringStakeCompound, RequestUnbondingSubmit, RequestUnlockKeyring, RequestUnlockType, ResolveAddressToDomainRequest, ResolveDomainRequest, ResponseAccountCreateWithSecretKey, ResponseAccountExportPrivateKey, ResponseChangeMasterPassword, ResponseFindRawMetadata, ResponseKeyringExportMnemonic, ResponseMigratePassword, ResponseMigrateSoloAccount, ResponseMigrateUnifiedAndFetchEligibleSoloAccounts, ResponseNftImport, ResponseParseEvmContractInput, ResponseParseTransactionSubstrate, ResponsePasskeyUnlockAuthenticate, ResponseQrParseRLP, ResponseQrSignEvm, ResponseQrSignSubstrate, ResponseRejectExternalRequest, ResponseResetWallet, ResponseResolveExternalRequest, ResponseSubscribeCurrentTokenPrice, ResponseSubscribeHistory, ResponseUnlockKeyring, ShowCampaignPopupRequest, StakingJson, StakingRewardJson, StakingType, ThemeNames, TokenPriorityDetails, TransactionHistoryItem, TransactionResponse, UiSettings, ValidateNetworkRequest, ValidateNetworkResponse, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
 import { AccountAuthType, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountExport, RequestAuthorizeCancel, RequestAuthorizeReject, RequestCurrentAccountAddress, RequestMetadataApprove, RequestMetadataReject, RequestSigningApproveSignature, RequestSigningCancel, RequestTypes, ResponseAccountExport, ResponseAuthorizeList, ResponseType, SigningRequest, WindowOpenParams } from '@subwallet/extension-base/background/types';
 import { TransactionWarning } from '@subwallet/extension-base/background/warnings/TransactionWarning';
@@ -58,7 +58,6 @@ import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisi
 import { calcDepositAmount, createInitMultisigExtrinsic, decodeCallData, DEFAULT_MAX_WEIGHT } from '@subwallet/extension-base/services/multisig-service/utils';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
-import { openDefaultPopup, openPasskeyUnlockWindow } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { createInitSubstrateProxyExtrinsic } from '@subwallet/extension-base/services/substrate-proxy-service';
@@ -4020,7 +4019,6 @@ export default class KoniExtension {
 
     if (response.status) {
       await removePasskeyUnlock().catch(console.error);
-      await this.setPasskeyUnlockAction(false);
     }
 
     return response;
@@ -4066,7 +4064,6 @@ export default class KoniExtension {
     }
 
     this.#koniState.updateKeyringState();
-    this.setPasskeyUnlockAction(false).catch(console.error);
 
     return {
       status: true,
@@ -4083,7 +4080,6 @@ export default class KoniExtension {
 
     try {
       await enrollPasskeyUnlock(request);
-      await this.setPasskeyUnlockAction(false);
 
       return { status: true, errors: [] };
     } catch (e) {
@@ -4116,7 +4112,6 @@ export default class KoniExtension {
 
     if (!unlockResponse.status) {
       await removePasskeyUnlock().catch(console.error);
-      await this.setPasskeyUnlockAction(false);
     } else if (nextUnlockSecret && nextPrfInput) {
       // The second PRF output comes from the same user-verification ceremony. Re-wrapping here
       // makes the response that just crossed the UI/background boundary useless next time.
@@ -4135,25 +4130,6 @@ export default class KoniExtension {
     this.#koniState.keyringService.lock();
     this.#keyringLockSubject.next(true);
     clearTimeout(this.#lockTimeOut);
-    getPasskeyUnlockContext()
-      .then((context) => this.setPasskeyUnlockAction(!!context))
-      .catch(console.error);
-  }
-
-  private async passkeyUnlockReturnToPopup ({ windowId }: RequestPasskeyUnlockReturnToPopup): Promise<boolean> {
-    // The popup override is cleared on unlock, but that runs detached, so re-apply it here to make
-    // sure a popup is registered before asking the browser to open it.
-    await this.setPasskeyUnlockAction(false);
-
-    return await openDefaultPopup(windowId);
-  }
-
-  private async setPasskeyUnlockAction (enabled: boolean): Promise<void> {
-    if (!chrome.action?.setPopup) {
-      return;
-    }
-
-    await chrome.action.setPopup({ popup: enabled ? '' : 'index.html' }).catch(console.error);
   }
 
   public keyringLockSubscribe (cb: (state: boolean) => void): any {
@@ -4176,7 +4152,6 @@ export default class KoniExtension {
     try {
       await this.#koniState.resetWallet(resetAll);
       await removePasskeyUnlock().catch(console.error);
-      await this.setPasskeyUnlockAction(false);
 
       return {
         errors: [],
@@ -6774,14 +6749,7 @@ export default class KoniExtension {
       case 'pri(keyring.passkeyUnlock.authenticate)':
         return await this.passkeyUnlockAuthenticate(request as RequestPasskeyUnlockAuthenticate);
       case 'pri(keyring.passkeyUnlock.remove)':
-        await removePasskeyUnlock();
-        await this.setPasskeyUnlockAction(false);
-
-        return;
-      case 'pri(keyring.passkeyUnlock.openWindow)':
-        return await openPasskeyUnlockWindow();
-      case 'pri(keyring.passkeyUnlock.returnToPopup)':
-        return await this.passkeyUnlockReturnToPopup(request as RequestPasskeyUnlockReturnToPopup);
+        return await removePasskeyUnlock();
       case 'pri(keyring.lock)':
         return this.keyringLock();
       case 'pri(keyring.export.mnemonic)':
