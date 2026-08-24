@@ -1143,6 +1143,7 @@
   "bg.SWAP.services.service.swap.baseHandler.recipientBalanceTooLow": "The recipient account has less than {{amount}} {{nativeSymbol}}, which can lead to your {{localSymbol}} being lost. Change recipient account and try again",
   "bg.TRANSACTION.core.validation.transfer.transferMinimumToAvoidFundLoss": "You must transfer at least {{amount}} {{symbol}} to avoid losing funds on the recipient account. Increase amount and try again",
   "bg.TRANSACTION.core.validation.transfer.featureUnderMaintenanceOnNetwork": "Feature under maintenance on {{chainInfoName}} network. Try again later",
+  "bg.TRANSACTION.core.validation.transfer.tokenCannotBeBridgedToNetwork": "",
   "bg.TRANSACTION.core.validation.transfer.featureUnderMaintenance": "Feature under maintenance. Try again later",
   "bg.SWAP.services.service.swap.featureUnderMaintenance": "Feature under maintenance. Try again later",
   "bg.TRANSACTION.core.validation.transfer.featureNotAvailableForNft": "This feature is not yet available for this NFT",
