@@ -3,14 +3,14 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
-import { ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
+import { APIItemState, ExtrinsicType, NominationInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import { getEarningStatusByNominations } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
@@ -18,7 +18,8 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
-import { BN, BN_ZERO } from '@polkadot/util';
+import { Codec } from '@polkadot/types/types';
+import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { fetchPoolsData } from '../../service';
 
@@ -104,9 +105,21 @@ interface SubnetFeeRate {
   fee_rate: string;
 }
 
+interface BasketPosition {
+  hotkey: string;
+  /** Realizable (mark-to-market) TAO payout of this position, in rao */
+  payout: string;
+}
+
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 export const DEFAULT_DTAO_MINBOND = '21000000';
+
+/** `RootClaimableThreshold` is a substrate-fixed `I96F32`, i.e. the raw bits carry 32 fractional bits */
+const I96F32_SCALE = new BigN(2).pow(32);
+
+/** Chain default of `RootClaimableThreshold[0]`: 500_000 rao (0.0005 TAO) */
+export const DEFAULT_ROOT_CLAIM_THRESHOLD = '500000';
 /* Fetch data */
 export class BittensorCache {
   private static instance: BittensorCache | null = null;
@@ -245,7 +258,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     fastUnstake: false,
     cancelUnstake: false,
     withdraw: false,
-    claimReward: false,
+    claimReward: true,
     changeValidator: true
   };
 
@@ -538,6 +551,151 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   override async checkAccountHaveStake (useAddresses: string[]): Promise<string[]> {
     return Promise.resolve([]);
   }
+
+  /* Get pool reward */
+
+  /**
+   * Total TAO a coldkey would realize right now by redeeming the beta baskets of every
+   * validator it root-stakes to, in rao. This is the "pending TAO owed" figure of the
+   * Root Reborn (v4.4.1) runtime; older nodes don't expose the API.
+   */
+  protected async getRootBasketOwed (address: string): Promise<string> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    if (!substrateApi.api.call?.betaBasketRuntimeApi?.getRootBasketOwed) {
+      return '0';
+    }
+
+    const owed = await substrateApi.api.call.betaBasketRuntimeApi.getRootBasketOwed(address);
+
+    return owed.toString();
+  }
+
+  /**
+   * Per-validator breakdown of the entitlements above. Needed because the dust threshold is
+   * applied per validator, not on the total.
+   */
+  protected async getRootBasketPositions (address: string): Promise<BasketPosition[]> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    if (!substrateApi.api.call?.betaBasketRuntimeApi?.getRootBasketPositions) {
+      return [];
+    }
+
+    // Vec<(hotkey, owedShares, payoutTao)>
+    const rawPositions = await substrateApi.api.call.betaBasketRuntimeApi.getRootBasketPositions(address);
+    const positions = rawPositions as unknown as Array<[Codec, Codec, Codec]>;
+
+    return Array.from(positions).map(([hotkey, , payout]) => ({
+      hotkey: hotkey.toString(),
+      payout: payout.toString()
+    }));
+  }
+
+  /** Minimum payout, in rao, a single validator must owe before the chain settles a claim on it */
+  protected async getRootClaimThreshold (): Promise<BigN> {
+    const substrateApi = await this.substrateApi.isReady;
+    const defaultThreshold = new BigN(DEFAULT_ROOT_CLAIM_THRESHOLD);
+
+    if (!substrateApi.api.query.subtensorModule?.rootClaimableThreshold) {
+      return defaultThreshold;
+    }
+
+    try {
+      const raw = (await substrateApi.api.query.subtensorModule.rootClaimableThreshold(0)).toJSON() as unknown as { bits: string | number } | string | number | null;
+      const bits = raw !== null && typeof raw === 'object' ? raw.bits : raw;
+
+      if (bits === null || bits === undefined) {
+        return defaultThreshold;
+      }
+
+      const threshold = new BigN(bits).dividedBy(I96F32_SCALE).integerValue(BigN.ROUND_FLOOR);
+
+      return threshold.isNaN() || threshold.lte(0) ? defaultThreshold : threshold;
+    } catch (e) {
+      console.error(e);
+
+      return defaultThreshold;
+    }
+  }
+
+  override async getPoolReward (useAddresses: string[], callback: (rs: EarningRewardItem) => void): Promise<VoidFunction> {
+    let cancel = false;
+
+    // Root claims are fund-level on netuid 0, subnet (alpha) positions have nothing to claim
+    if (this.type !== YieldPoolType.NATIVE_STAKING) {
+      return noop;
+    }
+
+    await this.substrateApi.isReady;
+
+    await Promise.all(useAddresses.map(async (address) => {
+      if (cancel) {
+        return;
+      }
+
+      try {
+        // Resolves to '0' on runtimes without the beta basket API, so the UI still settles
+        const unclaimedReward = await this.getRootBasketOwed(address);
+
+        const earningRewardItem: EarningRewardItem = {
+          ...this.baseInfo,
+          address: address,
+          type: this.type,
+          unclaimedReward: unclaimedReward,
+          state: APIItemState.READY
+        };
+
+        if (unclaimedReward !== '0') {
+          await this.createClaimNotification(earningRewardItem, this.nativeToken);
+        }
+
+        callback(earningRewardItem);
+      } catch (e) {
+        console.error(e);
+      }
+    }));
+
+    return () => {
+      cancel = true;
+    };
+  }
+
+  /* Get pool reward */
+
+  /* Claim reward action */
+
+  override async handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    if (!substrateApi.api.tx.subtensorModule.claimRoot) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const [positions, threshold] = await Promise.all([
+      this.getRootBasketPositions(address),
+      this.getRootClaimThreshold()
+    ]);
+
+    // A validator owing less than the threshold is skipped on-chain, so a claim built purely
+    // from dust would succeed as a no-op transaction that still charges a fee
+    const claimablePositions = positions.filter((position) => new BigN(position.payout).gte(threshold));
+
+    if (positions.length > 0 && claimablePositions.length === 0) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold', { replace: { threshold: formatNumber(threshold, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } })));
+    }
+
+    // Redemption is fund-level: the payout is sold to TAO and re-staked on root, so
+    // `bondReward` has no meaning here
+    if (claimablePositions.length === 1 && substrateApi.api.tx.subtensorModule.claimRootWithHotkey) {
+      return substrateApi.api.tx.subtensorModule.claimRootWithHotkey(claimablePositions[0].hotkey);
+    }
+
+    // `subnets` is ignored since v4.4.1, it is kept only so old call data still decodes
+    return substrateApi.api.tx.subtensorModule.claimRoot([]);
+  }
+
+  /* Claim reward action */
 
   /* Subscribe pool position */
 

@@ -72,10 +72,12 @@ const filterAccount = (
     const isMythosNetwork = _STAKING_CHAIN_GROUP.mythos.includes(_poolChain);
     const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(_poolChain);
     const isTanssiNetwork = _STAKING_CHAIN_GROUP.tanssi.includes(_poolChain);
+    // Root claims only exist for the netuid 0 position
+    const isBittensorRootNetwork = poolType === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.bittensor.includes(_poolChain);
     const bnUnclaimedReward = new BigN(reward?.unclaimedReward || '0');
 
     return (
-      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork || isBittensorRootNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
       isAstarNetwork
     );
   };
@@ -108,7 +110,8 @@ const Component = () => {
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const isHideCheckBox = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain) || _STAKING_CHAIN_GROUP.tanssi.includes(poolChain), [poolChain]);
+  // Bittensor re-stakes the claimed TAO on root itself, so the opt-in checkbox is meaningless there
+  const isHideCheckBox = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain) || _STAKING_CHAIN_GROUP.tanssi.includes(poolChain) || _STAKING_CHAIN_GROUP.bittensor.includes(poolChain), [poolChain]);
 
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
