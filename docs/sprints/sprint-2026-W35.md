@@ -15,8 +15,10 @@ goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #506
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← backlog | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 | US-42.20 | QC — Biometric / passkey login (#5058) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) |
 | US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | ready | new | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
+| US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | **P0** | 5 | ready | new | [link](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) |
+| US-42.23 | QC — Manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | ready | new | [link](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) |
 
-**5 stories · 31 points** — 3 dev stories (18 pts) and 2 QC stories (13 pts). The three dev stories
+**7 stories · 41 points** — 3 dev stories (18 pts) and 4 QC stories (23 pts). The three dev stories
 are all open PRs with no merge yet, so **none of them is `done` and none has a `version_shipped`.**
 Between them they carry **two reviews** (`saltict` on #5063, `lw-cdm` on #5065) and **one completed
 QC pass** ([US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md), 14/14 on #5061 —
@@ -25,19 +27,28 @@ which is the PR with no review at all).
 The one `done` in this window is a QC story, not a dev story: US-42.20 passed against a PR build.
 **Nothing has shipped.**
 
-The two QC stories were added on 2026-08-25 alongside the dev stories, not after them:
-[US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) covers the passkey feature —
-**`done` 2026-08-25, 14 / 14 AC, no bugs**, run against PR #5061 at commit `cab8ebd5ee`. Because
-that commit is **not merged**, the result is a claim about that build and not about whatever
-eventually lands; the release gate re-verifies rather than inherits it.
+**Every dev story in this window now has its own QC story**, all four written on 2026-08-25
+alongside the dev work rather than after it:
 
-[US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) is the v1.3.89 release gate and **has
-not run** — there is no v1.3.89 tag, `VERSION` is at 1.3.88, and all three content PRs are still
-open. It stays `ready` until a build exists.
+| Dev story | QC story | State |
+| --- | --- | --- |
+| US-5.16 — passkey login | [US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) | **done**, 14 / 14, no bugs |
+| US-13.19 — **P0** KAH↔PAH USDt | [US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | `ready` |
+| US-12.23 — Bittensor root claim | [US-42.23](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | `ready` |
+| *(all three together)* | [US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) — release gate | `ready` |
 
-One gap that follows from the table: the **P0** (US-13.19) and the Bittensor claim (US-12.23) have
-**no feature-level QC story**, only the release gate. The passkey item is the only one of the three
-with its own QC pass.
+US-42.20 ran against PR #5061 at commit `cab8ebd5ee`. Because that commit is **not merged**, the
+result is a claim about that build and not about whatever eventually lands; the release gate
+re-verifies rather than inherits it.
+
+[US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) **has not run** — there is no v1.3.89
+tag, `VERSION` is at 1.3.88, and all three content PRs are still open. It stays `ready` until a
+build exists.
+
+The two new feature QC stories are both written from the **code in the PRs**, because neither issue
+carries testable requirements on its own: #5064 has an empty body, and #5062 has a detailed spec
+that describes the **chainlist data fix** — which is not what PR #5063 in this repo does. That gap
+is AC-9 on US-42.22.
 
 Small again, and for the same reason [W34](sprint-2026-W34.md) was: this is what has evidence of
 being live. W34 closed at 5 of 5 on that basis.
