@@ -115,8 +115,12 @@ const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 export const DEFAULT_DTAO_MINBOND = '21000000';
 
-/** `RootClaimableThreshold` is a substrate-fixed `I96F32`, i.e. the raw bits carry 32 fractional bits */
-const I96F32_SCALE = new BigN(2).pow(32);
+/**
+ * `RootClaimableThreshold` is stored as a substrate-fixed `I96F32`: a 128 bit integer whose low
+ * 32 bits are the fraction. Dividing the raw bits by 2^32 turns it back into a rao amount,
+ * e.g. `{ bits: 2147483648000000 }` is 500_000 rao.
+ */
+const FIXED_POINT_32_DIVISOR = new BigN(2).pow(32);
 
 /** Chain default of `RootClaimableThreshold[0]`: 500_000 rao (0.0005 TAO) */
 export const DEFAULT_ROOT_CLAIM_THRESHOLD = '500000';
@@ -609,7 +613,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         return defaultThreshold;
       }
 
-      const threshold = new BigN(bits).dividedBy(I96F32_SCALE).integerValue(BigN.ROUND_FLOOR);
+      const threshold = new BigN(bits).dividedBy(FIXED_POINT_32_DIVISOR).integerValue(BigN.ROUND_FLOOR);
 
       return threshold.isNaN() || threshold.lte(0) ? defaultThreshold : threshold;
     } catch (e) {
