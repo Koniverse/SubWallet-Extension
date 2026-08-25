@@ -30,7 +30,7 @@ landed on 08-20 and the acceptance criteria below are now derived from the code 
 | --- | --- |
 | Issue | [#5058](https://github.com/Koniverse/SubWallet-Extension/issues/5058) |
 | Opened | 2026-08-13 by `tunghp2002` |
-| State | OPEN |
+| State | **CLOSED 2026-08-25** — see below; the PR is still open |
 | Labels | none |
 | Assignees | none |
 | Milestone | none |
@@ -58,7 +58,7 @@ now exists and the code settles what the issue never stated.
 | PR | [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) — **open**, not draft, 0 reviews |
 | Branch | `koni/dev/issue-5058` → `subwallet-dev` |
 | Opened | 2026-08-20 by `tunghp2002` |
-| Size | **4 commits**, **+1180 / −49** across **18 files** |
+| Size | **6 commits**, **+1317 / −54** |
 | Tests | **2 spec files** — `passkeyUnlock.spec.ts` in `extension-base` (69 lines) and `extension-koni-ui` (85 lines) |
 
 ### It wraps the master password — it does not replace it
@@ -92,6 +92,35 @@ before this commit existed.
 
 *(Correction: this story first recorded the PR as spanning "20 files". It was 18 then and is 18
 now — the count was wrong, the file list it was drawn from was not.)*
+
+### Update 2026-08-25 (evening) — QC passed, issue closed, PR still open
+
+Three things moved after the section above was written, and they do not all point the same way.
+
+| | |
+| --- | --- |
+| PR #5061 | **6 commits**, +1317 / −54, **still 0 reviews**, **still open** |
+| New commits | `0b7b248cfb` *Fix bug UI in newest chrome version*, `cab8ebd5ee` *Chore: update UI* (both 08-25) |
+| QC | **[US-42.20](US-42.20-qc-issue-5058-biometric-passkey-login.md) — 14/14 AC**, run against `cab8ebd5ee`, fresh install + upgrade from v1.3.88 |
+| Issue #5058 | **closed 2026-08-25 by `MaiThuongNinni`** |
+
+**The issue was closed by hand, not by a merge.** The timeline records a plain `closed` event with no
+commit attached, and PR #5061 is still open and unmerged. So `dev` does not contain this feature,
+and nothing has shipped — `status` stays **`review`**, `version_shipped` and `commit` stay empty
+([D106](../../CONTEXT.md)). A closed issue is not a merged branch
+([LESSONS §69](../../LESSONS.md) — a state an API hands you is a claim, not a fact).
+
+**The two risks this story flagged were both checked, and both held.** Recording it because they
+were called out here before QC ran, so the answer belongs next to the question:
+
+| Flagged here | Answered by US-42.20 |
+| --- | --- |
+| **AC-3** — master password must still work with no passkey enrolled | **AC-9 / AC-10 / AC-11** — holds with a passkey enrolled, on a browser without WebAuthn PRF, and after the passkey is removed. Nobody is locked out |
+| **AC-8** — the dApp surface US-5.15 hardened must not weaken | **AC-12 / AC-12b** — the signature is produced over exactly what the prompt displayed; the #5042 rule still holds |
+
+**One caveat carries forward, and US-42.20 states it too:** that 14/14 is a claim about `cab8ebd5ee`,
+not about whatever eventually merges. Two of the six commits landed on the day of the QC run, so if
+more land before merge the passkey paths need a re-run against the merged head.
 
 ### Where it plugs in
 

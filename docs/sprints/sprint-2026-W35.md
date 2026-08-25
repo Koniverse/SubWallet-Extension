@@ -18,7 +18,9 @@ goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #506
 
 **5 stories · 31 points** — 3 dev stories (18 pts) and 2 QC stories (13 pts). The three dev stories
 are all open PRs with no merge yet, so **none of them is `done` and none has a `version_shipped`.**
-Between them they carry **one review** — `saltict` on PR #5063; the other two have none.
+Between them they carry **two reviews** (`saltict` on #5063, `lw-cdm` on #5065) and **one completed
+QC pass** ([US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md), 14/14 on #5061 —
+which is the PR with no review at all).
 
 The one `done` in this window is a QC story, not a dev story: US-42.20 passed against a PR build.
 **Nothing has shipped.**
@@ -115,20 +117,42 @@ it replaces rather than revives — but neither the PR nor the issue says so.
 Both produce a *plausible wrong number* rather than an error. **PR #5065 ships no test** — the same
 gap as PR #5063.
 
-## Pattern worth naming — three PRs, one review, no tests
+## Pattern worth naming — refreshed 2026-08-25 (evening)
 
-All three stories in this window are open PRs opened within five days of each other, and they share
-a shape:
+The three dev stories are open PRs opened within five days of each other. The picture improved
+during the day but the shape is still worth stating:
 
-| PR | Story | Reviews | Tests |
-| --- | --- | --- | --- |
-| [#5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | US-13.19 (**P0**, tokens locked on the wrong chain) | 1 | **none** |
-| [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) | US-5.16 (unlock path) | **0** | 2 spec files |
-| [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) | US-12.23 (reward claim) | **0** | **none** |
+| PR | Story | Reviews | Tests | QC |
+| --- | --- | --- | --- | --- |
+| [#5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | US-13.19 (**P0**, tokens locked on the wrong chain) | 1 — `saltict` | **none** | **none** |
+| [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) | US-5.16 (unlock path) | **0** | 2 spec files | **14/14** — [US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) |
+| [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) | US-12.23 (reward claim) | 1 — `lw-cdm` | **none** | none |
 
-Two of the three touch money paths directly and neither has a test. The P0 — a bug that has already
-stranded a real transfer — has one approval and no regression test. Recorded as an observation
-about this window, not a process ruling.
+**What improved:** #5065 gained an approval, and #5061 gained a full QC pass that specifically
+checked the two things this sprint flagged as dangerous — the master-password fallback and the dApp
+signing guarantee. Both held.
+
+**What has not:** the **P0 still has no test and no QC**. #5063 is the one PR here touching a bug
+that has already stranded a real transfer, and it is the least verified of the three. Two of the
+three PRs still ship no test at all.
+
+**A reviewing oddity, recorded not resolved:** #5061 has a completed 14/14 QC pass and **zero code
+reviews**. QC and review answer different questions — QC asks whether it works, review asks whether
+the code should look like that — and a security-adjacent unlock path arguably wants both.
+
+## #5058 was closed by hand while its PR is still open
+
+Worth separating from the QC result, because the two are easy to read as one event.
+
+[#5058](https://github.com/Koniverse/SubWallet-Extension/issues/5058) was **closed 2026-08-25 by
+`MaiThuongNinni`**. The timeline shows a plain `closed` event with **no commit attached** — a manual
+close, not a merge-close. [PR #5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) is
+**still open and unmerged**, so `dev` does not contain the feature and nothing has shipped.
+
+[US-5.16](stories/US-5.16-biometric-passkey-login.md) therefore stays **`review`** with empty
+`version_shipped` and `commit`. A closed issue is not a merged branch
+([LESSONS §69](../LESSONS.md)) — and this sprint now has one story whose issue is closed, whose QC
+is done, and whose code is in no shipping branch.
 
 ## Not in this window — the eight stalled W33 stories
 

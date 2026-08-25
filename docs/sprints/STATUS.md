@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-25 04:59:22 UTC
-> Total stories: 298
+> Last generated: 2026-08-25 10:02:35 UTC
+> Total stories: 300
 
 ## 📋 Backlog (70)
 
@@ -79,13 +79,14 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (4)
+## 🟢 Ready (5)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
+| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | sprint-2026-W35 | MaiThuongNinni |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
 ## 🟡 In Progress (10)
@@ -117,7 +118,7 @@
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | sprint-2026-W35 | tunghp2002 |
 
-## ✅ Done (204)
+## ✅ Done (205)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -268,6 +269,7 @@
 | US-42.17 | QC — Update ParaSpell API integration to v2 on Extension (#5051) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.18 | QC — Remove XCM routes for chains dropped in ParaSpell XCM API v2 (#705) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.19 | QC — Release SubWallet Extension v1.3.88 | EPIC-42 | P2 | 8 | sprint-2026-W34 | MaiThuongNinni |
+| US-42.20 | QC — Support biometric/passkey login for extension (#5058) | EPIC-42 | P2 | 5 | sprint-2026-W35 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -341,10 +343,10 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 70
-- 🟢 **Ready**: 4
+- 🟢 **Ready**: 5
 - 🟡 **In Progress**: 10
 - 👀 **Review**: 9
-- ✅ **Done**: 204
+- ✅ **Done**: 205
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
