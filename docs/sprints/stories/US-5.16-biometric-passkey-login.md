@@ -58,8 +58,8 @@ now exists and the code settles what the issue never stated.
 | PR | [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) — **open**, not draft, 0 reviews |
 | Branch | `koni/dev/issue-5058` → `subwallet-dev` |
 | Opened | 2026-08-20 by `tunghp2002` |
-| Size | 3 commits, **+1035 / −49** across 20 files |
-| Tests | **2 spec files** — `passkeyUnlock.spec.ts` in both `extension-base` and `extension-koni-ui` |
+| Size | **4 commits**, **+1180 / −49** across **18 files** |
+| Tests | **2 spec files** — `passkeyUnlock.spec.ts` in `extension-base` (69 lines) and `extension-koni-ui` (85 lines) |
 
 ### It wraps the master password — it does not replace it
 
@@ -77,6 +77,21 @@ imported via `crypto.subtle.importKey('raw', …)` from the passkey **PRF extens
 So the master password stays the root of custody and the passkey is a *convenience layer over
 FR-55* — the answer this story listed as load-bearing, because the alternative (passkey replaces
 the password) would have reopened EPIC-5's **non-recoverable-by-design** decision. **It does not.**
+
+### Update, later on 2026-08-25 — a fourth commit extends this to dApps
+
+A commit landed after this story was first written: `4b7698b5b4` — *"Update UI passkey for dApp"*.
+The PR is now **4 commits / +1180 / −49** (was 3 / +1035), and the UI spec file grew from 46 to
+**85 lines**. Still **0 reviews**.
+
+**This widens the blast radius.** Passkey unlock now reaches the dApp-facing confirmation surface,
+which is the surface [US-5.15](US-5.15-signing-prompt-mode-confusion.md) hardened after #5042 — a
+signature may only be produced over the artefact the prompt displayed. A new unlock path in front of
+that flow deserves the same scrutiny; **AC-7 below does not cover it**, because it was written
+before this commit existed.
+
+*(Correction: this story first recorded the PR as spanning "20 files". It was 18 then and is 18
+now — the count was wrong, the file list it was drawn from was not.)*
 
 ### Where it plugs in
 
@@ -110,6 +125,9 @@ was built and are refutable against the branch:
 - [ ] **AC-6** — Removing the passkey in Settings → Security clears the stored record.
 - [ ] **AC-7** — Behaviour under FR-58 (per-action vs per-session unlock) is defined and unchanged
   for users who do not enrol.
+- [ ] **AC-8** — On the dApp confirmation surface (`4b7698b5b4`), a passkey unlock still produces a
+  signature only over the artefact the prompt displayed — the [US-5.15](US-5.15-signing-prompt-mode-confusion.md)
+  guarantee is not weakened by the new unlock path.
 
 > **Nothing ticked.** The PR is unmerged and unreviewed; none of these is a fact about `dev` yet
 > ([D107](../../CONTEXT.md)). AC-3, AC-4 and AC-7 are the ones worth a reviewer's attention — they

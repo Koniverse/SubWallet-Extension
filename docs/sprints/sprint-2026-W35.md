@@ -12,9 +12,11 @@ goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #506
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | **P0** | 5 | review | new | [link](stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) |
 | US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | review | ← backlog | [link](stories/US-5.16-biometric-passkey-login.md) |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← backlog | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 
-**2 stories · 13 points.** Both are open PRs with no merge yet, so **nothing here is `done` and
-nothing has a `version_shipped`.**
+**3 stories · 18 points.** All three are open PRs with no merge yet, so **nothing here is `done`
+and nothing has a `version_shipped`.** Between them they carry **one review** — `saltict` on
+PR #5063; the other two have none.
 
 Small again, and for the same reason [W34](sprint-2026-W34.md) was: this is what has evidence of
 being live. W34 closed at 5 of 5 on that basis.
@@ -47,7 +49,7 @@ asks for a regression test and nothing currently satisfies it.
 
 [#5058](https://github.com/Koniverse/SubWallet-Extension/issues/5058) has been a bare title since
 2026-08-13. [PR #5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) opened 08-20 —
-3 commits, +1035 / −49 across 20 files — and settles the question
+4 commits, +1180 / −49 across 18 files — and settles the question
 [2026-08-18 §D](../notes/2026-08-18.md) called load-bearing:
 
 > Does biometry **unlock a master password already held**, or **replace it** as the thing wrapping
@@ -63,13 +65,50 @@ master password must still work when no passkey is enrolled or the authenticator
 route by which an unlock convenience becomes a way to lose a wallet. It does ship **2 spec files**,
 which is more than [US-12.22](stories/US-12.22-nominator-fast-unbond-duration.md) managed.
 
-## Backlog touched this window
+### US-12.23 — the second empty issue answered by its own PR, hours later
 
-[US-12.23](stories/US-12.23-bittensor-manual-claim-native-staking.md) — manual claim for Bittensor
-native staking ([#5064](https://github.com/Koniverse/SubWallet-Extension/issues/5064), opened
-2026-08-24). **No sprint, `backlog`.** Like #5058 before it, the issue is a title with an empty body,
-so the story records open questions instead of invented acceptance criteria. Listed here for
-visibility, not scope. That is now **two empty-body issues in a month** from the same author.
+[#5064](https://github.com/Koniverse/SubWallet-Extension/issues/5064) opened 2026-08-24 with a title
+and **no body**, and was written up as a `backlog` placeholder on the morning of 08-25.
+[PR #5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) appeared the same day —
+1 commit, +198 / −14 — and answered three of the story's four open questions.
+
+The diff's own comment carries the design:
+
+> *Root claims redeem the basket of a netuid 0 position, subnet (alpha) positions have nothing to claim*
+
+`claimReward` goes **true** in `tao.ts` (+162) and explicitly **false** in `dtao.ts`. So this is
+root-network TAO, **not** subnet/alpha — which settles the overlap worry with
+[US-12.6](stories/US-12.6-bittensor-dtao-subnet-staking.md): there is none.
+
+**What is still unanswered is the one that matters.** v1.3.86 *removed* a deprecated Bittensor root
+claim type (#5045, [US-12.21](stories/US-12.21-earning-fixes-recovered-from-uncategorized.md)). This
+PR adds a root claim path on a **different** runtime API (`betaBasketRuntimeApi`), so on the evidence
+it replaces rather than revives — but neither the PR nor the issue says so.
+
+**Two quiet failure modes, and no test to catch either:**
+
+- `RootClaimableThreshold` is a substrate-fixed `I96F32` — the raw bits carry 32 fractional bits and
+  must be scaled by `2^32`. Read unscaled, it is wrong by nine orders of magnitude.
+- When the `rootClaimableThreshold` query is absent, the code falls back to `500000` rao. A wrong
+  fallback claims zero or nothing at all.
+
+Both produce a *plausible wrong number* rather than an error. **PR #5065 ships no test** — the same
+gap as PR #5063.
+
+## Pattern worth naming — three PRs, one review, no tests
+
+All three stories in this window are open PRs opened within five days of each other, and they share
+a shape:
+
+| PR | Story | Reviews | Tests |
+| --- | --- | --- | --- |
+| [#5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | US-13.19 (**P0**, funds already lost) | 1 | **none** |
+| [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) | US-5.16 (unlock path) | **0** | 2 spec files |
+| [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) | US-12.23 (reward claim) | **0** | **none** |
+
+Two of the three touch money paths directly and neither has a test. The P0 — a bug that has already
+cost a user 72,614 USDT — has one approval and no regression test. Recorded as an observation about
+this window, not a process ruling.
 
 ## Not in this window — the eight stalled W33 stories
 

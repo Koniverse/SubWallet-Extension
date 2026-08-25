@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-25 02:22:47 UTC
+> Last generated: 2026-08-25 04:59:22 UTC
 > Total stories: 298
 
-## 📋 Backlog (71)
+## 📋 Backlog (70)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -26,7 +26,6 @@
 | US-12.13 | Earning reward & APY-accuracy hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.14 | Earning performance & cache hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P3 | 1 | — | — |
 | US-13.8 | Bittensor alpha-token bridges (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | EPIC-13 | P2 | 8 | — | — |
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
@@ -104,12 +103,13 @@
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (8)
+## 👀 Review (9)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | sprint-2026-W35 | tunghp2002 |
 | US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | P0 | 5 | sprint-2026-W35 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
@@ -340,10 +340,10 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 71
+- 📋 **Backlog**: 70
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 10
-- 👀 **Review**: 8
+- 👀 **Review**: 9
 - ✅ **Done**: 204
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
