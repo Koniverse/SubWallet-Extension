@@ -58,6 +58,7 @@ import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisi
 import { calcDepositAmount, createInitMultisigExtrinsic, decodeCallData, DEFAULT_MAX_WEIGHT } from '@subwallet/extension-base/services/multisig-service/utils';
 import { GovVoteRequest, RemoveVoteRequest, UnlockVoteRequest } from '@subwallet/extension-base/services/open-gov/interface';
 import { EXTENSION_REQUEST_URL } from '@subwallet/extension-base/services/request-service/constants';
+import { isActionPopupSender, reopenActionPopup } from '@subwallet/extension-base/services/request-service/handler/PopupHandler';
 import { AuthUrls } from '@subwallet/extension-base/services/request-service/types';
 import { DEFAULT_AUTO_LOCK_TIME } from '@subwallet/extension-base/services/setting-service/constants';
 import { createInitSubstrateProxyExtrinsic } from '@subwallet/extension-base/services/substrate-proxy-service';
@@ -4087,7 +4088,7 @@ export default class KoniExtension {
     }
   }
 
-  private async passkeyUnlockAuthenticate ({ nextPrfInput, nextUnlockSecret, unlockSecret }: RequestPasskeyUnlockAuthenticate): Promise<ResponsePasskeyUnlockAuthenticate> {
+  private async passkeyUnlockAuthenticate ({ nextPrfInput, nextUnlockSecret, unlockSecret }: RequestPasskeyUnlockAuthenticate, port: chrome.runtime.Port): Promise<ResponsePasskeyUnlockAuthenticate> {
     if (!isValidUnlockSecret(unlockSecret)) {
       return { status: false, enrolled: true, errors: ['Invalid passkey unlock response'] };
     }
@@ -4116,6 +4117,12 @@ export default class KoniExtension {
       // The second PRF output comes from the same user-verification ceremony. Re-wrapping here
       // makes the response that just crossed the UI/background boundary useless next time.
       await rotatePasskeyUnlockSecret(password, nextUnlockSecret, nextPrfInput).catch(console.error);
+    }
+
+    // The browser drew its prompt outside the toolbar popup, which closed it. Bring it back rather
+    // than leaving an unlocked wallet behind an icon the user has to click again.
+    if (unlockResponse.status && isActionPopupSender(port)) {
+      reopenActionPopup().catch(console.error);
     }
 
     return {
@@ -6747,7 +6754,7 @@ export default class KoniExtension {
       case 'pri(keyring.passkeyUnlock.enroll)':
         return await this.passkeyUnlockEnroll(request as RequestPasskeyUnlockEnroll);
       case 'pri(keyring.passkeyUnlock.authenticate)':
-        return await this.passkeyUnlockAuthenticate(request as RequestPasskeyUnlockAuthenticate);
+        return await this.passkeyUnlockAuthenticate(request as RequestPasskeyUnlockAuthenticate, port);
       case 'pri(keyring.passkeyUnlock.remove)':
         return await removePasskeyUnlock();
       case 'pri(keyring.lock)':

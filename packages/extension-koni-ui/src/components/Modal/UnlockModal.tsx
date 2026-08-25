@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { PasskeyUnlockContext } from '@subwallet/extension-base/background/KoniTypes';
-import { useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext } from '@subwallet/extension-koni-ui/messaging';
+import { useExtensionDisplayModes, useSidePanelUtils, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext, windowOpen } from '@subwallet/extension-koni-ui/messaging';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
@@ -47,6 +47,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [isDisable, setIsDisable] = useState(true);
   const [passkeyUnlockLoading, setPasskeyUnlockLoading] = useState(false);
   const [passkeyUnlockContext, setPasskeyUnlockContext] = useState<PasskeyUnlockContext | null>(null);
+  const { isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
 
   const closeModal = useCallback(
     () => {
@@ -99,6 +101,17 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       return;
     }
 
+    if (isSidePanelMode) {
+      const opened = await windowOpen({
+        allowedPath: '/',
+        params: { passkeyUnlock: 'true' }
+      });
+
+      opened && closeSidePanel();
+
+      return;
+    }
+
     setPasskeyUnlockLoading(true);
 
     try {
@@ -117,7 +130,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     } finally {
       setPasskeyUnlockLoading(false);
     }
-  }, [onError, passkeyUnlockContext, t]);
+  }, [closeSidePanel, isSidePanelMode, onError, passkeyUnlockContext, t]);
 
   const onClickPasskeyUnlock = useCallback(() => {
     onPasskeyUnlock().catch(console.error);

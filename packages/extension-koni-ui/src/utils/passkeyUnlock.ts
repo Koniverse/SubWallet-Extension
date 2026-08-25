@@ -33,6 +33,7 @@ interface PrfResult {
 // height, since the popup already sits at the 600px ceiling the browser allows one. The dapp
 // confirmation is a real browser window, which has no such ceiling but never resizes itself to fit
 // its document, so body width does nothing there and it has to be resized through chrome.windows.
+//
 // Chrome draws the prompt as one of its own modal dialogs, which is a fixed width and sits against
 // the left of the web contents rather than centred in them. Any room past that width is not spread
 // around it, it lands as a strip of empty page down the right-hand side - so the surface is sized to
@@ -41,9 +42,8 @@ const PROMPT_WIDTH = 448;
 const PROMPT_MIN_HEIGHT = 640;
 const PROMPT_BODY_CLASS = '-passkey-prompt-mode';
 const SETTLE_FRAMES = 20;
-// A window frame is a handful of pixels; anything larger means innerWidth is not measuring what this
-// assumes (page zoom, say), and guessing wide enough to clip the dialog is worse than a small gap.
-const MAX_WINDOW_FRAME = 40;
+// Two is enough for the loop below to land: the first pass measures the frame, the second spends it.
+const RESIZE_PASSES = 3;
 
 type PromptSurface = 'side-panel' | 'window' | 'popup';
 type RestorePromptRoom = () => void;
@@ -64,16 +64,40 @@ function promptSurface (): PromptSurface {
 
 // The browser owns the resize, so the document only catches up a frame or more later - and the
 // prompt is measured against whatever it finds the moment it opens.
-async function settleWidth (): Promise<void> {
-  for (let frame = 0; frame < SETTLE_FRAMES && window.innerWidth < PROMPT_WIDTH; frame++) {
+async function settleViewport (previous: number): Promise<void> {
+  for (let frame = 0; frame < SETTLE_FRAMES && window.innerWidth === previous; frame++) {
     await nextFrame();
+  }
+}
+
+// chrome.windows sizes the whole window, frame included, while the dialog is laid out against the
+// web contents inside it. How thick that frame is depends on the platform, the window type and the
+// display scaling, so rather than assume a figure this resizes, measures what the viewport actually
+// became, and spends the difference - which is what closes the last few pixels beside the dialog.
+async function sizeViewportTo (id: number, target: number): Promise<void> {
+  for (let pass = 0; pass < RESIZE_PASSES; pass++) {
+    const drift = window.innerWidth - target;
+
+    if (drift === 0) {
+      return;
+    }
+
+    const { width = 0 } = await chrome.windows.getCurrent();
+    const before = window.innerWidth;
+
+    await chrome.windows.update(id, { width: width - drift });
+    await settleViewport(before);
   }
 }
 
 async function reserveWindowRoom (): Promise<RestorePromptRoom | null> {
   const { height = 0, id, width = 0 } = await chrome.windows.getCurrent();
+  // Only ever grow. A window the user has already sized past the dialog - the full-size confirmation
+  // window is one - is left as it is rather than snapped down to the prompt.
+  const needsWidth = window.innerWidth < PROMPT_WIDTH;
+  const needsHeight = height < PROMPT_MIN_HEIGHT;
 
-  if (id === undefined || (window.innerWidth >= PROMPT_WIDTH && height >= PROMPT_MIN_HEIGHT)) {
+  if (id === undefined || (!needsWidth && !needsHeight)) {
     return null;
   }
 
@@ -85,16 +109,13 @@ async function reserveWindowRoom (): Promise<RestorePromptRoom | null> {
   body.style.width = '100%';
   body.classList.add(PROMPT_BODY_CLASS);
 
-  // chrome.windows sizes the whole window, frame included, while the dialog is laid out against the
-  // web contents inside it. Measuring the frame here rather than assuming one keeps the two ends
-  // lined up across platforms, which is the difference between a flush dialog and a gap beside it.
-  const frame = Math.min(Math.max(width - window.innerWidth, 0), MAX_WINDOW_FRAME);
+  if (needsHeight) {
+    await chrome.windows.update(id, { height: PROMPT_MIN_HEIGHT });
+  }
 
-  await chrome.windows.update(id, {
-    height: Math.max(height, PROMPT_MIN_HEIGHT),
-    width: Math.max(width, PROMPT_WIDTH + frame)
-  });
-  await settleWidth();
+  if (needsWidth) {
+    await sizeViewportTo(id, PROMPT_WIDTH);
+  }
 
   return () => {
     body.classList.remove(PROMPT_BODY_CLASS);
@@ -211,6 +232,10 @@ export function isPasskeyPromptCancelled (error: unknown): boolean {
   const name = (error as DOMException)?.name;
 
   return name === 'AbortError' || name === 'NotAllowedError';
+}
+
+export function isExpandedPasskeyUnlockRequested (search: string, isLocked: boolean): boolean {
+  return isLocked && new URLSearchParams(search).get('passkeyUnlock') === 'true';
 }
 
 export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {

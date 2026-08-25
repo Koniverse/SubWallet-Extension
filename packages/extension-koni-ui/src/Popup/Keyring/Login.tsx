@@ -4,10 +4,12 @@
 import { PasskeyUnlockContext } from '@subwallet/extension-base/background/KoniTypes';
 import { Layout, PageWrapper, ResetWalletModal } from '@subwallet/extension-koni-ui/components';
 import { RESET_WALLET_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useExtensionDisplayModes, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
 import useUILock, { isManualLockRequested } from '@subwallet/extension-koni-ui/hooks/common/useUILock';
 import useFocusById from '@subwallet/extension-koni-ui/hooks/form/useFocusById';
-import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext } from '@subwallet/extension-koni-ui/messaging';
+import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils/form/form';
@@ -15,6 +17,7 @@ import { evaluatePasskeyCredential, holdPasskeyPromptRoom, isPasskeyPromptCancel
 import { Button, Form, Icon, Image, Input, ModalContext } from '@subwallet/react-ui';
 import { Fingerprint } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 type Props = ThemeProps
@@ -43,6 +46,9 @@ const Component: React.FC<Props> = ({ className }: Props) => {
   const passkeyAutoTriggered = useRef(false);
   const isManualLock = useMemo(isManualLockRequested, []);
   const { unlock } = useUILock();
+  const { isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
+  const isLocked = useSelector((state: RootState) => state.accountState.isLocked);
 
   const onUpdate: FormCallbacks<LoginFormState>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields);
@@ -86,6 +92,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
       return;
     }
 
+    if (isSidePanelMode) {
+      const opened = await windowOpen({
+        allowedPath: '/',
+        params: { passkeyUnlock: 'true' }
+      });
+
+      opened && closeSidePanel();
+
+      return;
+    }
+
     setPasskeyUnlockLoading(true);
     setPasskeyUnlockError('');
 
@@ -108,7 +125,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     } finally {
       setPasskeyUnlockLoading(false);
     }
-  }, [passkeyUnlockContext, passkeyUnlockLoading, t, unlock]);
+  }, [closeSidePanel, isSidePanelMode, passkeyUnlockContext, passkeyUnlockLoading, t, unlock]);
 
   const onClickPasskeyUnlock = useCallback(() => {
     onPasskeyUnlock().catch(console.error);
@@ -124,9 +141,17 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     return passkeyUnlockContext ? holdPasskeyPromptRoom() : undefined;
   }, [passkeyUnlockContext]);
 
+  // The passkey prompt can destroy a toolbar popup before its response clears the persisted UI
+  // lock. A reopened popup must trust the already-unlocked keyring instead of starting passkey again.
+  useEffect(() => {
+    if (!isManualLock && !isLocked) {
+      unlock();
+    }
+  }, [isLocked, isManualLock, unlock]);
+
   useEffect(() => {
     const trigger = () => {
-      if (isManualLock || passkeyAutoTriggered.current || !passkeyUnlockContext || passkeyUnlockLoading || document.visibilityState !== 'visible' || !document.hasFocus()) {
+      if (isManualLock || !isLocked || passkeyAutoTriggered.current || !passkeyUnlockContext || passkeyUnlockLoading || document.visibilityState !== 'visible' || !document.hasFocus()) {
         return;
       }
 
@@ -138,7 +163,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     window.addEventListener('focus', trigger);
 
     return () => window.removeEventListener('focus', trigger);
-  }, [isManualLock, onPasskeyUnlock, passkeyUnlockContext, passkeyUnlockLoading]);
+  }, [isLocked, isManualLock, onPasskeyUnlock, passkeyUnlockContext, passkeyUnlockLoading]);
 
   useFocusById(passwordInputId);
 

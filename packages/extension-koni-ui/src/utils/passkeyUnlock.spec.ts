@@ -3,7 +3,7 @@
 
 jest.mock('./common/browser', () => ({ isFirefox: () => false }));
 
-import { evaluatePasskeyCredential } from './passkeyUnlock';
+import { evaluatePasskeyCredential, isExpandedPasskeyUnlockRequested } from './passkeyUnlock';
 
 const getCredential = jest.fn();
 
@@ -81,5 +81,11 @@ describe('passkey unlock', () => {
     await evaluatePasskeyCredential('0x0102', '0x0304', []);
 
     expect('transports' in getCredential.mock.calls[0][0].publicKey.allowCredentials[0]).toBe(false);
+  });
+
+  it('keeps the expanded unlock route only while the keyring is locked', () => {
+    expect(isExpandedPasskeyUnlockRequested('?passkeyUnlock=true', true)).toBe(true);
+    expect(isExpandedPasskeyUnlockRequested('?passkeyUnlock=true', false)).toBe(false);
+    expect(isExpandedPasskeyUnlockRequested('?other=true', true)).toBe(false);
   });
 });
