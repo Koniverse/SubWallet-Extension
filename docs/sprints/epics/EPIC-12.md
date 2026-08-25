@@ -184,6 +184,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.20](../stories/US-12.20-earning-rewards-and-apy-accuracy.md) | Earning rewards & APY accuracy (settled) | The shipped half of reward/APY-figure correctness | ✅ done | 1.2.29 |
 | [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
 | [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | Nominator fast-unbond duration | Quote the unstaking window the runtime enforces, not `bondingDuration` (28d → 2d on DOT) | ✅ done | 1.3.87 |
+| [US-12.23](../stories/US-12.23-bittensor-manual-claim-native-staking.md) | Manual claim for Bittensor native staking | Placeholder for #5064 — the tracker issue is a title with an **empty body**, so the story records open questions instead of invented ACs | 📋 backlog | — |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**

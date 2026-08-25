@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-19 05:03:16 UTC
-> Total stories: 296
+> Last generated: 2026-08-25 02:22:47 UTC
+> Total stories: 298
 
 ## 📋 Backlog (71)
 
@@ -26,6 +26,7 @@
 | US-12.13 | Earning reward & APY-accuracy hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.14 | Earning performance & cache hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P3 | 1 | — | — |
 | US-13.8 | Bittensor alpha-token bridges (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | EPIC-13 | P2 | 8 | — | — |
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
@@ -62,7 +63,6 @@
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
 | US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
 | US-5.14 | Open security improvements (recovered from Uncategorized) | EPIC-5 | P3 | 1 | — | — |
-| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 1 | — | — |
 | US-6.6 | Design-system & UX hardening: cross-platform consistency and responsive regressions | EPIC-6 | P2 | 5 | — | — |
 | US-6.14 | Open UI improvements (recovered from Uncategorized) | EPIC-6 | P3 | 1 | — | — |
 | US-7.6 | Balance history (portfolio value over time) | EPIC-7 | P1 | 5 | — | — |
@@ -104,19 +104,20 @@
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (7)
+## 👀 Review (8)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
-| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W34 | tunghp2002 |
+| US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | P0 | 5 | sprint-2026-W35 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
+| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | sprint-2026-W35 | tunghp2002 |
 
-## ✅ Done (203)
+## ✅ Done (204)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -183,6 +184,7 @@
 | US-13.14 | XCM fee, dry-run & transfer validation | EPIC-13 | P3 | 5 | sprint-2026-M06 | PDTnhah |
 | US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | sprint-2024-M07 | frenkie-ng |
 | US-13.16 | Asset Hub Migration & relay-chain wind-down | EPIC-13 | P3 | 3 | sprint-2025-M11 | bluezdot |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W34 | tunghp2002 |
 | US-14.1 | Fiat on-ramp: buy crypto with card | EPIC-14 | P1 | 8 | sprint-2022-M09 | S2kael |
 | US-14.2 | Fiat off-ramp: sell crypto for fiat | EPIC-14 | P2 | 3 | sprint-2025-M09 | tunghp2002 |
 | US-14.5 | Fiat on-ramp fixes recovered from Uncategorized | EPIC-14 | P3 | 1 | sprint-2023-M10 | S2kael |
@@ -341,8 +343,8 @@ _No stories_
 - 📋 **Backlog**: 71
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 10
-- 👀 **Review**: 7
-- ✅ **Done**: 203
+- 👀 **Review**: 8
+- ✅ **Done**: 204
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 

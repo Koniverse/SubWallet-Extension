@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W34
-status: in-progress
+status: closed
 start: 2026-08-17
 end: 2026-08-23
 goal: "A deliberately small window. Land and verify the ParaSpell HTTP API v2 migration (#5051 / PR #5053) — the only piece of W33 work with live tracker evidence — and run the one QC pass W33 queued and never executed (#5054). Opened 2026-08-18 from tracker and git evidence; the eight stalled W33 stories were NOT rolled in, and that is a decision on the record, not an oversight."
@@ -10,7 +10,7 @@ goal: "A deliberately small window. Land and verify the ParaSpell HTTP API v2 mi
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | review | ← W33 | [link](stories/US-13.18-paraspell-http-api-v2.md) |
+| US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | done | ← W33 | [link](stories/US-13.18-paraspell-http-api-v2.md) |
 | US-42.17 | QC — Update ParaSpell API integration to v2 on Extension (#5051) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) |
 | US-42.16 | QC — Chainlist update: PRDCTR chain (#708) + TUSDT symbol (#707) | EPIC-42 | P3 | 3 | done | new | [link](stories/US-42.16-qc-chainlist-update-prdctr-chain-and-tusdt-symbol.md) |
 | US-42.18 | QC — Remove XCM routes dropped in ParaSpell XCM API v2 (#705) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.18-qc-issue-705-remove-dropped-xcm-routes.md) |
@@ -97,3 +97,54 @@ Unchanged from [2026-08-13 §D](../notes/2026-08-13.md): `projectV2` needs `read
 available token carries `gist, read:org, repo`. This window was opened from `gh issue view`,
 `gh pr view` and git alone. **No board column is claimed as current**, and if a card moved, nothing
 here would show it.
+
+---
+
+## Closeout — 2026-08-25
+
+The window ended **2026-08-23**. Closed two days later from `gh` + git; the board still could not be
+read (`read:project` scope unavailable, unchanged since 2026-08-13).
+
+### 5 of 5 stories · 23 of 23 points — everything closed
+
+| US | | Pts |
+| --- | --- | --- |
+| [US-13.18](stories/US-13.18-paraspell-http-api-v2.md) | ParaSpell `/v1` → `/v2`, **shipped v1.3.88** | 2 |
+| [US-42.17](stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | QC of that migration — 10/10 AC, fresh install + upgrade | 5 |
+| [US-42.16](stories/US-42.16-qc-chainlist-update-prdctr-chain-and-tusdt-symbol.md) | QC — chainlist: PRDCTR chain, TUSDT symbol | 3 |
+| [US-42.18](stories/US-42.18-qc-issue-705-remove-dropped-xcm-routes.md) | QC — XCM routes dropped in ParaSpell v2 | 5 |
+| [US-42.19](stories/US-42.19-qc-release-extension-v1-3-88.md) | QC — release v1.3.88 | 8 |
+
+**This is the first window in the record to close at 100%.** W33 closed at 3 of 13; W34 closed at
+5 of 5. The difference is not velocity — it is **scope honesty**. W34 was opened deliberately small
+(3 stories / 7 points) around the only work with live tracker evidence, and the four QC stories were
+written inside the window as the release moved. Nothing stale was carried in to pad it.
+
+### The release
+
+**v1.3.88**, cut 2026-08-19 from `master` (`93734db9cb`), carrying:
+
+- ParaSpell HTTP API v2 (#5051) — PR [#5053](https://github.com/Koniverse/SubWallet-Extension/pull/5053) merged 08-18, `da2207be1b`
+- Chainlist stable — PRDCTR chain, TUSDT symbol
+- Removal of XCM routes for chains ParaSpell dropped in v2
+
+Lineage verified: `git merge-base --is-ancestor da2207be1b 93734db9cb` passes; `git tag --contains
+da2207be1b` returns exactly `v1.3.88`.
+
+### One thing that did not go to plan
+
+[2026-08-18 §C](../notes/2026-08-18.md) flagged that PR #5053's two approvals both dated 2026-08-10
+while commits kept landing after them. **That gap was never closed** — the PR reached eight commits
+and merged on 08-18 with no re-review of the final head. It shipped and QC passed 10/10, so no harm
+is visible; the process point stands regardless, and is recorded rather than quietly dropped because
+it was raised *before* the merge.
+
+### Still not moving — the eight W33 stories
+
+Re-checked 2026-08-25. All six anchors OPEN, and **every last-touched date is byte-identical to the
+2026-08-18 check**: #4451 2025-11-18, #4889 2026-01-19, #4424 2026-01-19, #4946 2026-03-24,
+#4984 2026-04-08, #4995 2026-05-21.
+
+They have now sat out **three consecutive windows** — W31, W33 and W34 — and remain on
+`sprint-2026-W33`. Not carried into [W35](sprint-2026-W35.md), for the reasons given in
+[W33 § Closeout](sprint-2026-W33.md). The open planning call is unchanged and is now a month old.

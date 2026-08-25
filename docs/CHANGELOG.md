@@ -36,8 +36,21 @@ Release history for **SubWallet Extension**, in the koni-docs changelog format.
 (empty — track unreleased changes here; new version sections are inserted above the
 previous version, anchored on this block, per the koni-docs changelog template)
 
-<!-- No version drift: the newest entry below is 1.3.87, and VERSION and PRD.md
-     both read 1.3.87 (synced 2026-08-13 — see docs/notes/2026-08-13.md). -->
+<!-- No version drift: the newest entry below is 1.3.88, and VERSION and PRD.md
+     both read 1.3.88 (synced 2026-08-25 — see docs/notes/2026-08-25.md). -->
+
+---
+
+## [1.3.88] — 2026-08-19 — Release 1.3.88 (Koni) — v1.3.88
+
+### Changed
+- Migrate the ParaSpell HTTP integration from `/v1` to `/v2` across every XCM endpoint the wallet calls — transfer build, `xcm-fee`, `transferable-amount`, dry-run preview and the swap-bridge path (#5051)
+- Update chainlist (stable): add support for the PRDCTR chain, and update the TUSDT token symbol
+
+### Removed
+- Remove the XCM routes for chains ParaSpell dropped in its XCM API v2, so the wallet no longer offers a cross-chain route the upstream API will refuse
+
+**Commit**: 93734db9cb
 
 ---
 
