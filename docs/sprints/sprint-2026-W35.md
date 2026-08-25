@@ -3,7 +3,7 @@ id: sprint-2026-W35
 status: in-progress
 start: 2026-08-24
 end: 2026-08-30
-goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #5062 — a KAH↔PAH USDt XCM route that has already trapped 72,614 USDT of a user's funds; the other is the passkey unlock feature (#5058), whose PR finally answered what its empty issue never stated. Opened 2026-08-25 from tracker, PR and git evidence. The eight stalled W33 stories were again not carried in — a third window running."
+goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #5062 — a KAH↔PAH USDt XCM route the wallet offers but the asset cannot cross, leaving the tokens locked on the destination chain; alongside it, passkey unlock (#5058) and the Bittensor root claim path (#5064), each of whose PR answered what its empty issue never stated. Opened 2026-08-25 from tracker, PR and git evidence. The eight stalled W33 stories were again not carried in — a third window running."
 ---
 
 ## Sprint scope
@@ -27,7 +27,8 @@ being live. W34 closed at 5 of 5 on that basis.
 
 [#5062](https://github.com/Koniverse/SubWallet-Extension/issues/5062) is not a latent risk.
 `statemine-LOCAL-USDt` is the Kusama-AH-native USDt, `AssetRef.json` offers it an XCM route to
-Polkadot Asset Hub, and that asset cannot cross the bridge — **a user lost 72,614 USDT** sending it.
+Polkadot Asset Hub, and that asset cannot cross the bridge — **the tokens end up locked on the
+destination chain**, and this has already happened on a real transfer.
 `statemine-LOCAL-USDC` already models the bridged case correctly, so USDt is the odd one out.
 
 **The fix has two halves and only one of them is in this repository:**
@@ -42,7 +43,7 @@ issue prescribes. Merging it will close #5062 by the `[Issue-N]` convention and 
 undone with its issue closed. **The bad route stays live in production data until half 1 lands** —
 flagged on the story and worth confirming before merge.
 
-**PR #5063 adds no test.** For a bug that has already cost a user five figures, AC-6 on the story
+**PR #5063 adds no test.** For a bug that has already stranded a real transfer, AC-6 on the story
 asks for a regression test and nothing currently satisfies it.
 
 ### US-5.16 — the empty issue got answered by code
@@ -102,13 +103,13 @@ a shape:
 
 | PR | Story | Reviews | Tests |
 | --- | --- | --- | --- |
-| [#5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | US-13.19 (**P0**, funds already lost) | 1 | **none** |
+| [#5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | US-13.19 (**P0**, tokens locked on the wrong chain) | 1 | **none** |
 | [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) | US-5.16 (unlock path) | **0** | 2 spec files |
 | [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) | US-12.23 (reward claim) | **0** | **none** |
 
 Two of the three touch money paths directly and neither has a test. The P0 — a bug that has already
-cost a user 72,614 USDT — has one approval and no regression test. Recorded as an observation about
-this window, not a process ruling.
+stranded a real transfer — has one approval and no regression test. Recorded as an observation
+about this window, not a process ruling.
 
 ## Not in this window — the eight stalled W33 stories
 

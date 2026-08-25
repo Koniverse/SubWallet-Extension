@@ -149,7 +149,7 @@ it bridges.
 | [US-13.16](../stories/US-13.16-asset-hub-migration-and-relay-chain-wind-down.md) | Asset Hub Migration & relay-chain wind-down | Disable, re-point, re-enable — surviving an ecosystem event the wallet did not control | ✅ done | 1.3.66 |
 | [US-13.17](../stories/US-13.17-open-xcm-route-and-bridge-coverage.md) | Open XCM route & bridge coverage | Corridors and bridge options asked for and never delivered | 📋 backlog | — |
 | [US-13.18](../stories/US-13.18-paraspell-http-api-v2.md) | ParaSpell HTTP API v2 migration | Move the six ParaSpell endpoints off `/v1` before it is retired (#5051) | ✅ done | 1.3.88 |
-| [US-13.19](../stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) | Repoint KAH↔PAH USDt XCM refs | The KAH-native USDt is offered a bridge route it cannot cross — funds land trapped on PAH; **72,614 USDT already lost** (#5062) | 👀 review | — |
+| [US-13.19](../stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) | Repoint KAH↔PAH USDt XCM refs | The KAH-native USDt is offered a bridge route it cannot cross, so the tokens end up **locked on the destination chain**; already hit a real transfer (#5062) | 👀 review | — |
 
 > **US-13.12 … US-13.17 carry no FR.** They hold the incremental work, fixes and chores that landed
 > on this epic — **115 tracker issues**, folded in from the former one-issue-per-story maintenance
