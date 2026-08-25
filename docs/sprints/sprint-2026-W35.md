@@ -15,7 +15,7 @@ goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #506
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← backlog | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 | US-42.20 | QC — Biometric / passkey login (#5058) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) |
 | US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | ready | new | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
-| US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | **P0** | 5 | ready | new | [link](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) |
+| US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | **P0** | 5 | done | new | [link](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) |
 | US-42.23 | QC — Manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | ready | new | [link](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) |
 
 **7 stories · 41 points** — 3 dev stories (18 pts) and 4 QC stories (23 pts). The three dev stories
@@ -24,31 +24,32 @@ Between them they carry **two reviews** (`saltict` on #5063, `lw-cdm` on #5065) 
 QC pass** ([US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md), 14/14 on #5061 —
 which is the PR with no review at all).
 
-The one `done` in this window is a QC story, not a dev story: US-42.20 passed against a PR build.
-**Nothing has shipped.**
+The two `done` in this window are both QC stories, not dev stories. **No extension code has shipped**
+— every dev PR is still open.
 
-**Every dev story in this window now has its own QC story**, all four written on 2026-08-25
-alongside the dev work rather than after it:
+**Every dev story in this window has its own QC story**, all four written on 2026-08-25 alongside
+the dev work rather than after it:
 
 | Dev story | QC story | State |
 | --- | --- | --- |
 | US-5.16 — passkey login | [US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) | **done**, 14 / 14, no bugs |
-| US-13.19 — **P0** KAH↔PAH USDt | [US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | `ready` |
+| US-13.19 — **P0** KAH↔PAH USDt | [US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | **done**, 15 / 15, no bugs |
 | US-12.23 — Bittensor root claim | [US-42.23](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | `ready` |
 | *(all three together)* | [US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) — release gate | `ready` |
 
-US-42.20 ran against PR #5061 at commit `cab8ebd5ee`. Because that commit is **not merged**, the
-result is a claim about that build and not about whatever eventually lands; the release gate
-re-verifies rather than inherits it.
+Both passes ran against **unmerged PR builds**, so each is a claim about a specific commit rather
+than about what eventually lands; the release gate re-verifies rather than inherits them. The one
+exception is the **chainlist half of the P0**, which is merged and live in production data
+independently of this repo — see below.
 
 [US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) **has not run** — there is no v1.3.89
 tag, `VERSION` is at 1.3.88, and all three content PRs are still open. It stays `ready` until a
 build exists.
 
-The two new feature QC stories are both written from the **code in the PRs**, because neither issue
-carries testable requirements on its own: #5064 has an empty body, and #5062 has a detailed spec
-that describes the **chainlist data fix** — which is not what PR #5063 in this repo does. That gap
-is AC-9 on US-42.22.
+Both new feature QC stories are written from the **code in the PRs**, because neither issue supplies
+testable requirements on its own: #5064 has an empty body, and #5062's spec describes the
+**chainlist data fix**, which is not what PR #5063 in this repo does. Forcing that distinction into
+an acceptance criterion (AC-9 on US-42.22) is what surfaced the correction below.
 
 Small again, and for the same reason [W34](sprint-2026-W34.md) was: this is what has evidence of
 being live. W34 closed at 5 of 5 on that basis.
@@ -63,20 +64,34 @@ Polkadot Asset Hub, and that asset cannot cross the bridge — **the tokens end 
 destination chain**, and this has already happened on a real transfer.
 `statemine-LOCAL-USDC` already models the bridged case correctly, so USDt is the odd one out.
 
-**The fix has two halves and only one of them is in this repository:**
+**The fix has two halves, in two repositories — and both are accounted for:**
 
 | Half | Where | State |
 | --- | --- | --- |
-| Chainlist data — 4 edits to `ChainAsset.json` / `AssetRef.json` / `AssetLogoMap.json` | `SubWallet-ChainList` | **no issue, no PR found** (checked 08-25) |
+| Chainlist data — `ChainAsset.json` +71, `AssetRef.json` +4/−4, `AssetLogoMap.json` +1 | [ChainList PR #709](https://github.com/Koniverse/SubWallet-ChainList/pull/709) `[Issue-5062-extension]` | **merged 2026-08-24** |
 | Validation logic — `xcm/utils.ts` +162 | [PR #5063](https://github.com/Koniverse/SubWallet-Extension/pull/5063) | open, approved by `saltict` 08-24 |
 
-The PR's commit is *"feat: update validate logic"*: it adds a **guard**, not the data edits the
-issue prescribes. Merging it will close #5062 by the `[Issue-N]` convention and leave the data half
-undone with its issue closed. **The bad route stays live in production data until half 1 lands** —
-flagged on the story and worth confirming before merge.
+> **Correction, 2026-08-25.** This table previously read *"no issue, no PR found"* for the data half.
+> That was wrong. ChainList PR #709 exists and merged on 08-24 with exactly the four edits the issue
+> prescribes; it was missed because it is titled `[Issue-5062-extension]` and lives in the ChainList
+> repo, so neither an issue search nor a PR search in this repo surfaces it. **The bad route is
+> genuinely removed from production data, not merely blocked in the client** — which is the opposite
+> of the risk recorded here earlier, and worth stating plainly rather than quietly editing.
+>
+> The lesson generalises: a fix that spans repositories is not absent just because it is absent
+> *here*. Search the other repo by issue number in the title, not only by its own issue list.
+
+PR #5063's commit is *"feat: update validate logic"*: it adds a **guard**, not the data edits. With
+the data half merged, the two are belt and braces — the data stops the route being offered, the
+guard stops it being built if it is ever reached again.
 
 **PR #5063 adds no test.** For a bug that has already stranded a real transfer, AC-6 on the story
 asks for a regression test and nothing currently satisfies it.
+
+**QC passed 15 / 15** — [US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md),
+2026-08-25, fresh install and upgrade, no bugs. It confirmed both halves are in the build, that the
+KAH-native USDt offers no XCM route at all, and that nothing else was caught by the guard: USDC on
+the same route, same-consensus XCM, and other supported cross-consensus routes all still work.
 
 ### US-5.16 — the empty issue got answered by code
 
