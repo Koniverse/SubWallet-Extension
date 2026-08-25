@@ -10,6 +10,7 @@ export interface PasskeyEnrollment {
   credentialId: string;
   prfInput: string;
   unlockSecret: string;
+  transports?: string[];
 }
 
 export interface PasskeyAssertionResult {
@@ -25,30 +26,94 @@ interface PrfResult {
   };
 }
 
-// Chrome draws its passkey prompt inside whichever surface asked for it and clips it there, so in
-// the extension popup everything past the 388px body is cut off - the Cancel button included. The
-// popup is sized from its own document, so widening the body is the only lever there is. The page
-// is left to fill that width: pinning it to its own size instead just exposes the body behind it as
-// bars down the sides.
-const PROMPT_MIN_WIDTH = 480;
+// Chrome draws its passkey prompt inside whichever surface asked for it and clips it at that
+// surface's edge, so the prompt has to be given room before the ceremony starts. How that is done
+// depends on the surface, and the two are not interchangeable: the toolbar popup is sized from its
+// own document, so widening the body is the only lever there is - and there is none at all for
+// height, since the popup already sits at the 600px ceiling the browser allows one. The dapp
+// confirmation is a real browser window, which has no such ceiling but never resizes itself to fit
+// its document, so body width does nothing there and it has to be resized through chrome.windows.
+// Chrome draws the prompt as one of its own modal dialogs, which is a fixed width and sits against
+// the left of the web contents rather than centred in them. Any room past that width is not spread
+// around it, it lands as a strip of empty page down the right-hand side - so the surface is sized to
+// the dialog rather than generously.
+const PROMPT_WIDTH = 448;
+const PROMPT_MIN_HEIGHT = 640;
 const PROMPT_BODY_CLASS = '-passkey-prompt-mode';
+const SETTLE_FRAMES = 20;
+// A window frame is a handful of pixels; anything larger means innerWidth is not measuring what this
+// assumes (page zoom, say), and guessing wide enough to clip the dialog is worse than a small gap.
+const MAX_WINDOW_FRAME = 40;
+
+type PromptSurface = 'side-panel' | 'window' | 'popup';
+type RestorePromptRoom = () => void;
 
 function nextFrame (): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 }
 
-// Returns a callback that puts the width back, or null when the surface already has the room - the
-// side panel is sized by the browser and the expanded view is wide enough on its own.
-function reservePromptWidth (): (() => void) | null {
+function promptSurface (): PromptSurface {
+  const path = window.location.pathname;
+
+  if (path.includes('side-panel.html')) {
+    return 'side-panel';
+  }
+
+  return path.includes('notification.html') ? 'window' : 'popup';
+}
+
+// The browser owns the resize, so the document only catches up a frame or more later - and the
+// prompt is measured against whatever it finds the moment it opens.
+async function settleWidth (): Promise<void> {
+  for (let frame = 0; frame < SETTLE_FRAMES && window.innerWidth < PROMPT_WIDTH; frame++) {
+    await nextFrame();
+  }
+}
+
+async function reserveWindowRoom (): Promise<RestorePromptRoom | null> {
+  const { height = 0, id, width = 0 } = await chrome.windows.getCurrent();
+
+  if (id === undefined || (window.innerWidth >= PROMPT_WIDTH && height >= PROMPT_MIN_HEIGHT)) {
+    return null;
+  }
+
+  const body = document.body;
+  const previousWidth = body.style.width;
+
+  // The confirmation document is a fixed width of its own, so the extra room would otherwise show
+  // up as bare background down the sides. Stretch it for as long as the window is wider.
+  body.style.width = '100%';
+  body.classList.add(PROMPT_BODY_CLASS);
+
+  // chrome.windows sizes the whole window, frame included, while the dialog is laid out against the
+  // web contents inside it. Measuring the frame here rather than assuming one keeps the two ends
+  // lined up across platforms, which is the difference between a flush dialog and a gap beside it.
+  const frame = Math.min(Math.max(width - window.innerWidth, 0), MAX_WINDOW_FRAME);
+
+  await chrome.windows.update(id, {
+    height: Math.max(height, PROMPT_MIN_HEIGHT),
+    width: Math.max(width, PROMPT_WIDTH + frame)
+  });
+  await settleWidth();
+
+  return () => {
+    body.classList.remove(PROMPT_BODY_CLASS);
+    body.style.width = previousWidth;
+    chrome.windows.update(id, { height, width }).catch(console.error);
+  };
+}
+
+function reservePopupRoom (): RestorePromptRoom | null {
   const body = document.body;
 
-  if (window.location.pathname.includes('side-panel.html') || body.clientWidth >= PROMPT_MIN_WIDTH) {
+  if (body.clientWidth >= PROMPT_WIDTH) {
     return null;
   }
 
   const previousWidth = body.style.width;
 
-  body.style.width = `${PROMPT_MIN_WIDTH}px`;
+  // No frame to account for here - the popup is sized straight from this document.
+  body.style.width = `${PROMPT_WIDTH}px`;
   body.classList.add(PROMPT_BODY_CLASS);
 
   return () => {
@@ -57,21 +122,45 @@ function reservePromptWidth (): (() => void) | null {
   };
 }
 
-// Holds the width for as long as the caller keeps the returned callback unused. The unlock screen
-// uses this so the popup is already the size the prompt needs the moment it opens: resizing once
-// the prompt is on screen shifts the popup sideways under the user, since the browser keeps it
-// anchored to the toolbar icon.
-export function holdPasskeyPromptWidth (): () => void {
-  const restore = reservePromptWidth();
+// Returns a callback that puts the surface back, or null when it already has the room - the side
+// panel is sized by the browser and the expanded view is wide enough on its own. Reserving twice is
+// harmless: the second call sees a surface that already measures up and takes no action.
+function reservePromptRoom (): Promise<RestorePromptRoom | null> {
+  switch (promptSurface()) {
+    case 'side-panel':
+      return Promise.resolve(null);
+    case 'window':
+      return reserveWindowRoom();
+    default:
+      return Promise.resolve(reservePopupRoom());
+  }
+}
 
-  return () => restore?.();
+// Holds the room for as long as the caller keeps the returned callback unused. The unlock screen
+// uses this so the surface is already the size the prompt needs the moment it opens: resizing once
+// the prompt is on screen shifts it sideways under the user, since the popup stays anchored to the
+// toolbar icon.
+export function holdPasskeyPromptRoom (): RestorePromptRoom {
+  const pending = reservePromptRoom();
+  let released = false;
+
+  pending.catch(console.error);
+
+  return () => {
+    if (released) {
+      return;
+    }
+
+    released = true;
+    pending.then((restore) => restore?.()).catch(console.error);
+  };
 }
 
 async function withPromptRoom<T> (ceremony: () => Promise<T>): Promise<T> {
-  const restore = reservePromptWidth();
+  const restore = await reservePromptRoom();
 
-  // The popup needs a moment to settle at its new size and the prompt is measured against it as it
-  // opens, so wait either way - the width may have been reserved a frame ago by the unlock screen.
+  // The surface needs a moment to settle at its new size and the prompt is measured against it as
+  // it opens, so wait either way - the room may have been reserved a frame ago by the unlock screen.
   await nextFrame();
 
   try {
@@ -158,14 +247,19 @@ export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {
 
   const credentialId = u8aToHex(new Uint8Array(credential.rawId));
   const output = prfResult(credential);
+  // Recording this is what keeps later unlocks on the short verification sheet instead of the full
+  // chooser - see PasskeyUnlockContext.transports. Absent on older browsers, which is fine: an
+  // enrollment without it just behaves the way every enrollment used to.
+  const transports = (credential.response as { getTransports?: () => string[] }).getTransports?.() || [];
 
   try {
     return {
       credentialId,
       prfInput: u8aToHex(initialInput),
+      transports: transports.length ? transports : undefined,
       unlockSecret: output
         ? u8aToHex(output)
-        : (await evaluatePasskeyCredential(credentialId, u8aToHex(initialInput))).unlockSecret
+        : (await evaluatePasskeyCredential(credentialId, u8aToHex(initialInput), transports)).unlockSecret
     };
   } catch (error) {
     await forgetPasskeyCredential(credentialId);
@@ -176,7 +270,7 @@ export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {
   }
 }
 
-export async function evaluatePasskeyCredential (credentialId: string, encodedInput: string): Promise<PasskeyAssertionResult> {
+export async function evaluatePasskeyCredential (credentialId: string, encodedInput: string, transports?: string[]): Promise<PasskeyAssertionResult> {
   const currentInput = hexToU8a(encodedInput);
 
   try {
@@ -184,7 +278,11 @@ export async function evaluatePasskeyCredential (credentialId: string, encodedIn
       publicKey: {
         challenge: toBufferSource(randomBytes()),
         rpId: chrome.runtime.id,
-        allowCredentials: [{ type: 'public-key', id: toBufferSource(hexToU8a(credentialId)) }],
+        allowCredentials: [{
+          type: 'public-key',
+          id: toBufferSource(hexToU8a(credentialId)),
+          ...(transports?.length ? { transports: transports as AuthenticatorTransport[] } : {})
+        }],
         userVerification: 'required',
         extensions: {
           prf: { eval: { first: toBufferSource(currentInput) } }

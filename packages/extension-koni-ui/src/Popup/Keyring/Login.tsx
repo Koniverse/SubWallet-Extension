@@ -11,7 +11,7 @@ import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext } fro
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils/form/form';
-import { evaluatePasskeyCredential, holdPasskeyPromptWidth, isPasskeyPromptCancelled } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
+import { evaluatePasskeyCredential, holdPasskeyPromptRoom, isPasskeyPromptCancelled } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
 import { Button, Form, Icon, Image, Input, ModalContext } from '@subwallet/react-ui';
 import { Fingerprint } from 'phosphor-react';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -90,7 +90,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     setPasskeyUnlockError('');
 
     try {
-      const evaluation = await evaluatePasskeyCredential(passkeyUnlockContext.credentialId, passkeyUnlockContext.prfInput);
+      const evaluation = await evaluatePasskeyCredential(passkeyUnlockContext.credentialId, passkeyUnlockContext.prfInput, passkeyUnlockContext.transports);
       const response = await passkeyUnlockAuthenticate(evaluation);
 
       if (response.status) {
@@ -118,10 +118,10 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     passkeyUnlockGetContext().then(setPasskeyUnlockContext).catch(console.error);
   }, []);
 
-  // Take the width the browser prompt needs up front, so it is already in place if the user asks
+  // Take the room the browser prompt needs up front, so it is already in place if the user asks
   // for passkey unlock. Released when this screen goes away, which is once the wallet is open.
   useEffect(() => {
-    return passkeyUnlockContext ? holdPasskeyPromptWidth() : undefined;
+    return passkeyUnlockContext ? holdPasskeyPromptRoom() : undefined;
   }, [passkeyUnlockContext]);
 
   useEffect(() => {

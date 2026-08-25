@@ -15,9 +15,27 @@ Object.defineProperty(globalThis, 'chrome', {
   }
 });
 
+// Before running the ceremony these helpers size the surface the browser will draw its prompt in,
+// so they measure the popup document even though nothing here is about the assertion itself.
+function mockPopupSurface () {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: { innerWidth: 388, location: { pathname: '/index.html' } }
+  });
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: { body: { classList: { add: jest.fn(), remove: jest.fn() }, clientWidth: 388, style: {} } }
+  });
+  Object.defineProperty(globalThis, 'requestAnimationFrame', {
+    configurable: true,
+    value: (callback: (time: number) => void) => setTimeout(() => callback(0), 0)
+  });
+}
+
 describe('passkey unlock', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPopupSurface();
     Object.defineProperty(globalThis, 'navigator', {
       configurable: true,
       value: { credentials: { get: getCredential } }
@@ -42,5 +60,26 @@ describe('passkey unlock', () => {
     expect(options.rpId).toBe('subwallet');
     expect(new Uint8Array(options.extensions.prf.eval.first)).toEqual(new Uint8Array([3, 4]));
     expect(options.extensions.prf.evalByCredential).toBeUndefined();
+    expect(options.allowCredentials[0].transports).toBeUndefined();
+  });
+
+  it('replays the recorded transports so the browser can skip its passkey chooser', async () => {
+    getCredential.mockResolvedValue({
+      getClientExtensionResults: () => ({ prf: { results: { first: new Uint8Array([1]).buffer } } })
+    });
+
+    await evaluatePasskeyCredential('0x0102', '0x0304', ['internal']);
+
+    expect(getCredential.mock.calls[0][0].publicKey.allowCredentials[0].transports).toEqual(['internal']);
+  });
+
+  it('omits transports for enrollments made before they were recorded', async () => {
+    getCredential.mockResolvedValue({
+      getClientExtensionResults: () => ({ prf: { results: { first: new Uint8Array([1]).buffer } } })
+    });
+
+    await evaluatePasskeyCredential('0x0102', '0x0304', []);
+
+    expect('transports' in getCredential.mock.calls[0][0].publicKey.allowCredentials[0]).toBe(false);
   });
 });

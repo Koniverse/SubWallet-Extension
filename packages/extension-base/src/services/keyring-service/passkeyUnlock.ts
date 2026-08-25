@@ -15,6 +15,8 @@ interface PasskeyUnlockRecord {
   input: string;
   ciphertext: string;
   nonce: string;
+  // Optional: enrollments made before this was recorded simply have no transport hint to give back.
+  transports?: string[];
 }
 
 function readRecord (): Promise<PasskeyUnlockRecord | null> {
@@ -128,13 +130,14 @@ function isCompleteRecord (record: PasskeyUnlockRecord | null): record is Passke
     !!record.nonce;
 }
 
-export async function enrollPasskeyUnlock ({ credentialId, password, prfInput, unlockSecret }: RequestPasskeyUnlockEnroll): Promise<void> {
+export async function enrollPasskeyUnlock ({ credentialId, password, prfInput, transports, unlockSecret }: RequestPasskeyUnlockEnroll): Promise<void> {
   const wrapped = await wrapWalletPassword(password, unlockSecret);
 
   await writeRecord({
     schemaVersion: 2,
     credential: credentialId,
     input: prfInput,
+    ...(transports?.length ? { transports } : {}),
     ...wrapped
   });
 }
@@ -143,7 +146,7 @@ export async function getPasskeyUnlockContext (): Promise<PasskeyUnlockContext |
   const record = await readRecord();
 
   return isCompleteRecord(record)
-    ? { credentialId: record.credential, prfInput: record.input }
+    ? { credentialId: record.credential, prfInput: record.input, transports: record.transports }
     : null;
 }
 

@@ -2000,6 +2000,10 @@ export interface ResponseUnlockKeyring {
 export interface PasskeyUnlockContext {
   credentialId: string;
   prfInput: string;
+  // Where the authenticator said the credential lives. Without it the browser has to assume the
+  // credential could be anywhere and offers every route it knows, which is what turns a short
+  // verification sheet into the full "on this device / on other devices" chooser.
+  transports?: string[];
 }
 
 export interface RequestPasskeyUnlockEnroll extends PasskeyUnlockContext {

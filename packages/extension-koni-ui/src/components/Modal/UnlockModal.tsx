@@ -102,7 +102,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     setPasskeyUnlockLoading(true);
 
     try {
-      const evaluation = await evaluatePasskeyCredential(passkeyUnlockContext.credentialId, passkeyUnlockContext.prfInput);
+      const evaluation = await evaluatePasskeyCredential(passkeyUnlockContext.credentialId, passkeyUnlockContext.prfInput, passkeyUnlockContext.transports);
       const response = await passkeyUnlockAuthenticate(evaluation);
 
       if (!response.status) {
