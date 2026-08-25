@@ -114,13 +114,13 @@ const Component: React.FC<Props> = ({ className }: Props) => {
         unlock();
       } else {
         !response.enrolled && setPasskeyUnlockContext(null);
-        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.passkeyUnlockFailed'));
+        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
       }
     } catch (error) {
       console.error('Passkey unlock failed', error);
 
       if (!isPasskeyPromptCancelled(error)) {
-        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.passkeyUnlockFailed'));
+        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
       }
     } finally {
       setPasskeyUnlockLoading(false);
@@ -231,7 +231,7 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                   onClick={onClickPasskeyUnlock}
                   schema='secondary'
                 >
-                  {t('ui.ACCOUNT.screen.Keyring.Login.unlockWithPasskey')}
+                  {t('ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics')}
                 </Button>
                 {!!passkeyUnlockError && <div className='passkey-unlock-error'>{passkeyUnlockError}</div>}
               </Form.Item>

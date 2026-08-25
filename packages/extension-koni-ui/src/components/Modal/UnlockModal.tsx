@@ -120,12 +120,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
       if (!response.status) {
         !response.enrolled && setPasskeyUnlockContext(null);
-        onError(t('ui.ACCOUNT.screen.Keyring.Login.passkeyUnlockFailed'));
+        onError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
       }
     } catch (error) {
       if (!isPasskeyPromptCancelled(error)) {
         console.log('Passkey unlock error:', error);
-        onError(t('ui.ACCOUNT.screen.Keyring.Login.passkeyUnlockFailed'));
+        onError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
       }
     } finally {
       setPasskeyUnlockLoading(false);
@@ -165,7 +165,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
             onClick={onClickPasskeyUnlock}
             schema='secondary'
           >
-            {t('ui.ACCOUNT.screen.Keyring.Login.unlockWithPasskey')}
+            {t('ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics')}
           </Button>
         )}
         <Form

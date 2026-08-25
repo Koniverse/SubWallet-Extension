@@ -267,7 +267,7 @@ export async function registerPasskeyCredential (): Promise<PasskeyEnrollment> {
   })) as PublicKeyCredential | null;
 
   if (!credential) {
-    throw new Error('Passkey unlock setup was cancelled');
+    throw new Error('Biometric unlock setup was cancelled');
   }
 
   const credentialId = u8aToHex(new Uint8Array(credential.rawId));
@@ -319,7 +319,7 @@ export async function evaluatePasskeyCredential (credentialId: string, encodedIn
     const output = result?.results?.first && new Uint8Array(result.results.first);
 
     if (!output) {
-      throw new Error('This passkey cannot provide a secure unlock secret');
+      throw new Error('This device cannot provide a secure unlock secret');
     }
 
     try {
