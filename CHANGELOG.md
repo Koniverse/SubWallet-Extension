@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 1.3.88
+Build date: Aug 19, 2026.
+
+Features & Updates:
+- Update ParaSpell API integration to v2 (#5051)
+- Update chainlist stable:
+  - Add support for PRDCTR chain
+  - Update TUSDT token symbol
+  - Remove XCM routes for chains dropped in ParaSpell XCM API v2
+
+
+## 1.3.87
+Build date: Aug 12, 2026.
+
+Features & Updates:
+- Update nominator unstaking eras (#5055)
+
+
 ## 1.3.86
 Build date: Aug 06, 2026.
 
