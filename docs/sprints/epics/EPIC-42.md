@@ -1,10 +1,10 @@
 ---
 id: EPIC-42
 title: "QA Coverage Tracking"
-status: done
+status: in-progress
 prd_ref: []
 created: 2026-07-16
-updated: 2026-08-19
+updated: 2026-08-25
 ---
 
 ## Goal
@@ -52,17 +52,19 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.17](../stories/US-42.17-qc-issue-5051-paraspell-api-v2.md) | ParaSpell API v2 (#5051) — XCM regression QC; dev story is US-13.18 | done |
 | [US-42.18](../stories/US-42.18-qc-issue-705-remove-dropped-xcm-routes.md) | Remove XCM routes dropped in ParaSpell v2 (#705) | done |
 | [US-42.19](../stories/US-42.19-qc-release-extension-v1-3-88.md) | Release extension v1.3.88 — ParaSpell v2 (#5051) + chainlist (#708, #707, #705); dev, master, draft, production gate | done |
+| [US-42.20](../stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) | Biometric / passkey login (#5058) — PR #5061 build; 14 / 14 AC, no bugs | done |
+| [US-42.21](../stories/US-42.21-qc-release-extension-v1-3-89.md) | Release extension v1.3.89 — passkey login (#5058) + KAH↔PAH XCM refs (#5062) + Bittensor manual claim (#5064); dev, master, draft, production gate | ready |
 
 More rows get added here as testing starts.
 
 ## What this epic actually became — and the two holes it left
 
 > **The stated rule is not the practice.** "Each dev epic gets **one** QA page named
-> `US-42.<epic-number>`" describes a per-epic index. The 14 pages above are numbered
+> `US-42.<epic-number>`" describes a per-epic index. The 20 pages above are numbered
 > **sequentially** and are three different kinds of thing: per-issue QC (42.1–42.5, 42.7, 42.13,
-> 42.14, 42.15), per-release gate QC (42.6, 42.9, 42.10) and per-PR QC (42.11, 42.12). Neither the
+> 42.14, 42.15, 42.16, 42.17, 42.18, 42.20), per-release gate QC (42.6, 42.9, 42.10, 42.19, 42.21) and per-PR QC (42.11, 42.12). Neither the
 > naming nor the one-page-per-epic promise survived contact. Recorded, not "fixed" — renumbering
-> 14 pages to match a sentence would break every link to them, and the sentence is the cheaper
+> 20 pages to match a sentence would break every link to them, and the sentence is the cheaper
 > thing to change.
 
 **The sequence skips 8** — it runs 42.1…42.7, then 42.9. Nothing was deleted:
