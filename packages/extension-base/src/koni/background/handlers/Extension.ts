@@ -44,7 +44,7 @@ import { getClaimTxOnAvail, getClaimTxOnEthereum, isAvailChainBridge } from '@su
 import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/bittensorBridge/nativeTokenBridge';
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { estimateXcmFee } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
+import { estimateXcmFee, isXcmCurrencySupported } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
 import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainBitcoinCompatible, _isChainCompatibleLedgerEvm, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
@@ -1726,6 +1726,24 @@ export default class KoniExtension {
 
     const extrinsicType = ExtrinsicType.TRANSFER_XCM;
     const isSubstrateParaspellXcm = !(isAvailBridgeFromEvm || isAvailBridgeFromAvail || isSnowBridgeEvmTransfer || isPolygonBridgeTransfer || isPosBridgeTransfer || isAcrossBridgeTransfer || isBittensorBridgeTransfer || isSubtensorEvmBridgeTransfer);
+
+    // Bail out before building anything: on a cross-consensus route the wrong flavour of a token
+    // (local instead of bridged) is accepted by the origin but trapped on the destination.
+    if (isSubstrateParaspellXcm && destinationTokenInfo) {
+      const isCurrencySupported = await isXcmCurrencySupported(chainInfoMap[originTokenInfo.originChain], chainInfoMap[destinationTokenInfo.originChain], originTokenInfo);
+
+      if (!isCurrencySupported) {
+        return this.#koniState.transactionService.generateBeforeHandleResponseErrors([
+          new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.TRANSACTION.core.validation.transfer.tokenCannotBeBridgedToNetwork', {
+            replace: {
+              symbol: originTokenInfo.symbol,
+              originChainName: chainInfoMap[originTokenInfo.originChain].name,
+              destinationChainName: chainInfoMap[destinationTokenInfo.originChain].name
+            }
+          }))
+        ]);
+      }
+    }
 
     const isTransferNative = this.#koniState.getNativeTokenInfo(originNetworkKey).slug === tokenSlug;
     const isTransferLocalTokenAndPayThatTokenAsFee = !isTransferNative && tokenSlug === tokenPayFeeSlug;
