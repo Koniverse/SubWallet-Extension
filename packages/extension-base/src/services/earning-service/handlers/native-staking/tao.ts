@@ -122,8 +122,13 @@ export const DEFAULT_DTAO_MINBOND = '21000000';
  */
 const FIXED_POINT_32_DIVISOR = new BigN(2).pow(32);
 
-/** Chain default of `RootClaimableThreshold[0]`: 500_000 rao (0.0005 TAO) */
-export const DEFAULT_ROOT_CLAIM_THRESHOLD = '500000';
+/**
+ * Threshold used when the chain's own value can't be read. Zero means nothing is filtered: a
+ * wrong guess in the other direction would hide a claimable reward and lock the owner out of the
+ * claim screen, which is worse than briefly showing dust that a claim then skips.
+ */
+const UNKNOWN_ROOT_CLAIM_THRESHOLD = new BigN(0);
+
 /* Fetch data */
 export class BittensorCache {
   private static instance: BittensorCache | null = null;
@@ -559,25 +564,35 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Get pool reward */
 
   /**
-   * Total TAO a coldkey would realize right now by redeeming the beta baskets of every
-   * validator it root-stakes to, in rao. This is the "pending TAO owed" figure of the
-   * Root Reborn (v4.4.1) runtime; older nodes don't expose the API.
+   * TAO the coldkey can actually redeem right now, in rao. The chain skips any validator owing
+   * less than the threshold, so only the positions above it are counted: `getRootBasketOwed`
+   * would also include dust that no claim can move, which would leave the figure promising more
+   * than a claim delivers and would raise claim notifications nothing can satisfy.
    */
-  protected async getRootBasketOwed (address: string): Promise<string> {
-    const substrateApi = await this.substrateApi.isReady;
+  protected async getClaimableReward (address: string, threshold: BigN): Promise<string> {
+    const positions = await this.getRootBasketPositions(address);
 
-    if (!substrateApi.api.call?.betaBasketRuntimeApi?.getRootBasketOwed) {
-      return '0';
-    }
-
-    const owed = await substrateApi.api.call.betaBasketRuntimeApi.getRootBasketOwed(address);
-
-    return owed.toString();
+    return this.filterClaimablePositions(positions, threshold)
+      .reduce((total, position) => total.plus(position.payout), new BigN(0))
+      .toFixed();
   }
 
   /**
-   * Per-validator breakdown of the entitlements above. Needed because the dust threshold is
-   * applied per validator, not on the total.
+   * The positions a claim will actually settle. `root_claim_for_hotkey` skips a validator whose
+   * payout is under the threshold, so anything below it would only add weight to the transaction
+   * without paying out. Worthless positions go too, since the threshold can legitimately be zero.
+   */
+  protected filterClaimablePositions (positions: BasketPosition[], threshold: BigN): BasketPosition[] {
+    return positions.filter((position) => {
+      const payout = new BigN(position.payout);
+
+      return payout.gt(0) && payout.gte(threshold);
+    });
+  }
+
+  /**
+   * Per-validator entitlements of a coldkey, mark-to-market in rao. Empty on runtimes older than
+   * Root Reborn (v4.4.1), which have no beta basket API.
    */
   protected async getRootBasketPositions (address: string): Promise<BasketPosition[]> {
     const substrateApi = await this.substrateApi.isReady;
@@ -599,10 +614,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /** Minimum payout, in rao, a single validator must owe before the chain settles a claim on it */
   protected async getRootClaimThreshold (): Promise<BigN> {
     const substrateApi = await this.substrateApi.isReady;
-    const defaultThreshold = new BigN(DEFAULT_ROOT_CLAIM_THRESHOLD);
 
     if (!substrateApi.api.query.subtensorModule?.rootClaimableThreshold) {
-      return defaultThreshold;
+      return UNKNOWN_ROOT_CLAIM_THRESHOLD;
     }
 
     try {
@@ -610,16 +624,17 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       const bits = raw !== null && typeof raw === 'object' ? raw.bits : raw;
 
       if (bits === null || bits === undefined) {
-        return defaultThreshold;
+        return UNKNOWN_ROOT_CLAIM_THRESHOLD;
       }
 
       const threshold = new BigN(bits).dividedBy(FIXED_POINT_32_DIVISOR).integerValue(BigN.ROUND_FLOOR);
 
-      return threshold.isNaN() || threshold.lte(0) ? defaultThreshold : threshold;
+      // A chain that turns the dust check off reports 0, which is a value to honour, not to replace
+      return threshold.isNaN() || threshold.lt(0) ? UNKNOWN_ROOT_CLAIM_THRESHOLD : threshold;
     } catch (e) {
       console.error(e);
 
-      return defaultThreshold;
+      return UNKNOWN_ROOT_CLAIM_THRESHOLD;
     }
   }
 
@@ -633,6 +648,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     await this.substrateApi.isReady;
 
+    // Same for every address, so read it once per cycle rather than per address
+    const threshold = await this.getRootClaimThreshold();
+
     await Promise.all(useAddresses.map(async (address) => {
       if (cancel) {
         return;
@@ -640,7 +658,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
       try {
         // Resolves to '0' on runtimes without the beta basket API, so the UI still settles
-        const unclaimedReward = await this.getRootBasketOwed(address);
+        const unclaimedReward = await this.getClaimableReward(address, threshold);
 
         const earningRewardItem: EarningRewardItem = {
           ...this.baseInfo,
@@ -681,9 +699,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       this.getRootClaimThreshold()
     ]);
 
-    // A validator owing less than the threshold is skipped on-chain, so a claim built purely
-    // from dust would succeed as a no-op transaction that still charges a fee
-    const claimablePositions = positions.filter((position) => new BigN(position.payout).gte(threshold));
+    // A claim built purely from skipped positions would succeed as a no-op that still charges a fee
+    const claimablePositions = this.filterClaimablePositions(positions, threshold);
 
     if (positions.length > 0 && claimablePositions.length === 0) {
       return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold', { replace: { threshold: formatNumber(threshold, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } })));
