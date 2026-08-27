@@ -2792,5 +2792,9 @@
   "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "",
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
-  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
+  "ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed": "",
+  "ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics": "",
+  "ui.SETTINGS.screen.Setting.Security.passkeyUnlock": "",
+  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": ""
 }
