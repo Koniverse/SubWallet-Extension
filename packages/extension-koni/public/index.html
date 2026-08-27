@@ -6,9 +6,15 @@
   <link href="fonts/PlusJakartaSans/index.css" rel="stylesheet">
   <link href="./main.css" rel="stylesheet">
   <style>
+    html,
     body {
       width: 388px;
+      min-width: 388px;
+      max-width: 388px;
       height: 600px;
+      min-height: 600px;
+      max-height: 600px;
+      overflow: hidden;
     }
 
     .root-wrapper {
@@ -32,9 +38,15 @@
       overflow: hidden;
     }
 
+    html:has(body.-expanse-mode),
     body.-expanse-mode {
       width: 100%;
+      min-width: 0;
+      max-width: none;
       height: 100%;
+      min-height: 0;
+      max-height: none;
+      overflow: auto;
     }
 
     body.-expanse-mode .root-wrapper {

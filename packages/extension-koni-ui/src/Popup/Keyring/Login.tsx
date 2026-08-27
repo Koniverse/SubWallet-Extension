@@ -1,18 +1,23 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { PasskeyUnlockContext } from '@subwallet/extension-base/background/KoniTypes';
 import { Layout, PageWrapper, ResetWalletModal } from '@subwallet/extension-koni-ui/components';
 import { RESET_WALLET_MODAL } from '@subwallet/extension-koni-ui/constants';
+import { useExtensionDisplayModes, useSidePanelUtils } from '@subwallet/extension-koni-ui/hooks';
 import useTranslation from '@subwallet/extension-koni-ui/hooks/common/useTranslation';
-import useUILock from '@subwallet/extension-koni-ui/hooks/common/useUILock';
+import useUILock, { isManualLockRequested } from '@subwallet/extension-koni-ui/hooks/common/useUILock';
 import useFocusById from '@subwallet/extension-koni-ui/hooks/form/useFocusById';
-import { keyringUnlock } from '@subwallet/extension-koni-ui/messaging';
+import { keyringUnlock, passkeyUnlockAuthenticate, passkeyUnlockGetContext, windowOpen } from '@subwallet/extension-koni-ui/messaging';
+import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { FormCallbacks, FormFieldData } from '@subwallet/extension-koni-ui/types/form';
 import { simpleCheckForm } from '@subwallet/extension-koni-ui/utils/form/form';
-import { Button, Form, Image, Input, ModalContext } from '@subwallet/react-ui';
-import CN from 'classnames';
-import React, { useCallback, useContext, useState } from 'react';
+import { evaluatePasskeyCredential, holdPasskeyPromptRoom, isPasskeyPromptCancelled } from '@subwallet/extension-koni-ui/utils/passkeyUnlock';
+import { Button, Form, Icon, Image, Input, ModalContext } from '@subwallet/react-ui';
+import { Fingerprint } from 'phosphor-react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 type Props = ThemeProps
@@ -35,7 +40,15 @@ const Component: React.FC<Props> = ({ className }: Props) => {
 
   const [loading, setLoading] = useState(false);
   const [isDisable, setIsDisable] = useState(true);
+  const [passkeyUnlockLoading, setPasskeyUnlockLoading] = useState(false);
+  const [passkeyUnlockError, setPasskeyUnlockError] = useState('');
+  const [passkeyUnlockContext, setPasskeyUnlockContext] = useState<PasskeyUnlockContext | null>(null);
+  const passkeyAutoTriggered = useRef(false);
+  const isManualLock = useMemo(isManualLockRequested, []);
   const { unlock } = useUILock();
+  const { isSidePanelMode } = useExtensionDisplayModes();
+  const { closeSidePanel } = useSidePanelUtils();
+  const isLocked = useSelector((state: RootState) => state.accountState.isLocked);
 
   const onUpdate: FormCallbacks<LoginFormState>['onFieldsChange'] = useCallback((changedFields: FormFieldData[], allFields: FormFieldData[]) => {
     const { empty, error } = simpleCheckForm(allFields);
@@ -74,10 +87,88 @@ const Component: React.FC<Props> = ({ className }: Props) => {
     activeModal(RESET_WALLET_MODAL);
   }, [activeModal]);
 
+  const onPasskeyUnlock = useCallback(async () => {
+    if (!passkeyUnlockContext || passkeyUnlockLoading) {
+      return;
+    }
+
+    if (isSidePanelMode) {
+      const opened = await windowOpen({
+        allowedPath: '/',
+        params: { passkeyUnlock: 'true' }
+      });
+
+      opened && closeSidePanel();
+
+      return;
+    }
+
+    setPasskeyUnlockLoading(true);
+    setPasskeyUnlockError('');
+
+    try {
+      const evaluation = await evaluatePasskeyCredential(passkeyUnlockContext.credentialId, passkeyUnlockContext.prfInput, passkeyUnlockContext.transports);
+      const response = await passkeyUnlockAuthenticate(evaluation);
+
+      if (response.status) {
+        unlock();
+      } else {
+        !response.enrolled && setPasskeyUnlockContext(null);
+        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
+      }
+    } catch (error) {
+      console.error('Passkey unlock failed', error);
+
+      if (!isPasskeyPromptCancelled(error)) {
+        setPasskeyUnlockError(t('ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed'));
+      }
+    } finally {
+      setPasskeyUnlockLoading(false);
+    }
+  }, [closeSidePanel, isSidePanelMode, passkeyUnlockContext, passkeyUnlockLoading, t, unlock]);
+
+  const onClickPasskeyUnlock = useCallback(() => {
+    onPasskeyUnlock().catch(console.error);
+  }, [onPasskeyUnlock]);
+
+  useEffect(() => {
+    passkeyUnlockGetContext().then(setPasskeyUnlockContext).catch(console.error);
+  }, []);
+
+  // Take the room the browser prompt needs up front, so it is already in place if the user asks
+  // for passkey unlock. Released when this screen goes away, which is once the wallet is open.
+  useEffect(() => {
+    return passkeyUnlockContext ? holdPasskeyPromptRoom() : undefined;
+  }, [passkeyUnlockContext]);
+
+  // The passkey prompt can destroy a toolbar popup before its response clears the persisted UI
+  // lock. A reopened popup must trust the already-unlocked keyring instead of starting passkey again.
+  useEffect(() => {
+    if (!isManualLock && !isLocked) {
+      unlock();
+    }
+  }, [isLocked, isManualLock, unlock]);
+
+  useEffect(() => {
+    const trigger = () => {
+      if (isManualLock || !isLocked || passkeyAutoTriggered.current || !passkeyUnlockContext || passkeyUnlockLoading || document.visibilityState !== 'visible' || !document.hasFocus()) {
+        return;
+      }
+
+      passkeyAutoTriggered.current = true;
+      onPasskeyUnlock().catch(console.error);
+    };
+
+    trigger();
+    window.addEventListener('focus', trigger);
+
+    return () => window.removeEventListener('focus', trigger);
+  }, [isLocked, isManualLock, onPasskeyUnlock, passkeyUnlockContext, passkeyUnlockLoading]);
+
   useFocusById(passwordInputId);
 
   return (
-    <PageWrapper className={CN(className)}>
+    <PageWrapper className={className}>
       <Layout.Base>
         <div className='bg-image' />
         <div className='body-container'>
@@ -125,6 +216,26 @@ const Component: React.FC<Props> = ({ className }: Props) => {
                 {t('ui.ACCOUNT.screen.Keyring.Login.unlock')}
               </Button>
             </Form.Item>
+            {!!passkeyUnlockContext && (
+              <Form.Item>
+                <Button
+                  block={true}
+                  className='passkey-unlock-button'
+                  icon={(
+                    <Icon
+                      phosphorIcon={Fingerprint}
+                      weight='fill'
+                    />
+                  )}
+                  loading={passkeyUnlockLoading}
+                  onClick={onClickPasskeyUnlock}
+                  schema='secondary'
+                >
+                  {t('ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics')}
+                </Button>
+                {!!passkeyUnlockError && <div className='passkey-unlock-error'>{passkeyUnlockError}</div>}
+              </Form.Item>
+            )}
             <Form.Item>
               <div
                 className='forgot-password'
@@ -159,7 +270,7 @@ const Login = styled(Component)<Props>(({ theme }: Props) => {
       top: 0
     },
 
-    '.-side-panel-mode & .bg-image': {
+    '.-side-panel-mode & .bg-image, .-passkey-prompt-mode & .bg-image': {
       backgroundSize: 'cover'
     },
 
@@ -190,6 +301,17 @@ const Login = styled(Component)<Props>(({ theme }: Props) => {
 
       '.password-input': {
         marginTop: 62
+      },
+
+      '.passkey-unlock-button': {
+        marginTop: token.marginXS
+      },
+
+      '.passkey-unlock-error': {
+        color: token.colorError,
+        fontSize: token.fontSizeSM,
+        lineHeight: token.lineHeightSM,
+        marginTop: token.marginXS
       },
 
       '.forgot-password': {
