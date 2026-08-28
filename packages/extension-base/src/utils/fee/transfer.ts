@@ -198,7 +198,8 @@ export const calculateTransferMaxTransferable = async (id: string, request: Calc
         feeInfo: fee,
         transferAll: false,
         bitcoinApi,
-        network: network
+        network: network,
+        skipProtectedUtxos: true
       });
     } else {
       [transaction] = await createSubstrateExtrinsic({
