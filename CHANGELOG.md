@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.89
+Build date: Aug 28, 2026.
+
+Features & Updates:
+- Support biometric/passkey login for extension (#5058)
+- Repoint KAH<>PAH XCM refs (#5062)
+
+
 ## 1.3.88
 Build date: Aug 19, 2026.
 
