@@ -19,7 +19,7 @@ const initialState: RequestState = {
   connectWCRequest: {},
   notSupportWCRequest: {},
 
-  // Type of confirmation requets
+  // Type of confirmation requests
   addNetworkRequest: {},
   addTokenRequest: {},
   evmSignatureRequest: {},
