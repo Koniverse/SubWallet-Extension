@@ -8,12 +8,12 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.1 |
-| Total bugs found | 1 |
+| Stories tested | US-42.24.1, US-42.24.2 |
+| Total bugs found | 4 |
 | P0 | 0 |
-| P1 | 1 |
-| P2 | 0 |
-| Status | in progress |
+| P1 | 3 |
+| P2 | 1 |
+| Status | done |
 
 ---
 
@@ -29,21 +29,15 @@ Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
-| AC-1 | The buy flow opens the Transak widget correctly — Android fresh | ✅ Pass | |
-| AC-2 | When the widget URL cannot be fetched, the toast reads "Unable to redirect you to the selected supplier at the moment. Try again later" — Android fresh | ✅ Pass | |
-| AC-3 | AC-1 and AC-2 pass on Android upgrade | ✅ Pass | |
-| AC-4 | AC-1 and AC-2 pass on iOS fresh | ✅ Pass | |
-| AC-5 | AC-1 and AC-2 pass on iOS upgrade | ✅ Pass | |
-| AC-6 | An ERC-721 NFT on Rari imports successfully, no "Incompatible NFT" error — Android fresh | ⏭️ Skipped | Rari Chain has shut down |
-| AC-7 | An ERC-1155 NFT on Rari imports successfully — Android fresh | ⏭️ Skipped | Rari Chain has shut down |
-| AC-8 | AC-6 and AC-7 pass on Android upgrade | ⏭️ Skipped | Rari Chain has shut down |
-| AC-9 | AC-6 and AC-7 pass on iOS fresh | ⏭️ Skipped | Rari Chain has shut down |
-| AC-10 | AC-6 and AC-7 pass on iOS upgrade | ⏭️ Skipped | Rari Chain has shut down |
-| AC-11 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android fresh | ❌ Fail | See BUG-42.24.1-01 |
-| AC-12 | AC-11 passes on Android upgrade | ❌ Fail | See BUG-42.24.1-01 |
-| AC-13 | AC-11 passes on iOS fresh | ❌ Fail | See BUG-42.24.1-01 |
-| AC-14 | AC-11 passes on iOS upgrade | ❌ Fail | See BUG-42.24.1-01 |
-| AC-15 | After upgrading, existing accounts, balances, NFTs and settings are still there and correct — both platforms | 🚫 Blocked | Accounts, balances and settings all carry over correctly. Only the NFT half is blocked by BUG-42.24.1-01 |
+| AC-1 | The buy flow opens the Transak widget correctly — Android + iOS fresh | ✅ Pass | |
+| AC-2 | When the widget URL cannot be fetched, the toast reads "Unable to redirect you to the selected supplier at the moment. Try again later" — Android + iOS fresh | ✅ Pass | |
+| AC-3 | AC-1 and AC-2 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-4 | An ERC-721 NFT on Rari imports successfully, no "Incompatible NFT" error — Android + iOS fresh | ⏭️ Skipped | Rari Chain has shut down |
+| AC-5 | An ERC-1155 NFT on Rari imports successfully — Android + iOS fresh | ⏭️ Skipped | Rari Chain has shut down |
+| AC-6 | AC-4 and AC-5 pass on Android + iOS upgrade | ⏭️ Skipped | Rari Chain has shut down |
+| AC-7 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android + iOS fresh | ❌ Fail | See BUG-42.24.1-01 |
+| AC-8 | AC-7 passes on Android + iOS upgrade | ❌ Fail | See BUG-42.24.1-01 |
+| AC-9 | After upgrading, existing accounts, balances, NFTs and settings are still there and correct — both platforms | 🚫 Blocked | Accounts, balances and settings all carry over correctly. Only the NFT half is blocked by BUG-42.24.1-01 |
 
 ### Bugs
 
@@ -53,12 +47,38 @@ Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension
 
 ---
 
+## US-42.24.2 — Web-runner 1.3.69 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
+
+Session started on the new networks and tokens. Not finished.
+
+BUG-42.24.2-01 and -02 cleared on their own during the session — the networks can be turned on again — so no AC is failed or blocked on them. They are kept here because they are real and still need fixing.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Acurast Mainnet appears, connects, and balances load — Android + iOS fresh | ✅ Pass | chain-list [615](https://github.com/Koniverse/SubWallet-ChainList/issues/615) |
+| AC-4 | TRAC appears on each EVM network it was added to, with the right symbol and decimals — Android + iOS fresh | ✅ Pass | chain-list [621](https://github.com/Koniverse/SubWallet-ChainList/issues/621) |
+| AC-5 | vMANTA appears on Ethereum and on Manta Pacific, and shows as one multichain asset rather than two separate tokens — Android + iOS fresh | ✅ Pass | chain-list [624](https://github.com/Koniverse/SubWallet-ChainList/issues/624), [625](https://github.com/Koniverse/SubWallet-ChainList/issues/625) |
+
+The other AC in this story were not run today.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.2-01 | Acurast does not connect when turned on, and shows the disconnected badge instead of the connecting one | Manage networks → search "Acur" → turn on Acurast Mainnet → watch the badge on the network logo | The network never connects. The badge is the crossed-out disconnected icon even though the toggle is on | The network should connect and load balances. While it is still connecting the badge should be the yellow connecting icon, not the crossed-out one | P1 | todo | ![](img/BUG-42.24.2-01.jpg) |
+| BUG-42.24.2-02 | Network toggles cannot be switched on or off — affects every network, not only the new ones | Manage networks → tap the toggle on any network | The toggle does not respond. It happens on all networks, not just Acurast | Tapping a toggle turns the network on or off | P1 | todo | |
+| BUG-42.24.2-03 | The price chart is missing on the token detail screen — affects every token | Tokens → tap any token to open its detail screen (example: ACU on Acurast Mainnet) | The area below the action buttons is empty. Price, balance and the action buttons all render, but no chart appears. It happens on every token, not just the new ones | The price chart renders on the token detail screen | P2 | todo | ![](img/BUG-42.24.2-03.jpg) |
+
+---
+
 ## Summary
 
-1 bug found, P1. 5 AC pass, 4 fail, 5 skipped, 1 blocked.
+4 bugs found — 3 P1, 1 P2. Two stories touched.
 
-Transak widget URL (#4835) passes on all four combinations. NFT without tokenOfOwnerByIndex (#4568) fails on all four — BUG-42.24.1-01: an imported or attached account holding EVM NFTs shows none of them on Mobile, while the same account shows them on the Extension. The five NFT-import-on-Rari checks (#4625) are skipped because Rari Chain shut down in June 2026.
+US-42.24.1 (web-runner 1.3.68) is blocked: 3 AC pass, 2 fail, 3 skipped, 1 blocked. Transak passes. The NFT checks fail on BUG-42.24.1-01, and the Rari checks are skipped because that chain shut down in June 2026. AC-7 to AC-9 need a retest once the bug is fixed.
 
-AC-15 is blocked only in part. After an upgrade, accounts, balances and settings all carry over correctly on both platforms; the NFT half cannot be verified while no NFTs appear at all, so the AC stays open on that one point.
-
-The session cannot close until BUG-42.24.1-01 is fixed: AC-11 to AC-15 need a retest on the fixed build.
+US-42.24.2 (chain-list v0.2.122) is in progress: Acurast, TRAC and vMANTA all pass. Three bugs logged, none of them blocking an AC — the two network ones cleared on their own, the missing price chart is still there. BUG-42.24.2-02 and -03 happen on every network and every token, so they may not belong to this chain-list version at all.
