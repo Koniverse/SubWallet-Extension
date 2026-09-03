@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W35
-status: in-progress
+status: closed
 start: 2026-08-24
 end: 2026-08-30
 goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #5062 — a KAH↔PAH USDt XCM route the wallet offers but the asset cannot cross, leaving the tokens locked on the destination chain; alongside it, passkey unlock (#5058) and the Bittensor root claim path (#5064), each of whose PR answered what its empty issue never stated. Opened 2026-08-25 from tracker, PR and git evidence. The eight stalled W33 stories were again not carried in — a third window running."
@@ -10,13 +10,13 @@ goal: "Two open pull requests, both opened after v1.3.88 shipped. The P0 is #506
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | **P0** | 5 | review | new | [link](stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) |
-| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | review | ← backlog | [link](stories/US-5.16-biometric-passkey-login.md) |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← backlog | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | **P0** | 5 | done | new | [link](stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) |
+| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | done | ← backlog | [link](stories/US-5.16-biometric-passkey-login.md) |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | → W36 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 | US-42.20 | QC — Biometric / passkey login (#5058) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) |
-| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | ready | new | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
+| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | in-progress | → W36 | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
 | US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | **P0** | 5 | done | new | [link](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) |
-| US-42.23 | QC — Manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | ready | new | [link](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) |
+| US-42.23 | QC — Manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | done | new | [link](stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) |
 
 **7 stories · 41 points** — 3 dev stories (18 pts) and 4 QC stories (23 pts). The three dev stories
 are all open PRs with no merge yet, so **none of them is `done` and none has a `version_shipped`.**
@@ -197,3 +197,55 @@ contradicts. What has changed is only how long the question has gone unanswered 
 `projectV2` needs `read:project`; the available token carries `gist, read:org, repo`. Unchanged
 since 2026-08-13. This window was opened from `gh issue view`, `gh pr view` and git alone, and **no
 board column is claimed as current**.
+
+---
+
+## Closeout — 2026-09-03
+
+The window ended **2026-08-30**. Closed four days later from `gh`, git and the merged QC pages; the
+board still could not be read (`read:project`, unchanged since 2026-08-13).
+
+### 5 of 7 stories · 28 of 41 points — and a release
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **Done** | US-13.19 (**P0**), US-5.16, US-42.20, US-42.22, US-42.23 | 28 |
+| **→ [W36](sprint-2026-W36.md)** | US-12.23 (PR still open), US-42.21 (release QC unfinished) | 13 |
+
+**v1.3.89 shipped 2026-08-28** carrying exactly this window's two dev stories — #5058 passkey unlock
+and #5062 the P0 XCM repoint. Both PRs merged 08-27; lineage verified with
+`git merge-base --is-ancestor` and `git tag --contains` for each.
+
+The mid-window snapshot said *"no extension code has shipped — every dev PR is still open."* Three
+days later two of the three had merged and released. **The window's own text was accurate when
+written and wrong two days later**, which is the argument for dating every claim rather than stating
+it flat.
+
+### The P0 closed, and the earlier alarm about it was wrong
+
+[US-13.19](stories/US-13.19-repoint-kah-pah-usdt-xcm-refs.md) is `done` at 1.3.89 with **5 of 6 AC
+ticked**. The sixth, AC-6, is a regression test that was never written — recorded and carried, not
+quietly dropped.
+
+**The "chainlist half is missing" alarm this sprint raised was a false one.**
+[ChainList PR #709](https://github.com/Koniverse/SubWallet-ChainList/pull/709) merged **2026-08-24**,
+one day *before* the claim was written. It was missed because the search looked for issues and not
+pull requests, in a repo where the PR is titled with the *Extension* issue number. Both this file and
+US-13.19 now carry the correction.
+
+### What did not finish
+
+- **[US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) — the release gate for a release
+  that already shipped.** Its dev-stage checks passed (AC-1a, AC-1b, AC-2); **AC-3 through AC-9 —
+  master build, draft build, production — are still unticked six days after v1.3.89 went to
+  production.** The release did not wait for its own gate. Carried into W36 because production
+  checks on a live release are still worth running, not because they can still gate anything.
+- **[US-12.23](stories/US-12.23-bittensor-manual-claim-native-staking.md)** — QC passed 16/16 but
+  PR #5065 never merged and #5064 was **dropped from the v1.3.89 scope**, so its only verification is
+  one manual pass on an unmerged branch, and no release will re-check it until one picks the issue up.
+
+### Still not moving — the eight W33 stories
+
+Re-checked 2026-09-03. Unchanged again: all six anchors OPEN, same last-touched dates. They have now
+sat out **four consecutive windows** — W31, W33, W34, W35 — and are not carried into W36. The open
+planning call is five weeks old.

@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-08-25 10:02:35 UTC
-> Total stories: 300
+> Last generated: 2026-09-03 02:23:52 UTC
+> Total stories: 302
 
 ## 📋 Backlog (70)
 
@@ -79,17 +79,16 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (5)
+## 🟢 Ready (4)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
-| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | sprint-2026-W35 | MaiThuongNinni |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (10)
+## 🟡 In Progress (11)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -102,23 +101,22 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
+| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (9)
+## 👀 Review (7)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | sprint-2026-W35 | tunghp2002 |
-| US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | P0 | 5 | sprint-2026-W35 | tunghp2002 |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | sprint-2026-W36 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
-| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | sprint-2026-W35 | tunghp2002 |
 
-## ✅ Done (205)
+## ✅ Done (209)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -186,6 +184,7 @@
 | US-13.15 | XCM UI, history & token selection | EPIC-13 | P3 | 3 | sprint-2024-M07 | frenkie-ng |
 | US-13.16 | Asset Hub Migration & relay-chain wind-down | EPIC-13 | P3 | 3 | sprint-2025-M11 | bluezdot |
 | US-13.18 | ParaSpell HTTP API v2 migration | EPIC-13 | P2 | 2 | sprint-2026-W34 | tunghp2002 |
+| US-13.19 | Repoint KAH↔PAH USDt XCM refs — the route that trapped funds | EPIC-13 | P0 | 5 | sprint-2026-W35 | tunghp2002 |
 | US-14.1 | Fiat on-ramp: buy crypto with card | EPIC-14 | P1 | 8 | sprint-2022-M09 | S2kael |
 | US-14.2 | Fiat off-ramp: sell crypto for fiat | EPIC-14 | P2 | 3 | sprint-2025-M09 | tunghp2002 |
 | US-14.5 | Fiat on-ramp fixes recovered from Uncategorized | EPIC-14 | P3 | 1 | sprint-2023-M10 | S2kael |
@@ -270,6 +269,8 @@
 | US-42.18 | QC — Remove XCM routes for chains dropped in ParaSpell XCM API v2 (#705) | EPIC-42 | P2 | 5 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.19 | QC — Release SubWallet Extension v1.3.88 | EPIC-42 | P2 | 8 | sprint-2026-W34 | MaiThuongNinni |
 | US-42.20 | QC — Support biometric/passkey login for extension (#5058) | EPIC-42 | P2 | 5 | sprint-2026-W35 | MaiThuongNinni |
+| US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | P0 | 5 | sprint-2026-W35 | MaiThuongNinni |
+| US-42.23 | QC — Support manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | sprint-2026-W35 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -280,6 +281,7 @@
 | US-5.12 | Earlier security audit rounds (2022–2025) | EPIC-5 | P3 | 1 | sprint-2023-M08 | S2kael |
 | US-5.13 | Security fixes recovered from Uncategorized | EPIC-5 | P3 | 2 | sprint-2024-M11 | bluezdot |
 | US-5.15 | Signing-prompt mode confusion — a dApp must not render an extrinsic as an inert message | EPIC-5 | P0 | 2 | sprint-2026-W32 | tunghp2002 |
+| US-5.16 | Biometric / passkey login for the extension | EPIC-5 | P3 | 8 | sprint-2026-W35 | tunghp2002 |
 | US-6.1 | Dark-only responsive UI: popup and full-page expand view | EPIC-6 | P2 | 3 | sprint-2023-M03 | lw-cdm |
 | US-6.2 | Web app (standalone browser app) with feature parity to the extension | EPIC-6 | P2 | 5 | sprint-2024-M02 | saltict |
 | US-6.3 | Mobile app support via web-runner / WebView strategy | EPIC-6 | P2 | 5 | sprint-2022-M05 | saltict |
@@ -343,11 +345,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 70
-- 🟢 **Ready**: 5
-- 🟡 **In Progress**: 10
-- 👀 **Review**: 9
-- ✅ **Done**: 205
+- 🟢 **Ready**: 4
+- 🟡 **In Progress**: 11
+- 👀 **Review**: 7
+- ✅ **Done**: 209
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 11 stories in-progress (limit: 3).

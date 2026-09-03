@@ -138,7 +138,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.13](../stories/US-5.13-security-fixes-recovered-from-uncategorized.md) | Security fixes recovered from Uncategorized | Reset/ZK-mode/block-action from the triage bucket | ✅ done | 1.3.7 |
 | [US-5.14](../stories/US-5.14-open-security-improvements-recovered-from-uncategorized.md) | Open security improvements (recovered) | Open security work not yet delivered (rule 9) | 📋 backlog | — |
 | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | Signing-prompt mode confusion | Refuse to sign an extrinsic request carrying a raw-message payload, and name it to the user (#5042) | ✅ done | 1.3.85 |
-| [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | Biometric / passkey login for the extension | Passkey unlock wrapping the master password (PR #5061, +1035/−49, 2 spec files). The issue body is still empty — the ACs are derived from the code (#5058) | 👀 review | — |
+| [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | Biometric / passkey login for the extension | Opt-in passkey unlock that **wraps** the master password (AES-GCM under a WebAuthn-PRF key) rather than replacing it, so the non-recoverable-by-design model is untouched. QC 14/14; the no-passkey fallback holds (#5058) | ✅ done | 1.3.89 |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is

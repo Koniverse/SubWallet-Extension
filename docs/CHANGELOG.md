@@ -36,8 +36,20 @@ Release history for **SubWallet Extension**, in the koni-docs changelog format.
 (empty — track unreleased changes here; new version sections are inserted above the
 previous version, anchored on this block, per the koni-docs changelog template)
 
-<!-- No version drift: the newest entry below is 1.3.88, and VERSION and PRD.md
-     both read 1.3.88 (synced 2026-08-25 — see docs/notes/2026-08-25.md). -->
+<!-- No version drift: the newest entry below is 1.3.89, and VERSION and PRD.md
+     both read 1.3.89 (synced 2026-09-03 — see docs/notes/2026-09-03.md). -->
+
+---
+
+## [1.3.89] — 2026-08-28 — Release 1.3.89 (Koni) — v1.3.89
+
+### Added
+- Passkey unlock for the extension: an opt-in WebAuthn path that **wraps** the master password (AES-GCM under a key derived from the passkey PRF output) rather than replacing it, enrolled from Settings → Security (#5058)
+
+### Fixed
+- Repoint the KAH↔PAH USDt XCM refs so the Kusama-Asset-Hub-native USDt is no longer offered a bridge route it cannot cross — the bridged `statemine-LOCAL-USDt-Polkadot` asset now carries the route, and a guard refuses the old one (#5062)
+
+**Commit**: b9363157d0
 
 ---
 

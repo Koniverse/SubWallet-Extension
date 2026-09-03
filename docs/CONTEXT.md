@@ -1907,7 +1907,7 @@ carry an *(as of …)* marker and the current value.
 
 ---
 
-## Phase 4 — v1.3.8x (2026, shipped v1.3.88)
+## Phase 4 — v1.3.8x (2026, shipped v1.3.89)
 
 > The current era. Its first decisions come from the koni-docs adoption (EPIC-21): making the doc layer canonical over 302 releases of existing history. They govern how the docs describe the product rather than the product itself — but they bind every future story, so they belong in the log.
 

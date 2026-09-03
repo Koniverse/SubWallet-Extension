@@ -2,16 +2,16 @@
 id: US-5.16
 title: "Biometric / passkey login for the extension"
 epic: EPIC-5
-status: review
+status: done
 priority: P3
 points: 8
 sprint: sprint-2026-W35
-version_shipped:
+version_shipped: 1.3.89
 prd_ref: []
 assignee: tunghp2002
-commit:
+commit: f9a1bc49f1, 82e1a09927
 created: 2026-08-18
-updated: 2026-08-25
+updated: 2026-09-03
 ---
 
 ## Goal
@@ -122,6 +122,30 @@ were called out here before QC ran, so the answer belongs next to the question:
 not about whatever eventually merges. Two of the six commits landed on the day of the QC run, so if
 more land before merge the passkey paths need a re-run against the merged head.
 
+### Shipped 2026-08-28 — v1.3.89
+
+> **✅ done.** PR [#5061](https://github.com/Koniverse/SubWallet-Extension/pull/5061) merged
+> **2026-08-27** (`82e1a09927`) and went out in **v1.3.89** on 2026-08-28, alongside
+> [US-13.19](US-13.19-repoint-kah-pah-usdt-xcm-refs.md) (#5062). Those two are the whole release.
+
+Lineage checked, not assumed: `git merge-base --is-ancestor 82e1a09927 b9363157d0` passes and
+`git tag --contains 82e1a09927` returns exactly `v1.3.89`.
+
+`commit:` names `f9a1bc49f1` — *Init passkey unlock*, the commit that made the capability true — and
+`82e1a09927`, the merge that made it true in the product ([D106](../../CONTEXT.md)).
+
+**The manual close was ahead of the merge, not instead of it.** [§J of 2026-08-25](../../notes/2026-08-25.md)
+recorded #5058 closed by hand on 08-25 with the PR still open, and flagged that a closed issue is not
+a merged branch. That reading was correct at the time and the gap closed two days later on its own —
+the issue was simply closed early. Worth keeping as a record of *why* the story was not marked `done`
+then: on 08-25 nothing in any shipping branch contained the feature.
+
+**A new FR is warranted and is not invented here.** Passkey unlock adds a capability FR-55 (unified
+unlock / auto-lock) does not cover. `prd_ref` stays `[]` because PRD FR markers track shipped
+capability and the FR does not exist yet; writing one into this story would put a requirement into
+the map by the back door. Raised in [notes/2026-09-03.md](../../notes/2026-09-03.md) as a decision
+for whoever owns the PRD.
+
 ### Where it plugs in
 
 | Layer | File |
@@ -141,26 +165,36 @@ layered on the existing gate rather than a replacement for it.
 Derived from the **code**, not from the issue — the issue still has no body, so these describe what
 was built and are refutable against the branch:
 
-- [ ] **AC-1** — The master password is never stored in plaintext: `wrapWalletPassword()` AES-GCM
+- [x] **AC-1** — The master password is never stored in plaintext: `wrapWalletPassword()` AES-GCM
   encrypts it and only `{ciphertext, nonce}` is persisted.
-- [ ] **AC-2** — The wrapping key derives from the passkey PRF output, not from anything the page
+- [x] **AC-2** — The wrapping key derives from the passkey PRF output, not from anything the page
   or a dApp can supply.
-- [ ] **AC-3** — The master password still unlocks the wallet when no passkey is enrolled, or when
+- [x] **AC-3** — The master password still unlocks the wallet when no passkey is enrolled, or when
   the authenticator is unavailable — passkey unlock is additive, never the only path.
-- [ ] **AC-4** — Enrolling requires the current master password (so enrolment cannot be done by
+- [x] **AC-4** — Enrolling requires the current master password (so enrolment cannot be done by
   someone who has the device but not the password).
-- [ ] **AC-5** — `rotatePasskeyUnlockSecret()` re-wraps without changing the master password, and
+- [x] **AC-5** — `rotatePasskeyUnlockSecret()` re-wraps without changing the master password, and
   the old ciphertext stops working.
-- [ ] **AC-6** — Removing the passkey in Settings → Security clears the stored record.
-- [ ] **AC-7** — Behaviour under FR-58 (per-action vs per-session unlock) is defined and unchanged
+- [x] **AC-6** — Removing the passkey in Settings → Security clears the stored record.
+- [x] **AC-7** — Behaviour under FR-58 (per-action vs per-session unlock) is defined and unchanged
   for users who do not enrol.
-- [ ] **AC-8** — On the dApp confirmation surface (`4b7698b5b4`), a passkey unlock still produces a
+- [x] **AC-8** — On the dApp confirmation surface (`4b7698b5b4`), a passkey unlock still produces a
   signature only over the artefact the prompt displayed — the [US-5.15](US-5.15-signing-prompt-mode-confusion.md)
   guarantee is not weakened by the new unlock path.
 
-> **Nothing ticked.** The PR is unmerged and unreviewed; none of these is a fact about `dev` yet
-> ([D107](../../CONTEXT.md)). AC-3, AC-4 and AC-7 are the ones worth a reviewer's attention — they
-> are the ways an unlock convenience becomes a way to lose a wallet.
+> **Ticked 2026-09-03, on QC evidence — not on a repository check.**
+> [US-42.20](US-42.20-qc-issue-5058-biometric-passkey-login.md) passed **14/14** against commit
+> `cab8ebd5ee`, fresh install and upgrade from v1.3.88, and PR #5061 merged unchanged from that head.
+> If that page is wrong, these ticks are wrong with it ([D107](../../CONTEXT.md)).
+>
+> **The three flagged as dangerous all held.** AC-3 (fallback) → their AC-9/10/11: unlock still works
+> with a passkey enrolled, on a browser with no WebAuthn PRF, and after the passkey is removed —
+> nobody is locked out. AC-8 (dApp surface) → their AC-12/12b: the signature is produced over exactly
+> what the prompt displayed, so the US-5.15 guarantee from #5042 is intact.
+>
+> **AC-7 is the weakest tick here.** FR-58's per-action vs per-session axis was never called out
+> separately in the QC run; it is covered only insofar as the 14 ACs exercised unlock generally.
+> Flagged rather than quietly counted as equal to the others.
 
 ## Still open after the code
 

@@ -13,8 +13,10 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-08-25'
+lastEdited: '2026-09-03'
 editHistory:
+  - date: '2026-09-03'
+    changes: 'Version header 1.3.88 → 1.3.89 (release 1.3.89: #5058 passkey unlock, #5062 KAH↔PAH USDt XCM repoint). #5062 changes no requirement — it corrects asset data and adds a guard under FR-126. #5058 adds a capability FR-55 does not cover; a new FR is warranted and is called out in US-5.16 rather than invented here.'
   - date: '2026-08-25'
     changes: 'Version header 1.3.87 → 1.3.88 (release 1.3.88, #5051 + chainlist). No requirement change — the release swaps the ParaSpell HTTP version behind an existing capability and drops routes the upstream API no longer serves; FR-126 / NFR-16 already own it.'
   - date: '2026-08-13'
@@ -31,7 +33,7 @@ editHistory:
 
 # SubWallet — Product Requirements Document
 
-**Version:** 1.3.88
+**Version:** 1.3.89
 **Date:** 2026-06-04
 **Status:** Live (browser extension, web app, mobile)
 **Dual-Audience:** Human stakeholders + LLM implementation agents

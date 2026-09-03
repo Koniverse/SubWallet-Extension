@@ -21,8 +21,8 @@ cites it but a same-epic story shares its capability (inferred — a link to ver
 **routed** when only the epic area is clear; **unowned** when even that is not. The last
 two buckets — **the residue** — are the only issues a genuinely-new story could be about.
 
-- Issues cited across **230 of 308** release sections: **1130**
-- **Cited** by a story (certain — every row checked by command): **1106**
+- Issues cited across **231 of 309** release sections: **1132**
+- **Cited** by a story (certain — every row checked by command): **1108**
 - **Linked** to an existing story (inferred by capability): **24**
 - **Routed** to an epic, no story: **0**
 - **Unowned** (needs triage): **0**
@@ -1150,6 +1150,8 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045) | Remove Bittensor root claim type function, deprecated by the Bittensor v4.4.1 chain upgrade (#5045) | 1.3.86 | 2026-08-06 | US-12.6 |
 | [#5055](https://github.com/Koniverse/SubWallet-Extension/issues/5055) | Read the nominator unstaking period from `nominatorFastUnbondDuration` when nominators are not slashable (#5055) | 1.3.87 | 2026-08-12 | US-12.22 |
 | [#5051](https://github.com/Koniverse/SubWallet-Extension/issues/5051) | Migrate the ParaSpell HTTP integration from `/v1` to `/v2` across every XCM endpoint the wallet calls (#5051) | 1.3.88 | 2026-08-19 | US-13.18 |
+| [#5058](https://github.com/Koniverse/SubWallet-Extension/issues/5058) | Support biometric/passkey login for extension (#5058) | 1.3.89 | 2026-08-28 | US-5.16 |
+| [#5062](https://github.com/Koniverse/SubWallet-Extension/issues/5062) | Repoint KAH<>PAH XCM refs (#5062) | 1.3.89 | 2026-08-28 | US-13.19 |
 
 ## Linked — no citation, but an existing story owns the capability (inferred)
 
