@@ -9,9 +9,9 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.1 |
-| Total bugs found | 0 |
+| Total bugs found | 1 |
 | P0 | 0 |
-| P1 | 0 |
+| P1 | 1 |
 | P2 | 0 |
 | Status | in progress |
 
@@ -39,18 +39,26 @@ Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension
 | AC-8 | AC-6 and AC-7 pass on Android upgrade | ⏭️ Skipped | Rari Chain has shut down |
 | AC-9 | AC-6 and AC-7 pass on iOS fresh | ⏭️ Skipped | Rari Chain has shut down |
 | AC-10 | AC-6 and AC-7 pass on iOS upgrade | ⏭️ Skipped | Rari Chain has shut down |
-| AC-11 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android fresh | ✅ Pass | |
-| AC-12 | AC-11 passes on Android upgrade | ✅ Pass | |
-| AC-13 | AC-11 passes on iOS fresh | ✅ Pass | |
-| AC-14 | AC-11 passes on iOS upgrade | ✅ Pass | |
-| AC-15 | After upgrading, existing accounts, balances, NFTs and settings are still there and correct — both platforms | ⬜ Not run | |
+| AC-11 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android fresh | ❌ Fail | See BUG-42.24.1-01 |
+| AC-12 | AC-11 passes on Android upgrade | ❌ Fail | See BUG-42.24.1-01 |
+| AC-13 | AC-11 passes on iOS fresh | ❌ Fail | See BUG-42.24.1-01 |
+| AC-14 | AC-11 passes on iOS upgrade | ❌ Fail | See BUG-42.24.1-01 |
+| AC-15 | After upgrading, existing accounts, balances, NFTs and settings are still there and correct — both platforms | 🚫 Blocked | Accounts, balances and settings all carry over correctly. Only the NFT half is blocked by BUG-42.24.1-01 |
 
 ### Bugs
 
-None so far.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.1-01 | No auto-detect of EVM ERC-721 NFTs when importing or attaching an account that holds them | Import or attach account `0x66666F58dE1bcD762A5E5c5aFf9cc3C906D66666` on Mobile → open the NFT screen → the account holds NFTs on several EVM chains (Ethereum, Optimism, Gnosis) | No NFTs are shown on Mobile. The same account on the Extension shows them | The NFTs are auto-detected and shown on Mobile, the same as on the Extension | P1 | todo | |
 
 ---
 
 ## Summary
 
-Session in progress, no bugs found. Transak widget URL (#4835) and NFT without tokenOfOwnerByIndex (#4568) both pass on all four combinations. The five NFT-import-on-Rari checks (#4625) are skipped because Rari Chain shut down in June 2026. Only AC-15, the post-upgrade data check, is left.
+1 bug found, P1. 5 AC pass, 4 fail, 5 skipped, 1 blocked.
+
+Transak widget URL (#4835) passes on all four combinations. NFT without tokenOfOwnerByIndex (#4568) fails on all four — BUG-42.24.1-01: an imported or attached account holding EVM NFTs shows none of them on Mobile, while the same account shows them on the Extension. The five NFT-import-on-Rari checks (#4625) are skipped because Rari Chain shut down in June 2026.
+
+AC-15 is blocked only in part. After an upgrade, accounts, balances and settings all carry over correctly on both platforms; the NFT half cannot be verified while no NFTs appear at all, so the AC stays open on that one point.
+
+The session cannot close until BUG-42.24.1-01 is fixed: AC-11 to AC-15 need a retest on the fixed build.
