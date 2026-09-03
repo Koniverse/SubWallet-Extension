@@ -47,8 +47,8 @@ This was the highest-value check in the story, because a wrong scale here would 
 ### Old runtime and the removed claim path
 
 - On a node without `betaBasketRuntimeApi` the unclaimed reward settles at **0** and the screen neither hangs nor errors.
-- The deprecated root claim type **removed in v1.3.86** ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045), QC'd in [US-42.11](../../../sprints/stories/US-42.11-qc-extension-pr5043-and-issue5045.md)) has **not** come back. There is one claim path, not two — this PR replaces the old behaviour on a different runtime API, it does not revive it. Neither the issue nor the PR said so; this is the answer.
+- The deprecated root claim type **removed in v1.3.86** ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045), QC'd in [US-42.11](../../../../sprints/stories/US-42.11-qc-extension-pr5043-and-issue5045.md)) has **not** come back. There is one claim path, not two — this PR replaces the old behaviour on a different runtime API, it does not revive it. Neither the issue nor the PR said so; this is the answer.
 
 ### Note on the build
 
-This ran against an **unmerged** commit on an open PR. #5065 is approved by `lw-cdm` at head `ac5b0a6ac9` and **ships no test**, so this manual pass is the only verification the feature has. If more commits land before it merges, the numeric checks (the amount, the scale, the dust threshold) need a re-run against the merged head. The v1.3.89 release gate ([US-42.21](../../../sprints/stories/US-42.21-qc-release-extension-v1-3-89.md)) re-verifies this on the real release build rather than inheriting this result.
+This ran against an **unmerged** commit on an open PR. #5065 is approved by `lw-cdm` at head `ac5b0a6ac9` and **ships no test**, so this manual pass is the only verification the feature has. If more commits land before it merges, the numeric checks (the amount, the scale, the dust threshold) need a re-run against the merged head. The v1.3.89 release gate ([US-42.21](../../../../sprints/stories/US-42.21-qc-release-extension-v1-3-89.md)) re-verifies this on the real release build rather than inheriting this result.

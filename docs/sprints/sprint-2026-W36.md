@@ -3,14 +3,14 @@ id: sprint-2026-W36
 status: in-progress
 start: 2026-08-31
 end: 2026-09-06
-goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 with both its dev stories done, and what is left over is verification and one unmerged feature: complete the release gate that the release did not wait for (US-42.21, stages AC-3 to AC-9 still unticked in production), and land or reschedule the Bittensor manual claim (US-12.23 / PR #5065), whose issue is closed, whose QC passed 16/16, and whose code is in no branch that ships. Opened 2026-09-03 from tracker, PR and git evidence."
+goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 with both its dev stories done, and what was left over was verification and one unmerged feature. The release gate the release did not wait for is now complete (US-42.21, 16/16, no bugs); what remains is to land or reschedule the Bittensor manual claim (US-12.23 / PR #5065), whose issue is closed, whose QC passed 16/16, and whose code is in no branch that ships. Opened 2026-09-03 from tracker, PR and git evidence."
 ---
 
 ## Sprint scope
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | in-progress | ← W35 | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
+| US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | done | ← W35 | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← W35 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 
 **2 stories · 13 points**, both carried, **nothing new written in-window**. No new tracker issue has
@@ -21,30 +21,29 @@ Small again, and for the same reason [W34](sprint-2026-W34.md) was — which clo
 [W35](sprint-2026-W35.md), which closed at 5 of 7 and shipped a release. The scope is what has
 evidence of being live.
 
-## US-42.21 — a release gate the release did not wait for
+## US-42.21 — the release gate is now closed
 
-[v1.3.89](../CHANGELOG.md) went to production **2026-08-28**. Its release-QC story has:
+[v1.3.89](../CHANGELOG.md) went to production **2026-08-28**, ahead of its own gate. The gate has
+since been run to completion and **passed 16 / 16 with no bugs**:
 
 | Stage | AC | State |
 | --- | --- | --- |
 | dev environment | AC-1a, AC-1b, AC-2 | ✅ passed |
-| master build | AC-3a, AC-3b, AC-4 | ⬜ not run |
-| draft release build | AC-5a, AC-5b, AC-6 | ⬜ not run |
-| **production** | AC-7a, AC-7b, AC-8, AC-9 | ⬜ **not run** |
+| master build | AC-3a, AC-3b, AC-4 | ✅ passed |
+| draft release build | AC-5a, AC-5b, AC-6 | ✅ passed |
+| **production** | AC-7a, AC-7b, AC-8, AC-9 | ✅ passed |
 
-**Six days after the release went live, ten of thirteen checks are unticked**, including every
-production check and AC-9 — *the master password still unlocks the wallet on every stage, with the
-passkey both on and off, so nobody can be locked out*.
+**AC-9 held** — the master password unlocks the wallet at every stage with the passkey both on and
+off, so the newest thing in the release cannot lock anyone out. AC-12 is signed off on **both**
+halves of the P0 fix, which ship from two different repos: the chainlist data from
+[ChainList PR #709](https://github.com/Koniverse/SubWallet-ChainList/pull/709) and the guard from
+PR #5063. A real KAH↔PAH USDt transfer arrived, so the route is repointed rather than merely blocked.
 
-This is not a claim that the release is broken. Both items were QC'd individually before merge —
-[US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) 14/14 and
-[US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) 15/15 — so the content has
-been verified, just not *as the shipped artefact*. The gate exists to catch what packaging and
-promotion break, and that question is still open.
-
-**AC-9 is the one to run first.** It is the only check in the window standing between a passkey
-regression and a user who cannot open their wallet, and passkey unlock is the newest thing in the
-release.
+The order still stands as a process point, recorded not dropped: **the release shipped six days
+before its gate finished.** Both items had been QC'd individually before merge
+([US-42.20](stories/US-42.20-qc-issue-5058-biometric-passkey-login.md) 14/14,
+[US-42.22](stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) 15/15), and the gate has now
+confirmed the shipped artefact as well — but it confirmed it after the fact, not before.
 
 ## US-12.23 — four states that still do not line up
 
