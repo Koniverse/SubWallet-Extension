@@ -56,8 +56,30 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.21](../stories/US-42.21-qc-release-extension-v1-3-89.md) | Release extension v1.3.89 — passkey login (#5058) + **P0** KAH↔PAH XCM refs (#5062); dev, master, draft, production gate; 16 / 16 AC, no bugs | done |
 | [US-42.22](../stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | **P0** — Repoint KAH↔PAH USDt XCM refs (#5062); 15 / 15 AC, no bugs, both halves of the fix confirmed | done |
 | [US-42.23](../stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | Manual claim for Bittensor root staking (#5064) | ready |
+| [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 137 points | backlog |
+| [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex | backlog |
+| [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122 | backlog |
+| [US-42.24.3](../stories/US-42.24.3-qc-web-runner-1-3-70.md) | Web-runner 1.3.70 — OpenGov phase 1 (#4678, still open), plus the locked balance display (#4708) from 1.3.68 | backlog |
+| [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library updates, import from Trust Wallet | backlog |
+| [US-42.24.5](../stories/US-42.24.5-qc-web-runner-1-3-72.md) | Web-runner 1.3.72 — proxy accounts, chain-list v0.2.123, USDC and stEWT, ParaSpell V5 | backlog |
+| [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position | backlog |
+| [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1 | backlog |
+| [US-42.24.8](../stories/US-42.24.8-qc-web-runner-1-3-75.md) | Web-runner 1.3.75 — user-configurable Subscan API key | backlog |
+| [US-42.24.9](../stories/US-42.24.9-qc-web-runner-1-3-76.md) | Web-runner 1.3.76 — network toggle without API key, subnet token name and ID, Bittensor root staking | backlog |
+| [US-42.24.10](../stories/US-42.24.10-qc-web-runner-1-3-77.md) | Web-runner 1.3.77 — proxy and multisig improvements, PAH-KAH popup, stDOT sunset, chain-list v0.2.126 | backlog |
+| [US-42.24.11](../stories/US-42.24.11-qc-web-runner-1-3-78.md) | Web-runner 1.3.78 — XCM and bridge fees, disable all networks, Alpha transfer, TAO bridge, Bittensor swap | backlog |
+| [US-42.24.12](../stories/US-42.24.12-qc-web-runner-1-3-79.md) | Web-runner 1.3.79 — Alpha price, ParaSpell v1, display fixes after the 1.3.78 merge, swap refactor | backlog |
+| [US-42.24.13](../stories/US-42.24.13-qc-web-runner-1-3-80.md) | Web-runner 1.3.80 — transfer max at ED, XCM confirm address, token approve, NFTService phase 1 | backlog |
+| [US-42.24.14](../stories/US-42.24.14-qc-web-runner-1-3-82.md) | Web-runner 1.3.82 — Polygon zkEVM removed | backlog |
+| [US-42.24.15](../stories/US-42.24.15-qc-web-runner-1-3-83.md) | Web-runner 1.3.83 — earning terms and conditions | backlog |
+| [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129 | backlog |
+| [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
+| [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |
+| [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade | backlog |
 
 More rows get added here as testing starts.
+
+US-42.24 is the first story here to use a parent-and-sub-task numbering (`US-42.24.N`). The pages above it are numbered flat. This one is split because [#2057](https://github.com/Koniverse/SubWallet-Mobile/issues/2057) is a single tracker issue covering 18 web-runner versions, and each version is its own test session — flat numbering would have scattered them through the list with nothing showing they belong together.
 
 ## What this epic actually became — and the two holes it left
 
