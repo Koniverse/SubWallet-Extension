@@ -39,19 +39,11 @@ Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension
 | AC-8 | AC-6 and AC-7 pass on Android upgrade | ⏭️ Skipped | Rari Chain has shut down |
 | AC-9 | AC-6 and AC-7 pass on iOS fresh | ⏭️ Skipped | Rari Chain has shut down |
 | AC-10 | AC-6 and AC-7 pass on iOS upgrade | ⏭️ Skipped | Rari Chain has shut down |
-| AC-11 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android fresh | ⬜ Not run | |
-| AC-12 | AC-11 passes on Android upgrade | ⬜ Not run | |
-| AC-13 | AC-11 passes on iOS fresh | ⬜ Not run | |
-| AC-14 | AC-11 passes on iOS upgrade | ⬜ Not run | |
+| AC-11 | An NFT on a contract without tokenOfOwnerByIndex shows up in the NFT list — Android fresh | ✅ Pass | |
+| AC-12 | AC-11 passes on Android upgrade | ✅ Pass | |
+| AC-13 | AC-11 passes on iOS fresh | ✅ Pass | |
+| AC-14 | AC-11 passes on iOS upgrade | ✅ Pass | |
 | AC-15 | After upgrading, existing accounts, balances, NFTs and settings are still there and correct — both platforms | ⬜ Not run | |
-
-### Skipped — NFT import on Rari (AC-6 to AC-10)
-
-Rari Chain announced on 2026-06-04 that it was sunsetting, and told users to move their assets to Ethereum mainnet before 23:59 UTC on 2026-06-14. The chain is no longer running.
-
-The fix in [#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625) was about importing an ERC-721 or ERC-1155 NFT on Rari. With the chain gone there is nothing to import from, so these five AC cannot produce a result either way — a failure now would say nothing about the fix. Marked skipped rather than failed.
-
-This is worth raising with the developer: the chain has shut down, so any Rari configuration still in the app is likely to be removed the same way Polygon zkEVM was in 1.3.82 ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)).
 
 ### Bugs
 
@@ -61,10 +53,4 @@ None so far.
 
 ## Summary
 
-Session in progress. No bugs found.
-
-The Transak widget URL change ([#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835)) passes on all four combinations — Android and iOS, fresh install and upgrade. The widget URL now comes from the API call rather than being built locally, and the failure toast reads exactly as the issue specifies.
-
-Five AC are skipped, not failed: the NFT import checks on Rari ([#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625)) cannot run because Rari Chain shut down in June 2026. Details above.
-
-The NFT-without-tokenOfOwnerByIndex checks ([#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568)) are still to run; they need an NFT on a contract that does not implement that method.
+Session in progress, no bugs found. Transak widget URL (#4835) and NFT without tokenOfOwnerByIndex (#4568) both pass on all four combinations. The five NFT-import-on-Rari checks (#4625) are skipped because Rari Chain shut down in June 2026. Only AC-15, the post-upgrade data check, is left.
