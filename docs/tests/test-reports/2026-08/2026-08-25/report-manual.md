@@ -38,7 +38,7 @@ None found. All checks passed:
 
 ### Note on the build
 
-This ran against an **unmerged** commit on an open PR with 0 reviews. If more commits land before #5061 merges, the passkey paths need a re-run against the merged head. The v1.3.89 release gate ([US-42.21](../../../sprints/stories/US-42.21-qc-release-extension-v1-3-89.md)) re-verifies this content on the real release build rather than inheriting this result.
+This ran against an **unmerged** commit on an open PR with 0 reviews. If more commits land before #5061 merges, the passkey paths need a re-run against the merged head. The v1.3.89 release gate ([US-42.21](../../../../sprints/stories/US-42.21-qc-release-extension-v1-3-89.md)) re-verifies this content on the real release build rather than inheriting this result.
 
 ---
 
