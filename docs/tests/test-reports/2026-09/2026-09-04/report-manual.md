@@ -30,6 +30,10 @@ Still to run: AC-2, AC-3, AC-6 to AC-21.
 | AC | Description | Result | Notes |
 |---|---|---|---|
 | AC-2 | Monad Mainnet and its native token appear with the right name, symbol, logo and decimals, and connect — Android + iOS fresh | ✅ Pass | chain-list [627](https://github.com/Koniverse/SubWallet-ChainList/issues/627) |
+| AC-3 | Stable Mainnet and its token appear and connect, on both new RPCs — Android + iOS fresh | ✅ Pass | chain-list [628](https://github.com/Koniverse/SubWallet-ChainList/issues/628) |
+| AC-6 | xAlpha tokens appear on Base Mainnet and on Subtensor EVM — Android + iOS fresh | ✅ Pass | chain-list [633](https://github.com/Koniverse/SubWallet-ChainList/issues/633), [634](https://github.com/Koniverse/SubWallet-ChainList/issues/634) |
+| AC-7 | NIGHT appears on Cardano with the right symbol and balance — Android + iOS fresh | ⏭️ Skipped | Mobile does not support the Cardano ecosystem — chain-list [637](https://github.com/Koniverse/SubWallet-ChainList/issues/637) |
+| AC-12 | Phala Network is gone from the network list and cannot be enabled — Android + iOS fresh | ✅ Pass | chain-list [630](https://github.com/Koniverse/SubWallet-ChainList/issues/630) |
 | AC-14 | Avail Mainnet and Testnet show the new network and token logos — Android + iOS fresh | ✅ Pass | chain-list [626](https://github.com/Koniverse/SubWallet-ChainList/issues/626) |
 
 ### Bugs
