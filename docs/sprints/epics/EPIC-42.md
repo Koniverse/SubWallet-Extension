@@ -57,7 +57,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.22](../stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | **P0** — Repoint KAH↔PAH USDt XCM refs (#5062); 15 / 15 AC, no bugs, both halves of the fix confirmed | done |
 | [US-42.23](../stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | Manual claim for Bittensor root staking (#5064) | ready |
 | [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 20 sub-tasks, 148 points | in-progress |
-| [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex; 5 pass, 4 fail, 5 skip, 1 blocked by BUG-42.24.1-01 | blocked |
+| [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex; 3 pass, 3 skip (Rari shut down), 3 settled on retest | done |
 | [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122; 2 bugs logged, both cleared, no AC settled yet | in-progress |
 | [US-42.24.3](../stories/US-42.24.3-qc-web-runner-1-3-70.md) | Web-runner 1.3.70 — OpenGov phase 1 (#4678, still open), plus the locked balance display (#4708) from 1.3.68 | backlog |
 | [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library updates, import from Trust Wallet | backlog |
@@ -76,7 +76,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update, once fixed; 5 open so far | backlog |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 1 of 5 verified and its 3 AC rerun | in-progress |
 
 More rows get added here as testing starts.
 

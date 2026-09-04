@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.2, US-42.24.19 |
+| Stories tested | US-42.24.2, US-42.24.19, US-42.24.20 |
 | Total bugs found | 1 |
 | P0 | 0 |
 | P1 | 0 |
@@ -52,6 +52,24 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.19-01 | The "Migrate to Unified Account" screen appears twice when importing an account (iOS) | On iOS, import an account → watch the screens after the import completes | The "Migrate to Unified Account" screen is shown, and then shown again | The screen appears once | P2 | todo | |
+
+---
+
+## US-42.24.20 — Verify the bugs found during the web-runner update
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
+
+### Verify results
+
+| Bug | Found in | Fix verified | AC rerun |
+|---|---|---|---|
+| BUG-42.24.1-01 — EVM NFTs are not auto-detected when an account is imported or attached | US-42.24.1 | ✅ Pass | AC-7, AC-8, AC-9 — ✅ all pass |
+
+The other four bugs are not fixed yet.
+
+### Bugs
+
+None found during the recheck.
 
 ---
 
