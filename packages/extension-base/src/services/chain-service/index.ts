@@ -1123,9 +1123,13 @@ export class ChainService {
     }).catch(console.error);
     chainStateMap[chainSlug].active = true;
 
-    await this.initApiForChain(chainInfo);
-
-    this.lockChainInfoMap = false;
+    try {
+      await this.initApiForChain(chainInfo);
+    } finally {
+      // Releasing the lock only on success would strand every later edit,
+      // enable and disable behind a single failed connection attempt.
+      this.lockChainInfoMap = false;
+    }
 
     this.eventService.emit('chain.updateState', chainSlug);
 
@@ -1169,9 +1173,12 @@ export class ChainService {
       } catch (e) {}
     });
 
-    await Promise.all(initPromises);
+    try {
+      await Promise.all(initPromises);
+    } finally {
+      this.lockChainInfoMap = false;
+    }
 
-    this.lockChainInfoMap = false;
     needUpdate && this.updateChainStateMapSubscription();
 
     return needUpdate;
@@ -1817,13 +1824,15 @@ export class ChainService {
 
     let result;
 
-    if (params.mode === 'update') { // update existing chainInfo
-      await this.updateChain(params);
-    } else { // insert custom network
-      result = await this.insertChain(params);
+    try {
+      if (params.mode === 'update') { // update existing chainInfo
+        await this.updateChain(params);
+      } else { // insert custom network
+        result = await this.insertChain(params);
+      }
+    } finally {
+      this.lockChainInfoMap = false;
     }
-
-    this.lockChainInfoMap = false;
 
     return result;
   }

@@ -16,7 +16,9 @@ export async function fetchData (url: string, options: fetchJsonOptions = {}) {
 
     timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    fetchOptions.signal = new AbortController().signal;
+    // Must be the signal of the controller the timer aborts, otherwise the
+    // timeout never reaches the request and fetch waits forever.
+    fetchOptions.signal = controller.signal;
   }
 
   if (params) {
@@ -34,15 +36,17 @@ export async function fetchData (url: string, options: fetchJsonOptions = {}) {
     fetchOptions.body = JSON.stringify(data);
   }
 
-  const response = await fetch(url, fetchOptions);
+  try {
+    const response = await fetch(url, fetchOptions);
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! Status: ${response.status}`);
-  } else {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response;
+  } finally {
     clearTimeout(timeoutId);
   }
-
-  return response;
 }
 
 export async function fetchJson<T = any> (url: string, options: fetchJsonOptions = {}) {

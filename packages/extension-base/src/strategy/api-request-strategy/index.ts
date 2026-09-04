@@ -73,21 +73,30 @@ export abstract class BaseApiRequestStrategy implements ApiRequestStrategy {
 
           delete this.requestMap[request.id];
         }).catch((e: Error) => {
-          const isRateLimited = this.isRateLimited(e);
+          // A subclass parsing the error must never take the caller down with
+          // it - a throw here would leave the request promise unsettled forever.
+          let isRateLimited: boolean;
+
+          try {
+            isRateLimited = this.isRateLimited(e);
+          } catch (parseError) {
+            isRateLimited = false;
+          }
 
           // Limit rate
-          if (isRateLimited) {
-            if (request.retry < maxRetry) {
-              request.status = 'pending';
-              request.retry++;
-              this.context.reduceLimitRate();
-            } else {
-              // Reject request
-              request.reject(new SWError('MAX_RETRY', String(e)));
-            }
-          } else {
-            request.reject(new SWError('UNKNOWN', String(e)));
+          if (isRateLimited && request.retry < maxRetry) {
+            request.status = 'pending';
+            request.retry++;
+            this.context.reduceLimitRate();
+
+            return;
           }
+
+          request.reject(new SWError(isRateLimited ? 'MAX_RETRY' : 'UNKNOWN', String(e)));
+
+          // Drop it, or the request sits in the map as 'running' forever and
+          // keeps the processing interval alive for the rest of the session.
+          delete this.requestMap[request.id];
         });
       });
     }, this.context.intervalCheck);

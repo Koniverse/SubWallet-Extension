@@ -14,6 +14,12 @@ import { targetIsMobile, targetIsWeb, wait } from '@subwallet/extension-base/uti
 
 const QUERY_ROW = 100;
 
+/**
+ * Subscan is queried while a chain is being enabled, so a request that never
+ * settles leaves the whole flow hanging. Bound every call.
+ */
+const REQUEST_TIMEOUT = 20 * 1000;
+
 interface SubscanError {
   code: number;
   message: string;
@@ -42,7 +48,7 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
     return `https://${subscanChain}.api.subscan.io/${path}`;
   }
 
-  private postRequest (url: string, body: unknown) {
+  private async postRequest (url: string, body: unknown) {
     const parsed = new URL(url);
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
@@ -52,6 +58,8 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
       headers['X-API-Key'] = this.apiKey;
     }
 
+    let requestUrl = url;
+
     if (targetIsWeb || targetIsMobile) {
       const suffix = '.api.subscan.io';
       const subscanChain = parsed.hostname.endsWith(suffix)
@@ -59,25 +67,35 @@ export class SubscanService extends BaseApiRequestStrategyV2 {
         : parsed.hostname;
 
       headers['x-network'] = subscanChain;
-
-      return fetch(`${SUBSCAN_GATEWAY_URL}${parsed.pathname}${parsed.search}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body)
-      });
+      requestUrl = `${SUBSCAN_GATEWAY_URL}${parsed.pathname}${parsed.search}`;
     }
 
-    return fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      return await fetch(requestUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   isRateLimited (e: Error): boolean {
-    const error = JSON.parse(e.message) as SubscanError;
+    // The message is only JSON when Subscan itself answered. A transport
+    // failure (offline, DNS, gateway, abort) carries plain text, and letting
+    // JSON.parse throw here would strand the caller's promise.
+    try {
+      const error = JSON.parse(e.message) as SubscanError;
 
-    return error.code === 20008;
+      return error?.code === 20008;
+    } catch (parseError) {
+      return false;
+    }
   }
 
   public checkSupportedSubscanChain (chain: string): boolean {

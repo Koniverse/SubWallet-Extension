@@ -31,6 +31,12 @@ import { BalanceMapImpl } from './BalanceMapImpl';
 import { subscribeBalance } from './helpers';
 
 /**
+ * Detecting which tokens hold a balance is a nicety on top of enabling a
+ * chain, so it gets a hard ceiling: past this the chain is enabled anyway.
+ */
+const BALANCE_DETECTION_TIMEOUT = 30 * 1000;
+
+/**
  * Balance service
  * @class
 */
@@ -1006,11 +1012,30 @@ export class BalanceService implements StoppableServiceInterface {
     const tokenSlugsWithBalance: string[] = [];
 
     if (address && !_isCustomChain(chainInfo.slug)) {
-      if (_isPureEvmChain(chainInfo)) {
-        tokenSlugsWithBalance.push(...await this.getEvmTokensBalanceByChain(address, chainSlug));
-      } else if (_isChainSubstrateCompatible(chainInfo)) {
-        tokenSlugsWithBalance.push(...await this.getSubstrateTokensBalanceByChain(address, chainSlug, assetsByChain));
-      }
+      const detectBalance = async (): Promise<string[]> => {
+        if (_isPureEvmChain(chainInfo)) {
+          return await this.getEvmTokensBalanceByChain(address, chainSlug);
+        }
+
+        if (_isChainSubstrateCompatible(chainInfo)) {
+          return await this.getSubstrateTokensBalanceByChain(address, chainSlug, assetsByChain);
+        }
+
+        return [];
+      };
+
+      // Neither a failure nor a stalled request may keep the caller waiting:
+      // this runs inside the enable-chain flow, and the UI blocks on it.
+      const detected = await Promise.race([
+        detectBalance().catch((e) => {
+          console.error(e);
+
+          return [] as string[];
+        }),
+        waitTimeout(BALANCE_DETECTION_TIMEOUT).then(() => [] as string[])
+      ]);
+
+      tokenSlugsWithBalance.push(...(detected || []));
     }
 
     tokenSlugsWithBalance.forEach((tokenSlug) => {
