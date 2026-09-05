@@ -8,13 +8,12 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.1, US-42.24.2, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
-| Total bugs found | 4 |
+| Stories tested | US-42.24.1, US-42.24.2, US-42.24.4, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
+| Total bugs found | 5 |
 | P0 | 0 |
-| P1 | 3 |
+| P1 | 4 |
 | P2 | 1 |
 | Status | in progress |
-
 
 ---
 
@@ -40,6 +39,8 @@ All eight pass, so this story is closed. The Governance row wants rechecking wit
 ### Bugs
 
 None found.
+
+---
 
 ## US-42.24.2 — Web-runner 1.3.69 on Mobile
 
@@ -75,6 +76,25 @@ All twenty-one AC now have a verdict, so the story is closed: eighteen pass, one
 
 ---
 
+## US-42.24.4 — Web-runner 1.3.71 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Three items in this version: token enabling round 2 ([#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247)), library updates ([#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808)), and import from Trust Wallet ([#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762)).
+
+Token enabling is checked here. The Trust Wallet import needs that wallet installed with a seed created in it, so it waits for its own session.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-5 | Changing the RPC on a network leaves the native token switched on — Android + iOS fresh | ✅ Pass | |
+| AC-6 | A token with a balance that Subscan supports is detected and appears without being added by hand — Android + iOS fresh | ✅ Pass | |
+| AC-7 | Turning a network off and back on from Settings brings back the tokens that had a balance or were enabled before — Android + iOS fresh | ✅ Pass | |
+| AC-8 | AC-5 to AC-7 pass on Android + iOS upgrade | ✅ Pass | |
+
+### Bugs
+
+None found.
+
 ## US-42.24.14 — Web-runner 1.3.82 on Mobile
 
 Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Remove Polygon zkEVM ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)) — the network is being shut down by Polygon Labs, so its chain, tokens and assets are gone.
@@ -94,6 +114,7 @@ All six AC pass, so this story is closed.
 
 ### Bugs
 
+None found.
 
 ---
 
@@ -128,6 +149,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| REG-13 | Turn networks on and off, including the disable-all switch | ❌ Fail | See BUG-42.24.19-07 |
 | REG-20 | An XCM transfer goes through on at least two routes | ❌ Fail | See BUG-42.24.2-04, logged under US-42.24.2 |
 | REG-34 | NFTs load on EVM and on Unique Network, including nested ones | ❌ Fail | See BUG-42.24.19-05 |
 | REG-50 | The app opens, backgrounds and resumes without losing state | ❌ Fail | See BUG-42.24.19-06 |
@@ -138,6 +160,8 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.19-05 | NFTs on substrate networks do not show on Mobile (Android and iOS) | On either platform, use an account holding NFTs on a substrate network such as Polkadot Asset Hub or Kusama Asset Hub → open the NFT screen on Mobile → then open the same account on the Extension | No NFTs are shown on Mobile. The same account on the Extension shows them | The substrate NFTs show on Mobile, the same as on the Extension | P1 | todo | |
 | BUG-42.24.19-06 | The app loads forever after being left in the background — happens intermittently, on Android and iOS | 1. Open the app and use it normally<br>2. Send it to the background<br>3. Use another app for a while — over 30 minutes<br>4. Reopen SubWallet<br>5. Observe | The app sits on a loading screen and never finishes. Force-closing and reopening it clears the problem. Intermittent — it does not happen every time | The app resumes from the background and is usable, without needing a force-close | P1 | todo | ![](img/BUG-42.24.19-06.jpg) |
+| BUG-42.24.19-07 | The app crashes when tapping the + button while importing a custom network (Android) | Manage networks → tap + to add a network → tap the + button on the import screen | The app crashes and closes | The screen accepts the input and the network can be added | P1 | todo | |
+${row}
 
 ---
 
@@ -151,7 +175,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 |---|---|---|---|
 | BUG-42.24.2-05 — Buying a token through Banxa fails, the supplier never opens | US-42.24.2 | ✅ Pass | AC-18 — ✅ pass |
 
-Three of the twelve bugs are now verified. The other nine are not fixed yet.
+Three of the thirteen bugs are now verified. The other ten are not fixed yet.
 
 ### Bugs
 
