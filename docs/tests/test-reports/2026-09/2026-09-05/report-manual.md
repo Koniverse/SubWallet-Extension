@@ -8,14 +8,38 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.2, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
+| Stories tested | US-42.24.1, US-42.24.2, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
 | Total bugs found | 4 |
 | P0 | 0 |
 | P1 | 3 |
 | P2 | 1 |
 | Status | in progress |
 
+
 ---
+
+## US-42.24.1 — Web-runner 1.3.68 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) — this shipped in 1.3.68 but had been scheduled with 1.3.70 so its Governance row could be checked alongside OpenGov. OpenGov is not built, so the checks came back to the version that shipped them and the story reopened for a second run. Its first run was on [2026-09-03](../2026-09-03/report-manual.md).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-10 | Tapping the Locked field opens the breakdown, showing staking, governance and others — Android + iOS fresh | ✅ Pass | |
+| AC-11 | The staking row shows both active and inactive stake, and the figures match the staking screen — Android + iOS fresh | ✅ Pass | |
+| AC-12 | The governance row is present and reads zero — Android + iOS fresh | ✅ Pass | Zero is the only result available while OpenGov is unbuilt |
+| AC-13 | The "others" figure equals total locked minus the larger of staking and governance, and its tooltip is readable — Android + iOS fresh | ✅ Pass | |
+| AC-14 | In all-accounts mode the info icon shows the per-account breakdown — Android + iOS fresh | ✅ Pass | |
+| AC-15 | An account with nothing locked shows the breakdown sensibly — Android + iOS fresh | ✅ Pass | |
+| AC-16 | AC-10 to AC-15 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-17 | After upgrading, the breakdown still adds up against the balances carried over | ✅ Pass | |
+
+All eight pass, so this story is closed. The Governance row wants rechecking with a real lock behind it when OpenGov ships.
+
+### Bugs
+
+None found.
 
 ## US-42.24.2 — Web-runner 1.3.69 on Mobile
 

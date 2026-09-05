@@ -57,7 +57,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.22](../stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | **P0** — Repoint KAH↔PAH USDt XCM refs (#5062); 15 / 15 AC, no bugs, both halves of the fix confirmed | done |
 | [US-42.23](../stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | Manual claim for Bittensor root staking (#5064) | ready |
 | [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 138 points | in-progress |
-| [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex, locked balance display; reopened for the breakdown checks | in-progress |
+| [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex, locked balance display; 11 pass, 3 skip, 3 settled on retest | done |
 | [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122; 18 AC pass, 1 skip, AC-10 failed; AC-18 failed then settled on retest; 5 bugs | done |
 | [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library updates, import from Trust Wallet | backlog |
 | [US-42.24.5](../stories/US-42.24.5-qc-web-runner-1-3-72.md) | Web-runner 1.3.72 — proxy accounts, chain-list v0.2.123, USDC and stEWT, ParaSpell V5 | backlog |
