@@ -69,8 +69,8 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.11](../stories/US-42.24.11-qc-web-runner-1-3-78.md) | Web-runner 1.3.78 — XCM and bridge fees, disable all networks, Alpha transfer, TAO bridge, Bittensor swap | backlog |
 | [US-42.24.12](../stories/US-42.24.12-qc-web-runner-1-3-79.md) | Web-runner 1.3.79 — Alpha price, ParaSpell v1, display fixes after the 1.3.78 merge, swap refactor | backlog |
 | [US-42.24.13](../stories/US-42.24.13-qc-web-runner-1-3-80.md) | Web-runner 1.3.80 — transfer max at ED, XCM confirm address, token approve, NFTService phase 1 | backlog |
-| [US-42.24.14](../stories/US-42.24.14-qc-web-runner-1-3-82.md) | Web-runner 1.3.82 — Polygon zkEVM removed | backlog |
-| [US-42.24.15](../stories/US-42.24.15-qc-web-runner-1-3-83.md) | Web-runner 1.3.83 — earning terms and conditions | backlog |
+| [US-42.24.14](../stories/US-42.24.14-qc-web-runner-1-3-82.md) | Web-runner 1.3.82 — Polygon zkEVM removed; 6 / 6 AC, no bugs | done |
+| [US-42.24.15](../stories/US-42.24.15-qc-web-runner-1-3-83.md) | Web-runner 1.3.83 — earning terms and conditions; 8 / 8 AC, no bugs | done |
 | [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129 | backlog |
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |

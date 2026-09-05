@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.2, US-42.24.19, US-42.24.20 |
+| Stories tested | US-42.24.2, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
 | Total bugs found | 4 |
 | P0 | 0 |
 | P1 | 3 |
@@ -48,7 +48,53 @@ All twenty-one AC now have a verdict, so the story is closed: eighteen pass, one
 | BUG-42.24.2-04 | XCM cannot fetch a fee, so no XCM transfer can be sent — every route | Open an account with a balance → Send → pick DOT and a destination chain, for example Xode → enter an amount → tap Transfer | Estimated fee shows 0 DOT and the screen says "This feature is not available with this token". The transfer cannot be sent. Affects every XCM route, both the chains added in this chain-list version and token pairs that were already in the wallet | The fee is fetched and shown, and the XCM transfer goes through | P1 | todo | ![](img/BUG-42.24.2-04.jpg) |
 | BUG-42.24.2-05 | Buying a token through Banxa fails (Android and iOS) | Buy token → pick AVAX and Banxa as the supplier → pick the destination account → tap Buy now | "Unable to redirect you to the selected supplier at the moment. Try again later" — the supplier never opens | The flow hands off to Banxa so the purchase can be completed there | P2 | fixed, verified | ![](img/BUG-42.24.2-05.png) |
 
+
 ---
+
+## US-42.24.14 — Web-runner 1.3.82 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Remove Polygon zkEVM ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)) — the network is being shut down by Polygon Labs, so its chain, tokens and assets are gone.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Polygon zkEVM is not in the network list and cannot be enabled — Android + iOS fresh | ✅ Pass | |
+| AC-2 | Polygon zkEVM tokens do not appear anywhere — token list, send, swap, or anywhere else — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Other Polygon networks are unaffected and still work — Android + iOS fresh | ✅ Pass | |
+| AC-4 | AC-1 to AC-3 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-5 | An account that held assets on Polygon zkEVM opens without error after the upgrade | ✅ Pass | |
+| AC-6 | Old Polygon zkEVM transactions in history do not break the history screen | ✅ Pass | |
+
+All six AC pass, so this story is closed.
+
+### Bugs
+
+
+---
+
+## US-42.24.15 — Web-runner 1.3.83 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Earning terms and conditions ([#5007](https://github.com/Koniverse/SubWallet-Extension/issues/5007)) — the issue has an empty body, so these checks were written from the build.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Starting an earning position shows the terms before the transaction — Android + iOS fresh | ✅ Pass | |
+| AC-2 | The terms cannot be accepted without the user acting — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Declining or going back cancels the flow, and no transaction is sent — Android + iOS fresh | ✅ Pass | |
+| AC-4 | After accepting, the earning flow carries on and the position is created — Android + iOS fresh | ✅ Pass | |
+| AC-5 | Whether the terms show again on a later attempt matches what the build intends — Android + iOS fresh | ✅ Pass | |
+| AC-6 | The terms text is readable in all supported languages, with no raw keys — Android + iOS fresh | ✅ Pass | |
+| AC-7 | AC-1 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-8 | After upgrading, an account with an existing earning position is not blocked by the terms screen | ✅ Pass | |
+
+All eight AC pass, so this story is closed.
+
+### Bugs
+
+None found.
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
