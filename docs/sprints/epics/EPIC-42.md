@@ -4,7 +4,7 @@ title: "QA Coverage Tracking"
 status: in-progress
 prd_ref: []
 created: 2026-07-16
-updated: 2026-09-04
+updated: 2026-09-05
 ---
 
 ## Goal
@@ -75,8 +75,8 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129 | backlog |
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |
-| [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; 4 bugs, REG-1 and REG-16 failed | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 2 of 8 verified, their AC rerun and passing | in-progress |
+| [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; 5 bugs, REG-1, REG-16 and REG-34 failed | in-progress |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 2 of 9 verified, their AC rerun and passing | in-progress |
 
 More rows get added here as testing starts.
 
