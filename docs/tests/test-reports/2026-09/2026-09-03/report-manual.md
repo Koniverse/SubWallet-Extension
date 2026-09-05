@@ -23,7 +23,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 Three items in this session: Transak widget URL ([#4835](https://github.com/Koniverse/SubWallet-Extension/issues/4835)), NFT ERC-721 import on Rari ([#4625](https://github.com/Koniverse/SubWallet-Extension/issues/4625)), NFT without tokenOfOwnerByIndex ([#4568](https://github.com/Koniverse/SubWallet-Extension/issues/4568)).
 
-Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) also shipped in 1.3.68 but is tested in [US-42.24.3](../../../../sprints/stories/US-42.24.3-qc-web-runner-1-3-70.md) alongside OpenGov, since its breakdown has a Governance row.
+Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) also shipped in 1.3.68 but was not checked in this session — at the time it was scheduled with 1.3.70 so its Governance row could be checked alongside OpenGov. OpenGov turned out not to be built, so it came back to this story on 2026-09-05.
 
 ### AC results
 
