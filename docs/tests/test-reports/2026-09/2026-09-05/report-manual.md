@@ -1,0 +1,188 @@
+# Manual Test Report — EPIC-42 — 2026-09-05
+
+| Field | Value |
+|---|---|
+| Epic | EPIC-42 — QA Coverage Tracking |
+| Date | 2026-09-05 |
+| Tester | MaiThuongNinni |
+| Environment | Mobile — Android + iOS |
+| Runner | manual (mobile) |
+| Build under test | to fill in — build number + web-runner version |
+| Stories tested | US-42.24.1, US-42.24.2, US-42.24.4, US-42.24.14, US-42.24.15, US-42.24.19, US-42.24.20 |
+| Total bugs found | 5 |
+| P0 | 0 |
+| P1 | 4 |
+| P2 | 1 |
+| Status | in progress |
+
+---
+
+## US-42.24.1 — Web-runner 1.3.68 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) — this shipped in 1.3.68 but had been scheduled with 1.3.70 so its Governance row could be checked alongside OpenGov. OpenGov is not built, so the checks came back to the version that shipped them and the story reopened for a second run. Its first run was on [2026-09-03](../2026-09-03/report-manual.md).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-10 | Tapping the Locked field opens the breakdown, showing staking, governance and others — Android + iOS fresh | ✅ Pass | |
+| AC-11 | The staking row shows both active and inactive stake, and the figures match the staking screen — Android + iOS fresh | ✅ Pass | |
+| AC-12 | The governance row is present and reads zero — Android + iOS fresh | ✅ Pass | Zero is the only result available while OpenGov is unbuilt |
+| AC-13 | The "others" figure equals total locked minus the larger of staking and governance, and its tooltip is readable — Android + iOS fresh | ✅ Pass | |
+| AC-14 | In all-accounts mode the info icon shows the per-account breakdown — Android + iOS fresh | ✅ Pass | |
+| AC-15 | An account with nothing locked shows the breakdown sensibly — Android + iOS fresh | ✅ Pass | |
+| AC-16 | AC-10 to AC-15 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-17 | After upgrading, the breakdown still adds up against the balances carried over | ✅ Pass | |
+
+All eight pass, so this story is closed. The Governance row wants rechecking with a real lock behind it when OpenGov ships.
+
+### Bugs
+
+None found.
+
+---
+
+## US-42.24.2 — Web-runner 1.3.69 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
+
+Third day on this story, after [2026-09-03](../2026-09-03/report-manual.md) and [2026-09-04](../2026-09-04/report-manual.md). It finishes here.
+
+All twenty-one AC now have a verdict, so the story is closed: eighteen pass, one skipped, and two failed with bugs logged. One of those two, the Banxa failure, has since been fixed and AC-18 rerun — see the verify section below.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-8 | ARIAIP on Story Protocol can be sent, and the transaction goes through — Android + iOS fresh | ✅ Pass | chain-list [616](https://github.com/Koniverse/SubWallet-ChainList/issues/616) |
+| AC-9 | cACU on Acurast Canary can be sent — Android + iOS fresh | ✅ Pass | chain-list [620](https://github.com/Koniverse/SubWallet-ChainList/issues/620) |
+| AC-10 | DOT can be sent by XCM to and from Xode — Android + iOS fresh | ❌ Fail | See BUG-42.24.2-04 |
+| AC-13 | The RPCs that were removed are no longer listed, and every chain still has a working one — Android + iOS fresh | ✅ Pass | chain-list [618](https://github.com/Koniverse/SubWallet-ChainList/issues/618) |
+| AC-15 | The Aventus Polkadot block explorer link opens the right page — Android + iOS fresh | ✅ Pass | chain-list [632](https://github.com/Koniverse/SubWallet-ChainList/issues/632) |
+| AC-16 | The Subtensor EVM explorer link opens the right page — Android + iOS fresh | ✅ Pass | part of the stable build |
+| AC-17 | Chains with updated RPCs connect and their balances load — Android + iOS fresh | ✅ Pass | chain-list [636](https://github.com/Koniverse/SubWallet-ChainList/issues/636) |
+| AC-18 | Banxa appears as a buy option for the tokens it was added for, and the flow opens — Android + iOS fresh | ❌ Fail | See BUG-42.24.2-05 |
+| AC-19 | AC-1 to AC-18 pass on Android + iOS upgrade | ✅ Pass | Same result as the fresh run, the two failures included |
+| AC-20 | After upgrading, networks and tokens enabled before the upgrade are still enabled and their balances still load | ✅ Pass | |
+| AC-21 | An account that held Phala before the upgrade opens without error, and its balance is not silently lost from view | ✅ Pass | |
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.2-04 | XCM cannot fetch a fee, so no XCM transfer can be sent — every route | Open an account with a balance → Send → pick DOT and a destination chain, for example Xode → enter an amount → tap Transfer | Estimated fee shows 0 DOT and the screen says "This feature is not available with this token". The transfer cannot be sent. Affects every XCM route, both the chains added in this chain-list version and token pairs that were already in the wallet | The fee is fetched and shown, and the XCM transfer goes through | P1 | todo | ![](img/BUG-42.24.2-04.jpg) |
+| BUG-42.24.2-05 | Buying a token through Banxa fails (Android and iOS) | Buy token → pick AVAX and Banxa as the supplier → pick the destination account → tap Buy now | "Unable to redirect you to the selected supplier at the moment. Try again later" — the supplier never opens | The flow hands off to Banxa so the purchase can be completed there | P2 | fixed, verified | ![](img/BUG-42.24.2-05.png) |
+
+
+---
+
+## US-42.24.4 — Web-runner 1.3.71 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Three items in this version: token enabling round 2 ([#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247)), library updates ([#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808)), and import from Trust Wallet ([#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762)).
+
+Token enabling is checked here. The Trust Wallet import needs that wallet installed with a seed created in it, so it waits for its own session.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-5 | Changing the RPC on a network leaves the native token switched on — Android + iOS fresh | ✅ Pass | |
+| AC-6 | A token with a balance that Subscan supports is detected and appears without being added by hand — Android + iOS fresh | ✅ Pass | |
+| AC-7 | Turning a network off and back on from Settings brings back the tokens that had a balance or were enabled before — Android + iOS fresh | ✅ Pass | |
+| AC-8 | AC-5 to AC-7 pass on Android + iOS upgrade | ✅ Pass | |
+
+### Bugs
+
+None found.
+
+## US-42.24.14 — Web-runner 1.3.82 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Remove Polygon zkEVM ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)) — the network is being shut down by Polygon Labs, so its chain, tokens and assets are gone.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Polygon zkEVM is not in the network list and cannot be enabled — Android + iOS fresh | ✅ Pass | |
+| AC-2 | Polygon zkEVM tokens do not appear anywhere — token list, send, swap, or anywhere else — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Other Polygon networks are unaffected and still work — Android + iOS fresh | ✅ Pass | |
+| AC-4 | AC-1 to AC-3 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-5 | An account that held assets on Polygon zkEVM opens without error after the upgrade | ✅ Pass | |
+| AC-6 | Old Polygon zkEVM transactions in history do not break the history screen | ✅ Pass | |
+
+All six AC pass, so this story is closed.
+
+### Bugs
+
+None found.
+
+---
+
+## US-42.24.15 — Web-runner 1.3.83 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Earning terms and conditions ([#5007](https://github.com/Koniverse/SubWallet-Extension/issues/5007)) — the issue has an empty body, so these checks were written from the build.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Starting an earning position shows the terms before the transaction — Android + iOS fresh | ✅ Pass | |
+| AC-2 | The terms cannot be accepted without the user acting — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Declining or going back cancels the flow, and no transaction is sent — Android + iOS fresh | ✅ Pass | |
+| AC-4 | After accepting, the earning flow carries on and the position is created — Android + iOS fresh | ✅ Pass | |
+| AC-5 | Whether the terms show again on a later attempt matches what the build intends — Android + iOS fresh | ✅ Pass | |
+| AC-6 | The terms text is readable in all supported languages, with no raw keys — Android + iOS fresh | ✅ Pass | |
+| AC-7 | AC-1 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-8 | After upgrading, an account with an existing earning position is not blocked by the terms screen | ✅ Pass | |
+
+All eight AC pass, so this story is closed.
+
+### Bugs
+
+None found.
+
+## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| REG-13 | Turn networks on and off, including the disable-all switch | ❌ Fail | See BUG-42.24.19-07 |
+| REG-20 | An XCM transfer goes through on at least two routes | ❌ Fail | See BUG-42.24.2-04, logged under US-42.24.2 |
+| REG-34 | NFTs load on EVM and on Unique Network, including nested ones | ❌ Fail | See BUG-42.24.19-05 |
+| REG-50 | The app opens, backgrounds and resumes without losing state | ❌ Fail | See BUG-42.24.19-06 |
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-05 | NFTs on substrate networks do not show on Mobile (Android and iOS) | On either platform, use an account holding NFTs on a substrate network such as Polkadot Asset Hub or Kusama Asset Hub → open the NFT screen on Mobile → then open the same account on the Extension | No NFTs are shown on Mobile. The same account on the Extension shows them | The substrate NFTs show on Mobile, the same as on the Extension | P1 | todo | |
+| BUG-42.24.19-06 | The app loads forever after being left in the background — happens intermittently, on Android and iOS | 1. Open the app and use it normally<br>2. Send it to the background<br>3. Use another app for a while — over 30 minutes<br>4. Reopen SubWallet<br>5. Observe | The app sits on a loading screen and never finishes. Force-closing and reopening it clears the problem. Intermittent — it does not happen every time | The app resumes from the background and is usable, without needing a force-close | P1 | todo | ![](img/BUG-42.24.19-06.jpg) |
+| BUG-42.24.19-07 | The app crashes when tapping the + button while importing a custom network (Android) | Manage networks → tap + to add a network → tap the + button on the import screen | The app crashes and closes | The screen accepts the input and the network can be added | P1 | todo | |
+${row}
+
+---
+
+## US-42.24.20 — Verify the bugs found during the web-runner update
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
+
+### Verify results
+
+| Bug | Found in | Fix verified | AC rerun |
+|---|---|---|---|
+| BUG-42.24.2-05 — Buying a token through Banxa fails, the supplier never opens | US-42.24.2 | ✅ Pass | AC-18 — ✅ pass |
+
+Three of the thirteen bugs are now verified. The other ten are not fixed yet.
+
+### Bugs
+
+None found during the recheck.
+
+---
+
+## Summary
+
+Session in progress.
