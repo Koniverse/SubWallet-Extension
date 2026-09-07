@@ -13,7 +13,7 @@
 | P0 | 0 |
 | P1 | 4 |
 | P2 | 1 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -73,7 +73,6 @@ All twenty-one AC now have a verdict, so the story is closed: eighteen pass, one
 | BUG-42.24.2-04 | XCM cannot fetch a fee, so no XCM transfer can be sent — every route | Open an account with a balance → Send → pick DOT and a destination chain, for example Xode → enter an amount → tap Transfer | Estimated fee shows 0 DOT and the screen says "This feature is not available with this token". The transfer cannot be sent. Affects every XCM route, both the chains added in this chain-list version and token pairs that were already in the wallet | The fee is fetched and shown, and the XCM transfer goes through | P1 | todo | ![](img/BUG-42.24.2-04.jpg) |
 | BUG-42.24.2-05 | Buying a token through Banxa fails (Android and iOS) | Buy token → pick AVAX and Banxa as the supplier → pick the destination account → tap Buy now | "Unable to redirect you to the selected supplier at the moment. Try again later" — the supplier never opens | The flow hands off to Banxa so the purchase can be completed there | P2 | fixed, verified | ![](img/BUG-42.24.2-05.png) |
 
-
 ---
 
 ## US-42.24.4 — Web-runner 1.3.71 on Mobile
@@ -94,6 +93,8 @@ Token enabling is checked here. The Trust Wallet import needs that wallet instal
 ### Bugs
 
 None found.
+
+---
 
 ## US-42.24.14 — Web-runner 1.3.82 on Mobile
 
@@ -141,6 +142,8 @@ All eight AC pass, so this story is closed.
 
 None found.
 
+---
+
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
 Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
@@ -185,4 +188,10 @@ None found during the recheck.
 
 ## Summary
 
-Session in progress.
+5 bugs found — 4 P1, 1 P2. One bug verified fixed within the session.
+
+Four stories closed. US-42.24.2 (chain-list v0.2.122) finished with every AC settled: eighteen pass, one skipped for Cardano, two failed with bugs. US-42.24.14 (Polygon zkEVM removal) and US-42.24.15 (earning terms) both came out clean. US-42.24.1 reopened for the locked balance display and closed again — the breakdown works on both platforms, though its Governance row can only read zero while OpenGov is unbuilt.
+
+US-42.24.4 started: token enabling passes, the Trust Wallet import waits for its own session.
+
+BUG-42.24.2-04 is the one that matters most — XCM cannot fetch a fee, so no XCM transfer can be sent on any route.
