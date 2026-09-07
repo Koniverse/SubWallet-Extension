@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W36
-status: in-progress
+status: closed
 start: 2026-08-31
 end: 2026-09-06
 goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 with both its dev stories done, and what was left over was verification and one unmerged feature. The release gate the release did not wait for is now complete (US-42.21, 16/16, no bugs); what remains is to land or reschedule the Bittensor manual claim (US-12.23 / PR #5065), whose issue is closed, whose QC passed 16/16, and whose code is in no branch that ships. Opened 2026-09-03 from tracker, PR and git evidence."
@@ -11,15 +11,22 @@ goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 wit
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | done | ← W35 | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← W35 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | → W37 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24.1 | QC — Web-runner 1.3.68 | EPIC-42 | P2 | 8 | done | new | [link](stories/US-42.24.1-qc-web-runner-1-3-68.md) |
+| US-42.24.2 | QC — Web-runner 1.3.69 | EPIC-42 | P2 | 8 | done | new | [link](stories/US-42.24.2-qc-web-runner-1-3-69.md) |
+| US-42.24.4 | QC — Web-runner 1.3.71 | EPIC-42 | P2 | 8 | in-progress | tester | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
+| US-42.24.14 | QC — Web-runner 1.3.82 | EPIC-42 | P2 | 2 | done | new | [link](stories/US-42.24.14-qc-web-runner-1-3-82.md) |
+| US-42.24.15 | QC — Web-runner 1.3.83 | EPIC-42 | P2 | 3 | done | new | [link](stories/US-42.24.15-qc-web-runner-1-3-83.md) |
+| US-42.24.19 | QC — Web-runner 1.3.86 full regression | EPIC-42 | P2 | 13 | in-progress | tester | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
+| US-42.24.20 | QC — Verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 
-**2 stories · 13 points**, both carried, **nothing new written in-window**. No new tracker issue has
-been opened since [#5064](https://github.com/Koniverse/SubWallet-Extension/issues/5064) on 2026-08-24
-— ten days without one, the longest quiet stretch in the record so far.
+**10 stories · 63 points.** The window opened at **2 stories / 13 points**; the
+[US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md) web-runner QC programme — a parent plus 19
+version sub-tasks — landed inside it on 2026-09-03, and eight of those were worked this week.
 
-Small again, and for the same reason [W34](sprint-2026-W34.md) was — which closed at 5 of 5, and
-[W35](sprint-2026-W35.md), which closed at 5 of 7 and shipped a release. The scope is what has
-evidence of being live.
+**Twelve more sub-tasks sit in `backlog` with no sprint** (US-42.24.5 … .13, .16 … .18, **88
+points**) — the rest of the 1.3.68 → 1.3.86 backfill, never in this window.
 
 ## US-42.21 — the release gate is now closed
 
@@ -90,3 +97,55 @@ from [2026-08-10 §D](../notes/2026-08-10.md) is now five weeks old.
 `projectV2` needs `read:project`; the available token carries `gist, read:org, repo`. Unchanged since
 2026-08-13. Opened from `gh issue view`, `gh pr view` and git alone; **no board column is claimed as
 current**.
+
+---
+
+## Closeout — 2026-09-07
+
+Window ended **2026-09-06**. Closed the next day from `gh`, git and the merged QC pages; the board
+still could not be read.
+
+### 5 of 10 stories · 29 of 63 points
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **Done** | US-42.21, US-42.24.1, US-42.24.2, US-42.24.14, US-42.24.15 | 29 |
+| **→ [W37](sprint-2026-W37.md)** | US-12.23 | 5 |
+| **Stays on W36 — tester-owned** | US-42.24 (parent), US-42.24.4, US-42.24.19, US-42.24.20 | 29 |
+
+> **The four in-progress US-42.24 sub-tasks keep `sprint: sprint-2026-W36` and were not moved.**
+> They belong to the tester's QC programme, and which window they sit in is their call, not this
+> file's. The same boundary applies as to the test reports and
+> [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md): status of that work is recorded by
+> whoever runs it. Noted here so a later reader does not read the omission as an oversight.
+
+**The scope table above was rebuilt at closeout, not merely re-statused.** It recorded 2 stories and
+13 points all week while eight more were being worked under it — the US-42.24 programme arrived
+2026-09-03 and nothing added it to the window. A sprint file that is not rebuilt when work lands in
+it under-reports by whatever arrived late, and here that was **five sixths of the points**.
+
+### What closed
+
+- **[US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md) — the v1.3.89 release gate is
+  `done`.** [W35's closeout](sprint-2026-W35.md) flagged it as a gate the release did not wait for,
+  with 10 of 13 checks unticked six days after production. It finished inside this window.
+- **[US-42.24.1](stories/US-42.24.1-qc-web-runner-1-3-68.md) closed**, its blocking bug
+  `BUG-42.24.1-01` verified fixed in
+  [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) with AC-7, AC-8 and AC-9 rerun and
+  passing.
+- **US-42.24.3 was dropped** — the 1.3.70 sub-task; its locked-balance checks moved to US-42.24.1.
+
+### What did not
+
+- **[US-12.23](stories/US-12.23-bittensor-manual-claim-native-staking.md)** — unchanged for a second
+  window. PR [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) still open and
+  approved, #5064 still closed by hand, still out of the release scope. Its 16/16 QC pass is now
+  **13 days old against a branch that has not merged**, which is the decay this was flagged for.
+- **The web-runner QC is roughly a third done.** Eight of twenty sub-tasks touched; twelve still
+  `backlog` at **88 points** — the programme is larger than the rest of the live sprint record
+  combined.
+
+### Still not moving — the eight W33 stories
+
+Re-checked 2026-09-07. Unchanged: all six anchors OPEN, same last-touched dates. **Five consecutive
+windows sat out** — W31, W33, W34, W35, W36. The planning call is six weeks old.
