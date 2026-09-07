@@ -85,7 +85,10 @@ global.chrome.storage = {
       }).catch(console.error);
     },
     // @ts-ignore
-    remove: (key: string, value: any, callback?: () => void) => {
+    // chrome.storage.local.remove takes (keys, callback). This shim used to
+    // declare a value argument in the middle that the real API does not have, so
+    // every caller's callback landed there and was never invoked.
+    remove: (key: string, callback?: () => void) => {
       storage.removeItem(key).then(() => {
         callback && callback();
       }).catch(console.error);

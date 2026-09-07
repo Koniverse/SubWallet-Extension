@@ -12,7 +12,7 @@ import { BaseApiRequestStrategyV2 } from '@subwallet/extension-base/strategy/api
 import { SubscanEventBaseItemData, SubscanEventListResponse, SubscanExtrinsicParam, SubscanExtrinsicParamResponse } from '@subwallet/extension-base/types';
 import { targetIsMobile, targetIsWeb, wait } from '@subwallet/extension-base/utils';
 
-const QUERY_ROW = 100;
+const QUERY_ROW = 25;
 
 /**
  * Subscan is queried while a chain is being enabled, so a request that never
