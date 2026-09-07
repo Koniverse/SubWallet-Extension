@@ -9,10 +9,10 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.4, US-42.24.5, US-42.24.19 |
-| Total bugs found | 4 |
+| Total bugs found | 5 |
 | P0 | 0 |
 | P1 | 1 |
-| P2 | 3 |
+| P2 | 4 |
 | Status | in progress |
 
 ---
@@ -104,6 +104,7 @@ Nothing settled yet — the session is on the Add proxy screen and the bug below
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.5-01 | The Add proxy screen shows an Available balance line the Extension does not | Account detail → Manage proxies → Add proxy → look at the lines under the form | Two lines are shown: Available balance and Proxy deposit. The Extension shows only Proxy deposit | Only the Proxy deposit line, matching the Extension | P2 | todo | ![](img/BUG-42.24.5-01.png) |
+| BUG-42.24.5-02 | The Transaction details sheet on Add proxy confirmation cannot be scrolled | Account detail → Manage proxies → Add proxy → fill the form → Approve → on the Add proxy confirmation screen open Transaction details → try to scroll the JSON | The JSON is longer than the sheet and is cut off at the bottom. Swiping up or down inside the sheet does not move it, so the end of the call data cannot be read | The sheet scrolls to the end of the JSON | P2 | todo | ![](img/BUG-42.24.5-02.png) |
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
