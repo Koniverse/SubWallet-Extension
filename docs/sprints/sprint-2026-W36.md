@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W36
-status: in-progress
+status: done
 start: 2026-08-31
 end: 2026-09-06
 goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 with both its dev stories done, and what was left over was verification and one unmerged feature. The release gate the release did not wait for is now complete (US-42.21, 16/16, no bugs); what remains is to land or reschedule the Bittensor manual claim (US-12.23 / PR #5065), whose issue is closed, whose QC passed 16/16, and whose code is in no branch that ships. Opened 2026-09-03 from tracker, PR and git evidence."

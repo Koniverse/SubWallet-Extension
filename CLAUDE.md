@@ -9,7 +9,7 @@ See [AGENTS.md](AGENTS.md) for the full project guide.
 koni-docs:
   plugins: []
   docs_path: docs/
-  active_sprint: sprint-2026-W36
+  active_sprint: sprint-2026-W37
   version_file: VERSION
 
 ## Active Context <!-- koni-docs:auto-update -->
