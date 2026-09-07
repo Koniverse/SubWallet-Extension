@@ -9,11 +9,12 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.4, US-42.24.5, US-42.24.19 |
-| Total bugs found | 5 |
+| Total bugs found | 10 |
 | P0 | 0 |
 | P1 | 1 |
-| P2 | 4 |
-| Status | in progress |
+| P2 | 7 |
+| P3 | 2 |
+| Status | done |
 
 ---
 
@@ -21,15 +22,9 @@
 
 Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Three items in this version: token enabling round 2 ([#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247)), library updates ([#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808)), and import from Trust Wallet ([#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762)).
 
-Token enabling passed on [2026-09-05](../2026-09-05/report-manual.md). Today covers the Trust Wallet import.
+Token enabling passed on [2026-09-05](../2026-09-05/report-manual.md). Today covers the library updates and the Trust Wallet import.
 
-Both halves of this story had their AC rewritten today, and for the same reason: the originals came from the issue titles, and the real scope was somewhere else.
-
-The Trust Wallet AC now follow the checklist actually used to test it — the screens the import is reached through, what the imported account may do afterwards, and what happens when the same seed arrives twice by two routes. Twenty AC in four groups, all of them run below.
-
-The library AC now follow the test scope the developer wrote in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808): the whole user-facing surface across EVM, Substrate, Bitcoin and TON, in five areas. Fifteen AC, fourteen of them passing and one skipped.
-
-Both halves ran today. AC-1 to AC-4 (token enabling) passed on 2026-09-05, so every AC in this story now has a verdict: 38 pass and one skipped.
+The AC for both halves were rewritten today from their real scope: the Trust Wallet checklist, and the developer's test scope in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808). Every AC in the story now has a verdict — 38 pass, one skipped.
 
 ### AC results
 
@@ -79,11 +74,7 @@ All twenty pass, on both platforms, fresh install and upgrade.
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.4-01 | Past transaction history does not load unless a Subscan API key is saved | Install the app fresh, or import an account into an existing install → open that account history without a Subscan API key saved → then save a key in Settings and look again | Without a key, the history is empty — past transactions the account really has do not appear. They show up once a key is saved | The history loads without the user having to supply their own API key. The key is meant to raise the rate limit for heavy use, not to be the price of seeing your own past transactions<br><br>Developer note, not verified here: Subscan tightened its query limit, and the app still asks for 100 records at a time where only 25 are now allowed. The fix is to drop the page size to 25 | P1 | skipped, cannot be checked here | |
 
-Why BUG-42.24.4-01 is skipped rather than failed:
-
-The bug is real and reproduces. What cannot be done here is decide whether it is fixed. The developer is fixing it in a newer Extension version than the one this web-runner carries — Mobile runs the Extension code through the web-runner, and the runner is pinned to 1.3.86, so a fix landing after that does not reach this build at all.
-
-So AC-16 cannot get a verdict on this build either way: the code with the fix is not in it. That is the definition of a skip rather than a fail. It gets run when a web-runner carrying the fixed Extension version arrives.
+BUG-42.24.4-01 is skipped, not failed: the bug reproduces, but the fix lands in a newer Extension version than this web-runner carries, so AC-16 cannot get a verdict here either way. It gets rerun when a web-runner with the fix arrives.
 
 
 
@@ -97,7 +88,19 @@ The AC for this story were written out today from their real scope — the proxy
 
 ### AC results
 
-Nothing settled yet — the session is on the Add proxy screen and the bug below came out of it.
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | The Manage proxies tab lists the proxies with their address and type, on a unified account and on a solo Polkadot account — Android + iOS fresh | ✅ Pass | |
+| AC-2 | On an EVM, TON or mixed Substrate-EVM account the tab still appears but the list cannot be read, added to or removed from — Android + iOS fresh | ✅ Pass | |
+| AC-3 | A watch-only account can see its proxies but cannot add or remove — Android + iOS fresh | ✅ Pass | |
+| AC-4 | A proxy can be added as Any, Staking or Non-transfer, and appears in Manage proxies with the right type label — Android + iOS fresh | ✅ Pass | |
+| AC-5 | Adding fails cleanly when it should — insufficient balance, adding yourself, a duplicate type on the same address — Android + iOS fresh | ✅ Pass | |
+| AC-6 | A proxy can be removed, and it disappears from Manage proxies on that network — Android + iOS fresh | ✅ Pass | |
+| AC-7 | Removing from a watch-only account is refused — Android + iOS fresh | ✅ Pass | |
+| AC-8 | A transfer signed by an Any proxy goes through, with the main account paying the amount and the proxy paying the gas — Android + iOS fresh | ✅ Pass | |
+| AC-19 | Voting through a proxy — Android + iOS fresh | ⏭️ Skipped | Mobile has no governance screen to vote from |
+
+Adding and removing both work. The bugs below are all display problems on those same screens, not failures of the flows.
 
 ### Bugs
 
@@ -105,6 +108,10 @@ Nothing settled yet — the session is on the Add proxy screen and the bug below
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.5-01 | The Add proxy screen shows an Available balance line the Extension does not | Account detail → Manage proxies → Add proxy → look at the lines under the form | Two lines are shown: Available balance and Proxy deposit. The Extension shows only Proxy deposit | Only the Proxy deposit line, matching the Extension | P2 | todo | ![](img/BUG-42.24.5-01.png) |
 | BUG-42.24.5-02 | The Transaction details sheet on Add proxy confirmation cannot be scrolled | Account detail → Manage proxies → Add proxy → fill the form → Approve → on the Add proxy confirmation screen open Transaction details → try to scroll the JSON | The JSON is longer than the sheet and is cut off at the bottom. Swiping up or down inside the sheet does not move it, so the end of the call data cannot be read | The sheet scrolls to the end of the JSON | P2 | todo | ![](img/BUG-42.24.5-02.png) |
+| BUG-42.24.5-03 | The Proxy type field on the Add proxy screen is greyed out and has no dropdown arrow | Account detail → Manage proxies → Add proxy → look at the Proxy type field | The selected type is dim grey, the same colour as the placeholder text, and the field has no dropdown arrow on the right | The selected type is in the normal white text, and the field shows a dropdown arrow like the Extension does | P2 | todo | ![](img/BUG-42.24.5-03.png) |
+| BUG-42.24.5-04 | The Governance proxy type is offered on Mobile, which has no governance feature | Account detail → Manage proxies → Add proxy → open the Proxy type list | Governance is one of the types that can be picked, but Mobile has no governance screen, so a proxy added with it cannot be used for anything | Governance is not offered on Mobile while the feature is not there | P2 | todo | ![](img/BUG-42.24.5-03.png) |
+| BUG-42.24.5-05 | The Available balance label on the Remove proxy screen has two colons | Account detail → Manage proxies → remove a proxy → look at the Available balance line | It reads "Available balance:: 1,430.88 TAO" — the colon is doubled | One colon: "Available balance: 1,430.88 TAO" | P3 | todo | ![](img/BUG-42.24.5-05.png) |
+| BUG-42.24.5-06 | The Remove proxy confirmation title is truncated although there is room for it | Account detail → Manage proxies → remove a proxy → Continue → look at the screen title | The title shows "Remove proxy confirmati…" — cut two characters short of the full word, with empty space on both sides of it | The full title "Remove proxy confirmation" is shown | P3 | todo | ![](img/BUG-42.24.5-06.png) |
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
@@ -122,7 +129,16 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.19-08 | The info tooltip on the Others row of the locked balance breakdown says something different on Mobile than on the Extension | Open a token with a locked balance → tap Locked to expand the breakdown → tap the (i) next to Others → compare with the same tooltip on the Extension | Mobile says "Other locks are the remainder after deducting the greater of the staking and governance locks from the total locked balance". The Extension says "Balances locked due to unique on-chain actions on the network" | Both platforms explain the Others row the same way. One of the two texts is wrong and the developer needs to say which | P2 | todo | ![](img/BUG-42.24.19-08.jpg) |
 | BUG-42.24.19-09 | The Account name field on the Create derived account screen is indented out of line (Android) | Open an account → Create derived account → look at the Account name field | The label and the input below it do not line up — the input sits indented from the label above it, and from the rest of the form | The field lines up with the labels and fields around it | P2 | todo | ![](img/BUG-42.24.19-09.png) |
+| BUG-42.24.19-10 | The Android back button does nothing on the History screen | Open the History screen → press the Android hardware or gesture back button | The screen does not go back — it stays on History, and the only way out is the on-screen back arrow | The back button returns to the previous screen, as it does elsewhere in the app | P2 | todo | |
 
 ## Summary
 
-Session in progress.
+US-42.24.4 is finished. Both halves had their AC rewritten today from their real scope, and every AC now has a verdict: 38 pass and AC-16 skipped, because the fix for BUG-42.24.4-01 lands in a later Extension version than this web-runner carries.
+
+US-42.24.5 started on the proxy screens. Seeing the proxy list, adding and removing all work, and a transfer signed by an Any proxy goes through with the fees split the way it should be — AC-1 to AC-8. AC-19 is skipped: Mobile has no governance screen to vote from. The rest of the story is untouched.
+
+Six bugs came out of those proxy screens and none of them stops the flow: an extra Available balance line on Add proxy, a Transaction details sheet that will not scroll, the Proxy type field greyed out with no dropdown arrow, the Governance type offered although Mobile cannot use it, a doubled colon on Remove proxy, and a title truncated with room to spare. The Governance one is worth the developer's attention — the type can be picked but nothing on Mobile can use a proxy created with it.
+
+Regression picked up three more: the locked balance tooltip text differs from the Extension, the Account name field on Create derived account is out of line, and the Android back button does nothing on History.
+
+Ten bugs today: one P1, seven P2, two P3.
