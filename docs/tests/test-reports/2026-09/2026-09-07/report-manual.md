@@ -27,15 +27,29 @@ Both halves of this story had their AC rewritten today, and for the same reason:
 
 The Trust Wallet AC now follow the checklist actually used to test it — the screens the import is reached through, what the imported account may do afterwards, and what happens when the same seed arrives twice by two routes. Twenty AC in four groups, all of them run below.
 
-The library AC now follow the test scope the developer wrote in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808): the whole user-facing surface across EVM, Substrate, Bitcoin and TON, in five areas. Fifteen AC, none run yet.
+The library AC now follow the test scope the developer wrote in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808): the whole user-facing surface across EVM, Substrate, Bitcoin and TON, in five areas. Fifteen AC, fourteen of them passing and one skipped.
 
-Still to run: AC-5 to AC-19, the library update scope.
+Both halves ran today. AC-1 to AC-4 (token enabling) passed on 2026-09-05, so every AC in this story now has a verdict: 38 pass and one skipped.
 
 ### AC results
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| AC-5 | Creating an account works on EVM, Substrate, Bitcoin and TON — Android + iOS fresh | ✅ Pass | |
+| AC-6 | Importing works by JSON, seed phrase and private key on each ecosystem — Android + iOS fresh | ✅ Pass | |
+| AC-7 | Exporting and deriving accounts work on each ecosystem — Android + iOS fresh | ✅ Pass | |
+| AC-8 | Accounts that existed before the upgrade are still visible and usable | ✅ Pass | |
+| AC-9 | Signing works for every account type — Android + iOS fresh | ✅ Pass | |
+| AC-10 | A transaction can be sent on EVM, Substrate, Bitcoin and TON — Android + iOS fresh | ✅ Pass | |
+| AC-11 | Fee, gas or fee rate is right per chain and matches what is taken — Android + iOS fresh | ✅ Pass | |
+| AC-12 | Message and typed-data signing from a dApp works, including EIP-712 — Android + iOS fresh | ✅ Pass | |
+| AC-13 | The wallet connects to dApps and can connect, sign and send — Android + iOS fresh | ✅ Pass | |
+| AC-14 | Balances load and the token list is right on each chain — Android + iOS fresh | ✅ Pass | |
+| AC-15 | Switching network across the four ecosystems is smooth — Android + iOS fresh | ✅ Pass | |
 | AC-16 | History, prices and portfolio all load and keep updating — Android + iOS fresh | ⏭️ Skipped | See BUG-42.24.4-01 — the fix ships in a later Extension version than this web-runner carries |
+| AC-17 | The app updates to the new version cleanly and works afterwards | ✅ Pass | |
+| AC-18 | AC-5 to AC-16 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-19 | After upgrading, imported accounts, enabled tokens and network settings are all still there | ✅ Pass | |
 | AC-20 | The Import from Trust Wallet screen opens from the welcome screen, asking for 12 words by default | ✅ Pass | |
 | AC-21 | It opens the same way from the home screen | ✅ Pass | |
 | AC-22 | A seed longer than 12 words is refused with "Invalid seed phrase. Please try again" | ✅ Pass | |

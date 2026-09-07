@@ -59,7 +59,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 143 points | in-progress |
 | [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex, locked balance display; 11 pass, 3 skip, 3 settled on retest | done |
 | [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122; 18 AC pass, 1 skip, AC-10 failed; AC-18 failed then settled on retest; 5 bugs | done |
-| [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling and the Trust Wallet import pass, 24 of 39 AC; the library update scope is what is left | in-progress |
+| [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library scope and Trust Wallet import; 38 of 39 AC pass, AC-16 skipped on BUG-42.24.4-01 | done |
 | [US-42.24.5](../stories/US-42.24.5-qc-web-runner-1-3-72.md) | Web-runner 1.3.72 — proxy accounts, chain-list v0.2.123, USDC and stEWT, ParaSpell V5 | backlog |
 | [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position | backlog |
 | [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1 | backlog |
