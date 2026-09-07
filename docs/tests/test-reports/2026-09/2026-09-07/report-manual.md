@@ -8,11 +8,11 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.4, US-42.24.19 |
-| Total bugs found | 3 |
+| Stories tested | US-42.24.4, US-42.24.5, US-42.24.19 |
+| Total bugs found | 4 |
 | P0 | 0 |
 | P1 | 1 |
-| P2 | 2 |
+| P2 | 3 |
 | Status | in progress |
 
 ---
@@ -86,7 +86,24 @@ The bug is real and reproduces. What cannot be done here is decide whether it is
 So AC-16 cannot get a verdict on this build either way: the code with the fix is not in it. That is the definition of a skip rather than a fail. It gets run when a web-runner carrying the fixed Extension version arrives.
 
 
+
 ---
+
+## US-42.24.5 — Web-runner 1.3.72 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Proxy accounts ([#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725)), chain-list v0.2.123 ([#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861)) and ParaSpell V5 ([#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908)).
+
+The AC for this story were written out today from their real scope — the proxy checklist and the 22 ChainList issues rolled into v0.2.123 — so it now runs to 43 AC. The session has started on the Add proxy screen.
+
+### AC results
+
+Nothing settled yet — the session is on the Add proxy screen and the bug below came out of it.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.5-01 | The Add proxy screen shows an Available balance line the Extension does not | Account detail → Manage proxies → Add proxy → look at the lines under the form | Two lines are shown: Available balance and Proxy deposit. The Extension shows only Proxy deposit | Only the Proxy deposit line, matching the Extension | P2 | todo | ![](img/BUG-42.24.5-01.png) |
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
