@@ -11,11 +11,11 @@ goal: "Carry on the web-runner 1.3.86 QC. Four of the nineteen sub-tasks closed 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-42.24 | QC — Update web-runner to 1.3.86 (#2057) | EPIC-42 | P2 | 0 | in-progress | ← W36 | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
-| US-42.24.4 | QC — Web-runner 1.3.71 | EPIC-42 | P2 | 8 | in-progress | ← W36 | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
+| US-42.24.4 | QC — Web-runner 1.3.71 | EPIC-42 | P2 | 13 | in-progress | ← W36 | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
 | US-42.24.19 | QC — Full regression on Mobile | EPIC-42 | P2 | 13 | in-progress | ← W36 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
 | US-42.24.20 | QC — Verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | ← W36 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 
-4 stories · 29 points, all carried from W36. The parent carries no points of its own; it tracks the sub-tasks.
+4 stories · 34 points, all carried from W36. The parent carries no points of its own; it tracks the sub-tasks.
 
 Thirteen sub-tasks are still `backlog` and stay out of the window until one is picked up: 1.3.72 to 1.3.80, and 1.3.84 to 1.3.86. They are not planned work yet, so listing them here would say more than is true.
 
