@@ -59,9 +59,9 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 150 points | in-progress |
 | [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex, locked balance display; 11 pass, 3 skip, 3 settled on retest | done |
 | [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122; 18 AC pass, 1 skip, AC-10 failed; AC-18 failed then settled on retest; 5 bugs | done |
-| [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library scope and Trust Wallet import; 38 of 39 AC pass, AC-16 skipped on BUG-42.24.4-01 | done |
+| [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library scope and Trust Wallet import; 39 / 39 AC, no bugs | done |
 | [US-42.24.5](../stories/US-42.24.5-qc-web-runner-1-3-72.md) | Web-runner 1.3.72 — proxy accounts and chain-list v0.2.123, both written out from their real scope; 43 AC, the proxy half done — AC-1 to AC-18 and AC-20 pass, AC-19 skipped, 6 bugs on the proxy screens | in-progress |
-| [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position | backlog |
+| [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position; 9 / 9 AC, no bugs | in-progress |
 | [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1 | backlog |
 | [US-42.24.8](../stories/US-42.24.8-qc-web-runner-1-3-75.md) | Web-runner 1.3.75 — user-configurable Subscan API key | backlog |
 | [US-42.24.9](../stories/US-42.24.9-qc-web-runner-1-3-76.md) | Web-runner 1.3.76 — network toggle without API key, subnet token name and ID, Bittensor root staking | backlog |
@@ -75,7 +75,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; 11 bugs of its own plus the XCM fee bug; seven REG lines failed | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 24 verified, their AC rerun and passing | in-progress |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 23 verified, their AC rerun and passing | in-progress |
 
 More rows get added here as testing starts.
 
