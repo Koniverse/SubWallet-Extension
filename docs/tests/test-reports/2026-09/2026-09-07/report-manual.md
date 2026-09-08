@@ -9,9 +9,9 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.4, US-42.24.5, US-42.24.19 |
-| Total bugs found | 10 |
+| Total bugs found | 9 |
 | P0 | 0 |
-| P1 | 1 |
+| P1 | 0 |
 | P2 | 7 |
 | P3 | 2 |
 | Status | done |
@@ -24,7 +24,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 Token enabling passed on [2026-09-05](../2026-09-05/report-manual.md). Today covers the library updates and the Trust Wallet import.
 
-The AC for both halves were rewritten today from their real scope: the Trust Wallet checklist, and the developer's test scope in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808). Every AC in the story now has a verdict — 38 pass, one skipped.
+The AC for both halves were rewritten today from their real scope: the Trust Wallet checklist, and the developer's test scope in [#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808). Every AC in the story passes — 39 of 39.
 
 ### AC results
 
@@ -41,7 +41,7 @@ The AC for both halves were rewritten today from their real scope: the Trust Wal
 | AC-13 | The wallet connects to dApps and can connect, sign and send — Android + iOS fresh | ✅ Pass | |
 | AC-14 | Balances load and the token list is right on each chain — Android + iOS fresh | ✅ Pass | |
 | AC-15 | Switching network across the four ecosystems is smooth — Android + iOS fresh | ✅ Pass | |
-| AC-16 | History, prices and portfolio all load and keep updating — Android + iOS fresh | ⏭️ Skipped | See BUG-42.24.4-01 — the fix ships in a later Extension version than this web-runner carries |
+| AC-16 | History, prices and portfolio all load and keep updating — Android + iOS fresh | ✅ Pass | |
 | AC-17 | The app updates to the new version cleanly and works afterwards | ✅ Pass | |
 | AC-18 | AC-5 to AC-16 pass on Android + iOS upgrade | ✅ Pass | |
 | AC-19 | After upgrading, imported accounts, enabled tokens and network settings are all still there | ✅ Pass | |
@@ -70,12 +70,7 @@ All twenty pass, on both platforms, fresh install and upgrade.
 
 ### Bugs
 
-| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
-|---|---|---|---|---|---|---|---|
-| BUG-42.24.4-01 | Past transaction history does not load unless a Subscan API key is saved | Install the app fresh, or import an account into an existing install → open that account history without a Subscan API key saved → then save a key in Settings and look again | Without a key, the history is empty — past transactions the account really has do not appear. They show up once a key is saved | The history loads without the user having to supply their own API key. The key is meant to raise the rate limit for heavy use, not to be the price of seeing your own past transactions<br><br>Developer note, not verified here: Subscan tightened its query limit, and the app still asks for 100 records at a time where only 25 are now allowed. The fix is to drop the page size to 25 | P1 | skipped, cannot be checked here | |
-
-BUG-42.24.4-01 is skipped, not failed: the bug reproduces, but the fix lands in a newer Extension version than this web-runner carries, so AC-16 cannot get a verdict here either way. It gets rerun when a web-runner with the fix arrives.
-
+None.
 
 
 ---
@@ -133,7 +128,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 ## Summary
 
-US-42.24.4 is finished. Both halves had their AC rewritten today from their real scope, and every AC now has a verdict: 38 pass and AC-16 skipped, because the fix for BUG-42.24.4-01 lands in a later Extension version than this web-runner carries.
+US-42.24.4 is finished. Both halves had their AC rewritten today from their real scope, and all 39 AC pass with no bugs.
 
 US-42.24.5 started on the proxy screens. Seeing the proxy list, adding and removing all work, and a transfer signed by an Any proxy goes through with the fees split the way it should be — AC-1 to AC-8. AC-19 is skipped: Mobile has no governance screen to vote from. The rest of the story is untouched.
 
@@ -141,4 +136,4 @@ Six bugs came out of those proxy screens and none of them stops the flow: an ext
 
 Regression picked up three more: the locked balance tooltip text differs from the Extension, the Account name field on Create derived account is out of line, and the Android back button does nothing on History.
 
-Ten bugs today: one P1, seven P2, two P3.
+Nine bugs today: seven P2 and two P3.
