@@ -8,12 +8,12 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.5, US-42.24.6, US-42.24.19 |
-| Total bugs found | 1 |
+| Stories tested | US-42.24.5, US-42.24.6, US-42.24.7, US-42.24.8, US-42.24.19 |
+| Total bugs found | 4 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 0 |
-| P3 | 1 |
+| P2 | 1 |
+| P3 | 3 |
 | Status | in progress |
 
 ---
@@ -97,6 +97,43 @@ All nine AC pass. The third item in this version, services-sdk 0.1.16, was the o
 
 None.
 
+## US-42.24.8 — Web-runner 1.3.75 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. One item: the user-configurable Subscan API key in Settings ([#4965](https://github.com/Koniverse/SubWallet-Extension/issues/4965)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | The API key field is in Settings, hidden as you type, and the eye toggle reveals and hides it — Android + iOS fresh | ✅ Pass | |
+| AC-2 | A valid key saves, and it is still there after closing and reopening the app — Android + iOS fresh | ✅ Pass | |
+| AC-3 | With a valid key saved, the features that use Subscan work — balances and history load — Android + iOS fresh | ✅ Pass | |
+| AC-4 | The key is not shown anywhere it should not be, such as logs or an export — Android + iOS fresh | ✅ Pass | |
+| AC-5 | An invalid key gives a clear message rather than a silent failure — Android + iOS fresh | ✅ Pass | |
+| AC-6 | The key can be cleared, and the app falls back to working without one — Android + iOS fresh | ✅ Pass | Judged against how the Extension behaves today |
+| AC-7 | AC-1 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-8 | After upgrading, a key saved before the upgrade is still saved and still works — both platforms | ✅ Pass | |
+
+All eight pass.
+
+### Bugs
+
+None.
+
+## US-42.24.7 — Web-runner 1.3.74 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)). The AC for this story were rewritten today from the multisig QC checklist, because the issue body is an unfilled template. Started on the transfer confirmation screen.
+
+### AC results
+
+Nothing settled yet.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.7-01 | The multisig confirmation screens still use the old layout, not the one the Extension has | Create a multisig account → start a transfer from it → look at the Transfer confirmation screen, and compare with the same screen on the Extension | Mobile labels the first row Send from and puts the recipient and amount in separate blocks. The Extension labels it Multisig, groups network with it, and puts recipient and amount together in one block | The confirmation screens match the Extension layout. This applies to every multisig confirmation screen, not only transfer | P2 | todo | ![](img/BUG-42.24.7-01.png) |
+
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
 Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
@@ -106,6 +143,8 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.19-11 | The sections on the Unstake confirm screen are spaced unevenly | Open a staked position → Unstake → enter an amount → Continue → look at the gaps between the boxes on the confirm screen | The gap between the account box and the Unstake amount box is larger than the gap between Unstake amount and the fee box below it | The gaps between the boxes are the same | P3 | todo | ![](img/BUG-42.24.19-11.png) |
+| BUG-42.24.19-12 | The group headings on the Select account screen have no padding above them | Multisig → Add signer → Select account → look at the SOLO ACCOUNT and UNIFIED ACCOUNT headings | Each heading sits flush against the block of accounts above it, with no gap, while there is a gap below it before its own block | The heading has space above it, so it reads as belonging to the block below rather than being stuck to the one above | P3 | todo | ![](img/BUG-42.24.19-12.png) |
+| BUG-42.24.19-13 | The blocks on the Create multisig account screen are spaced unevenly | Multisig → Create multisig account → look at the gaps between ADD SIGNATORY, SIGNATORIES and SET APPROVAL THRESHOLD and their blocks | The gaps differ from one section to the next, and the signatory rows sit closer together than the sections around them | The sections and their blocks are spaced evenly down the screen | P3 | todo | ![](img/BUG-42.24.19-13.png) |
 
 ## Summary
 
