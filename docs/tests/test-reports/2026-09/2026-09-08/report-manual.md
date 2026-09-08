@@ -39,6 +39,14 @@ Carried on from [2026-09-07](../2026-09-07/report-manual.md), where AC-1 to AC-8
 | AC-17 | Removing one proxy of several returns exactly one ProxyDepositFactor; removing the last returns the rest — Android + iOS fresh | ✅ Pass | |
 | AC-18 | With too little balance the transaction fails and nothing changes, and an error is shown — Android + iOS fresh | ✅ Pass | |
 | AC-20 | AC-1 to AC-18 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-21 | Mosaic Chain Mainnet appears, connects, and balances load — Android + iOS fresh | ✅ Pass | [ChainList #631](https://github.com/Koniverse/SubWallet-ChainList/issues/631) |
+| AC-22 | Bifrost Network mainnet and testnet appear and connect, with the testnet showing its updated network information — Android + iOS fresh | ✅ Pass | [ChainList #643](https://github.com/Koniverse/SubWallet-ChainList/issues/643) and [#646](https://github.com/Koniverse/SubWallet-ChainList/issues/646) |
+| AC-23 | Metamask USD on Ethereum appears with the right symbol, decimals and balance — Android + iOS fresh | ✅ Pass | [ChainList #629](https://github.com/Koniverse/SubWallet-ChainList/issues/629) |
+| AC-24 | USDC and stEWT on Energy Web X appear and can be sent — Android + iOS fresh | ✅ Pass | [ChainList #639](https://github.com/Koniverse/SubWallet-ChainList/issues/639) — the item #2057 lists as "#639" |
+| AC-27 | NIGHT on Cardano shows a price — Android + iOS fresh | ⏭️ Skipped | [ChainList #642](https://github.com/Koniverse/SubWallet-ChainList/issues/642) — Mobile does not support Cardano, so there is no screen the price could appear on |
+| AC-31 | The removed networks are gone and cannot be enabled — Amplitude Testnet, Parallel, Acala Mandala, Subsocial X, Integritee Polkadot, Integritee, Logion — Android + iOS fresh | ✅ Pass | [ChainList #638](https://github.com/Koniverse/SubWallet-ChainList/issues/638) |
+| AC-36 | The Bittensor subnet logos and the WUD token logo are updated — Android + iOS fresh | ✅ Pass | [ChainList #635](https://github.com/Koniverse/SubWallet-ChainList/issues/635) |
+| AC-37 | The Stable Mainnet block explorer link opens the right page — Android + iOS fresh | ✅ Pass | [ChainList #640](https://github.com/Koniverse/SubWallet-ChainList/issues/640) |
 
 The proxy account half of this story is finished. Every check passes except AC-19, skipped on 2026-09-07 because Mobile has no governance screen to vote from.
 
