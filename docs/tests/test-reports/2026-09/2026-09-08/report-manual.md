@@ -45,7 +45,12 @@ Carried on from [2026-09-07](../2026-09-07/report-manual.md), where AC-1 to AC-8
 | AC-24 | USDC and stEWT on Energy Web X appear and can be sent — Android + iOS fresh | ✅ Pass | [ChainList #639](https://github.com/Koniverse/SubWallet-ChainList/issues/639) — the item #2057 lists as "#639" |
 | AC-27 | NIGHT on Cardano shows a price — Android + iOS fresh | ⏭️ Skipped | [ChainList #642](https://github.com/Koniverse/SubWallet-ChainList/issues/642) — Mobile does not support Cardano, so there is no screen the price could appear on |
 | AC-31 | The removed networks are gone and cannot be enabled — Amplitude Testnet, Parallel, Acala Mandala, Subsocial X, Integritee Polkadot, Integritee, Logion — Android + iOS fresh | ✅ Pass | [ChainList #638](https://github.com/Koniverse/SubWallet-ChainList/issues/638) |
-| AC-36 | The Bittensor subnet logos and the WUD token logo are updated — Android + iOS fresh | ✅ Pass | [ChainList #635](https://github.com/Koniverse/SubWallet-ChainList/issues/635) |
+| AC-31a | Nodle Parachain and Altair are gone too and cannot be enabled — Android + iOS fresh | ✅ Pass | [ChainList #658](https://github.com/Koniverse/SubWallet-ChainList/issues/658) — added today, the AC written earlier named seven networks and these two were not among them |
+| AC-33 | USDC can be sent by XCM between Polkadot Asset Hub and Energy Web X — Android + iOS fresh | ✅ Pass | The new route works. BUG-42.24.2-04, logged on 1.3.69 when no XCM route could fetch a fee, does not reproduce here |
+| AC-35 | Every chain whose RPC list was trimmed still connects and loads balances — Android + iOS fresh | ✅ Pass | [ChainList #651](https://github.com/Koniverse/SubWallet-ChainList/issues/651) |
+| AC-35a | Shibuya connects on its corrected paraChainId (1000 to 2000) — Android + iOS fresh | ✅ Pass | [ChainList #651](https://github.com/Koniverse/SubWallet-ChainList/issues/651) — added today |
+| AC-35b | HOLLAR on Hydration shows its corrected existential deposit of 0.02 — Android + iOS fresh | ✅ Pass | [ChainList #651](https://github.com/Koniverse/SubWallet-ChainList/issues/651) — added today |
+| AC-36 | The Bittensor subnet logos and the WUD token logo are updated — Android + iOS fresh | ✅ Pass | [ChainList #635](https://github.com/Koniverse/SubWallet-ChainList/issues/635) and [#659](https://github.com/Koniverse/SubWallet-ChainList/issues/659) |
 | AC-37 | The Stable Mainnet block explorer link opens the right page — Android + iOS fresh | ✅ Pass | [ChainList #640](https://github.com/Koniverse/SubWallet-ChainList/issues/640) |
 
 The proxy account half of this story is finished. Every check passes except AC-19, skipped on 2026-09-07 because Mobile has no governance screen to vote from.
