@@ -18,6 +18,7 @@ const dotenv = require('dotenv');
 const CopyPlugin = require('copy-webpack-plugin');
 
 const pkgJson = require('./package.json');
+const chainListPkgJson = require('@subwallet/chain-list/package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const args = process.argv.slice(2);
@@ -123,6 +124,10 @@ const createConfig = (entry, alias = {}, useSplitChunk = false) => {
           NODE_ENV: JSON.stringify(mode),
           PKG_NAME: JSON.stringify(pkgJson.name),
           PKG_VERSION: JSON.stringify(pkgJson.version),
+          // Without this the SDK sends SW-SDK-ChainList-Version: undefined and the
+          // backend answers swap path lookups with an empty path. The extension build
+          // (extension-koni/webpack.shared.cjs) has always defined it; this one had not.
+          CHAIN_LIST_VERSION: JSON.stringify(chainListPkgJson.version),
           TARGET_ENV: JSON.stringify('mobile'),
           BRANCH_NAME: JSON.stringify(process.env.BRANCH_NAME),
           ..._additionalEnv
