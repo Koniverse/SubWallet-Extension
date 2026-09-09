@@ -9,12 +9,12 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.5, US-42.24.7, US-42.24.9 |
-| Total bugs found | 10 |
+| Total bugs found | 14 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 6 |
+| P2 | 10 |
 | P3 | 4 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -76,6 +76,10 @@ Carried on from [2026-09-08](../2026-09-08/report-manual.md), where the AC were 
 | BUG-42.24.7-09 | Tapping a multisig notification only opens History, not the pending transaction it names | Have a multisig transaction waiting for approval → open Notifications → tap the "[account] APPROVAL REQUIRED" item | The app opens the History screen and stops there. The pending transaction the notification is about does not open, so the approval has to be found by hand | Tapping the notification opens the detail of that pending multisig transaction, which is what "Click to view details" in the notification promises | P2 | todo | |
 | BUG-42.24.7-10 | Swap is still offered on a multisig account | Switch to a multisig account → look at the action buttons on the token list | Swap sits alongside Address, Send and Buy, in the same enabled blue as the others | Swap is disabled for a multisig account, since a multisig cannot swap | P2 | todo | ![](img/BUG-42.24.7-10.png) |
 | BUG-42.24.7-11 | Liquid staking is still listed in Earning options on a multisig account | Switch to a multisig account → Earning → look at the list of earning options | MANTA, a liquid staking option, is listed alongside the nomination pool and direct nomination ones | Liquid staking options are hidden for a multisig account, as subnet staking is | P2 | todo | ![](img/BUG-42.24.7-11.png) |
+| BUG-42.24.7-12 | Notification settings has no Pending multisig approvals option | Settings → Notification settings → look at the list under "Show notifications about" | Four options are listed: Claim tokens, Withdraw tokens, Claim AVAIL bridge, Claim POLYGON bridge. The Extension has a fifth, Pending multisig approvals, and Mobile does not | The fifth option is there, so multisig approval notifications can be turned off like the rest | P2 | todo | ![](img/BUG-42.24.7-12.png) |
+| BUG-42.24.7-13 | Multisig accounts have no multisig badge on their avatar | Settings → Export account, or any account list → look at the avatars of the multisig accounts | The avatar carries only the network badge. Nothing marks the account as multisig, so it cannot be told apart from an ordinary account by looking. The Extension puts a small multisig badge on the avatar | The avatar carries the multisig badge, as it does on the Extension | P2 | todo | ![](img/BUG-42.24.7-13.png) |
+| BUG-42.24.7-14 | The Select account screen for a new multisig shows no account-type badges | Create multisig account → Add signatory → Select account → look at the avatars in the list | The avatars carry no type badge, so QR accounts and multisig accounts look the same as ordinary ones. Which kind a signatory is cannot be told while picking it | Each avatar carries the badge for its account type, so the signatory being picked can be told apart | P2 | todo | ![](img/BUG-42.24.7-14.png) |
+| BUG-42.24.7-15 | The account filter on Export account has no Multisig account option | Settings → Export account → open the filter → look at the list of account types | Five types are offered: Unified, Solo, QR signer, Ledger and Watch-only. Multisig is not among them, so multisig accounts cannot be filtered for | Multisig account is offered alongside the other types | P2 | todo | ![](img/BUG-42.24.7-15.png) |
 
 ## US-42.24.9 — Web-runner 1.3.76 on Mobile
 
@@ -97,4 +101,12 @@ None.
 
 ## Summary
 
-Session in progress.
+US-42.24.5 finished. ParaSpell V5 broke none of the XCM routes, and the proxy relationships set up before an upgrade survive it, so the story closes at 41 of 43 with AC-19 and AC-27 skipped.
+
+US-42.24.9 came out of the backlog for one item: a network can be turned on with no Subscan API key saved and with a wrong one, on both platforms and both install paths. The rest of that version is untouched.
+
+The day was mostly multisig. Creating an account, managing it, exporting and reimporting it all work — AC-1 to AC-10 pass, including recreating a deleted multisig from the same signatories and threshold, which brings back the old account with its history and notifications.
+
+Two AC failed, both the same shape: a feature that should be closed to a multisig account is still open. Swap is offered on the token list, and liquid staking is still listed in Earning options. Neither is a display problem; they let a user start something a multisig cannot finish.
+
+Fourteen bugs today, ten P2 and four P3. Most are the multisig UI not matching the Extension: no multisig badge on avatars, no account-type badges when picking a signatory, no Multisig option in the export filter, no Pending multisig approvals option in notification settings, no date heading on pending records, and a confirmation screen still on the old layout. Two are worth the developer's attention beyond the polish: tapping a multisig notification opens History rather than the transaction it names, and Mark all as read runs off the edge of the Notifications screen.
