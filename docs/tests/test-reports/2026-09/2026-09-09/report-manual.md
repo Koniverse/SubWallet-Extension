@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.5, US-42.24.7 |
+| Stories tested | US-42.24.5, US-42.24.7, US-42.24.9 |
 | Total bugs found | 5 |
 | P0 | 0 |
 | P1 | 0 |
@@ -67,6 +67,24 @@ Carried on from [2026-09-08](../2026-09-08/report-manual.md), where the AC were 
 | BUG-42.24.7-04 | The background behind the filter row on History is the wrong colour (Android) | Open History on Android → look at the strip behind the network and account filters | The strip behind the filters is a different shade from the rest of the screen, so it reads as a separate band | The background matches the rest of the screen, as it does on iOS | P3 | todo | ![](img/BUG-42.24.7-04.png) |
 | BUG-42.24.7-05 | The Select account dropdown on the Multisig tab has its label in the wrong colour | Open History → Multisig tab → look at the Select account dropdown next to All networks | Select account is dim grey, while All networks beside it is in the normal white. The two dropdowns sit side by side and do not match | Both dropdowns use the same label colour | P3 | todo | ![](img/BUG-42.24.7-05.png) |
 | BUG-42.24.7-06 | Pending multisig records on the Multisig tab have no date heading | Open History → Multisig tab → look above the first pending record, and compare with the same tab on the Extension | The records run straight on with no date above them. Each shows only a time, so which day a request came from cannot be told. The Extension groups them under a date heading such as "Feb 11, 2026" | The records are grouped under a date heading, as they are on the Extension | P2 | todo | ![](img/BUG-42.24.7-06.png) |
+
+## US-42.24.9 — Web-runner 1.3.76 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. One of its three items ran: turning a network on without a correct Subscan API key ([#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | With no Subscan API key saved, a network can be turned on — Android + iOS fresh | ✅ Pass | |
+| AC-2 | With a wrong API key saved, a network can still be turned on — Android + iOS fresh | ✅ Pass | |
+| AC-3 | AC-1 and AC-2 pass on Android + iOS upgrade | ✅ Pass | |
+
+The subnet token naming and the Bittensor root staking items in this version, AC-4 to AC-14, have not been run.
+
+### Bugs
+
+None.
 
 ## Summary
 

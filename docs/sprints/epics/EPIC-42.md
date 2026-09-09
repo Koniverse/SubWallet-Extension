@@ -64,7 +64,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position; 9 / 9 AC, no bugs | done |
 | [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1, written out from the QC checklist; 32 AC, 6 bugs | in-progress |
 | [US-42.24.8](../stories/US-42.24.8-qc-web-runner-1-3-75.md) | Web-runner 1.3.75 — user-configurable Subscan API key; 8 / 8 AC, no bugs | done |
-| [US-42.24.9](../stories/US-42.24.9-qc-web-runner-1-3-76.md) | Web-runner 1.3.76 — network toggle without API key, subnet token name and ID, Bittensor root staking | backlog |
+| [US-42.24.9](../stories/US-42.24.9-qc-web-runner-1-3-76.md) | Web-runner 1.3.76 — network toggle without API key, subnet token name and ID, Bittensor root staking; 3 of 14 AC pass | in-progress |
 | [US-42.24.10](../stories/US-42.24.10-qc-web-runner-1-3-77.md) | Web-runner 1.3.77 — proxy and multisig improvements, PAH-KAH popup, stDOT sunset, chain-list v0.2.126 | backlog |
 | [US-42.24.11](../stories/US-42.24.11-qc-web-runner-1-3-78.md) | Web-runner 1.3.78 — XCM and bridge fees, disable all networks, Alpha transfer, TAO bridge, Bittensor swap | backlog |
 | [US-42.24.12](../stories/US-42.24.12-qc-web-runner-1-3-79.md) | Web-runner 1.3.79 — Alpha price, ParaSpell v1, display fixes after the 1.3.78 merge, swap refactor | backlog |
