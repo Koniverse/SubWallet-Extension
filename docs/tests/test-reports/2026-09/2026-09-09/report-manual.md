@@ -9,11 +9,11 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.5, US-42.24.7 |
-| Total bugs found | 3 |
+| Total bugs found | 5 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 1 |
-| P3 | 2 |
+| P2 | 2 |
+| P3 | 3 |
 | Status | in progress |
 
 ---
@@ -65,6 +65,8 @@ Carried on from [2026-09-08](../2026-09-08/report-manual.md), where the AC were 
 | BUG-42.24.7-02 | The tab bar on a multisig account's details screen cannot be scrolled sideways | Open a multisig account → Account details → look at the tab row: ACCOUNT ADDRESS, MULTISIG MEMBERS, MANAGE P… | The tabs are wider than the screen and the last one is cut off. Swiping the row sideways does not move it, so the tabs past the edge cannot be reached | The tab row scrolls sideways so every tab can be opened | P2 | todo | ![](img/BUG-42.24.7-02.png) |
 | BUG-42.24.7-03 | The filter button is still shown on the Multisig tab of History, where it does nothing (iOS) | Open History → switch to the Multisig tab → look at the filter button top right | The filter button is there on the Multisig tab as well as on the History tab, although there is nothing on this tab to filter | The filter button is hidden on the Multisig tab | P3 | todo | ![](img/BUG-42.24.7-03.jpg) |
 | BUG-42.24.7-04 | The background behind the filter row on History is the wrong colour (Android) | Open History on Android → look at the strip behind the network and account filters | The strip behind the filters is a different shade from the rest of the screen, so it reads as a separate band | The background matches the rest of the screen, as it does on iOS | P3 | todo | ![](img/BUG-42.24.7-04.png) |
+| BUG-42.24.7-05 | The Select account dropdown on the Multisig tab has its label in the wrong colour | Open History → Multisig tab → look at the Select account dropdown next to All networks | Select account is dim grey, while All networks beside it is in the normal white. The two dropdowns sit side by side and do not match | Both dropdowns use the same label colour | P3 | todo | ![](img/BUG-42.24.7-05.png) |
+| BUG-42.24.7-06 | Pending multisig records on the Multisig tab have no date heading | Open History → Multisig tab → look above the first pending record, and compare with the same tab on the Extension | The records run straight on with no date above them. Each shows only a time, so which day a request came from cannot be told. The Extension groups them under a date heading such as "Feb 11, 2026" | The records are grouped under a date heading, as they are on the Extension | P2 | todo | ![](img/BUG-42.24.7-06.png) |
 
 ## Summary
 
