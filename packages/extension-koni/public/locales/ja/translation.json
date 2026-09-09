@@ -2796,5 +2796,12 @@
   "ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed": "",
   "ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics": "",
   "ui.SETTINGS.screen.Setting.Security.passkeyUnlock": "",
-  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": ""
+  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "鍵導出リクエスト",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{domain}} が以下のアカウントから導出鍵を要求しています",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "永続的な派生鍵",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "この鍵はあなたのアカウントから導出され、永続的です。後から変更したり取り消したりすることはできません。この鍵は {{domain}} に固有で、他のサイトが同じ鍵を導出することはできません。",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "導出の詳細",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "バインド先",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
 }

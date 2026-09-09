@@ -2796,5 +2796,12 @@
   "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "",
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
-  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "Yêu cầu tạo khóa dẫn xuất",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{domain}} đang yêu cầu một khóa dẫn xuất từ tài khoản sau",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "Khóa dẫn xuất vĩnh viễn",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "Khóa này được dẫn xuất từ tài khoản của bạn và là vĩnh viễn — không thể thay đổi hay thu hồi về sau. Khóa là duy nhất với {{domain}}; không trang nào khác dẫn xuất được khóa giống vậy.",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Chi tiết khóa dẫn xuất",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Gắn với",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
 }

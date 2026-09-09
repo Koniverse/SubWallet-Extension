@@ -2797,5 +2797,12 @@
   "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found",
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
-  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "Key derivation request",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{domain}} is requesting a derived key from the following account",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "Permanent derived key",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "This key is derived from your account and is permanent — it cannot be changed or revoked later. It is unique to {{domain}}; no other site can derive the same key.",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Derivation details",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Bound to",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
 }

@@ -2798,5 +2798,12 @@
   "ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed": "",
   "ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics": "",
   "ui.SETTINGS.screen.Setting.Security.passkeyUnlock": "",
-  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": ""
+  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "Запрос на создание производного ключа",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{domain}} запрашивает производный ключ от следующего аккаунта",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "Постоянный производный ключ",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "Этот ключ производный от вашего аккаунта и постоянный — его нельзя изменить или отозвать позже. Ключ уникален для {{domain}}; никакой другой сайт не сможет получить такой же ключ.",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Детали производного ключа",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Привязан к",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
 }

@@ -3,3 +3,4 @@
 
 export { default as SubstrateMessageDetail } from './Message';
 export { default as SubstrateExtrinsic } from './Extrinsic';
+export { default as VrfDetail } from './Vrf';

@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { KeypairType } from '@subwallet/keyring/types';
-import type { Signer as InjectedSigner } from '@polkadot/api/types';
+import type { Signer as PolkadotSigner, SignerResult } from '@polkadot/api/types';
 import type { ProviderInterface } from '@polkadot/rpc-provider/types';
 import type { ExtDef } from '@polkadot/types/extrinsic/signedExtensions/types';
+import type { HexString } from '@polkadot/util/types';
 
 // eslint-disable-next-line no-undef
 type This = typeof globalThis;
@@ -95,6 +96,37 @@ export interface InjectedProviderWithMeta {
   // provider will actually always be a PostMessageProvider, which implements InjectedProvider
   provider: InjectedProvider;
   meta: ProviderMeta;
+}
+
+export interface SignerPayloadVrf {
+  /** the account to derive for, must be a local sr25519 account */
+  address: string;
+  /** the message to derive over, 0x-prefixed hex */
+  data: HexString;
+  /** the caller's own domain separator within its origin, 0x-prefixed hex; empty if omitted */
+  context?: HexString;
+}
+
+export interface InjectedSigner extends PolkadotSigner {
+  /**
+   * SubWallet-specific extension to the injected-web3 spec: sr25519 VRF signing.
+   *
+   * Optional — dapps must feature-detect with `typeof signer.signVrf === 'function'`, and other
+   * injected signers (e.g. the MetaMask compat shim) legitimately do not implement it.
+   *
+   * Returns 96 hex-encoded bytes, `output(32) || proof(64)`. **Only `output(32)` is
+   * deterministic** — the proof is randomized, so two calls with the same payload return
+   * different 96-byte values. Derive keys from the first 32 bytes alone; hashing the whole
+   * result yields a different key on every call.
+   *
+   * The output is bound to the requesting site's origin (`scheme://host`), which the wallet
+   * takes from the tab and never from this payload. No other site can obtain the same value, and
+   * a dapp served from several origins (http vs https included) derives a different value on
+   * each, so pin a canonical one.
+   *
+   * Local password-protected sr25519 accounts only.
+   */
+  signVrf?: (payload: SignerPayloadVrf) => Promise<SignerResult>;
 }
 
 export interface Injected {
