@@ -14,7 +14,7 @@
 | P1 | 0 |
 | P2 | 1 |
 | P3 | 3 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -148,4 +148,12 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 ## Summary
 
-Session in progress.
+US-42.24.5 finished both of its large halves. The proxy account work is settled — AC-1 to AC-18 and AC-20 pass, AC-19 skipped because Mobile has no governance screen — and so is chain-list v0.2.123, where AC-21 to AC-39 pass and only AC-27 is skipped, Cardano not being supported on Mobile. Every one of the 22 ChainList issues in that version now has a verdict. What is left in the story is ParaSpell V5, AC-40 to AC-43.
+
+Four AC were added along the way, each because reading the ChainList issue showed the AC written earlier did not cover what had changed: the metadata marking which chains support proxies, the Shibuya paraChainId correction, the HOLLAR existential deposit, and the removal of Nodle Parachain and Altair.
+
+Two stories closed clean out of the backlog. US-42.24.6 on 1.3.73 passes 9 of 9 — the Crowdloans tab removal, the parachain earning position fix and services-sdk 0.1.16. US-42.24.8 on 1.3.75 passes 8 of 8, the user-configurable Subscan API key.
+
+BUG-42.24.2-04 turned out to be fixed: XCM could not fetch a fee on any route when it was logged on 1.3.69, and both new routes send on this build. The two AC it was holding are different routes and still need their rerun.
+
+Four bugs today, all display problems. The multisig confirmation screens still use the old layout rather than the Extension's; the other three are spacing and padding on the Unstake confirm, Select account and Create multisig account screens.
