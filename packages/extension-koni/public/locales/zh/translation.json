@@ -2796,5 +2796,12 @@
   "ui.ACCOUNT.screen.Keyring.Login.biometricUnlockFailed": "",
   "ui.ACCOUNT.screen.Keyring.Login.unlockWithBiometrics": "",
   "ui.SETTINGS.screen.Setting.Security.passkeyUnlock": "",
-  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": ""
+  "ui.SETTINGS.screen.Setting.Security.passkeyUnlockDescription": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "密钥派生请求",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{domain}} 正在请求从以下账户派生密钥",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "永久派生密钥",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "此密钥由您的账户派生，且是永久的——之后无法更改或撤销。该密钥为 {{domain}} 独有，其他网站无法派生出相同的密钥。",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "派生详情",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "绑定至",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
 }

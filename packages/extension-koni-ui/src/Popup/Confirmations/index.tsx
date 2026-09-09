@@ -25,7 +25,7 @@ import { SignerPayloadJSON } from '@polkadot/types/types';
 import { isEthereumAddress } from '@polkadot/util-crypto';
 
 import { ConfirmationHeader } from './parts';
-import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSendTransactionRequestConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation } from './variants';
+import { AddNetworkConfirmation, AddTokenConfirmation, AuthorizeConfirmation, BitcoinSendTransactionRequestConfirmation, BitcoinSignatureConfirmation, BitcoinSignPsbtConfirmation, CardanoSignatureConfirmation, CardanoSignTransactionConfirmation, ConnectWalletConnectConfirmation, EvmSignatureConfirmation, EvmSignatureWithProcess, EvmTransactionConfirmation, MetadataConfirmation, NetworkConnectionErrorConfirmation, NotSupportConfirmation, NotSupportWCConfirmation, SignConfirmation, TransactionConfirmation, VrfSignConfirmation } from './variants';
 
 type Props = ThemeProps
 
@@ -85,6 +85,7 @@ const Component = function ({ className }: Props) {
       let account: AccountJson | undefined;
       let canSign = true;
       let isMessage = false;
+      let isVrf = false;
 
       if (confirmation.type === 'signingRequest') {
         const request = confirmation.item as SigningRequest;
@@ -119,6 +120,7 @@ const Component = function ({ className }: Props) {
         }
 
         isMessage = _isMessage;
+        isVrf = request.request.isVrf === true;
       } else if (['evmSignatureRequest', 'evmSendTransactionRequest', 'evmWatchTransactionRequest'].includes(confirmation.type)) {
         const request = confirmation.item as ConfirmationDefinitions['evmSignatureRequest' | 'evmSendTransactionRequest' | 'evmWatchTransactionRequest'][0];
 
@@ -151,6 +153,7 @@ const Component = function ({ className }: Props) {
       const notSupport = signMode === AccountSignMode.READ_ONLY ||
         signMode === AccountSignMode.UNKNOWN ||
         (signMode === AccountSignMode.QR && isEvm && isProductionMode) ||
+        (isVrf && signMode !== AccountSignMode.PASSWORD) ||
         !canSign;
 
       if (notSupport) {
@@ -259,10 +262,17 @@ const Component = function ({ className }: Props) {
         return (
           <MetadataConfirmation request={confirmation.item as MetadataRequest} />
         );
-      case 'signingRequest':
-        return (
-          <SignConfirmation request={confirmation.item as SigningRequest} />
-        );
+
+      case 'signingRequest': {
+        const request = confirmation.item as SigningRequest;
+
+        // a VRF request derives a permanent key for the site rather than signing a message, so it
+        // must never fall through to the ordinary message-signature screen
+        return request.request.isVrf
+          ? <VrfSignConfirmation request={request} />
+          : <SignConfirmation request={request} />;
+      }
+
       case 'connectWCRequest':
         return (
           <ConnectWalletConnectConfirmation request={confirmation.item as WalletConnectSessionRequest} />
