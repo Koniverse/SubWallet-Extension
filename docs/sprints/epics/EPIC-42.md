@@ -62,7 +62,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library scope and Trust Wallet import; 39 / 39 AC, no bugs | done |
 | [US-42.24.5](../stories/US-42.24.5-qc-web-runner-1-3-72.md) | Web-runner 1.3.72 — proxy accounts and chain-list v0.2.123, both written out from their real scope; 41 / 43 AC pass, AC-19 and AC-27 skipped, 6 bugs on the proxy screens | done |
 | [US-42.24.6](../stories/US-42.24.6-qc-web-runner-1-3-73.md) | Web-runner 1.3.73 — services-sdk, Crowdloans tab removed, parachain earning position; 9 / 9 AC, no bugs | done |
-| [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1, written out from the QC checklist; 32 AC, 1 bug | in-progress |
+| [US-42.24.7](../stories/US-42.24.7-qc-web-runner-1-3-74.md) | Web-runner 1.3.74 — multisig phase 1, written out from the QC checklist; 32 AC, 4 bugs | in-progress |
 | [US-42.24.8](../stories/US-42.24.8-qc-web-runner-1-3-75.md) | Web-runner 1.3.75 — user-configurable Subscan API key; 8 / 8 AC, no bugs | done |
 | [US-42.24.9](../stories/US-42.24.9-qc-web-runner-1-3-76.md) | Web-runner 1.3.76 — network toggle without API key, subnet token name and ID, Bittensor root staking | backlog |
 | [US-42.24.10](../stories/US-42.24.10-qc-web-runner-1-3-77.md) | Web-runner 1.3.77 — proxy and multisig improvements, PAH-KAH popup, stDOT sunset, chain-list v0.2.126 | backlog |
@@ -75,7 +75,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045) | backlog |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; 13 bugs of its own plus the XCM fee bug; seven REG lines failed | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 26 verified, their AC rerun and passing | in-progress |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 29 verified, their AC rerun and passing | in-progress |
 
 More rows get added here as testing starts.
 
