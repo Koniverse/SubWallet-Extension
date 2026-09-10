@@ -9,11 +9,11 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.7, US-42.24.10 |
-| Total bugs found | 7 |
+| Total bugs found | 11 |
 | P0 | 0 |
 | P1 | 1 |
-| P2 | 5 |
-| P3 | 1 |
+| P2 | 8 |
+| P3 | 2 |
 | Status | in progress |
 
 ---
@@ -40,6 +40,10 @@ Carried on from [2026-09-09](../2026-09-09/report-manual.md), where AC-1 to AC-1
 | BUG-42.24.7-20 | The signatory validation message is shown as a large red block rather than a tooltip | Create multisig account → Add signatory → paste an EVM address | "Signatory address must be a Substrate address" fills a red block between the field and the signatory list, pushing the rest of the form down. The Extension shows the same text as a small tooltip above the field, leaving the layout alone. There is also no clear button on the field, which the Extension has | The message is shown the way the Extension shows it, without moving the rest of the form | P3 | todo | ![](img/BUG-42.24.7-20.png) |
 | BUG-42.24.7-21 | The Multisig transaction detail sheet does not match the Extension | Open History → Multisig tab → tap a completed multisig transaction → compare the fields with the same sheet on the Extension | Four differences: Transaction type reads "Multisig transaction" where the Extension reads "Sign transaction"; the account row is labelled Sender rather than From account; there is no Multisig account row at all; and a Network fee row is shown that the Extension does not have | The fields match the Extension — same labels, same rows, in the same order | P2 | todo | ![](img/BUG-42.24.7-21.png) |
 | BUG-42.24.7-22 | Select an account to sign never finishes loading on a multisig signature request | Connect to polkadot.js.org from the in-app browser → start a multisig transaction → on the Signature request sheet look at "Select an account to sign transaction" | The field keeps spinning and never loads the accounts. No signatory can be picked, so Approve stays disabled and the request cannot be signed at all | The account list loads so a signatory can be chosen and the request approved | P1 | todo | ![](img/BUG-42.24.7-22.png) |
+| BUG-42.24.7-23 | The Sender on a pending multisig transaction shows an address where the Recipient shows a name | Open History → Multisig tab → tap a pending transaction → compare the Sender and Recipient columns on the Send token sheet | Sender shows only the shortened address, while Recipient shows the account name with its address underneath. The two columns are also out of line with each other, the network row sitting at a different height on each side | Sender shows the account name the same way Recipient does, and the two columns line up | P2 | todo | ![](img/BUG-42.24.7-23.png) |
+| BUG-42.24.7-24 | The insufficient balance warning on Add proxy confirmation is not styled like the Extension | Add a proxy from a multisig account with too little balance on the signing account → look at the warning on the Add proxy confirmation screen | Mobile puts a "Warning" heading above the text and leaves the text itself in grey. The Extension has no heading and puts the whole message in yellow | The warning is styled as the Extension styles it — no heading, message in yellow | P3 | todo | ![](img/BUG-42.24.7-24.png) |
+| BUG-42.24.7-25 | Creating a multisig that already exists as a watch-only account shows a raw error key | Attach a multisig address to the wallet as watch-only or QR → create a multisig with the same signatories and threshold → confirm the account name | The toast shows the untranslated key "bg.ACCOUNT.services.keyring.handler.Multisig.multisigAddressExists" | The creation is blocked with a readable message: "The generated multisig address already exists under the account named \"X\". Remove the account first, then try again" | P2 | todo | ![](img/BUG-42.24.7-25.png) |
+| BUG-42.24.7-26 | Starting a second identical multisig transaction shows a raw error key | From a multisig account start a transaction → leave it pending, unapproved → start the same transaction again, same amount, same sender and recipient, same network | The toast shows the untranslated key "bg.TRANSACTION_SERVICE.services.service.transaction.existingMultisigPendingTransaction" | The second transaction is blocked with a readable message: "You've a pending multisig transaction with the same information. Complete the transaction first, then try again". This applies to every feature, not only transfer | P2 | todo | ![](img/BUG-42.24.7-26.png) |
 
 ## US-42.24.10 — Web-runner 1.3.77 on Mobile
 
