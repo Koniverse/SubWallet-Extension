@@ -33,6 +33,10 @@ Carried on from [2026-09-09](../2026-09-09/report-manual.md), where AC-1 to AC-1
 | AC-19 | The All tab holds multisig items along with the rest, and the multisig tab shows them with icon, time, account name, action title and content — Android + iOS fresh | ✅ Pass | The AC was corrected today: it had said the All tab holds no multisig items, which is not how the build behaves |
 | AC-20 | The unread and read tabs behave as before and hold multisig items along with the rest — Android + iOS fresh | ✅ Pass | Corrected the same way |
 | AC-21 | Search works on the multisig tab, and the empty state shows when nothing matches — Android + iOS fresh | ✅ Pass | |
+| AC-22 | The transaction tab shows ordinary transactions and no pending or completed multisig ones, and after a multisig submission the init, execute, approve and reject records appear — Android + iOS fresh | ✅ Pass | |
+| AC-23 | The multisig tab shows pending transactions as waiting for approval or approved, and they disappear once the threshold is met — Android + iOS fresh | ✅ Pass | |
+| AC-24 | In account detail the same holds per account, whether the account is viewed as the multisig or as one of its signatories — Android + iOS fresh | ✅ Pass | |
+| AC-25 | Deleting a signatory hides its pending transactions from the multisig tab; deleting the multisig itself keeps them but shows the address in place of the name — Android + iOS fresh | ✅ Pass | |
 
 ### Bugs
 
@@ -73,7 +77,7 @@ None.
 
 ## Summary
 
-Multisig notifications and the dApp flows pass. US-42.24.10 came out of the backlog for the stDOT sunset, 4 of 4.
+Multisig notifications, history and the dApp flows pass. US-42.24.10 came out of the backlog for the stDOT sunset, 4 of 4.
 
 Four AC were corrected against the build, all written from the checklist and all wrong about what the app does — cross-chain, dApp signing, and the three notification tabs. Worth asking the developer which is meant to be right.
 
