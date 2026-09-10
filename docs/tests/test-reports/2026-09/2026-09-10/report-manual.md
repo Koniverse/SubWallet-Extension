@@ -73,12 +73,8 @@ None.
 
 ## Summary
 
-The multisig work carried on through the signatory picker, notifications and the dApp flows. Notifications pass — all three tabs hold multisig items and search works. Connecting to a dApp and signing from one both work.
+Multisig notifications and the dApp flows pass. US-42.24.10 came out of the backlog for the stDOT sunset, 4 of 4.
 
-Four AC were corrected against the build today, all four written originally from the checklist and all four wrong about what the app does: cross-chain is refused for a multisig rather than following the signatory logic, a multisig can connect and sign for a dApp rather than being blocked, and the All, Unread and Read tabs all hold multisig items rather than excluding them. The checklist appears to describe an intended design that the build did not follow; worth asking the developer which is meant to be right.
+Four AC were corrected against the build, all written from the checklist and all wrong about what the app does — cross-chain, dApp signing, and the three notification tabs. Worth asking the developer which is meant to be right.
 
-US-42.24.10 came out of the backlog for one item: the stDOT sunset passes on all four of its AC.
-
-Thirteen bugs today, one P1, ten P2 and two P3. Two are worth reading first. The signatory picker on a dApp signature request sometimes never finishes loading, and when it does not, the request cannot be signed at all. And two error messages reach the user as raw translation keys rather than sentences — creating a multisig that already exists, and starting a second identical multisig transaction.
-
-The rest are the multisig screens not matching the Extension: a detail sheet with four wrong fields, a Sender column showing an address where Recipient shows a name, a warning styled differently, a validation message that moves the layout, a picker shown on a network that cannot use it, and a warning that fires before its data has loaded.
+Thirteen bugs: one P1, ten P2, two P3. The P1 is the signatory picker on a dApp signature request sometimes not loading, which blocks signing. Two error messages reach the user as raw translation keys. The rest are multisig screens not matching the Extension.
