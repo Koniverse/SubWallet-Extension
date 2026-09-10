@@ -9,10 +9,10 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.7 |
-| Total bugs found | 5 |
+| Total bugs found | 7 |
 | P0 | 0 |
-| P1 | 0 |
-| P2 | 4 |
+| P1 | 1 |
+| P2 | 5 |
 | P3 | 1 |
 | Status | in progress |
 
@@ -38,6 +38,8 @@ Carried on from [2026-09-09](../2026-09-09/report-manual.md), where AC-1 to AC-1
 | BUG-42.24.7-18 | View transaction does not open the transaction details | Submit a multisig transaction → on the result screen tap View transaction | Nothing opens. The transaction details screen the button points at does not appear | The transaction details open, showing that transaction | P2 | todo | |
 | BUG-42.24.7-19 | The message refusing a cross-chain transfer from a multisig does not say why | In All accounts mode → Send → pick a multisig account as From → pick a destination on another chain | The toast says "This feature is not available with this token", which points at the token rather than the account. The Extension says "Cross-chain transfer is not supported for multisig account" | The message names the real reason, as the Extension does | P2 | todo | ![](img/BUG-42.24.7-19.png) |
 | BUG-42.24.7-20 | The signatory validation message is shown as a large red block rather than a tooltip | Create multisig account → Add signatory → paste an EVM address | "Signatory address must be a Substrate address" fills a red block between the field and the signatory list, pushing the rest of the form down. The Extension shows the same text as a small tooltip above the field, leaving the layout alone. There is also no clear button on the field, which the Extension has | The message is shown the way the Extension shows it, without moving the rest of the form | P3 | todo | ![](img/BUG-42.24.7-20.png) |
+| BUG-42.24.7-21 | The Multisig transaction detail sheet does not match the Extension | Open History → Multisig tab → tap a completed multisig transaction → compare the fields with the same sheet on the Extension | Four differences: Transaction type reads "Multisig transaction" where the Extension reads "Sign transaction"; the account row is labelled Sender rather than From account; there is no Multisig account row at all; and a Network fee row is shown that the Extension does not have | The fields match the Extension — same labels, same rows, in the same order | P2 | todo | ![](img/BUG-42.24.7-21.png) |
+| BUG-42.24.7-22 | Select an account to sign never finishes loading on a multisig signature request | Connect to polkadot.js.org from the in-app browser → start a multisig transaction → on the Signature request sheet look at "Select an account to sign transaction" | The field keeps spinning and never loads the accounts. No signatory can be picked, so Approve stays disabled and the request cannot be signed at all | The account list loads so a signatory can be chosen and the request approved | P1 | todo | ![](img/BUG-42.24.7-22.png) |
 
 ## Summary
 
