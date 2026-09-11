@@ -49,8 +49,15 @@ is set by those twelve, and nothing currently schedules them.
 ## New this week, and not in scope
 
 [#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072) *"Support sr25519 VRF signing
-for dApp key derivation"* (2026-09-05) → [US-10.21](stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md),
-`backlog`, no sprint.
+for dApp key derivation"* (2026-09-05) → [US-10.21](stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md).
+
+**Status corrected 2026-09-11 — this is live work in this window, not backlog.** The story went
+`in-progress` on 09-09 when #5072 moved on the board, and
+[PR #5076](https://github.com/Koniverse/SubWallet-Extension/pull/5076) (`koni/dev/issue-5072`) has
+been open since 09-09 with review required. This section said `backlog, no sprint` for two days
+while both were true — the same shape as W36, where work landed under a window whose scope table
+never learned of it. It is still **not in the scope table**: adding a story to a window two days
+before it closes is a planning call, recorded here as open, not made.
 
 **The third empty-body issue in under a month**, after #5058 and #5064 — both of which were
 eventually explained by their own PR rather than by the issue, and neither of which ever gained a
