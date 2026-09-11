@@ -33,7 +33,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 The XCM library moving up a major version broke nothing: the routes are all still there and the fees match.
 
-Every AC in this story now has a verdict — 41 pass, AC-19 and AC-27 skipped. The six bugs logged against it are all display problems on the proxy screens; none of them stopped a flow, so the AC covering those flows pass.
+Every AC in this story now has a verdict — 45 pass, AC-19 and AC-27 skipped. The six bugs logged against it are all display problems on the proxy screens; none of them stopped a flow, so the AC covering those flows pass.
 
 ### Bugs
 
@@ -101,7 +101,7 @@ None.
 
 ## Summary
 
-US-42.24.5 finished. ParaSpell V5 broke none of the XCM routes, and the proxy relationships set up before an upgrade survive it, so the story closes at 41 of 43 with AC-19 and AC-27 skipped.
+US-42.24.5 finished. ParaSpell V5 broke none of the XCM routes, and the proxy relationships set up before an upgrade survive it, so the story closes at 45 of 47 with AC-19 and AC-27 skipped.
 
 US-42.24.9 came out of the backlog for one item: a network can be turned on with no Subscan API key saved and with a wrong one, on both platforms and both install paths. The rest of that version is untouched.
 
