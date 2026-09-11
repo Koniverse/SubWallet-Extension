@@ -27,6 +27,9 @@ Carried on from [2026-09-10](../2026-09-10/report-manual.md), where 18 AC passed
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| AC-11 | Transfer on a single chain — a multisig with at least two signable signatories can transfer, and the signatory picker behaves as designed — Android + iOS fresh | ✅ Pass | |
+| AC-12 | Transfer max — transfer all equals the transferable amount, and when the fee is paid in the native token the signatory paying it is shown — Android + iOS fresh | ✅ Pass | |
+| AC-27 | With a watch-only signatory, applying gives "The account you are using is Watch-only account, you cannot use this feature with it" — Android + iOS fresh | ✅ Pass | |
 
 ### Bugs
 
