@@ -29,7 +29,15 @@ Carried on from [2026-09-10](../2026-09-10/report-manual.md), where 18 AC passed
 |---|---|---|---|
 | AC-11 | Transfer on a single chain — a multisig with at least two signable signatories can transfer, and the signatory picker behaves as designed — Android + iOS fresh | ✅ Pass | |
 | AC-12 | Transfer max — transfer all equals the transferable amount, and when the fee is paid in the native token the signatory paying it is shown — Android + iOS fresh | ✅ Pass | |
+| AC-16 | Unstake, stake more, withdraw and change validator all follow the same logic — Android + iOS fresh | ✅ Pass | |
+| AC-18 | Buy token is unaffected, and adding or removing a proxy follows the transfer logic — Android + iOS fresh | ✅ Pass | |
+| AC-26 | A pending record appears on the multisig tab whatever kind the signatories are — normal, QR, ledger, proxy, multisig — Android + iOS fresh | ✅ Pass | |
 | AC-27 | With a watch-only signatory, applying gives "The account you are using is Watch-only account, you cannot use this feature with it" — Android + iOS fresh | ✅ Pass | |
+| AC-28 | Opening a pending transaction offers the right actions for who is looking: the initiator can reject, an in-between signatory can approve, the last signatory with call data can approve and execute — Android + iOS fresh | ✅ Pass | |
+| AC-29 | A completed transaction offers view on explorer, and it opens that transaction on Subscan — Android + iOS fresh | ✅ Pass | |
+| AC-30 | Reject, approve, and approve and execute each open their own confirmation screen — Android + iOS fresh | ✅ Pass | |
+| AC-31 | AC-1 to AC-30 pass on Android + iOS upgrade | ❌ Fail | AC-13, AC-14 and AC-15 fail on upgrade too |
+| AC-32 | After upgrading, multisig accounts, their pending transactions and their notifications are all still there and still correct — both platforms | ✅ Pass | |
 
 ### Bugs
 
