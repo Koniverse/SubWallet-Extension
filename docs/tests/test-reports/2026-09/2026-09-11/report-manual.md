@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.7 |
+| Stories tested | US-42.24.7, US-42.24.9 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -43,6 +43,25 @@ Carried on from [2026-09-10](../2026-09-10/report-manual.md), where 18 AC passed
 
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
+
+## US-42.24.9 — Web-runner 1.3.76 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Carried on from [2026-09-09](../2026-09-09/report-manual.md), where the network toggle without an API key passed. Today covers the subnet token naming ([#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-4 | Subnet tokens show as `{subnetId} \| {tokenName} {symbol}` in the token list — Android + iOS fresh | ✅ Pass | |
+| AC-5 | The same format appears in token detail and in the transfer form — Android + iOS fresh | ✅ Pass | |
+| AC-6 | Searching by subnet ID finds the token — Android + iOS fresh | ✅ Pass | |
+| AC-7 | AC-4 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+
+What is left in this story is the Bittensor root staking group, AC-8 to AC-14.
+
+### Bugs
+
+None.
 
 ## Summary
 
