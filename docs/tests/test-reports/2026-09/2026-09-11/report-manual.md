@@ -8,10 +8,10 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.7, US-42.24.9 |
-| Total bugs found | 0 |
+| Stories tested | US-42.24.7, US-42.24.9, US-42.24.10, US-42.24.18 |
+| Total bugs found | 1 |
 | P0 | 0 |
-| P1 | 0 |
+| P1 | 1 |
 | P2 | 0 |
 | Status | in progress |
 
@@ -53,11 +53,56 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 | AC | Description | Result | Notes |
 |---|---|---|---|
 | AC-4 | Subnet tokens show as `{subnetId} \| {tokenName} {symbol}` in the token list — Android + iOS fresh | ✅ Pass | |
-| AC-5 | The same format appears in token detail and in the transfer form — Android + iOS fresh | ✅ Pass | |
+| AC-5 | The same format appears in token detail — Android + iOS fresh | ✅ Pass | AC-5 was split today: it had covered token detail and the transfer form in one line, and the transfer form has two cases of its own |
+| AC-5a | A native TAO transfer works from the transfer form, with no validator field on it — Android + iOS fresh | ✅ Pass | |
+| AC-5b | A subnet token shows its subnet ID and name on the transfer form, with its validator fields, and the transfer goes through — Android + iOS fresh | ❌ Fail | See BUG-42.24.9-01 |
 | AC-6 | Searching by subnet ID finds the token — Android + iOS fresh | ✅ Pass | |
 | AC-7 | AC-4 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-8 to AC-14 | The Bittensor root staking group ([#4829](https://github.com/Koniverse/SubWallet-Extension/issues/4829)) | ⏭️ Skipped | The root claim type was removed again in 1.3.86 ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045)), so there is nothing left in the build to test |
 
-What is left in this story is the Bittensor root staking group, AC-8 to AC-14.
+The story closes at 8 of 16, one failure and the root staking group skipped.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.9-01 | A subnet token cannot be transferred — the form has no validator fields and no subnet name | Switch to Bittensor → Send → pick a subnet token → look at the Amount screen | The token shows only its bare symbol, not `{subnetId} \| {tokenName}`, and the form has no Select validator fields at all. Without them the transfer cannot be completed. The Extension shows "SN3 \| Te…" with a Select validator field on each side | The form matches the Extension — the subnet name on the token, a validator field for each side, and the transfer goes through | P1 | todo | ![](img/BUG-42.24.9-01.png) |
+
+## US-42.24.18 — Web-runner 1.3.86 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started and closed today: the Bittensor root claim type removal ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | The removed root claim option no longer appears on the Bittensor earning screens — Android + iOS fresh | ✅ Pass | |
+| AC-2 | Bittensor earning still works — the position shows, and stake and unstake go through — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Nothing calls the deprecated function — no error, no stuck loading, no empty screen where the option used to be — Android + iOS fresh | ✅ Pass | |
+| AC-4 | Subnet staking on Bittensor is unaffected — Android + iOS fresh | ✅ Pass | |
+| AC-5 | AC-1 to AC-4 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-6 | After upgrading, an account that had used the old root claim opens without error and its position is correct — both platforms | ✅ Pass | |
+
+6 of 6, no bugs. This removal is also why the root staking group in US-42.24.9 is skipped.
+
+### Bugs
+
+None.
+
+## US-42.24.10 — Web-runner 1.3.77 on Mobile
+
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Carried on from [2026-09-10](../2026-09-10/report-manual.md), where the stDOT sunset passed. Today covers the proxy account improvements ([#4942](https://github.com/Koniverse/SubWallet-Extension/issues/4942)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | Wording on the stake and unstake screens is right when acting through a proxy account — Android + iOS fresh | ✅ Pass | |
+| AC-2 | Transfer max from a proxy account leaves the right amount and the transaction goes through — Android + iOS fresh | ✅ Pass | |
+| AC-3 | The removed EVM network types no longer appear in the list of networks supporting proxy accounts — Android + iOS fresh | ✅ Pass | |
+| AC-4 | AC-1 to AC-3 pass on Android + iOS upgrade | ✅ Pass | |
+
+What is left in this story is the multisig improvements, the PAH-KAH popup and chain-list v0.2.126.
 
 ### Bugs
 
