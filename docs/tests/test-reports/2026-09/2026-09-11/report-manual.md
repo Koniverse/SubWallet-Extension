@@ -13,7 +13,7 @@
 | P0 | 0 |
 | P1 | 1 |
 | P2 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -100,9 +100,18 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 | AC-1 | Wording on the stake and unstake screens is right when acting through a proxy account — Android + iOS fresh | ✅ Pass | |
 | AC-2 | Transfer max from a proxy account leaves the right amount and the transaction goes through — Android + iOS fresh | ✅ Pass | |
 | AC-3 | The removed EVM network types no longer appear in the list of networks supporting proxy accounts — Android + iOS fresh | ✅ Pass | |
+| AC-3a | The transferable figure on the Unlock vote confirmation screen matches what the Extension shows — Android + iOS fresh | ✅ Pass | Judged by comparing the display with the Extension, not by testing governance itself |
+| AC-3b | History details show the proxy information for a transaction signed through a proxy — Android + iOS fresh | ✅ Pass | |
+| AC-3d | Choosing which token pays the fee works with a proxy account — Android + iOS fresh | ⏭️ Skipped | The developer marked this "No fix": the signer is picked on the confirmation screen while the fee token is picked on the send screen, so it cannot be handled |
 | AC-4 | AC-1 to AC-3 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-5 to AC-7 | The multisig improvements — account picker, network filter, dApp signing, priority token list, Mark as read, transfer max against Subscan | ✅ Pass | AC-6c passes although BUG-42.24.7-12 is still open: that bug is a row alignment problem, not a missing feature |
+| AC-8 to AC-10 | The PAH to KAH fee warning popup is gone, and the transfer still works with an accurate fee | ✅ Pass | |
+| AC-13a | MANTA parachain staking is treated the same way as stDOT | ✅ Pass | [ChainList #683](https://github.com/Koniverse/SubWallet-ChainList/issues/683) |
+| AC-13b | A popup explains why the stDOT position was automatically unstaked | ⏭️ Skipped | Optional item in #4968, still unticked, so it is not built |
+| AC-15 to AC-16 | chain-list v0.2.126 — Avail RPCs, multisig on Energy Web X, PRIME and EURC on Hydration, and swap support for both | ✅ Pass | ChainList [#680](https://github.com/Koniverse/SubWallet-ChainList/issues/680), [#686](https://github.com/Koniverse/SubWallet-ChainList/issues/686), [#687](https://github.com/Koniverse/SubWallet-ChainList/issues/687), [#688](https://github.com/Koniverse/SubWallet-ChainList/issues/688) |
+| AC-17 | After upgrading, proxy relationships, multisig accounts and the stDOT position are all still there and shown correctly — both platforms | ✅ Pass | |
 
-What is left in this story is the multisig improvements, the PAH-KAH popup and chain-list v0.2.126.
+The story closes at 27 of 29, two skipped and no bugs. Its AC were rewritten today from the four Extension issue bodies and the four ChainList issues behind v0.2.126, taking it from 17 AC to 29.
 
 ### Bugs
 
@@ -110,4 +119,12 @@ None.
 
 ## Summary
 
-Session in progress.
+Four stories closed today. US-42.24.7 multisig at 28 of 32, US-42.24.9 at 8 of 16, US-42.24.10 at 27 of 29, and US-42.24.18 at 6 of 6.
+
+One bug: a subnet token cannot be transferred at all, because the form has no validator fields and does not show the subnet name. P1.
+
+Two stories had their AC rewritten from the real scope rather than issue titles. US-42.24.10 went from 17 AC to 29 after reading the four Extension issues and the four ChainList issues behind v0.2.126; its points stayed at 8, since it rechecks features already built and tested on 1.3.72 and 1.3.74.
+
+Two AC are skipped for reasons worth keeping apart. AC-3d the developer marked "No fix" — the signer and the fee token are picked on different screens, so it cannot be handled. AC-13b is an optional item that is simply not built yet.
+
+The Bittensor root staking group in US-42.24.9 is skipped for a third reason: 1.3.86 removed the root claim type again, so there is nothing left in the build to test.
