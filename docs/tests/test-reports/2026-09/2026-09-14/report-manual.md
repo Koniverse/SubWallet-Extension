@@ -55,6 +55,8 @@ Its AC were rewritten today from the transfer QC checklist, taking that half fro
 | AC-10 | An alpha token can be sent, with the right fee, and it arrives — Android + iOS fresh | ✅ Pass | |
 | AC-11 | The transfer screen shows the alpha token with its subnet, matching the format from 1.3.76 — Android + iOS fresh | ✅ Pass | |
 | AC-12 | AC-10 and AC-11 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-12a | The alpha tokens that have an xAlpha counterpart appear on Subtensor EVM with the right symbol, decimals and balance — Android + iOS fresh | ✅ Pass | [ChainList #670](https://github.com/Koniverse/SubWallet-ChainList/issues/670) |
+| AC-12b | Those alpha tokens can be sent on the EVM side — Android + iOS fresh | ✅ Pass | |
 
 The liquid staking AC were rewritten today from the QC checklist as well, from 3 AC to 11. The case that matters is staking DOT on Bifrost when the DOT sits on Polkadot Asset Hub: the app bridges it across first, so the available balance, the estimated fee and the amounts on each confirmation step all have to allow for the XCM hop.
 
