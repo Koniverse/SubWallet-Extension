@@ -12,10 +12,18 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← W37 (4th) | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
 | US-10.21 | sr25519 VRF signing for dApp key derivation | EPIC-10 | P3 | 5 | in-progress | new | [link](stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md) |
+| US-42.24.11 | QC — web-runner 1.3.78 | EPIC-42 | P2 | 13 | done | tester · 09-14 | [link](stories/US-42.24.11-qc-web-runner-1-3-78.md) |
+| US-42.24.12 | QC — web-runner 1.3.79 | EPIC-42 | P2 | 5 | done | tester · 09-14 | [link](stories/US-42.24.12-qc-web-runner-1-3-79.md) |
+| US-42.24.13 | QC — web-runner 1.3.80 | EPIC-42 | P2 | 8 | in-progress | tester · 09-14 | [link](stories/US-42.24.13-qc-web-runner-1-3-80.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | 13 | in-progress | tester ← W37 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
+| US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester ← W37 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 
-**2 stories · 10 points** at open. **Re-read every story's `sprint:` field at each sync** — the
-tester sets it on their own stories and two windows in a row learned of 95 and 50 points only at
-closeout.
+**8 stories · 57 points** — 2 · 10 at open on 09-14, **+6 · 47 the same day** when the tester's
+PR #5081 put 1.3.78, 1.3.79 and 1.3.80 on `sprint: sprint-2026-W38` and carried the parent, the
+regression story and the verify story across from W37 (commit `d8d84e15a0`). Added the day they
+appeared, not at closeout — the first window where the table was told in time. Rows marked *tester*
+were placed by the tester's own commits and are listed, never moved.
 
 ## US-12.23 — a fourth window
 
@@ -41,16 +49,16 @@ needs from it is a review**, not more code: the PR has had none in five days.
 
 ## The web-runner QC programme — the tester scopes it
 
-Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md). At open: **12 done
-(98 pts), 3 in progress on W37 (21 pts), 5 in `backlog` with no sprint (36 pts)** — 1.3.78, 1.3.79,
-1.3.80, 1.3.84, 1.3.85. The tester puts their stories on a window by setting `sprint:` in their own
-commits; this file lists what it finds and moves nothing. If those rows appear here mid-week, add
-them to the table then, not at closeout.
+Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md). At open: 12 done
+(98 pts), 3 in progress on W37 (21 pts), 5 in `backlog` with no sprint (36 pts). **By 09-14 evening:
+14 done (116 pts), 4 in progress (29 pts, all on W38), 2 in `backlog` (10 pts): 1.3.84 and 1.3.85.** The tester puts their stories on a window by setting `sprint:` in their own
+commits; this file lists what it finds and moves nothing. The six that arrived on 09-14 are in the
+table above.
 
-[#2057](https://github.com/Koniverse/SubWallet-Mobile/issues/2057) stands at **40 of 48** at open.
-Three P1s: item 9 (intermittent infinite loading, open since 09-03), item 40 (signing list never
-loads on a dApp request via multisig), item 48 (subnet token transfer impossible — no validator
-fields). Record: [notes/2026-09-04.md](../notes/2026-09-04.md).
+[#2057](https://github.com/Koniverse/SubWallet-Mobile/issues/2057) stood at 40 of 48 at open with
+three P1s; by 09-14 evening **47 of 54**, one P1 left (item 9, intermittent infinite loading, open
+since 09-03), and a third comment sweeping 1.3.78 and 1.3.80. Record:
+[notes/2026-09-04.md](../notes/2026-09-04.md).
 
 ## Not in this window — the eight stalled W33 stories
 

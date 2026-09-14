@@ -105,10 +105,12 @@ still could not be read.
 | --- | --- | --- |
 | **Done** | US-42.24.4, .5, .6, .7, .8, .9, .10, .18 | 77 |
 | **→ [W38](sprint-2026-W38.md)** | US-12.23 | 5 |
-| **Stays on W37 — tester-owned** | US-42.24 (parent), US-42.24.19, US-42.24.20 | 21 |
+| **→ [W38](sprint-2026-W38.md) — moved by the tester** | US-42.24 (parent), US-42.24.19, US-42.24.20 | 21 |
 
-> The three in-progress US-42.24 rows keep `sprint: sprint-2026-W37` and were not moved. Which
-> window the tester's work sits in is the tester's call; same boundary as the test reports.
+> At closeout on 09-14 morning these three still read `sprint: sprint-2026-W37` and this table said
+> they stayed. The tester's own commit `d8d84e15a0`, merged that afternoon in PR #5081, moved them
+> to W38. Row corrected the same day; the boundary holds — which window the tester's work sits in is
+> the tester's call, and here they made it.
 
 **Everything that closed was QC, and every dev story carried.** The eight done stories are the
 tester's version-by-version sweep landing — seven web-runner versions plus 1.3.86 — at 77 points in
