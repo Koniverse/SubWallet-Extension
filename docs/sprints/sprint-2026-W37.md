@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W37
-status: in-progress
+status: closed
 start: 2026-09-07
 end: 2026-09-13
 goal: "Settle US-12.23 — a PR that has sat open and approved for three windows while its QC evidence ages against a branch nobody builds. The web-runner QC programme is the larger body of live work but is tester-owned and tracked in its own stories, so it is described here and not scoped. Opened 2026-09-07 from tracker, PR and git evidence."
@@ -10,9 +10,25 @@ goal: "Settle US-12.23 — a PR that has sat open and approved for three windows
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← W36 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | → W38 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24.4 | QC — web-runner 1.3.71 | EPIC-42 | P2 | 13 | done | tester | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
+| US-42.24.5 | QC — web-runner 1.3.72 | EPIC-42 | P2 | 20 | done | tester | [link](stories/US-42.24.5-qc-web-runner-1-3-72.md) |
+| US-42.24.6 | QC — web-runner 1.3.73 | EPIC-42 | P2 | 5 | done | tester | [link](stories/US-42.24.6-qc-web-runner-1-3-73.md) |
+| US-42.24.7 | QC — web-runner 1.3.74 | EPIC-42 | P2 | 13 | done | tester | [link](stories/US-42.24.7-qc-web-runner-1-3-74.md) |
+| US-42.24.8 | QC — web-runner 1.3.75 | EPIC-42 | P2 | 3 | done | tester | [link](stories/US-42.24.8-qc-web-runner-1-3-75.md) |
+| US-42.24.9 | QC — web-runner 1.3.76 | EPIC-42 | P2 | 13 | done | tester | [link](stories/US-42.24.9-qc-web-runner-1-3-76.md) |
+| US-42.24.10 | QC — web-runner 1.3.77 | EPIC-42 | P2 | 8 | done | tester | [link](stories/US-42.24.10-qc-web-runner-1-3-77.md) |
+| US-42.24.18 | QC — web-runner 1.3.86 | EPIC-42 | P2 | 2 | done | tester | [link](stories/US-42.24.18-qc-web-runner-1-3-86.md) |
+| US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | 13 | in-progress | tester | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
+| US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 
-**1 story · 5 points.** Small, and honestly so: it is the only non-QC item in flight.
+**12 stories · 103 points — rebuilt at closeout.** This table read *1 story · 5 points* all week.
+The eleven US-42.24 rows were put on `sprint: sprint-2026-W37` by the tester's own commits
+(PRs #5077–#5080), not by this file, and this file did not learn of them until it was closed — the
+same under-report as [W36](sprint-2026-W36.md), and by a larger margin: **95 of 103 points arrived
+without the scope table being told.** Rows marked *tester* were not moved and will not be; they are
+listed because they are here.
 
 ## US-12.23 — a third window, and the evidence is aging
 
@@ -77,3 +93,38 @@ US-4.21, US-4.22, US-4.23, US-5.10, US-10.11, US-12.11, US-13.11, US-20.4 (**32 
 `projectV2` needs `read:project`; the token carries `gist, read:org, repo`. Unchanged since
 2026-08-13. Opened from `gh issue view`, `gh pr view` and git; **no board column is claimed as
 current**.
+
+## Closeout — 2026-09-14
+
+Window ended **2026-09-13**. Closed the next day from `gh`, git and the merged QC pages; the board
+still could not be read.
+
+### 8 of 12 stories · 77 of 103 points
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **Done** | US-42.24.4, .5, .6, .7, .8, .9, .10, .18 | 77 |
+| **→ [W38](sprint-2026-W38.md)** | US-12.23 | 5 |
+| **Stays on W37 — tester-owned** | US-42.24 (parent), US-42.24.19, US-42.24.20 | 21 |
+
+> The three in-progress US-42.24 rows keep `sprint: sprint-2026-W37` and were not moved. Which
+> window the tester's work sits in is the tester's call; same boundary as the test reports.
+
+**Everything that closed was QC, and every dev story carried.** The eight done stories are the
+tester's version-by-version sweep landing — seven web-runner versions plus 1.3.86 — at 77 points in
+one week. The one dev story in scope, US-12.23, did not move: PR #5065's head is still the
+2026-08-27 commit, its issue is still closed by hand, and its 16/16 QC is now **18 days old**. It
+goes to a **fourth** window.
+
+**The sprint file was wrong all week, again.** The goal line above says the QC programme is
+*"described here and not scoped"*, and that was true when written on 09-07. The tester then scoped
+it themselves — eleven stories onto W37 across four merged PRs — and nothing here changed until
+closeout. Two windows in a row now. The fix is not to stop the tester setting `sprint:`; it is to
+re-read every story's `sprint:` field at each sync instead of assuming the table is the source.
+
+**US-10.21 was live in this window and never in scope.** `in-progress` since 09-09, PR #5076 open
+with review required since 09-09, still open at close. Corrected in the section below on 09-11; not
+added then because adding two days before close is a planning call. It is scoped into W38.
+
+**#2057 stands at 40 of 48** at close, with three P1s open — items 9, 40 and 48; the latter two are
+transactions that cannot be made. Tracker record: [notes/2026-09-04.md](../notes/2026-09-04.md).
