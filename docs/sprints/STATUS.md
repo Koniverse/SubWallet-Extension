@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-07 02:23:02 UTC
+> Last generated: 2026-09-14 02:25:25 UTC
 > Total stories: 323
 
-## 📋 Backlog (83)
+## 📋 Backlog (75)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,6 @@
 | US-10.10 | Multi-wallet coexistence hardening | EPIC-10 | P1 | 3 | — | — |
 | US-10.12 | WebApp injected-account caching | EPIC-10 | P2 | 3 | — | — |
 | US-10.17 | Open dApp connection & signing improvements | EPIC-10 | P3 | 5 | — | — |
-| US-10.21 | sr25519 VRF signing for dApp key derivation | EPIC-10 | P3 | 1 | — | — |
 | US-11.10 | In-wallet swap via PiperX | EPIC-11 | P2 | 5 | — | — |
 | US-11.11 | In-wallet swap via StellaSwap | EPIC-11 | P3 | 5 | — | — |
 | US-11.16 | Swap flow improvements (improvement on US-11.12 / US-11.13) | EPIC-11 | P3 | 5 | — | — |
@@ -59,18 +58,11 @@
 | US-4.17 | Solana support | EPIC-4 | P1 | 5 | — | — |
 | US-4.18 | Chain-abstraction SDK (developer-facing) | EPIC-4 | P2 | 8 | — | — |
 | US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
-| US-42.24.10 | QC — Web-runner 1.3.77 on Mobile | EPIC-42 | P2 | 8 | — | MaiThuongNinni |
 | US-42.24.11 | QC — Web-runner 1.3.78 on Mobile | EPIC-42 | P2 | 13 | — | MaiThuongNinni |
 | US-42.24.12 | QC — Web-runner 1.3.79 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
 | US-42.24.13 | QC — Web-runner 1.3.80 on Mobile | EPIC-42 | P2 | 8 | — | MaiThuongNinni |
 | US-42.24.16 | QC — Web-runner 1.3.84 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
 | US-42.24.17 | QC — Web-runner 1.3.85 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
-| US-42.24.18 | QC — Web-runner 1.3.86 on Mobile | EPIC-42 | P2 | 2 | — | MaiThuongNinni |
-| US-42.24.5 | QC — Web-runner 1.3.72 on Mobile | EPIC-42 | P2 | 13 | — | MaiThuongNinni |
-| US-42.24.6 | QC — Web-runner 1.3.73 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
-| US-42.24.7 | QC — Web-runner 1.3.74 on Mobile | EPIC-42 | P2 | 8 | — | MaiThuongNinni |
-| US-42.24.8 | QC — Web-runner 1.3.75 on Mobile | EPIC-42 | P2 | 3 | — | MaiThuongNinni |
-| US-42.24.9 | QC — Web-runner 1.3.76 on Mobile | EPIC-42 | P2 | 13 | — | MaiThuongNinni |
 | US-5.8 | Blockaid tx/signature risk scanning | EPIC-5 | P0 | 5 | — | — |
 | US-5.9 | Anti-scam address screening | EPIC-5 | P0 | 5 | — | — |
 | US-5.11 | Two-factor authentication for outgoing transfers | EPIC-5 | P3 | 1 | — | — |
@@ -106,6 +98,7 @@
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
+| US-10.21 | sr25519 VRF signing for dApp key derivation | EPIC-10 | P3 | 5 | sprint-2026-W38 | — |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
@@ -114,10 +107,9 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W36 | MaiThuongNinni |
-| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
-| US-42.24.4 | QC — Web-runner 1.3.71 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W36 | MaiThuongNinni |
+| US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W37 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
 ## 👀 Review (7)
@@ -126,13 +118,13 @@
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | sprint-2026-W37 | tunghp2002 |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | sprint-2026-W38 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (214)
+## ✅ Done (222)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -267,9 +259,17 @@
 | US-4.27 | Network & token on the WebApp & Avail Space | EPIC-4 | P3 | 5 | sprint-2024-M01 | frenkie-ng |
 | US-4.28 | Chains, tokens & data recovered from Uncategorized | EPIC-4 | P3 | 5 | sprint-2025-M10 | bluezdot |
 | US-42.24.1 | QC — Web-runner 1.3.68 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
+| US-42.24.10 | QC — Web-runner 1.3.77 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.24.14 | QC — Web-runner 1.3.82 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.15 | QC — Web-runner 1.3.83 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W36 | MaiThuongNinni |
+| US-42.24.18 | QC — Web-runner 1.3.86 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.24.2 | QC — Web-runner 1.3.69 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
+| US-42.24.4 | QC — Web-runner 1.3.71 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.5 | QC — Web-runner 1.3.72 on Mobile | EPIC-42 | P2 | 20 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.6 | QC — Web-runner 1.3.73 on Mobile | EPIC-42 | P2 | 5 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.7 | QC — Web-runner 1.3.74 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.8 | QC — Web-runner 1.3.75 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.9 | QC — Web-runner 1.3.76 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.1 | Test — Stake/unstake screen bugs after upgrade (#5013) | EPIC-42 | P2 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.2 | Test — Cypress (CP) token on Base shows correctly in wallet (#703) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
 | US-42.3 | Test — Polkadot Hub EVM chain works correctly in wallet (#701) | EPIC-42 | P3 | 3 | sprint-2026-W29 | MaiThuongNinni |
@@ -365,11 +365,11 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 83
+- 📋 **Backlog**: 75
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 14
 - 👀 **Review**: 7
-- ✅ **Done**: 214
+- ✅ **Done**: 222
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
