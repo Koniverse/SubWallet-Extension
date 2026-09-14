@@ -8,12 +8,12 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.11, US-42.24.12 |
-| Total bugs found | 5 |
+| Stories tested | US-42.24.11, US-42.24.12 — both closed; US-42.24.13 started |
+| Total bugs found | 6 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 2 |
-| P3 | 3 |
+| P3 | 4 |
 | Status | done |
 
 ---
@@ -84,7 +84,7 @@ The Bittensor swap and chain-list v0.2.127 were checked last and pass, which clo
 
 ## US-42.24.12 — Web-runner 1.3.79 on Mobile
 
-Started at the end of the session, straight after 1.3.78 closed. Only the alpha price half ([#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987)) was run today — the price now comes from currentAlphaPriceAll instead of taoIn divided by alphaIn, and it matches TaoStats.
+Started at the end of the session, straight after 1.3.78 closed. All four items were run: the alpha price ([#4987](https://github.com/Koniverse/SubWallet-Extension/issues/4987)), which now comes from currentAlphaPriceAll instead of taoIn divided by alphaIn and matches TaoStats; the ParaSpell move to API v1 ([#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979)); the display fixes after the merge ([#4988](https://github.com/Koniverse/SubWallet-Extension/issues/4988)); and the swap service refactor ([#4826](https://github.com/Koniverse/SubWallet-Extension/issues/4826)).
 
 ### AC results
 
@@ -93,15 +93,64 @@ Started at the end of the session, straight after 1.3.78 closed. Only the alpha 
 | AC-1 | The alpha price shown matches TaoStats for the same subnet at the same moment — Android + iOS fresh | ✅ Pass | |
 | AC-2 | Balances valued in alpha are right, and earning on a Bittensor subnet works rather than failing on a bad price — Android + iOS fresh | ✅ Pass | |
 | AC-3 | AC-1 and AC-2 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-4 | XCM transfers still work on the main routes after the API change — Android + iOS fresh | ✅ Pass | [#4979](https://github.com/Koniverse/SubWallet-Extension/issues/4979) |
+| AC-5 | The fee quoted before sending matches what is taken — Android + iOS fresh | ✅ Pass | |
+| AC-6 | No route that worked before has disappeared — Android + iOS fresh | ✅ Pass | |
+| AC-7 | AC-4 to AC-6 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-8 | On the transfer confirmation screen, the fee value has the right colour and size, matching the design — Android + iOS fresh | ✅ Pass | [#4988](https://github.com/Koniverse/SubWallet-Extension/issues/4988) |
+| AC-9 | The amount and the fee are lined up correctly — Android + iOS fresh | ✅ Pass | |
+| AC-10 | The transfer amount input shows the right value — Android + iOS fresh | ✅ Pass | |
+| AC-11 | The token approve screen shows the network fee — Android + iOS fresh | ✅ Pass | |
+| AC-12 | AC-8 to AC-11 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-13 | Swap still works on the main routes, with the right rate and fee — Android + iOS fresh | ✅ Pass | [#4826](https://github.com/Koniverse/SubWallet-Extension/issues/4826) |
+| AC-14 | AC-13 passes on Android + iOS upgrade | ✅ Pass | |
+| AC-15 | After upgrading, swap history and Bittensor balances are still correct — both platforms | ✅ Pass | |
 
-Left for the next session: ParaSpell API v1, the four display fixes after the 1.3.78 merge, and the swap refactor.
+The ParaSpell move to API v1 changes the base URL and the request format, so the XCM routes were run again rather than taken on trust — they work, the quoted fee matches what is taken, and no route was lost. The swap service refactor has nothing visible in it, so it is checked by whether swap still works, and it does. The four display problems that came out of the 1.3.78 merge are all fixed, checked against the Figma link in the issue.
+
+The upgrade carry-over passes as well, which closes the story with all 15 AC passing and no bug found.
 
 ### Bugs
 
 None found.
 
+## US-42.24.13 — Web-runner 1.3.80 on Mobile
+
+Opened at the end of the session. Three of the four items were run: transfer max when the balance sits exactly at the existential deposit ([#2641](https://github.com/Koniverse/SubWallet-Extension/issues/2641)); the network address on the XCM confirmation screen ([#3936](https://github.com/Koniverse/SubWallet-Extension/issues/3936)); and token approve on XCM ([#4830](https://github.com/Koniverse/SubWallet-Extension/issues/4830)).
+
+The AC had one case for the swap flow, so a second was added for the plain XCM transfer, which took this half from 3 AC to 4 and the story from 15 AC to 16.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | With a balance exactly equal to the existential deposit, transfer max goes through instead of failing — Android + iOS fresh | ✅ Pass | [#2641](https://github.com/Koniverse/SubWallet-Extension/issues/2641) |
+| AC-2 | The amount and fee shown before confirming are right for that case — Android + iOS fresh | ✅ Pass | |
+| AC-3 | AC-1 and AC-2 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-4 | During a swap that needs XCM, the confirmation screen shows the right network's address — Android + iOS fresh | ✅ Pass | |
+| AC-4a | The same during a plain XCM transfer — Android + iOS fresh | ✅ Pass | |
+| AC-5 | The same during liquid staking — Android + iOS fresh | ✅ Pass | |
+| AC-6 | AC-4 to AC-5 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-7 | With a token already approved, the XCM flow goes straight to the transfer confirmation, skipping the approve screen — Android + iOS fresh | ✅ Pass | [#4830](https://github.com/Koniverse/SubWallet-Extension/issues/4830) |
+| AC-8 | With a token not yet approved, the approve screen still appears as it should — Android + iOS fresh | ✅ Pass | |
+| AC-9 | AC-7 and AC-8 pass on Android + iOS upgrade | ✅ Pass | |
+
+All three flows that reach the XCM confirmation screen name the right network, so that half is finished. Token approve behaves both ways: skipped when the token is already approved, still shown when it is not.
+
+| AC-11 | Unique Network NFTs are found and shown correctly, including nested ones — Android + iOS fresh | ✅ Pass | The Go to parent button is styled wrongly, see BUG-42.24.13-01; the nesting itself is right |
+
+A nested NFT shows what it is nested in and can walk up to its parent, so the nesting works. Only the button that does it is styled wrongly.
+
+Left for the next session: the rest of NFTService phase 1 and the upgrade carry-over.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.13-01 | The Go to parent button on a nested NFT has no button styling | NFTs → open a nested NFT, one that shows "Nested in" under its name → look at the Go to parent button and compare with the same screen on the Extension | The button has the same background as the panel behind it, so it reads as a line of centred text rather than something to tap. The Extension gives it its own lighter panel, which sets it apart from the detail card | Go to parent is shown as a button the way the Extension shows it, with its own background against the card | P3 | todo | ![](img/BUG-42.24.13-01.png) |
+
 ## Summary
 
-US-42.24.11 ran in full today and is closed, and US-42.24.12 was opened at the end of the session with its alpha price half passing. All 39 AC pass on Android and iOS, fresh install and upgrade. The two halves that were rewritten from the QC checklists this morning — the XCM destination fee from 3 AC to 10, liquid staking from 3 AC to 11 — both pass, as do the disable-all-networks switch, alpha token transfer, the alpha tokens on Subtensor EVM, the TAO bridge in both directions, the Bittensor on-chain swap and chain-list v0.2.127.
+US-42.24.11 ran in full today and is closed, and US-42.24.12 was opened at the end of the session and closed in the same session — all 15 AC pass across its four items, with no bug found. All 39 AC pass on Android and iOS, fresh install and upgrade. The two halves that were rewritten from the QC checklists this morning — the XCM destination fee from 3 AC to 10, liquid staking from 3 AC to 11 — both pass, as do the disable-all-networks switch, alpha token transfer, the alpha tokens on Subtensor EVM, the TAO bridge in both directions, the Bittensor on-chain swap and chain-list v0.2.127.
 
-Five bugs were found, all display defects. None blocks the feature it sits on: every transfer, stake and swap completed and the figures were right. Two are P2 — the Insufficient balance popup falling back to the Android system dialog, and two debug lines left on the swap confirmation screen. The other three are alignment and styling gaps against the Extension. All five are in US-42.24.20 waiting for a fixed build.
+Six bugs were found, all display defects. None blocks the feature it sits on: every transfer, stake and swap completed and the figures were right. Two are P2 — the Insufficient balance popup falling back to the Android system dialog, and two debug lines left on the swap confirmation screen. The other three are alignment and styling gaps against the Extension. US-42.24.13 was opened last, with the XCM confirmation address passing on all three flows that reach that screen — swap, plain transfer and liquid staking. All six bugs are in US-42.24.20 waiting for a fixed build.
