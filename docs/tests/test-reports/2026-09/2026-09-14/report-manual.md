@@ -9,11 +9,11 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.11, US-42.24.12 — both closed; US-42.24.13 started |
-| Total bugs found | 6 |
+| Total bugs found | 8 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 2 |
-| P3 | 4 |
+| P3 | 6 |
 | Status | done |
 
 ---
@@ -137,9 +137,9 @@ The AC had one case for the swap flow, so a second was added for the plain XCM t
 
 All three flows that reach the XCM confirmation screen name the right network, so that half is finished. Token approve behaves both ways: skipped when the token is already approved, still shown when it is not.
 
-| AC-11 | Unique Network NFTs are found and shown correctly, including nested ones — Android + iOS fresh | ✅ Pass | The Go to parent button is styled wrongly, see BUG-42.24.13-01; the nesting itself is right |
+| AC-11 | Unique Network NFTs are found and shown correctly, including nested ones — Android + iOS fresh | ✅ Pass | Three display defects, BUG-42.24.13-01 to BUG-42.24.13-03; the NFTs themselves are found and shown right |
 
-A nested NFT shows what it is nested in and can walk up to its parent, so the nesting works. Only the button that does it is styled wrongly.
+A nested NFT shows what it is nested in and can walk up to its parent, so the nesting works. What is wrong is the styling around it — the Go to parent button has no button background, and the NFT details section carries an empty panel and a row the Extension does not have.
 
 Left for the next session: the rest of NFTService phase 1 and the upgrade carry-over.
 
@@ -148,9 +148,11 @@ Left for the next session: the rest of NFTService phase 1 and the upgrade carry-
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.13-01 | The Go to parent button on a nested NFT has no button styling | NFTs → open a nested NFT, one that shows "Nested in" under its name → look at the Go to parent button and compare with the same screen on the Extension | The button has the same background as the panel behind it, so it reads as a line of centred text rather than something to tap. The Extension gives it its own lighter panel, which sets it apart from the detail card | Go to parent is shown as a button the way the Extension shows it, with its own background against the card | P3 | todo | ![](img/BUG-42.24.13-01.png) |
+| BUG-42.24.13-02 | The NFT details section carries an empty panel and a Resources or inventory row the Extension does not have | NFTs → open an NFT that has a description → look at the NFT details section and compare with the same screen on the Extension | Two extra things sit in the section. An empty panel sits above the NFT details heading, and a "Resources or inventory" row with an icon sits below the description. The Extension shows only the description, labelled Description underneath it | The section matches the Extension — the description with its Description label, no empty panel above and no Resources or inventory row below | P3 | todo | ![](img/BUG-42.24.13-02.png) |
+| BUG-42.24.13-03 | The NFT detail screen lays its fields out differently from the Extension | NFTs → open any NFT → compare the NFT details section with the same screen on the Extension | Each field sits in its own separate card — description, collection name, owned by, network — with no field label beside it, and the description has no Description label at all. NFT ID and Collection ID are pulled out into a "Properties" heading of their own below. The Extension puts all six in one panel as labelled rows, Description included | The fields are laid out the way the Extension lays them out — one panel, each row labelled, with NFT ID and Collection ID among them rather than under a separate Properties heading | P3 | todo | ![](img/BUG-42.24.13-03.png) |
 
 ## Summary
 
 US-42.24.11 ran in full today and is closed, and US-42.24.12 was opened at the end of the session and closed in the same session — all 15 AC pass across its four items, with no bug found. All 39 AC pass on Android and iOS, fresh install and upgrade. The two halves that were rewritten from the QC checklists this morning — the XCM destination fee from 3 AC to 10, liquid staking from 3 AC to 11 — both pass, as do the disable-all-networks switch, alpha token transfer, the alpha tokens on Subtensor EVM, the TAO bridge in both directions, the Bittensor on-chain swap and chain-list v0.2.127.
 
-Six bugs were found, all display defects. None blocks the feature it sits on: every transfer, stake and swap completed and the figures were right. Two are P2 — the Insufficient balance popup falling back to the Android system dialog, and two debug lines left on the swap confirmation screen. The other three are alignment and styling gaps against the Extension. US-42.24.13 was opened last, with the XCM confirmation address passing on all three flows that reach that screen — swap, plain transfer and liquid staking. All six bugs are in US-42.24.20 waiting for a fixed build.
+Eight bugs were found, all display defects. None blocks the feature it sits on: every transfer, stake and swap completed and the figures were right. Two are P2 — the Insufficient balance popup falling back to the Android system dialog, and two debug lines left on the swap confirmation screen. The other three are alignment and styling gaps against the Extension. US-42.24.13 was opened last, with the XCM confirmation address passing on all three flows that reach that screen — swap, plain transfer and liquid staking. All eight bugs are in US-42.24.20 waiting for a fixed build.
