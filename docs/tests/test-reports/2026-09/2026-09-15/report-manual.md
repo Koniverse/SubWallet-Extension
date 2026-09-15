@@ -120,7 +120,7 @@ Both are one defect in a shared component rather than many. BUG-42.24.19-14 cove
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-Four bugs rechecked, all pass. Three AC that bugs had been holding were rerun today and pass, so every bug marked fixed now has its AC settled as well.
+Twenty-two bugs rechecked and all pass, and one closed without a fix. The seven AC the fixed bugs had been holding were all rerun today and pass, so no bug marked fixed has an AC still outstanding.
 
 | Item | Found in | Severity | What it is | State |
 |---|---|---|---|---|
@@ -128,11 +128,34 @@ Four bugs rechecked, all pass. Three AC that bugs had been holding were rerun to
 | BUG-42.24.2-02 | US-42.24.2 | P1 | Network toggles did not respond, on every network | ✅ Fixed — toggles respond normally |
 | BUG-42.24.2-03 | US-42.24.2 | P2 | The price chart was missing on the token detail screen, on every token | ✅ Fixed — the chart is shown |
 | BUG-42.24.19-02 | US-42.24.19 | P1 | The Create a password screen froze on a fresh install — Continue and Back both stopped responding | ✅ Fixed — both buttons respond |
+| BUG-42.24.19-04 | US-42.24.19 | P1 | Transferring an NFT on a supported network was refused, with a message naming the account rather than the network | ✅ Fixed — the transfer is allowed |
+| BUG-42.24.19-05 | US-42.24.19 | P1 | NFTs on substrate networks (Polkadot Asset Hub, Kusama Asset Hub) did not show at all | ✅ Fixed — substrate NFTs are listed |
+| BUG-42.24.19-07 | US-42.24.19 | P1 | The app crashed when tapping the + button while importing a custom network (Android) | ✅ Fixed — a custom network can be imported |
+| BUG-42.24.19-08 | US-42.24.19 | P2 | The info tooltip on the Others row of the locked balance breakdown read differently from the Extension | ✅ Fixed — the tooltip matches |
+| BUG-42.24.19-09 | US-42.24.19 | P2 | The Account name field on the Create derived account screen was indented out of line (Android) | ✅ Fixed — the field lines up |
+| BUG-42.24.5-01 | US-42.24.5 | P2 | The Add proxy screen showed an Available balance line the Extension does not have | ✅ Fixed — the line is gone |
+| BUG-42.24.5-02 | US-42.24.5 | P2 | The Transaction details sheet on the Add proxy confirmation could not be scrolled, so the call data could not be read | ✅ Fixed — the sheet scrolls |
+| BUG-42.24.5-03 | US-42.24.5 | P2 | The Proxy type field on the Add proxy screen was greyed out and had no dropdown arrow | ✅ Fixed — the field has its normal colour and the dropdown opens |
+| BUG-42.24.5-05 | US-42.24.5 | P3 | The Available balance label on the Remove proxy screen had two colons | ✅ Fixed — one colon |
+| BUG-42.24.5-06 | US-42.24.5 | P3 | The Remove proxy confirmation title was truncated although there was room for it | ✅ Fixed — the full title is shown |
+| BUG-42.24.5-04 | US-42.24.5 | P2 | The Governance proxy type is offered on Mobile, which has no governance feature | ⏭️ Skipped — the developer is keeping the option for when governance is supported |
+| BUG-42.24.19-11 | US-42.24.19 | P3 | The sections on the Unstake confirm screen were spaced unevenly | ✅ Fixed — the spacing is even |
+| BUG-42.24.19-12 | US-42.24.19 | P3 | The group headings on the Select account screen had no padding above them | ✅ Fixed — the headings have padding |
+| BUG-42.24.19-13 | US-42.24.19 | P3 | The blocks on the Create multisig account screen were spaced unevenly, with no left and right padding | ✅ Fixed — the spacing and padding are right |
+| BUG-42.24.7-02 | US-42.24.7 | P2 | The tab bar on a multisig account's details screen could not be scrolled sideways to reach the hidden tabs | ✅ Fixed — the tab bar scrolls |
+| BUG-42.24.7-03 | US-42.24.7 | P3 | The filter button was still shown on the Multisig tab of History, where it does nothing (iOS) | ✅ Fixed — the button is gone |
+| BUG-42.24.7-04 | US-42.24.7 | P3 | The background behind the filter row on History was the wrong colour (Android) | ✅ Fixed — the colour matches |
+| BUG-42.24.7-05 | US-42.24.7 | P3 | The Select account dropdown on the Multisig tab had its label in the wrong colour | ✅ Fixed — the label is the right colour |
+| BUG-42.24.7-07 | US-42.24.7 | P3 | The multisig account name on a pending transaction was in the wrong colour | ✅ Fixed — the name is the right colour |
 | AC-10 | US-42.24.2 | — | DOT can be sent by XCM to and from Xode | ✅ Rerun, passes — BUG-42.24.2-04 now settled both ways |
 | REG-20 | US-42.24.19 | — | An XCM transfer goes through on at least two routes | ✅ Rerun, passes — BUG-42.24.2-04 now settled both ways |
 | REG-1 | US-42.24.19 | — | Create a new account, and the seed phrase is shown and can be written down | ✅ Rerun, passes — BUG-42.24.19-02 now settled both ways |
+| REG-16 | US-42.24.19 | — | Send an NFT | ✅ Rerun, passes — BUG-42.24.19-04 now settled both ways |
+| REG-34 | US-42.24.19 | — | NFTs load on EVM and on Unique Network, including nested ones | ✅ Rerun, passes — BUG-42.24.19-05 now settled both ways |
+| REG-13 | US-42.24.19 | — | Turn networks on and off, including the disable-all switch | ✅ Rerun, passes — BUG-42.24.19-07 now settled both ways |
+| REG-11 | US-42.24.19 | — | The locked balance breakdown opens and its figures add up | ✅ Rerun, passes — BUG-42.24.19-08 now settled both ways |
 
-8 of 67 bugs verified, 59 still open.
+26 of 67 bugs verified and one closed without a fix, 40 still open.
 
 ## Summary
 
