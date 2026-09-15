@@ -68,14 +68,14 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.10](../stories/US-42.24.10-qc-web-runner-1-3-77.md) | Web-runner 1.3.77 — proxy and multisig improvements, PAH-KAH popup, stDOT sunset, chain-list v0.2.126, all written out from the issue bodies; 27 / 29 AC pass, AC-3d and AC-13b skipped, no bugs | done |
 | [US-42.24.11](../stories/US-42.24.11-qc-web-runner-1-3-78.md) | Web-runner 1.3.78 — XCM and bridge fees, disable all networks, alpha tokens on Subtensor EVM, Alpha transfer, TAO bridge, Bittensor swap, chain-list v0.2.127; the XCM and liquid staking halves written out from the QC checklists; all 39 AC pass | done |
 | [US-42.24.12](../stories/US-42.24.12-qc-web-runner-1-3-79.md) | Web-runner 1.3.79 — Alpha price, ParaSpell v1, display fixes after the 1.3.78 merge, swap refactor; all 15 AC pass | done |
-| [US-42.24.13](../stories/US-42.24.13-qc-web-runner-1-3-80.md) | Web-runner 1.3.80 — transfer max at ED, XCM confirm address, token approve, NFTService phase 1; 11 of 16 AC pass | in-progress |
+| [US-42.24.13](../stories/US-42.24.13-qc-web-runner-1-3-80.md) | Web-runner 1.3.80 — transfer max at ED, XCM confirm address, token approve, NFTService phase 1; all 16 AC pass | done |
 | [US-42.24.14](../stories/US-42.24.14-qc-web-runner-1-3-82.md) | Web-runner 1.3.82 — Polygon zkEVM removed; 6 / 6 AC, no bugs | done |
 | [US-42.24.15](../stories/US-42.24.15-qc-web-runner-1-3-83.md) | Web-runner 1.3.83 — earning terms and conditions; 8 / 8 AC, no bugs | done |
-| [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129 | backlog |
-| [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042) | backlog |
+| [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129; AC written out from the release note, 23 AC | backlog |
+| [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042); AC written out from the polkadot-js report, 11 AC | backlog |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045); 6 / 6 AC, no bugs | done |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; 13 bugs of its own plus the XCM fee bug; seven REG lines failed | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 62 verified, their AC rerun and passing | in-progress |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 4 of 64 verified, their AC rerun and passing | in-progress |
 
 More rows get added here as testing starts.
 
