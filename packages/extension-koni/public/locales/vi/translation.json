@@ -2803,5 +2803,10 @@
   "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "Khóa này được dẫn xuất từ tài khoản của bạn và là vĩnh viễn — không thể thay đổi hay thu hồi về sau. Khóa là duy nhất với {{domain}}; không trang nào khác dẫn xuất được khóa giống vậy.",
   "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Chi tiết khóa dẫn xuất",
   "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Gắn với",
-  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.title": "Mở khóa bằng sinh trắc học",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "Dùng Touch ID, Windows Hello, vân tay hoặc khóa màn hình của thiết bị để mở khóa SubWallet mà không cần nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào trong Cài đặt > Cài đặt bảo mật",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "Để sau",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "Bật ngay",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Không thể thiết lập mở khóa bằng sinh trắc học. Bạn có thể thử lại trong Cài đặt > Cài đặt bảo mật"
 }

@@ -2803,5 +2803,10 @@
   "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "この鍵はあなたのアカウントから導出され、永続的です。後から変更したり取り消したりすることはできません。この鍵は {{domain}} に固有で、他のサイトが同じ鍵を導出することはできません。",
   "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "導出の詳細",
   "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "バインド先",
-  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.title": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
 }

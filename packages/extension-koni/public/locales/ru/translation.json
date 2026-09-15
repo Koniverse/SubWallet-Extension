@@ -2805,5 +2805,10 @@
   "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "Этот ключ производный от вашего аккаунта и постоянный — его нельзя изменить или отозвать позже. Ключ уникален для {{domain}}; никакой другой сайт не сможет получить такой же ключ.",
   "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Детали производного ключа",
   "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Привязан к",
-  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context"
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.title": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
 }

@@ -28,6 +28,7 @@ export const DELETE_ADDRESS_BOOK_MODAL = 'delete-address-book-modal';
 export const EDIT_AUTO_LOCK_TIME_MODAL = 'edit-auto-lock-time-modal';
 export const EDIT_UNLOCK_TYPE_MODAL = 'edit-unlock-type-modal';
 export const RESET_WALLET_MODAL = 'reset-wallet-modal';
+export const PASSKEY_UNLOCK_SETUP_MODAL = 'passkey-unlock-setup-modal';
 export const ADD_CONNECTION_MODAL = 'add-connection-modal';
 export const DISCONNECT_EXTENSION_MODAL = 'disconnect-extension-modal';
 export const REMIND_BACKUP_SEED_PHRASE_MODAL = 'remind-backup-seed-phrase-modal';
