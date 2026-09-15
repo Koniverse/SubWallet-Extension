@@ -120,7 +120,7 @@ Both are one defect in a shared component rather than many. BUG-42.24.19-14 cove
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-Twenty-two bugs rechecked and all pass, and one closed without a fix. The seven AC the fixed bugs had been holding were all rerun today and pass, so no bug marked fixed has an AC still outstanding.
+Twenty-four bugs rechecked and all pass, and one closed without a fix. The seven AC the fixed bugs had been holding were all rerun today and pass, so no bug marked fixed has an AC still outstanding.
 
 | Item | Found in | Severity | What it is | State |
 |---|---|---|---|---|
@@ -146,6 +146,8 @@ Twenty-two bugs rechecked and all pass, and one closed without a fix. The seven 
 | BUG-42.24.7-03 | US-42.24.7 | P3 | The filter button was still shown on the Multisig tab of History, where it does nothing (iOS) | ✅ Fixed — the button is gone |
 | BUG-42.24.7-04 | US-42.24.7 | P3 | The background behind the filter row on History was the wrong colour (Android) | ✅ Fixed — the colour matches |
 | BUG-42.24.7-05 | US-42.24.7 | P3 | The Select account dropdown on the Multisig tab had its label in the wrong colour | ✅ Fixed — the label is the right colour |
+| BUG-42.24.7-06 | US-42.24.7 | P2 | Pending multisig records on the Multisig tab had no date heading | ✅ Fixed — the date heading is shown |
+| BUG-42.24.7-08 | US-42.24.7 | P2 | Mark all as read ran off the right edge of the Notifications screen | ✅ Fixed — the label fits |
 | BUG-42.24.7-07 | US-42.24.7 | P3 | The multisig account name on a pending transaction was in the wrong colour | ✅ Fixed — the name is the right colour |
 | AC-10 | US-42.24.2 | — | DOT can be sent by XCM to and from Xode | ✅ Rerun, passes — BUG-42.24.2-04 now settled both ways |
 | REG-20 | US-42.24.19 | — | An XCM transfer goes through on at least two routes | ✅ Rerun, passes — BUG-42.24.2-04 now settled both ways |
@@ -155,7 +157,7 @@ Twenty-two bugs rechecked and all pass, and one closed without a fix. The seven 
 | REG-13 | US-42.24.19 | — | Turn networks on and off, including the disable-all switch | ✅ Rerun, passes — BUG-42.24.19-07 now settled both ways |
 | REG-11 | US-42.24.19 | — | The locked balance breakdown opens and its figures add up | ✅ Rerun, passes — BUG-42.24.19-08 now settled both ways |
 
-26 of 67 bugs verified and one closed without a fix, 40 still open.
+28 of 67 bugs verified and one closed without a fix, 38 still open.
 
 ## Summary
 
