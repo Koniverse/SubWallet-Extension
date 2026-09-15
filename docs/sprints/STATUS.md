@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-14 02:25:25 UTC
+> Last generated: 2026-09-14 11:56:13 UTC
 > Total stories: 323
 
-## 📋 Backlog (75)
+## 📋 Backlog (72)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -58,9 +58,6 @@
 | US-4.17 | Solana support | EPIC-4 | P1 | 5 | — | — |
 | US-4.18 | Chain-abstraction SDK (developer-facing) | EPIC-4 | P2 | 8 | — | — |
 | US-4.25 | Open network & token improvements | EPIC-4 | P3 | 5 | — | — |
-| US-42.24.11 | QC — Web-runner 1.3.78 on Mobile | EPIC-42 | P2 | 13 | — | MaiThuongNinni |
-| US-42.24.12 | QC — Web-runner 1.3.79 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
-| US-42.24.13 | QC — Web-runner 1.3.80 on Mobile | EPIC-42 | P2 | 8 | — | MaiThuongNinni |
 | US-42.24.16 | QC — Web-runner 1.3.84 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
 | US-42.24.17 | QC — Web-runner 1.3.85 on Mobile | EPIC-42 | P2 | 5 | — | MaiThuongNinni |
 | US-5.8 | Blockaid tx/signature risk scanning | EPIC-5 | P0 | 5 | — | — |
@@ -93,7 +90,7 @@
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (14)
+## 🟡 In Progress (15)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -107,9 +104,10 @@
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
-| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W37 | MaiThuongNinni |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.13 | QC — Web-runner 1.3.80 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W38 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
 ## 👀 Review (7)
@@ -124,7 +122,7 @@
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (222)
+## ✅ Done (224)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -260,6 +258,8 @@
 | US-4.28 | Chains, tokens & data recovered from Uncategorized | EPIC-4 | P3 | 5 | sprint-2025-M10 | bluezdot |
 | US-42.24.1 | QC — Web-runner 1.3.68 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.10 | QC — Web-runner 1.3.77 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.11 | QC — Web-runner 1.3.78 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24.12 | QC — Web-runner 1.3.79 on Mobile | EPIC-42 | P2 | 5 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.14 | QC — Web-runner 1.3.82 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.15 | QC — Web-runner 1.3.83 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.18 | QC — Web-runner 1.3.86 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W37 | MaiThuongNinni |
@@ -365,12 +365,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 75
+- 📋 **Backlog**: 72
 - 🟢 **Ready**: 4
-- 🟡 **In Progress**: 14
+- 🟡 **In Progress**: 15
 - 👀 **Review**: 7
-- ✅ **Done**: 222
+- ✅ **Done**: 224
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 14 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 15 stories in-progress (limit: 3).
