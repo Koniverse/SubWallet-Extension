@@ -63,7 +63,7 @@ None found — nothing was run.
 
 ## US-42.24.16 — Web-runner 1.3.84 on Mobile
 
-Opened at the end of the session. Two items were run. The post-upgrade fixes ([#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013)) — the two problems that came out of an earlier version upgrade: the confirmation screen when moving a stake to a different validator, and the app crashing when the slider was in use on the unstake screen and the user switched account. And two of the four chain-list v0.2.129 entries: the MYTH XCM route between Polkadot Asset Hub and Hydration ([ChainList #301](https://github.com/Koniverse/SubWallet-ChainList/issues/301)) and Polkadot Hub EVM as a new chain ([ChainList #701](https://github.com/Koniverse/SubWallet-ChainList/issues/701)).
+Opened at the end of the session and most of the way through. Both Extension items ran: the recommended validator for native and subnet staking ([#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024)), and the post-upgrade fixes ([#5013](https://github.com/Koniverse/SubWallet-Extension/issues/5013)) — the confirmation screen when moving a stake to a different validator, and the app crashing when the slider was in use on the unstake screen and the user switched account. Two of the four chain-list v0.2.129 entries ran as well: the MYTH XCM route between Polkadot Asset Hub and Hydration ([ChainList #301](https://github.com/Koniverse/SubWallet-ChainList/issues/301)) and Polkadot Hub EVM as a new chain ([ChainList #701](https://github.com/Koniverse/SubWallet-ChainList/issues/701)).
 
 Its AC were written out today from the release note and the issue bodies, taking the story from 12 AC to 23.
 
@@ -71,6 +71,12 @@ Its AC were written out today from the release note and the issue bodies, taking
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| AC-1 | A recommended validator is suggested when starting native staking, and it can be overridden with a different choice — Android + iOS fresh | ✅ Pass | [#5024](https://github.com/Koniverse/SubWallet-Extension/issues/5024) |
+| AC-1a | The suggestion is marked in the validator list so it is clear which one is recommended, and the list still shows every other validator — Android + iOS fresh | ✅ Pass | |
+| AC-1b | Staking with the suggested validator goes through, and the position afterwards names that validator — Android + iOS fresh | ✅ Pass | |
+| AC-2 | The same for subnet staking — Android + iOS fresh | ✅ Pass | |
+| AC-2a | A subnet stake with the suggested validator goes through and shows the right subnet afterwards — Android + iOS fresh | ✅ Pass | |
+| AC-3 | AC-1 to AC-2a pass on Android + iOS upgrade | ✅ Pass | |
 | AC-4 | The confirmation screen for moving a stake to another validator looks right — Android + iOS fresh | ✅ Pass | |
 | AC-4a | That screen names both validators, the one being left and the one being moved to, with the amount and the fee — Android + iOS fresh | ✅ Pass | |
 | AC-4b | The move goes through and the position afterwards sits with the new validator — Android + iOS fresh | ✅ Pass | |
@@ -82,9 +88,9 @@ Its AC were written out today from the release note and the issue bodies, taking
 | AC-10 | Polkadot Hub EVM appears in the network list with its logo, connects on its RPC and loads balances — Android + iOS fresh | ✅ Pass | [ChainList #701](https://github.com/Koniverse/SubWallet-ChainList/issues/701) |
 | AC-10a | A transfer on Polkadot Hub EVM goes through, and its explorer link opens the transaction — Android + iOS fresh | ✅ Pass | |
 
-The crash from the issue did not reproduce, and the stake move screen shows what it should. Two of the four chain-list entries pass: the MYTH route runs both ways, and Polkadot Hub EVM comes up as a new chain — it connects, loads balances, sends, and its explorer link opens the transaction.
+The validator suggestion works on both native and subnet staking — it is marked in the list, can be overridden, and staking with it goes through. The crash from #5013 did not reproduce, and the stake move screen shows what it should. Two of the four chain-list entries pass: the MYTH route runs both ways, and Polkadot Hub EVM comes up as a new chain — it connects, loads balances, sends, and its explorer link opens the transaction.
 
-Left for the next session: recommended validators and the two remaining chain-list entries — TUSDT on Bittensor and Cypress on Base Mainnet.
+Left for the next session: the two remaining chain-list entries — TUSDT on Bittensor and Cypress on Base Mainnet — and the three upgrade AC.
 
 ### Bugs
 
