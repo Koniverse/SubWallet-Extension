@@ -9,6 +9,7 @@ export { default as EvmTransactionConfirmation } from './EvmTransactionConfirmat
 export { default as MetadataConfirmation } from './MetadataConfirmation';
 export { default as NotSupportConfirmation } from './NotSupportConfirmation';
 export { default as SignConfirmation } from './Message/SignConfirmation';
+export { default as VrfSignConfirmation } from './Message/VrfSignConfirmation';
 export { default as TransactionConfirmation } from './Transaction';
 export { default as NotSupportWCConfirmation } from './NotSupportWCConfirmation';
 export { default as CardanoSignTransactionConfirmation } from './CardanoSignTransactionConfirmation';
