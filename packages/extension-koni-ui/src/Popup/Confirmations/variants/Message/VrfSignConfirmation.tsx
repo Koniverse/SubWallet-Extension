@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SigningRequest } from '@subwallet/extension-base/background/types';
-import { getDomainFromUrl } from '@subwallet/extension-base/utils';
 import { AccountItemWithProxyAvatar, AlertBox, ConfirmationGeneralInfo, ViewDetailIcon } from '@subwallet/extension-koni-ui/components';
 import { useGetAccountByAddress, useOpenDetailModal } from '@subwallet/extension-koni-ui/hooks';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -31,7 +30,7 @@ function Component ({ className, request }: Props) {
   const account = useGetAccountByAddress(address);
   const onClickDetail = useOpenDetailModal();
 
-  const domain = useMemo(() => getDomainFromUrl(request.url), [request.url]);
+  const origin = useMemo(() => new URL(request.url).origin, [request.url]);
   const data = useMemo(() => (request.request.payload as SignerPayloadRaw).data, [request.request.payload]);
 
   return (
@@ -42,7 +41,7 @@ function Component ({ className, request }: Props) {
           {t('ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest')}
         </div>
         <div className='description'>
-          {t('ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount', { domain })}
+          {t('ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount', { origin })}
         </div>
 
         <AccountItemWithProxyAvatar
@@ -54,7 +53,7 @@ function Component ({ className, request }: Props) {
 
         <AlertBox
           className='vrf-alert'
-          description={t('ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning', { domain })}
+          description={t('ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning', { origin })}
           title={t('ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle')}
           type='info'
         />

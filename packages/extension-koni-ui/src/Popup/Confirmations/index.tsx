@@ -432,6 +432,10 @@ const Component = function ({ className }: Props) {
           return t('ui.Confirmations.multisigTransaction');
       }
     } else {
+      if (confirmation.type === 'signingRequest' && (confirmation.item as SigningRequest).request.isVrf) {
+        return t('ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest');
+      }
+
       return t(titleMap[confirmation.type] || '');
     }
   }, [confirmation, t, transactionRequest]);

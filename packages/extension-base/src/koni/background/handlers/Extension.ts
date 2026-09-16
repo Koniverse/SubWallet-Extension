@@ -231,6 +231,10 @@ export default class KoniExtension {
     const queued = this.#koniState.getSignRequest(id);
 
     assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
+    // This path resolves the request with whatever the UI hands over, bypassing `RequestVrfSign.sign()`
+    // and its sr25519 check. A plain signature is 64 bytes where the dapp expects 96 of VRF output,
+    // and it would derive a key from it all the same - so keep VRF off the QR, Ledger and injected flows here too.
+    assert(!queued.request.isVrf, 'VRF requests can only be approved with the account password');
 
     const { resolve } = queued;
 
