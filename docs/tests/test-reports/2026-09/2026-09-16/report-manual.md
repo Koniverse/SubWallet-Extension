@@ -8,12 +8,12 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.7, US-42.24.19, US-42.24.20 |
-| Total bugs found | 2 |
+| Stories tested | US-42.24.7, US-42.24.13, US-42.24.19, US-42.24.20 |
+| Total bugs found | 3 |
 | P0 | 0 |
 | P1 | 1 |
 | P2 | 1 |
-| P3 | 0 |
+| P3 | 1 |
 | Status | in progress |
 
 ---
@@ -49,6 +49,11 @@ Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the sto
 | BUG-42.24.9-01 | US-42.24.9 | P1 | A subnet token could not be transferred — the form had no validator fields and no subnet name | ✅ Fixed — the form carries them and the transfer goes through |
 | BUG-42.24.11-01 | US-42.24.11 | P2 | The Insufficient balance popup on Start earning used the Android system dialog rather than the app's own sheet | ✅ Fixed — the app's own sheet is shown |
 | BUG-42.24.16-01 | US-42.24.16 | P2 | The unstake confirmation screen dropped the TAO unstaking fee notice, so nothing told the user that 0.01 TAO comes off what they get back | ✅ Fixed — the notice is shown |
+| BUG-42.24.11-03 | US-42.24.11 | P3 | The alpha transfer Amount screen misaligned Available balance and dropped the fungible token notice | ✅ Fixed — Available balance lines up and the notice is shown, on both alpha and TAO |
+| BUG-42.24.11-05 | US-42.24.11 | P2 | The swap confirmation screen showed a raw address line and "simple id: undefined" under the warning box | ✅ Fixed — both lines are gone |
+| BUG-42.24.13-01 | US-42.24.13 | P3 | The Go to parent button on a nested NFT had no button styling, so it read as plain text | ✅ Fixed — the button has its own panel |
+| BUG-42.24.13-02 | US-42.24.13 | P3 | The NFT details section carried an empty panel above it and a Resources or inventory row below the description, neither of which the Extension has | ✅ Fixed — both are gone |
+| BUG-42.24.13-05 | US-42.24.13 | P3 | The info icon in the Description popup was stretched into a tall bar down the height of the text | ✅ Fixed — the icon keeps its own size |
 
 ## US-42.24.7 — Multisig account phase 1
 
@@ -59,6 +64,16 @@ One bug found while rechecking the multisig batch.
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.24.7-30 | The Call data row on the Signature request screen has no info button when signing for a dApp through a multisig account | Connect a multisig account to a dApp — polkadot.js.org, for instance → start a transaction there → on the Signature request screen, look at the Call data row | The row shows the shortened call data and nothing else. There is no way to see what the call actually contains. The Extension puts an info button at the end of that row, which opens the full call data | The info button is on the Call data row and opens the full call data, the way the Extension does it | P2 | todo | ![](img/BUG-42.24.7-30.png) |
+
+## US-42.24.13 — Web-runner 1.3.80 on Mobile
+
+One bug found while rechecking the NFT screens.
+
+### Bugs
+
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.13-06 | The cards on the NFT detail screen have no padding above or below them | NFTs → open a nested NFT → look at the gaps between the image, the name card, the collection card and the buttons | The cards sit tight against each other and against the image, with no breathing space between them. The Go to Parent button also fills almost the whole card it sits in | The cards carry the padding the design calls for, the way the Extension spaces them | P3 | todo | ![](img/BUG-42.24.13-06.png) |
 
 ## US-42.24.19 — Full wallet regression
 
