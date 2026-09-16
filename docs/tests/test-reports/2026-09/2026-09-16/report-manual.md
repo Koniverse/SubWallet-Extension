@@ -14,13 +14,13 @@
 | P1 | 1 |
 | P2 | 1 |
 | P3 | 1 |
-| Status | in progress |
+| Status | done |
 
 ---
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the story from 4 verified to 28 with one closed no fix. Thirty-eight bugs are still open, and twenty-two of those are the multisig batch from US-42.24.7.
+Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the story from 4 verified to 28 with one closed no fix. The day started with thirty-eight bugs open, twenty-two of them the multisig batch from US-42.24.7, and ended with fifteen.
 
 ### Bugs rechecked
 
@@ -54,6 +54,9 @@ Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the sto
 | BUG-42.24.13-01 | US-42.24.13 | P3 | The Go to parent button on a nested NFT had no button styling, so it read as plain text | ✅ Fixed — the button has its own panel |
 | BUG-42.24.13-02 | US-42.24.13 | P3 | The NFT details section carried an empty panel above it and a Resources or inventory row below the description, neither of which the Extension has | ✅ Fixed — both are gone |
 | BUG-42.24.13-05 | US-42.24.13 | P3 | The info icon in the Description popup was stretched into a tall bar down the height of the text | ✅ Fixed — the icon keeps its own size |
+| BUG-42.24.7-01 | US-42.24.7 | P2 | The multisig confirmation screens still used the old layout rather than the one the Extension has | ✅ Fixed — the screens use the new layout |
+| AC-13 | US-42.24.7 | — | Cross-chain transfer is refused for a multisig account, with a message saying so | ✅ Rerun, passes — BUG-42.24.7-19 now settled both ways |
+| AC-5b | US-42.24.9 | — | A subnet token shows its subnet ID and name on the transfer form, with its validator fields, and the transfer goes through | ✅ Rerun, passes — BUG-42.24.9-01 now settled both ways |
 
 ## US-42.24.7 — Multisig account phase 1
 
@@ -93,4 +96,10 @@ No bug row was created for it. Scrolling works, it is only rough, and there is n
 
 ## Summary
 
-Session in progress.
+A verification session, and the biggest one so far. Twenty-three bugs were rechecked on the fixed build and all pass, taking US-42.24.20 from 28 verified to 54 of 71, with two closed no fix. Four AC that bugs had been holding were rerun and pass — AC-14, AC-15, AC-13 and AC-5b — so no bug marked fixed has an AC still outstanding.
+
+Most of the day went on the multisig batch from US-42.24.7, which had been the largest block of open bugs in the programme. Twenty-six of its thirty bugs are now settled, including its only P1 — the signatory picker that sometimes never finished loading when signing for a dApp. Four are left: the toast hidden behind the detail sheet, the notification that opens History rather than the transaction it names, the signatory picker on a network with no multisig support, and the missing call data button logged today.
+
+Three bugs were logged. The one that matters is BUG-42.24.19-16, P1: opening History, switching to the Multisig tab and tapping History again drops the app onto its own error screen, and the only way on is back to home. The other two are display defects — the Call data row on the Signature request screen has no info button when signing for a dApp, and the cards on the NFT detail screen have no padding.
+
+US-42.24.19 was also reworked for round 2. Its checklist was rewritten from the QC checklist and split by platform, 77 lines each for Android and iOS against the 53 shared lines it had before, and the story was re-pointed from 13 to 20. The round 1 results are gone; the sixteen bugs round 1 found are kept with their real status, ten fixed and six open.
