@@ -43,9 +43,16 @@ choice is pending when the choice is being made by not making it.
 
 `in-progress` since 2026-09-09, when #5072 moved on the board;
 [PR #5076](https://github.com/Koniverse/SubWallet-Extension/pull/5076) (`koni/dev/issue-5072`) open
-with review required since the same day. The story is written from the PR's diff, not the issue —
-#5072 has no body — and its EPIC-10 placement is marked provisional in the story. **What this window
-needs from it is a review**, not more code: the PR has had none in five days.
+since the same day. The story is written from the PR's diff, not the issue — #5072 has no body — and
+its EPIC-10 placement is marked provisional in the story.
+
+**Reviewed 2026-09-15, fixed 2026-09-16, approval still pending.** saltict's review (a comment, not
+a formal approval) found three things — the warning named a stripped domain while the key is bound
+to the full origin, so three URLs on one host read as one; the header said *Signature request*; and
+the QR / Ledger / injected approve path could complete a VRF request with a 64-byte plain signature.
+`67939c4315` fixes all three. Left: the unit test the reviewer asked for on the third, and a formal
+approval against the new head. The PR also carries `89e3c05e17`, a passkey-unlock setup modal with
+no issue and no story — a US-5.16 follow-up riding in the wrong PR. Split or story; open call.
 
 ## The web-runner QC programme — the tester scopes it
 
