@@ -41,6 +41,8 @@ Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the sto
 | BUG-42.24.7-29 | US-42.24.7 | P2 | Approval required notifications stayed on the Notifications screen after the initiator had rejected the transaction, so the other signatories were still being asked to approve something that was already dead | ✅ Fixed — the notifications clear when the initiator rejects |
 | BUG-42.24.7-20 | US-42.24.7 | P3 | The signatory validation message is shown as a large red block rather than a tooltip | ⏭️ Skipped — Mobile needs a different mechanism, so the developer is keeping the block as it is |
 | BUG-42.24.7-21 | US-42.24.7 | P2 | The Multisig transaction detail sheet did not match the Extension | ✅ Fixed — the sheet matches |
+| BUG-42.24.7-22 | US-42.24.7 | P1 | Select an account to sign sometimes did not finish loading on a multisig signature request, including when signing for a dApp | ✅ Fixed — the picker finishes loading |
+| BUG-42.24.7-23 | US-42.24.7 | P2 | The Sender on a pending multisig transaction showed an address where the Recipient showed a name, and the two blocks sat out of line | ✅ Fixed — both sides read the same way and line up |
 
 ## US-42.24.19 — Full wallet regression
 
