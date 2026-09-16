@@ -9,9 +9,9 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.19, US-42.24.20 |
-| Total bugs found | 0 |
+| Total bugs found | 1 |
 | P0 | 0 |
-| P1 | 0 |
+| P1 | 1 |
 | P2 | 0 |
 | P3 | 0 |
 | Status | in progress |
@@ -32,12 +32,22 @@ Carried on from [2026-09-15](../2026-09-15/report-manual.md), which took the sto
 | AC-15 | US-42.24.7 | — | Earning — nomination pool and direct nomination follow the transfer logic; liquid staking and subnet staking are hidden | ✅ Rerun, passes — BUG-42.24.7-11 now settled both ways |
 | BUG-42.24.7-12 | US-42.24.7 | P2 | Notification settings had no Pending multisig approvals option | ✅ Fixed — the option is there |
 | BUG-42.24.7-13 | US-42.24.7 | P2 | Multisig accounts had no multisig badge on their avatar | ✅ Fixed — the badge is shown |
+| BUG-42.24.7-14 | US-42.24.7 | P2 | The Select account screen for a new multisig showed no account-type badges | ✅ Fixed — the badges are shown |
+| BUG-42.24.7-15 | US-42.24.7 | P2 | The account filter on Export account had no Multisig account option | ✅ Fixed — the option is in the filter |
+| BUG-42.24.7-17 | US-42.24.7 | P2 | The Multisig tab did not offer to enable a network that was turned off | ✅ Fixed — the popup asks to enable it |
+| BUG-42.24.7-18 | US-42.24.7 | P2 | View transaction did not open the transaction details | ✅ Fixed — the details open |
+| BUG-42.24.7-24 | US-42.24.7 | P3 | The insufficient balance warning on Add proxy confirmation was not styled like the Extension | ✅ Fixed — the warning matches, with its heading, icon and panel |
+| BUG-42.24.7-19 | US-42.24.7 | P2 | The message refusing a cross-chain transfer from a multisig did not say why | ✅ Fixed — the toast reads "Cross-chain transfer is not supported for multisig account" |
 
 ## US-42.24.19 — Full wallet regression
 
 ### Bugs
 
-None found yet.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-16 | The app crashes on the History screen after switching to the Multisig tab and back | Open History → tap the Multisig tab → tap History again | The app falls over to its own error screen: "Unknown error" in the title bar, then "Oops, an error occurred!" with Send report and Back to home. The History screen is gone and the only way on is back to home | History opens on the tab tapped, with no crash | P1 | todo | ![](img/BUG-42.24.19-16.png) |
+
+The app caught this itself rather than closing, so it is the in-app error screen and not an OS crash, but the screen is lost either way.
 
 ## Summary
 
