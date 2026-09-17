@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.3.90
+Build date: Sep 17, 2026.
+
+Features & Updates:
+- Support sr25519 VRF signing for dApp key derivation (#5072)
+- Support manual claim for Bittensor native staking (#5064)
+
+
 ## 1.3.89
 Build date: Aug 28, 2026.
 
