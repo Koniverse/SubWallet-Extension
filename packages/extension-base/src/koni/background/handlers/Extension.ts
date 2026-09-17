@@ -231,6 +231,10 @@ export default class KoniExtension {
     const queued = this.#koniState.getSignRequest(id);
 
     assert(queued, t('bg.koni.handler.Extension.unableToProceed'));
+    // This path resolves the request with whatever the UI hands over, bypassing `RequestVrfSign.sign()`
+    // and its sr25519 check. A plain signature is 64 bytes where the dapp expects 96 of VRF output,
+    // and it would derive a key from it all the same - so keep VRF off the QR, Ledger and injected flows here too.
+    assert(!queued.request.isVrf, 'VRF requests can only be approved with the account password');
 
     const { resolve } = queued;
 
@@ -4090,7 +4094,7 @@ export default class KoniExtension {
     };
   }
 
-  private async passkeyUnlockEnroll (request: RequestPasskeyUnlockEnroll): Promise<ResponseUnlockKeyring> {
+  private async passkeyUnlockEnroll (request: RequestPasskeyUnlockEnroll, port: chrome.runtime.Port): Promise<ResponseUnlockKeyring> {
     const unlockResponse = this.keyringUnlock({ password: request.password });
 
     if (!unlockResponse.status) {
@@ -4099,11 +4103,17 @@ export default class KoniExtension {
 
     try {
       await enrollPasskeyUnlock(request);
-
-      return { status: true, errors: [] };
     } catch (e) {
       return { status: false, errors: [(e as Error).message] };
     }
+
+    // Same as unlocking: the browser drew its prompt outside the toolbar popup, which closed it.
+    // Bring it back rather than leaving an unlocked wallet behind an icon the user has to click again.
+    if (isActionPopupSender(port)) {
+      reopenActionPopup().catch(console.error);
+    }
+
+    return { status: true, errors: [] };
   }
 
   private async passkeyUnlockAuthenticate ({ nextPrfInput, nextUnlockSecret, unlockSecret }: RequestPasskeyUnlockAuthenticate, port: chrome.runtime.Port): Promise<ResponsePasskeyUnlockAuthenticate> {
@@ -6770,7 +6780,7 @@ export default class KoniExtension {
       }
 
       case 'pri(keyring.passkeyUnlock.enroll)':
-        return await this.passkeyUnlockEnroll(request as RequestPasskeyUnlockEnroll);
+        return await this.passkeyUnlockEnroll(request as RequestPasskeyUnlockEnroll, port);
       case 'pri(keyring.passkeyUnlock.authenticate)':
         return await this.passkeyUnlockAuthenticate(request as RequestPasskeyUnlockAuthenticate, port);
       case 'pri(keyring.passkeyUnlock.remove)':

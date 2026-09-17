@@ -2150,6 +2150,7 @@
   "ui.EARNING.components.Modal.Earning.Validator.changeValidators": "Change validators",
   "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold": "No rewards to claim. You need at least {{threshold}} {{symbol}} pending on a validator before you can claim",
   "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee": "Validator change fee",
@@ -2797,5 +2798,17 @@
   "ui.NFT.screen.nested.NftViewStructure.noStructureDataFound": "No structure data found",
   "Only shows referenda you've voted directly in": "",
   "Only shows referenda you've voted through delegation": "",
-  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": ""
+  "You're delegating votes for the referendum's track with account named \"<highlight>{{name}}</highlight>\". Ask your delegatee to vote or remove your delegated votes, then try again": "",
+  "ui.DAPP.Confirmations.Message.Vrf.keyDerivationRequest": "Key derivation request",
+  "ui.DAPP.Confirmations.Message.Vrf.approvingRequestWithAccount": "{{origin}} is requesting a derived key from the following account",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarningTitle": "Permanent derived key",
+  "ui.DAPP.Confirmations.Message.Vrf.permanentKeyWarning": "This key is derived from your account and is permanent — it cannot be changed or revoked later. It is unique to {{origin}}; no other site can derive the same key.",
+  "ui.DAPP.Confirmations.Message.Vrf.derivationDetails": "Derivation details",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.boundTo": "Bound to",
+  "ui.DAPP.Confirmations.Detail.Substrate.Vrf.context": "Context",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.title": "Unlock with Biometrics",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "Use Touch ID, Windows Hello, fingerprint or your device screen lock to unlock SubWallet without typing your password. You can change this anytime in Settings > Security",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "Not now",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "Enable",
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Unable to set up biometric unlock. You can try again in Settings > Security"
 }
