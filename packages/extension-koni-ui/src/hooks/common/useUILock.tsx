@@ -20,6 +20,7 @@ export function isManualLockRequested (): boolean {
 export interface UILockInterface {
   isUILocked: boolean;
   lock: () => Promise<void>;
+  keepLocked: () => void;
   unlock: () => void;
 }
 
@@ -37,10 +38,16 @@ export default function useUILock (): UILockInterface {
     navigate('/keyring/login');
   }, [dispatch, navigate]);
 
+  // Keeps the unlock screen in place once the keyring is open, until unlock() is called. Unlike
+  // lock() the keyring is left alone and nothing is navigated: the user is already on that screen.
+  const keepLocked = useCallback(() => {
+    dispatch(updateUIViewState({ isUILocked: true }));
+  }, [dispatch]);
+
   const unlock = useCallback(() => {
     manualLockRequested = false;
     dispatch(updateUIViewState({ isUILocked: false }));
   }, [dispatch]);
 
-  return { isUILocked, lock, unlock };
+  return { isUILocked, lock, keepLocked, unlock };
 }

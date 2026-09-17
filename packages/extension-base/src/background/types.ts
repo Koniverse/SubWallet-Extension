@@ -3,7 +3,7 @@
 
 /* eslint-disable no-use-before-define */
 
-import type { InjectedAccount, InjectedMetadataKnown, MetadataDef, ProviderList, ProviderMeta } from '@subwallet/extension-inject/types';
+import type { InjectedAccount, InjectedMetadataKnown, MetadataDef, ProviderList, ProviderMeta, SignerPayloadVrf } from '@subwallet/extension-inject/types';
 import type { KeyringPair, KeyringPair$Json } from '@subwallet/keyring/types';
 import type { KeyringPairs$Json } from '@subwallet/ui-keyring/types';
 import type { JsonRpcResponse } from '@polkadot/rpc-provider/types';
@@ -115,6 +115,7 @@ export interface RequestSignatures extends KoniRequestSignatures {
   'pub(authorize.tabV2)': [RequestAuthorizeTab, boolean];
   'pub(bytes.sign)': [SignerPayloadRaw, ResponseSigning];
   'pub(extrinsic.sign)': [SignerPayloadJSON, ResponseSigning];
+  'pub(vrf.sign)': [SignerPayloadVrf, ResponseSigning];
   'pub(metadata.list)': [null, InjectedMetadataKnown[]];
   'pub(metadata.provide)': [MetadataDef, boolean];
   'pub(phishing.redirectIfDenied)': [null, boolean];
@@ -365,6 +366,10 @@ export type MessageTypesWithNoSubscriptions = Exclude<MessageTypes, keyof Subscr
 export interface RequestSign {
   readonly payload: SignerPayloadJSON | SignerPayloadRaw;
   readonly isRawDataInExtrinsic?: boolean;
+  /** set by `RequestVrfSign`: this derives a key for the requesting site, it is not a message signature */
+  readonly isVrf?: boolean;
+  /** the dapp's own domain separator on a VRF request, shown on the confirmation screen */
+  readonly vrfContext?: HexString;
 
   sign (registry: TypeRegistry, pair: KeyringPair): { signature: HexString };
 }
