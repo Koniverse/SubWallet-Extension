@@ -39,6 +39,7 @@ Carried on from [2026-09-16](../2026-09-16/report-manual.md), which took the sto
 
 | Item | Found in | Severity | What it is | State |
 |---|---|---|---|---|
+| BUG-42.24.19-10 | US-42.24.19 | P2 | The Android back button does nothing on the History screen | ⏭️ Closed no fix — the developer is blocking it on purpose |
 
 ## US-42.25 — sr25519 VRF signing for dApp key derivation (#5072)
 
