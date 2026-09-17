@@ -17,15 +17,18 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | US-42.24.13 | QC — web-runner 1.3.80 | EPIC-42 | P2 | 8 | done | tester · 09-14 | [link](stories/US-42.24.13-qc-web-runner-1-3-80.md) |
 | US-42.24.16 | QC — web-runner 1.3.84 | EPIC-42 | P2 | 8 | done | tester · 09-16 | [link](stories/US-42.24.16-qc-web-runner-1-3-84.md) |
 | US-42.24.17 | QC — web-runner 1.3.85 | EPIC-42 | P2 | 8 | closed | tester · 09-16 — **not run**, 0 of 11 AC testable on Mobile | [link](stories/US-42.24.17-qc-web-runner-1-3-85.md) |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24 | QC — Update web-runner to 1.3.90 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | **20** | in-progress | tester ← W37 · re-pointed 13 → 20 on 09-16 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
 | US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester ← W37 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| US-42.25 | QC — sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | done | tester · 09-17 | [link](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) |
+| US-42.26 | QC — release Extension v1.3.90 | EPIC-42 | P2 | 8 | done | tester · 09-17 | [link](stories/US-42.26-qc-release-extension-v1-3-90.md) |
 
-**10 stories · 80 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081: 1.3.78,
+**12 stories · 93 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081: 1.3.78,
 1.3.79, 1.3.80, plus parent / regression / verify carried from W37 by `d8d84e15a0`); **+2 · 16 and
-+7 on 09-16** (PR #5083: 1.3.84 done, 1.3.85 closed unrun, regression re-pointed 13 → 20). Each
-batch added the day it landed. Rows marked *tester* were placed by the tester's own commits and are
-listed, never moved. **Every one of the twenty US-42.24 sub-tasks is now on a window.**
++7 on 09-16** (PR #5083: 1.3.84 done, 1.3.85 closed unrun, regression re-pointed 13 → 20);
+**+2 · 13 on 09-17** (US-42.25 for #5072, and US-42.26 as the v1.3.90 release gate — both opened and
+closed the same day). Each batch added the day it landed. Rows marked *tester* were placed by the
+tester's own commits and are listed, never moved. **Four more sub-tasks were added on 09-17 for 1.3.87 to 1.3.90 and sit in `backlog` with no sprint; the other twenty are all on a window.**
 
 ## US-12.23 — a fourth window
 
@@ -58,7 +61,7 @@ no issue and no story — a US-5.16 follow-up riding in the wrong PR. Split or s
 
 ## The web-runner QC programme — the tester scopes it
 
-Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md). At open: 12 done
+Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md). At open: 12 done
 (98 pts), 3 in progress on W37 (21 pts), 5 in `backlog` (36 pts). By 09-14 evening: 14 done, 4 in
 progress, 2 in `backlog`. **By 09-16: 16 done (132 pts), 1 closed unrun (8), 3 in progress (28) —
 nothing left in `backlog`.** The tester puts their stories on a window by setting `sprint:` in their

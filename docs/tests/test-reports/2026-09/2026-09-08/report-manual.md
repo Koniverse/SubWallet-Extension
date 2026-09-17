@@ -20,7 +20,7 @@
 
 ## US-42.24.5 — Web-runner 1.3.72 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Proxy accounts ([#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725)), chain-list v0.2.123 ([#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861)) and ParaSpell V5 ([#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Proxy accounts ([#4725](https://github.com/Koniverse/SubWallet-Extension/issues/4725)), chain-list v0.2.123 ([#4861](https://github.com/Koniverse/SubWallet-Extension/issues/4861)) and ParaSpell V5 ([#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908)).
 
 Carried on from [2026-09-07](../2026-09-07/report-manual.md), where AC-1 to AC-8 passed and AC-19 was skipped. Today picks up from AC-9.
 
@@ -75,7 +75,7 @@ No bugs on the proxy signing checks.
 
 ## US-42.24.6 — Web-runner 1.3.73 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. All three items ran: the services-sdk update ([#4957](https://github.com/Koniverse/SubWallet-Extension/issues/4957)), the Crowdloans tab removal ([#4920](https://github.com/Koniverse/SubWallet-Extension/issues/4920)) and the parachain earning position fix ([#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Started today, out of the backlog. All three items ran: the services-sdk update ([#4957](https://github.com/Koniverse/SubWallet-Extension/issues/4957)), the Crowdloans tab removal ([#4920](https://github.com/Koniverse/SubWallet-Extension/issues/4920)) and the parachain earning position fix ([#4950](https://github.com/Koniverse/SubWallet-Extension/issues/4950)).
 
 ### AC results
 
@@ -99,7 +99,7 @@ None.
 
 ## US-42.24.8 — Web-runner 1.3.75 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. One item: the user-configurable Subscan API key in Settings ([#4965](https://github.com/Koniverse/SubWallet-Extension/issues/4965)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Started today, out of the backlog. One item: the user-configurable Subscan API key in Settings ([#4965](https://github.com/Koniverse/SubWallet-Extension/issues/4965)).
 
 ### AC results
 
@@ -122,7 +122,7 @@ None.
 
 ## US-42.24.7 — Web-runner 1.3.74 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)). The AC for this story were rewritten today from the multisig QC checklist, because the issue body is an unfilled template. Started on the transfer confirmation screen.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)). The AC for this story were rewritten today from the multisig QC checklist, because the issue body is an unfilled template. Started on the transfer confirmation screen.
 
 ### AC results
 
@@ -136,7 +136,7 @@ Nothing settled yet.
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
 
 ### Bugs
 

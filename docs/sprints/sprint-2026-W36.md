@@ -12,7 +12,7 @@ goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 wit
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | done | ← W35 | [link](stories/US-42.21-qc-release-extension-v1-3-89.md) |
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | → W37 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | US-42.24.1 | QC — Web-runner 1.3.68 | EPIC-42 | P2 | 8 | done | new | [link](stories/US-42.24.1-qc-web-runner-1-3-68.md) |
 | US-42.24.2 | QC — Web-runner 1.3.69 | EPIC-42 | P2 | 8 | done | new | [link](stories/US-42.24.2-qc-web-runner-1-3-69.md) |
 | US-42.24.4 | QC — Web-runner 1.3.71 | EPIC-42 | P2 | 8 | in-progress | tester | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
@@ -22,7 +22,7 @@ goal: "A finishing window, not a building one. v1.3.89 shipped on 2026-08-28 wit
 | US-42.24.20 | QC — Verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 
 **10 stories · 63 points.** The window opened at **2 stories / 13 points**; the
-[US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md) web-runner QC programme — a parent plus 19
+[US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) web-runner QC programme — a parent plus 19
 version sub-tasks — landed inside it on 2026-09-03, and eight of those were worked this week.
 
 **Twelve more sub-tasks sit in `backlog` with no sprint** (US-42.24.5 … .13, .16 … .18, **88
