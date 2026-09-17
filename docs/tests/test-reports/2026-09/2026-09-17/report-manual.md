@@ -9,9 +9,9 @@
 | Runner | manual |
 | Build under test | to fill in — build number + web-runner version; US-42.25 ran a PR #5076 build from the link in the issue comment |
 | Stories tested | US-42.24.19, US-42.24.20, US-42.25, US-42.26 |
-| Total bugs found | 0 |
+| Total bugs found | 2 |
 | P0 | 0 |
-| P1 | 0 |
+| P1 | 2 |
 | P2 | 0 |
 | P3 | 0 |
 | Status | in progress |
@@ -26,10 +26,26 @@ Round 2 starts today on the rewritten checklist — 77 lines each for Android an
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| REG-A-11 | Lock the wallet by hand | ✅ Pass | Android |
+| REG-A-12 | Unlock by typing the password; unlock by Face ID or Touch ID | ✅ Pass | Android |
+| REG-A-50 | Change the currency, and the select currency popup | ✅ Pass | Android |
+| REG-A-51 | Change the language, and search within the language list | ✅ Pass | Android |
+| REG-A-52 | Turn in-app notifications off and on | ✅ Pass | Android. Wallet theme is coming soon and is not checked |
+| REG-A-53 | Change the wallet password — current password; new password; confirm; the I understand checkbox; the learn more link; save | ✅ Pass | Android |
+| REG-A-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | Android |
+| REG-A-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | Android |
+| REG-A-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | Android |
+
+9 of 77 Android lines done. iOS has not started.
 
 ### Bugs
 
-None found yet.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-17 | WalletConnect offers no account to connect on an EVM network the wallet already has | Have a unified account in the wallet and the EVM network enabled → open a dApp that uses WalletConnect, react-app.walletconnect.com for instance → scan the pairing QR → look at the account list on the WalletConnect screen | The screen shows the two networks connected, but under "Choose the account(s) you'd like to connect" it says "No available account — You don't have any account to connect. Please create one or skip this step by hitting Cancel". Approve is disabled, so the dApp cannot be connected at all. The unified account covers EVM and the network is already in the wallet, so it should be on the list | The unified account is offered for the EVM network and can be selected, and Approve goes through | P1 | todo | ![](img/BUG-42.24.19-17.png) |
+| BUG-42.24.19-18 | The WalletConnect popup cannot be dismissed after closing and reopening the app | Start a WalletConnect pairing so the connect popup is on screen → close the app → reopen it → the popup is still there → tap Cancel | Neither button responds. Cancel does not close the popup and Approve does nothing, so the popup stays on screen with no way past it | Cancel closes the popup and the wallet goes back to where it was | P1 | todo | |
+
+Both bugs are round 2 and both are on WalletConnect. BUG-42.24.19-17 blocks REG-A-60, which checks creating a connection on a supported network; BUG-42.24.19-18 leaves the user stuck on the popup that connection opens.
 
 ## US-42.24.20 — Verify the bugs found during this update
 
@@ -81,7 +97,7 @@ None.
 
 ## US-42.26 — Release gate, Extension v1.3.90
 
-Stages 1 and 2 of four. Both release items were merged into the extension on dev and checked there, then rebuilt from master and checked again, with a regression pass at each stage.
+Stages 1 to 3 of four. Both release items were merged into the extension on dev and checked there, rebuilt from master and checked again, then checked once more on the draft release build, with a regression pass at each stage.
 
 ### AC results
 
@@ -93,14 +109,18 @@ Stages 1 and 2 of four. Both release items were merged into the extension on dev
 | AC-3a | sr25519 VRF signing (#5072) works correctly on the master build | ✅ Pass | |
 | AC-3b | Bittensor manual claim (#5064) works correctly on the master build | ✅ Pass | |
 | AC-4 | Regression pass on the master build finds no new issues in the app's main functions | ✅ Pass | |
+| AC-5a | sr25519 VRF signing (#5072) works correctly on the draft release build | ✅ Pass | |
+| AC-5b | Bittensor manual claim (#5064) works correctly on the draft release build | ✅ Pass | |
+| AC-6 | Regression pass on the draft release build finds no new issues in the app's main functions | ✅ Pass | |
+| AC-12 | The Bittensor manual claim is re-verified on the release build rather than inherited from US-42.23 | ✅ Pass | Settled by AC-5b — the claim ran on the draft build, not on the three-week-old PR build |
 
 This is the first time either item has been checked on merged code. US-42.25 ran the VRF signing against an unmerged PR build earlier today, and US-42.23 ran the Bittensor claim three weeks ago on a build that has not been rebuilt since, so neither result carries into the release on its own.
 
-Two stages left: draft release and production.
+One stage left: production. Four AC wait on it — AC-7a, AC-7b, AC-9 and AC-8, which needs the version read on both the draft and the production build. AC-10, AC-11 and the two-origin checks AC-13 and AC-14 are still to run as well.
 
 ### Bugs
 
-None found on dev or on the master build.
+None found on dev, on the master build or on the draft release.
 
 ## Summary
 
