@@ -81,7 +81,7 @@ None.
 
 ## US-42.26 — Release gate, Extension v1.3.90
 
-Stage 1 of four. Both release items were merged into the extension on dev and checked there, along with a regression pass over the app's main functions.
+Stages 1 and 2 of four. Both release items were merged into the extension on dev and checked there, then rebuilt from master and checked again, with a regression pass at each stage.
 
 ### AC results
 
@@ -90,14 +90,17 @@ Stage 1 of four. Both release items were merged into the extension on dev and ch
 | AC-1a | sr25519 VRF signing (#5072) works correctly after merge into the dev environment | ✅ Pass | [#5076](https://github.com/Koniverse/SubWallet-Extension/pull/5076) merged as `a4799cfbb1` |
 | AC-1b | Bittensor manual claim (#5064) works correctly after merge into the dev environment | ✅ Pass | [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) merged as `1b7abee917` |
 | AC-2 | Regression pass on dev finds no new issues in the app's main functions | ✅ Pass | |
+| AC-3a | sr25519 VRF signing (#5072) works correctly on the master build | ✅ Pass | |
+| AC-3b | Bittensor manual claim (#5064) works correctly on the master build | ✅ Pass | |
+| AC-4 | Regression pass on the master build finds no new issues in the app's main functions | ✅ Pass | |
 
 This is the first time either item has been checked on merged code. US-42.25 ran the VRF signing against an unmerged PR build earlier today, and US-42.23 ran the Bittensor claim three weeks ago on a build that has not been rebuilt since, so neither result carries into the release on its own.
 
-Three stages left: master build, draft release, production.
+Two stages left: draft release and production.
 
 ### Bugs
 
-None found on dev.
+None found on dev or on the master build.
 
 ## Summary
 
