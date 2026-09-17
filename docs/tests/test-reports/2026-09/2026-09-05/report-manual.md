@@ -19,7 +19,7 @@
 
 ## US-42.24.1 — Web-runner 1.3.68 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) — this shipped in 1.3.68 but had been scheduled with 1.3.70 so its Governance row could be checked alongside OpenGov. OpenGov is not built, so the checks came back to the version that shipped them and the story reopened for a second run. Its first run was on [2026-09-03](../2026-09-03/report-manual.md).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Locked balance display ([#4708](https://github.com/Koniverse/SubWallet-Extension/issues/4708)) — this shipped in 1.3.68 but had been scheduled with 1.3.70 so its Governance row could be checked alongside OpenGov. OpenGov is not built, so the checks came back to the version that shipped them and the story reopened for a second run. Its first run was on [2026-09-03](../2026-09-03/report-manual.md).
 
 ### AC results
 
@@ -44,7 +44,7 @@ None found.
 
 ## US-42.24.2 — Web-runner 1.3.69 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
 
 Third day on this story, after [2026-09-03](../2026-09-03/report-manual.md) and [2026-09-04](../2026-09-04/report-manual.md). It finishes here.
 
@@ -77,7 +77,7 @@ All twenty-one AC now have a verdict, so the story is closed: eighteen pass, one
 
 ## US-42.24.4 — Web-runner 1.3.71 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Three items in this version: token enabling round 2 ([#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247)), library updates ([#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808)), and import from Trust Wallet ([#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Three items in this version: token enabling round 2 ([#4247](https://github.com/Koniverse/SubWallet-Extension/issues/4247)), library updates ([#4808](https://github.com/Koniverse/SubWallet-Extension/issues/4808)), and import from Trust Wallet ([#4762](https://github.com/Koniverse/SubWallet-Extension/issues/4762)).
 
 Token enabling is checked here. The Trust Wallet import needs that wallet installed with a seed created in it, so it waits for its own session.
 
@@ -98,7 +98,7 @@ None found.
 
 ## US-42.24.14 — Web-runner 1.3.82 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Remove Polygon zkEVM ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)) — the network is being shut down by Polygon Labs, so its chain, tokens and assets are gone.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Remove Polygon zkEVM ([#5002](https://github.com/Koniverse/SubWallet-Extension/issues/5002)) — the network is being shut down by Polygon Labs, so its chain, tokens and assets are gone.
 
 ### AC results
 
@@ -121,7 +121,7 @@ None found.
 
 ## US-42.24.15 — Web-runner 1.3.83 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Earning terms and conditions ([#5007](https://github.com/Koniverse/SubWallet-Extension/issues/5007)) — the issue has an empty body, so these checks were written from the build.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Earning terms and conditions ([#5007](https://github.com/Koniverse/SubWallet-Extension/issues/5007)) — the issue has an empty body, so these checks were written from the build.
 
 ### AC results
 
@@ -146,7 +146,7 @@ None found.
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
 
 ### AC results
 
@@ -170,7 +170,7 @@ ${row}
 
 ## US-42.24.20 — Verify the bugs found during the web-runner update
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
 
 ### Verify results
 

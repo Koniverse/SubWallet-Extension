@@ -19,7 +19,7 @@
 
 ## US-42.24.2 — Web-runner 1.3.69 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). chain-list stable v0.2.122 ([#4827](https://github.com/Koniverse/SubWallet-Extension/issues/4827)) — 18 chain-list issues covering new networks, new tokens, transfers and XCM, removals, logos, explorer links, RPCs and on-ramp.
 
 Continuing the session started on [2026-09-03](../2026-09-03/report-manual.md), where AC-1 (Acurast), AC-4 (TRAC) and AC-5 (vMANTA) passed. Three bugs were logged that day and are still open; none of them blocks an AC.
 
@@ -45,7 +45,7 @@ None so far.
 
 ## US-42.24.19 — Web-runner 1.3.86 full regression on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). The full wallet regression, run alongside the version sub-tasks where the same screens come up.
 
 ### AC results
 
@@ -67,7 +67,7 @@ Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md)
 
 ## US-42.24.20 — Verify the bugs found during the web-runner update
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Rechecking bugs on a build with fixes, and rerunning the AC each bug had left unsettled.
 
 ### Verify results
 

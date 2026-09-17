@@ -56,7 +56,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.21](../stories/US-42.21-qc-release-extension-v1-3-89.md) | Release extension v1.3.89 — passkey login (#5058) + **P0** KAH↔PAH XCM refs (#5062); dev, master, draft, production gate; 16 / 16 AC, no bugs | done |
 | [US-42.22](../stories/US-42.22-qc-issue-5062-repoint-kah-pah-usdt-xcm.md) | **P0** — Repoint KAH↔PAH USDt XCM refs (#5062); 15 / 15 AC, no bugs, both halves of the fix confirmed | done |
 | [US-42.23](../stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md) | Manual claim for Bittensor root staking (#5064) | ready |
-| [US-42.24](../stories/US-42.24-qc-web-runner-1-3-86.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 155 points | in-progress |
+| [US-42.24](../stories/US-42.24-qc-web-runner-1-3-90.md) | Update web-runner to 1.3.86 on Mobile (#2057) — parent, 19 sub-tasks, 155 points | in-progress |
 | [US-42.24.1](../stories/US-42.24.1-qc-web-runner-1-3-68.md) | Web-runner 1.3.68 — Transak URL, NFT on Rari, NFT without tokenOfOwnerByIndex, locked balance display; 11 pass, 3 skip, 3 settled on retest | done |
 | [US-42.24.2](../stories/US-42.24.2-qc-web-runner-1-3-69.md) | Web-runner 1.3.69 — chain-list stable v0.2.122; 18 AC pass, 1 skip, AC-10 failed; AC-18 failed then settled on retest; 5 bugs | done |
 | [US-42.24.4](../stories/US-42.24.4-qc-web-runner-1-3-71.md) | Web-runner 1.3.71 — token enabling, library scope and Trust Wallet import; 39 / 39 AC, no bugs | done |
@@ -74,10 +74,14 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.16](../stories/US-42.24.16-qc-web-runner-1-3-84.md) | Web-runner 1.3.84 — recommended validators, post-upgrade fixes, chain-list v0.2.129; AC written out from the release note, 23 AC; all 23 AC pass | done |
 | [US-42.24.17](../stories/US-42.24.17-qc-web-runner-1-3-85.md) | Web-runner 1.3.85 — signing prompts could conceal the transaction (#5042); AC written out from the polkadot-js report, 11 AC; closed without being run — no way to send a crafted signing request on Mobile | closed |
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045); 6 / 6 AC, no bugs | done |
+| [US-42.24.21](../stories/US-42.24.21-qc-web-runner-1-3-87.md) | Web-runner 1.3.87 — nominator unstaking eras (#5055); empty issue body, 5 AC | backlog |
+| [US-42.24.22](../stories/US-42.24.22-qc-web-runner-1-3-88.md) | Web-runner 1.3.88 — ParaSpell API v2 (#5051); every XCM route run again, 8 AC | backlog |
+| [US-42.24.23](../stories/US-42.24.23-qc-web-runner-1-3-89.md) | Web-runner 1.3.89 — repoint KAH↔PAH XCM refs (#5062), the P0; 6 AC | backlog |
+| [US-42.24.24](../stories/US-42.24.24-qc-web-runner-1-3-90.md) | Web-runner 1.3.90 — sr25519 VRF signing (#5072) and Bittensor manual claim (#5064); 22 AC, picks up the two-origin check US-42.25 could not run | backlog |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; round 1 logged 16 bugs, 10 now fixed; round 2 runs a rewritten checklist of 77 lines per platform | in-progress |
 | [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 54 of 73 verified, 3 closed no fix, their AC rerun and passing | in-progress |
 | [US-42.25](../stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) | sr25519 VRF signing for dApp key derivation (#5072) — PR #5076, AC written from the diff; 11 / 11 AC, no bugs; the multi-origin, locale and refusal checks were dropped from scope, not run | done |
-| [US-42.26](../stories/US-42.26-qc-release-extension-v1-3-90.md) | Release gate for Extension v1.3.90 — sr25519 VRF signing (#5072) and Bittensor manual claim (#5064), four build stages; 14 AC; dev, master and draft stages pass, 10 of 14 AC | in-progress |
+| [US-42.26](../stories/US-42.26-qc-release-extension-v1-3-90.md) | Release gate for Extension v1.3.90 — sr25519 VRF signing (#5072) and Bittensor manual claim (#5064), four build stages; all four pass, 16 of 18 AC, 2 skipped for want of a second origin | done |
 
 More rows get added here as testing starts.
 

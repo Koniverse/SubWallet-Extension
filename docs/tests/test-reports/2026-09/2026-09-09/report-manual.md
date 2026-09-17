@@ -20,7 +20,7 @@
 
 ## US-42.24.5 — Web-runner 1.3.72 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). The proxy and chain-list halves were settled on [2026-09-08](../2026-09-08/report-manual.md); what was left is ParaSpell V5 ([#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). The proxy and chain-list halves were settled on [2026-09-08](../2026-09-08/report-manual.md); what was left is ParaSpell V5 ([#4908](https://github.com/Koniverse/SubWallet-Extension/issues/4908)).
 
 ### AC results
 
@@ -41,7 +41,7 @@ None.
 
 ## US-42.24.7 — Web-runner 1.3.74 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
 
 Carried on from [2026-09-08](../2026-09-08/report-manual.md), where the AC were rewritten from the multisig QC checklist and BUG-42.24.7-01 was logged on the confirmation screen. Today starts at the top of the checklist.
 
@@ -83,7 +83,7 @@ Carried on from [2026-09-08](../2026-09-08/report-manual.md), where the AC were 
 
 ## US-42.24.9 — Web-runner 1.3.76 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. One of its three items ran: turning a network on without a correct Subscan API key ([#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Started today, out of the backlog. One of its three items ran: turning a network on without a correct Subscan API key ([#4972](https://github.com/Koniverse/SubWallet-Extension/issues/4972)).
 
 ### AC results
 

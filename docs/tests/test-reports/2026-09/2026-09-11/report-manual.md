@@ -19,7 +19,7 @@
 
 ## US-42.24.7 — Web-runner 1.3.74 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
 
 Carried on from [2026-09-10](../2026-09-10/report-manual.md), where 18 AC passed and 3 failed. What is left is the multisig tab checks (AC-26 to AC-30) and the upgrade runs.
 
@@ -46,7 +46,7 @@ Carried on from [2026-09-10](../2026-09-10/report-manual.md), where 18 AC passed
 
 ## US-42.24.9 — Web-runner 1.3.76 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Carried on from [2026-09-09](../2026-09-09/report-manual.md), where the network toggle without an API key passed. Today covers the subnet token naming ([#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Carried on from [2026-09-09](../2026-09-09/report-manual.md), where the network toggle without an API key passed. Today covers the subnet token naming ([#4892](https://github.com/Koniverse/SubWallet-Extension/issues/4892)).
 
 ### AC results
 
@@ -70,7 +70,7 @@ The story closes at 8 of 16, one failure and the root staking group skipped.
 
 ## US-42.24.18 — Web-runner 1.3.86 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started and closed today: the Bittensor root claim type removal ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Started and closed today: the Bittensor root claim type removal ([#5045](https://github.com/Koniverse/SubWallet-Extension/issues/5045)).
 
 ### AC results
 
@@ -91,7 +91,7 @@ None.
 
 ## US-42.24.10 — Web-runner 1.3.77 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Carried on from [2026-09-10](../2026-09-10/report-manual.md), where the stDOT sunset passed. Today covers the proxy account improvements ([#4942](https://github.com/Koniverse/SubWallet-Extension/issues/4942)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Carried on from [2026-09-10](../2026-09-10/report-manual.md), where the stDOT sunset passed. Today covers the proxy account improvements ([#4942](https://github.com/Koniverse/SubWallet-Extension/issues/4942)).
 
 ### AC results
 

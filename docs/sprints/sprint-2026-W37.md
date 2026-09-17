@@ -11,7 +11,7 @@ goal: "Settle US-12.23 — a PR that has sat open and approved for three windows
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | → W38 | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester | [link](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | US-42.24.4 | QC — web-runner 1.3.71 | EPIC-42 | P2 | 13 | done | tester | [link](stories/US-42.24.4-qc-web-runner-1-3-71.md) |
 | US-42.24.5 | QC — web-runner 1.3.72 | EPIC-42 | P2 | 20 | done | tester | [link](stories/US-42.24.5-qc-web-runner-1-3-72.md) |
 | US-42.24.6 | QC — web-runner 1.3.73 | EPIC-42 | P2 | 5 | done | tester | [link](stories/US-42.24.6-qc-web-runner-1-3-73.md) |
@@ -47,7 +47,7 @@ That 16/16 is now **11 days old and describes a commit nobody is building.** The
 
 ## The web-runner QC programme — described, not scoped
 
-[US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md) and its sub-tasks are **tester-owned**. Which
+[US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) and its sub-tasks are **tester-owned**. Which
 sprint they sit in is recorded by whoever runs them, so they are **not moved into this window** and
 not counted in its points. They are the larger body of live work and are described here only so the
 sprint record is not misleading by omission:

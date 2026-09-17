@@ -14,7 +14,7 @@
 | P1 | 2 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -97,7 +97,7 @@ None.
 
 ## US-42.26 — Release gate, Extension v1.3.90
 
-Stages 1 to 3 of four. Both release items were merged into the extension on dev and checked there, rebuilt from master and checked again, then checked once more on the draft release build, with a regression pass at each stage.
+All four stages ran and the story is closed. Both release items were checked on dev after merge, on the master build, on the draft release and on production, with a regression pass at each stage. 16 of 18 AC pass, 2 skipped, no bugs.
 
 ### AC results
 
@@ -112,16 +112,28 @@ Stages 1 to 3 of four. Both release items were merged into the extension on dev 
 | AC-5a | sr25519 VRF signing (#5072) works correctly on the draft release build | ✅ Pass | |
 | AC-5b | Bittensor manual claim (#5064) works correctly on the draft release build | ✅ Pass | |
 | AC-6 | Regression pass on the draft release build finds no new issues in the app's main functions | ✅ Pass | |
+| AC-7a | sr25519 VRF signing (#5072) is live and working on production | ✅ Pass | |
+| AC-7b | Bittensor manual claim (#5064) is live and working on production | ✅ Pass | |
+| AC-8 | The version shown in the extension is 1.3.90 on the draft and production builds | ✅ Pass | |
+| AC-9 | The master password still unlocks the wallet on every stage | ✅ Pass | Checked at each of the four stages |
+| AC-10 | AC-1 to AC-9 hold on a fresh install | ✅ Pass | |
+| AC-11 | AC-1 to AC-9 hold on an upgrade from v1.3.89 | ✅ Pass | No data loss, old master password still works |
 | AC-12 | The Bittensor manual claim is re-verified on the release build rather than inherited from US-42.23 | ✅ Pass | Settled by AC-5b — the claim ran on the draft build, not on the three-week-old PR build |
+| AC-13 | The same dApp served from two origins derives two different keys | ⏭️ Skipped | The test dApp is still reachable from one origin only |
+| AC-14 | The key derivation confirmation screen shows the full origin with its scheme | ⏭️ Skipped | Same reason — no second origin to compare against |
 
 This is the first time either item has been checked on merged code. US-42.25 ran the VRF signing against an unmerged PR build earlier today, and US-42.23 ran the Bittensor claim three weeks ago on a build that has not been rebuilt since, so neither result carries into the release on its own.
 
-One stage left: production. Four AC wait on it — AC-7a, AC-7b, AC-9 and AC-8, which needs the version read on both the draft and the production build. AC-10, AC-11 and the two-origin checks AC-13 and AC-14 are still to run as well.
+AC-13 and AC-14 are skipped rather than passed. They are the two-origin comparison — the same dApp at two addresses should derive two different keys, which is what the VRF feature exists for — and the test dApp is still reachable from one address only. US-42.25 left the same check open earlier today. It is worth setting up before the Mobile run in US-42.24.24 reaches it as AC-5.
 
 ### Bugs
 
-None found on dev, on the master build or on the draft release.
+None at any of the four stages.
 
 ## Summary
 
-Session in progress. US-42.25 done: 11 of 11 AC pass, no bugs.
+Two Extension stories closed today. US-42.25 ran the sr25519 VRF signing against a PR build and passed 11 of 11. US-42.26, the v1.3.90 release gate, then ran all four build stages — dev merge, master, draft and production — and passed 16 of 18 AC with no bugs at any stage, shipping the release.
+
+The two skipped AC are the same gap both stories hit: the two-origin comparison has no test dApp behind it. That is the property the VRF feature exists for, and it is still unverified by hand on either platform.
+
+On Mobile, round 2 of the regression started and reached 9 of 77 Android lines. It found two P1 bugs straight away, both on WalletConnect: no account offered to connect on an EVM network the wallet already has, and a popup that cannot be dismissed after the app restarts. US-42.24.20 closed one more bug no fix — the Android back button on History, which the developer blocks on purpose.

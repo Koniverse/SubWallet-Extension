@@ -15,11 +15,11 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | US-42.24.11 | QC — web-runner 1.3.78 | EPIC-42 | P2 | 13 | done | tester · 09-14 | [link](stories/US-42.24.11-qc-web-runner-1-3-78.md) |
 | US-42.24.12 | QC — web-runner 1.3.79 | EPIC-42 | P2 | 5 | done | tester · 09-14 | [link](stories/US-42.24.12-qc-web-runner-1-3-79.md) |
 | US-42.24.13 | QC — web-runner 1.3.80 | EPIC-42 | P2 | 8 | in-progress | tester · 09-14 | [link](stories/US-42.24.13-qc-web-runner-1-3-80.md) |
-| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
+| US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | 13 | in-progress | tester ← W37 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
 | US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester ← W37 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 | US-42.25 | QC — sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | done | tester · 09-17 | [link](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) |
-| US-42.26 | QC — release Extension v1.3.90 | EPIC-42 | P2 | 8 | in-progress | tester · 09-17 | [link](stories/US-42.26-qc-release-extension-v1-3-90.md) |
+| US-42.26 | QC — release Extension v1.3.90 | EPIC-42 | P2 | 8 | done | tester · 09-17 | [link](stories/US-42.26-qc-release-extension-v1-3-90.md) |
 
 **10 stories · 70 points** — 2 · 10 at open on 09-14, **+6 · 47 the same day** when the tester's
 PR #5081 put 1.3.78, 1.3.79 and 1.3.80 on `sprint: sprint-2026-W38` and carried the parent, the
@@ -59,7 +59,7 @@ no issue and no story — a US-5.16 follow-up riding in the wrong PR. Split or s
 
 ## The web-runner QC programme — the tester scopes it
 
-Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-86.md). At open: 12 done
+Twenty sub-tasks of [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md). At open: 12 done
 (98 pts), 3 in progress on W37 (21 pts), 5 in `backlog` with no sprint (36 pts). **By 09-14 evening:
 14 done (116 pts), 4 in progress (29 pts, all on W38), 2 in `backlog` (10 pts): 1.3.84 and 1.3.85.** The tester puts their stories on a window by setting `sprint:` in their own
 commits; this file lists what it finds and moves nothing. The six that arrived on 09-14 are in the

@@ -20,7 +20,7 @@
 
 ## US-42.24.7 — Web-runner 1.3.74 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Multisig account phase 1 ([#4855](https://github.com/Koniverse/SubWallet-Extension/issues/4855)).
 
 Carried on from [2026-09-09](../2026-09-09/report-manual.md), where AC-1 to AC-10 passed and AC-14 and AC-15 failed. What is left is the rest of the signatory picker, notifications, history, the multisig tab and the upgrade runs.
 
@@ -58,7 +58,7 @@ Carried on from [2026-09-09](../2026-09-09/report-manual.md), where AC-1 to AC-1
 
 ## US-42.24.10 — Web-runner 1.3.77 on Mobile
 
-Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-86.md). Started today, out of the backlog. One of its five items ran: the stDOT sunset ([#4968](https://github.com/Koniverse/SubWallet-Extension/issues/4968)), after StellaSwap shut the product down.
+Part of [US-42.24](../../../../sprints/stories/US-42.24-qc-web-runner-1-3-90.md). Started today, out of the backlog. One of its five items ran: the stDOT sunset ([#4968](https://github.com/Koniverse/SubWallet-Extension/issues/4968)), after StellaSwap shut the product down.
 
 ### AC results
 
