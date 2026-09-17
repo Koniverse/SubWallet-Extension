@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS; Extension for US-42.25 |
 | Runner | manual |
 | Build under test | to fill in — build number + web-runner version; US-42.25 ran a PR #5076 build from the link in the issue comment |
-| Stories tested | US-42.24.19, US-42.24.20, US-42.25 |
+| Stories tested | US-42.24.19, US-42.24.20, US-42.25, US-42.26 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -22,9 +22,9 @@
 
 Round 2 starts today on the rewritten checklist — 77 lines each for Android and iOS, covering ground round 1 did not. Results go against REG-A for Android and REG-I for iOS.
 
-### Checklist results
+### AC results
 
-| Line | Description | Result | Notes |
+| AC | Description | Result | Notes |
 |---|---|---|---|
 
 ### Bugs
@@ -44,27 +44,25 @@ Carried on from [2026-09-16](../2026-09-16/report-manual.md), which took the sto
 
 Extension, not Mobile. First run of the new story, against a PR [#5076](https://github.com/Koniverse/SubWallet-Extension/pull/5076) build. Test dApp was Orbinum Hub at `https://feat-subwallet-substrate.app-m9y.pages.dev`, through Shielded Pool → Private Vault → Sign and unlock.
 
-### Results
+### AC results
 
-| AC | What it checks | Result |
-|---|---|---|
-| AC-1 | dApp asks for a VRF signature, confirmation appears, approving returns a result | pass |
-| AC-2 | Rejecting returns an error, no signature | pass |
-| AC-3 | Same request twice gives the same derived key | pass |
-| AC-4 | The screen shows the full origin, scheme included | pass |
-| AC-5 | The header reads Key derivation request | pass |
-| AC-6 | The screen names the account and warns the key is permanent | pass |
-| AC-7 | View details shows Bound to and Context | pass |
-| AC-8 | Ordinary dApp connect and signing still work | pass |
-| AC-9 | The passkey unlock setup modal in this PR behaves | pass |
-| AC-10 | All of the above on a fresh install | pass |
-| AC-11 | All of the above on an upgrade | pass |
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | A dApp asks for a VRF signature, the confirmation appears, and approving returns a result | ✅ Pass | |
+| AC-2 | Rejecting returns an error and no signature | ✅ Pass | |
+| AC-3 | The same request twice gives the same derived key | ✅ Pass | |
+| AC-4 | The screen shows the full origin, scheme included | ✅ Pass | The fix for the review finding that an earlier version showed a stripped domain |
+| AC-5 | The header reads Key derivation request | ✅ Pass | |
+| AC-6 | The screen names the account and warns that the key is permanent | ✅ Pass | |
+| AC-7 | View details shows Bound to and Context | ✅ Pass | |
+| AC-8 | Ordinary dApp connect and signing still work | ✅ Pass | |
+| AC-9 | The passkey unlock setup modal that rides in this PR behaves | ✅ Pass | |
+| AC-10 | All of the above on a fresh install | ✅ Pass | |
+| AC-11 | All of the above on an upgrade | ✅ Pass | |
 
 11 of 11 pass, no bugs. Story closed.
 
 The whole path works: the dApp asks for a derived key, the wallet shows the Key derivation request screen naming `https://feat-subwallet-substrate.app-m9y.pages.dev` and the account, and after approving, Orbinum Hub derives its own privacy address `orbpriv3:0x2b2bc3e…b:fc15d64d` and shields 1 ORB into a note with a commitment and a created tx. The signature is real, not a screen that only looks right.
-
-The confirmation screen shows the full origin with `https://` in front, which is the fix for the review finding that the earlier version showed a stripped domain.
 
 ### What this session does not cover
 
@@ -79,6 +77,26 @@ Evidence: video and screenshots posted to [issue #5072](https://github.com/Koniv
 ### Bugs
 
 None.
+
+## US-42.26 — Release gate, Extension v1.3.90
+
+Stage 1 of four. Both release items were merged into the extension on dev and checked there, along with a regression pass over the app's main functions.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1a | sr25519 VRF signing (#5072) works correctly after merge into the dev environment | ✅ Pass | [#5076](https://github.com/Koniverse/SubWallet-Extension/pull/5076) merged as `a4799cfbb1` |
+| AC-1b | Bittensor manual claim (#5064) works correctly after merge into the dev environment | ✅ Pass | [#5065](https://github.com/Koniverse/SubWallet-Extension/pull/5065) merged as `1b7abee917` |
+| AC-2 | Regression pass on dev finds no new issues in the app's main functions | ✅ Pass | |
+
+This is the first time either item has been checked on merged code. US-42.25 ran the VRF signing against an unmerged PR build earlier today, and US-42.23 ran the Bittensor claim three weeks ago on a build that has not been rebuilt since, so neither result carries into the release on its own.
+
+Three stages left: master build, draft release, production.
+
+### Bugs
+
+None found on dev.
 
 ## Summary
 
