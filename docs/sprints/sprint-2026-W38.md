@@ -18,11 +18,13 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | US-42.24 | QC — Update web-runner to 1.3.86 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-86.md) |
 | US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | 13 | in-progress | tester ← W37 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
 | US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester ← W37 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| US-42.25 | QC — sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | in-progress | tester · 09-17 | [link](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) |
 
-**8 stories · 57 points** — 2 · 10 at open on 09-14, **+6 · 47 the same day** when the tester's
+**9 stories · 62 points** — 2 · 10 at open on 09-14, **+6 · 47 the same day** when the tester's
 PR #5081 put 1.3.78, 1.3.79 and 1.3.80 on `sprint: sprint-2026-W38` and carried the parent, the
 regression story and the verify story across from W37 (commit `d8d84e15a0`). Added the day they
-appeared, not at closeout — the first window where the table was told in time. Rows marked *tester*
+appeared, not at closeout — the first window where the table was told in time. **+1 · 5 on 09-17**
+when US-42.25 was written for #5072 and the tester took it the same day. Rows marked *tester*
 were placed by the tester's own commits and are listed, never moved.
 
 ## US-12.23 — a fourth window

@@ -76,6 +76,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.18](../stories/US-42.24.18-qc-web-runner-1-3-86.md) | Web-runner 1.3.86 — Bittensor root claim type removed (#5045); 6 / 6 AC, no bugs | done |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; round 1 logged 16 bugs, 10 now fixed; round 2 runs a rewritten checklist of 77 lines per platform | in-progress |
 | [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 54 of 71 verified, 2 closed no fix, their AC rerun and passing | in-progress |
+| [US-42.25](../stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) | sr25519 VRF signing for dApp key derivation (#5072) — PR #5076, AC written from the diff; 16 AC, needs a test dApp served from two origins | in-progress |
 
 More rows get added here as testing starts.
 
