@@ -163,7 +163,7 @@ page.
 | [US-10.17](../stories/US-10.17-open-dapp-connection-and-signing-improvements.md) | Open dApp connection & signing improvements | The unthemed open remainder — 21 rows across connection, signing, errors | 📋 backlog | — |
 | [US-10.19](../stories/US-10.19-dapp-directory-docs-and-qa.md) | dApp directory, integration docs & QA | The catalogue and process around connectivity, not the connectors | ✅ done | 1.1.27 |
 | [US-10.20](../stories/US-10.20-dapp-fixes-recovered-from-uncategorized.md) | dApp fixes recovered from Uncategorized | Provider injection, EIP standards, website-access | ✅ done | 1.3.46 |
-| [US-10.21](../stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md) | sr25519 VRF signing for dApp key derivation | Placeholder for #5072 — the issue is a title with an **empty body**, so the story records open questions, not invented ACs. EPIC-10 placement provisional | 📋 backlog | — |
+| [US-10.21](../stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md) | sr25519 VRF signing for dApp key derivation | `signVrf` on sr25519 accounts, origin-bound context, own confirmation screen. Written from PR #5076's diff — #5072 never gained a body. Reviewed 09-15, three findings fixed, merged and **shipped 09-17** without the requested unit test on the background assert; 7 of 10 AC verified against code, 3 handed to a release gate that does not exist yet (#5072) | ✅ done | 1.3.90 |
 
 ## Object map & user-story interactions
 
