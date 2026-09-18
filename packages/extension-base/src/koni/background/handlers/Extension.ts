@@ -4695,8 +4695,16 @@ export default class KoniExtension {
       return true;
     }
 
-    await this.#koniState.walletConnectService.rejectSession(wcId);
-    request.reject(new Error('USER_REJECTED'));
+    try {
+      await this.#koniState.walletConnectService.rejectSession(wcId);
+    } catch (e) {
+      // The proposal can already be gone on the WalletConnect side (expired pairing, proposal
+      // re-delivered by the relay after a restart); the request still has to leave the queue,
+      // otherwise the confirmation can never be dismissed.
+      console.error('Failed to reject WalletConnect session', e);
+    } finally {
+      request.reject(new Error('USER_REJECTED'));
+    }
 
     return true;
   }
