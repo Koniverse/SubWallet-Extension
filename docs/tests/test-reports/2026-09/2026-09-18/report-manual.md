@@ -8,13 +8,13 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.19, US-42.24.20, US-42.24.22, US-42.24.24; US-42.24.21 — closed |
-| Total bugs found | 4 |
+| Stories tested | US-42.24.19, US-42.24.20, US-42.24.22; US-42.24.21, US-42.24.23 — closed; US-42.24.24 — blocked |
+| Total bugs found | 5 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 2 |
+| P2 | 3 |
 | P3 | 2 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -84,7 +84,7 @@ None.
 
 Opened at the end of the session. Its AC were written out today from the release note, taking the story from 8 AC to 17 — the chain-list half was missing entirely, and the route removals turned one AC on its head.
 
-Both chain-list entries ran: PRDCTR as a new substrate chain ([ChainList #708](https://github.com/Koniverse/SubWallet-ChainList/issues/708)) and the Bittensor TUSDT symbol change ([#707](https://github.com/Koniverse/SubWallet-ChainList/issues/707)).
+Three of the four items ran: PRDCTR as a new substrate chain ([ChainList #708](https://github.com/Koniverse/SubWallet-ChainList/issues/708)), the Bittensor TUSDT symbol change ([#707](https://github.com/Koniverse/SubWallet-ChainList/issues/707)) and the fifteen XCM routes removed with the ParaSpell v2 move ([#705](https://github.com/Koniverse/SubWallet-ChainList/issues/705)).
 
 ### AC results
 
@@ -94,8 +94,38 @@ Both chain-list entries ran: PRDCTR as a new substrate chain ([ChainList #708](h
 | AC-13 | Its token shows as PRD with the right logo and price, and a transfer goes through with the explorer link opening the transaction — Android + iOS fresh | ✅ Pass | |
 | AC-14 | The Bittensor TUSDT symbol reads TUSDT, not tUSDT — Android + iOS fresh | ✅ Pass | [ChainList #707](https://github.com/Koniverse/SubWallet-ChainList/issues/707) |
 | AC-15 | The symbol change did not break the token — balance, transfer and history still work, and an existing holding is not shown twice under the two spellings — Android + iOS fresh | ✅ Pass | |
+| AC-7 | The Moonbeam routes are no longer offered — GLMR and ACA with Acala, DOT with Polkadot, USDt with Asset Hub, and the xcDOT and xcMANTA pairs with Manta — Android + iOS fresh | ✅ Pass | [ChainList #705](https://github.com/Koniverse/SubWallet-ChainList/issues/705) |
+| AC-8 | The Moonriver route with Kusama, KSM to xcKSM, is no longer offered — Android + iOS fresh | ✅ Pass | |
+| AC-9 | The Manta routes are no longer offered — MANTA with Bifrost and DOT with Polkadot, both directions — Android + iOS fresh | ✅ Pass | |
+| AC-10 | The chains themselves still work for everything else — a removed route does not take balances, transfers or history with it — Android + iOS fresh | ✅ Pass | |
+| AC-11 | AC-7 to AC-10 pass on Android + iOS upgrade | ✅ Pass | |
 
-Left for the next session: ParaSpell API v2 itself, the fifteen removed routes, and the upgrade AC.
+The removal AC are the ones the first draft of this story had backwards. ParaSpell v2 dropped Moonbeam, Moonriver and Manta, so the fifteen routes had to go with them — the check is that they are absent from the picker, not that they still work. All fifteen are gone and the three chains still work for everything else.
+
+Left for the next session: ParaSpell API v2 itself (AC-1 to AC-6) and the two upgrade AC, AC-16 and AC-17.
+
+### Bugs
+
+None.
+
+## US-42.24.23 — Web-runner 1.3.89 on Mobile
+
+Opened and closed in the same session. The version carries one item, the P0 repoint of the KAH↔PAH USDt XCM references ([#5062](https://github.com/Koniverse/SubWallet-Extension/issues/5062)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | A USDt transfer from Kusama Asset Hub to Polkadot Asset Hub arrives, with the right amount — Android + iOS fresh | ✅ Pass | |
+| AC-2 | The same works in the other direction, Polkadot Asset Hub to Kusama Asset Hub — Android + iOS fresh | ✅ Pass | |
+| AC-3 | The fee quoted before sending matches what is taken, on both directions — Android + iOS fresh | ✅ Pass | |
+| AC-4 | Confirm which halves of the fix are in the Mobile build — the chain-list data, the guard, or both | ✅ Pass | Both. The route delivering rather than being blocked is what shows it |
+| AC-5 | Tokens never leave the source chain on a route that cannot deliver them | ✅ Pass | The failure the P0 was raised for |
+| AC-6 | AC-1 to AC-5 pass on Android + iOS upgrade | ✅ Pass | |
+
+6 of 6 pass, no bugs. Story closed.
+
+A real transfer arrived in both directions, which settles AC-4 without a separate check. A guard alone would have blocked the route rather than let it through, so the build carries the repointed chain-list data as well — the distinction US-42.22 drew on Extension and the reason this AC was written.
 
 ### Bugs
 
@@ -103,7 +133,7 @@ None.
 
 ## US-42.24.24 — Web-runner 1.3.90 on Mobile
 
-Opened at the end of the session. Only the VRF signing half ran ([#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072)); the Bittensor manual claim is still to come.
+Opened at the end of the session. The VRF signing half ran ([#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072)). The Bittensor manual claim ([#5064](https://github.com/Koniverse/SubWallet-Extension/issues/5064)) is blocked at its first check — AC-10 fails, so the claim itself cannot be reached.
 
 ### AC results
 
@@ -118,14 +148,21 @@ Opened at the end of the session. Only the VRF signing half ran ([#5072](https:/
 | AC-7 | The details view shows Bound to and Context, and the values match what the dApp asked for — Android + iOS fresh | ✅ Pass | |
 | AC-8 | Ordinary dApp signing still works, and a dApp that never asks for a derived key behaves as before — Android + iOS fresh | ✅ Pass | |
 | AC-9 | AC-1 to AC-8 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-10 | On a Bittensor root (netuid 0) position, the rewards panel shows Unclaimed rewards with a value and a working Claim button — Android + iOS fresh | ❌ Fail | BUG-42.24.24-01 — the figure reads 0 TAO on every position |
 
-8 of 9 pass, 1 skipped. AC-5 is the two-origin comparison, and this is the third story to leave it open after US-42.25 and US-42.26 — the property the VRF feature exists for still has no manual test behind it on either platform. Setting up a second origin would close it in all three.
+8 of 10 pass, 1 fails, 1 skipped. AC-5 is the two-origin comparison, and this is the third story to leave it open after US-42.25 and US-42.26 — the property the VRF feature exists for still has no manual test behind it on either platform. Setting up a second origin would close it in all three.
 
-Left for the next session: the Bittensor manual claim, AC-10 to AC-22.
+AC-10 fails on Mobile while the same two accounts read correctly on the Extension the same day, so this is the web-runner build rather than the feature itself. US-42.23 QC'd #5064 on the Extension on 2026-08-27 and passed 16 of 16; that story stays closed and unchanged.
+
+The story is set to `blocked` on BUG-42.24.24-01. AC-12 to AC-18 are the claim itself and cannot be reached while the rewards panel reads zero; AC-11 and AC-19 to AC-22 do not need a claimable figure, but half the scope of this version cannot be run at all. It picks up on a build where the figure reads through.
 
 ### Bugs
 
-None.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.24-01 | Unclaimed rewards always show 0 TAO on Bittensor native staking, so nothing can be claimed | Earning → open a Bittensor native staking position that has been staked long enough to have earned → look at the Unclaimed rewards figure → tap Claim rewards | Unclaimed rewards read 0 TAO no matter how much is staked. Two positions were checked, one holding 133,160.31 TAO and one holding 1.02 TAO, and both show 0 TAO. The same two accounts on the Extension the same day read 497.71 TAO and 0.0068 TAO, so the rewards exist and it is the Mobile build that cannot see them. With the figure at zero there is nothing to claim, so the manual claim this feature exists for cannot be used at all | Unclaimed rewards show what the account has actually earned, matching the Extension, and Claim rewards claims it | P2 | todo | ![](img/BUG-42.24.24-01.png) |
+
+The two positions are four orders of magnitude apart in stake and both read 0 TAO, so this is not one account that happens to have earned nothing.
 
 ## US-42.24.20 — Verify the bugs found during this update
 
@@ -149,4 +186,14 @@ None.
 
 ## Summary
 
-Session in progress.
+Six stories worked. Two closed clean: US-42.24.21 (1.3.87, nominator unstaking eras) 5 of 5 and US-42.24.23 (1.3.89, the KAH↔PAH XCM repoint) 6 of 6, both with no bugs. The 1.3.89 P0 is settled on Mobile — the route delivers both ways, so the build carries the repointed chain-list data and the guard, not the guard alone.
+
+US-42.24.19 round 2 took Android from 9 to 27 of 77 lines and found four bugs, two P2 and two P3. iOS has not started.
+
+US-42.24.20 verified eleven more bugs fixed, including three P1s — the History crash after the Multisig tab, and both WalletConnect P1s on EVM.
+
+US-42.24.22 (1.3.88) reached 9 of 17. All three chain-list items pass, the fifteen removed XCM routes included. ParaSpell v2 itself is still to run.
+
+US-42.24.24 (1.3.90) is blocked. The VRF half passes 8 of 9, with the two-origin comparison skipped for the third story running — US-42.25 and US-42.26 left the same gap, so the property the feature exists for still has no manual test on either platform. The Bittensor claim half stops at AC-10: unclaimed rewards read 0 TAO on every position, while the same accounts on the Extension the same day read 497.71 TAO and 0.0068 TAO. That is BUG-42.24.24-01, and it blocks AC-12 to AC-18.
+
+Five bugs logged, three P2 and two P3, none open at P0 or P1.
