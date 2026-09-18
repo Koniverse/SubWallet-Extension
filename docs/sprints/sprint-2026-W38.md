@@ -10,8 +10,9 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | review | ← W37 (4th) | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
-| US-10.21 | sr25519 VRF signing for dApp key derivation | EPIC-10 | P3 | 5 | in-progress | new | [link](stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md) |
+| US-12.23 | Manual claim for Bittensor native staking | EPIC-12 | P2 | 5 | done | ← W37 (4th) · **shipped 1.3.90** | [link](stories/US-12.23-bittensor-manual-claim-native-staking.md) |
+| US-10.21 | sr25519 VRF signing for dApp key derivation | EPIC-10 | P3 | 5 | done | new · **shipped 1.3.90** | [link](stories/US-10.21-sr25519-vrf-signing-dapp-key-derivation.md) |
+| US-5.17 | Offer passkey unlock once, right after a password unlock | EPIC-5 | P3 | 3 | done | new · **shipped 1.3.90**, no issue, unlisted | [link](stories/US-5.17-passkey-unlock-setup-offer.md) |
 | US-42.24.11 | QC — web-runner 1.3.78 | EPIC-42 | P2 | 13 | done | tester · 09-14 | [link](stories/US-42.24.11-qc-web-runner-1-3-78.md) |
 | US-42.24.12 | QC — web-runner 1.3.79 | EPIC-42 | P2 | 5 | done | tester · 09-14 | [link](stories/US-42.24.12-qc-web-runner-1-3-79.md) |
 | US-42.24.13 | QC — web-runner 1.3.80 | EPIC-42 | P2 | 8 | done | tester · 09-14 | [link](stories/US-42.24.13-qc-web-runner-1-3-80.md) |
@@ -23,11 +24,11 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | US-42.25 | QC — sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | done | tester · 09-17 | [link](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) |
 | US-42.26 | QC — release Extension v1.3.90 | EPIC-42 | P2 | 8 | done | tester · 09-17 | [link](stories/US-42.26-qc-release-extension-v1-3-90.md) |
 
-**12 stories · 93 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081: 1.3.78,
+**13 stories · 96 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081: 1.3.78,
 1.3.79, 1.3.80, plus parent / regression / verify carried from W37 by `d8d84e15a0`); **+2 · 16 and
 +7 on 09-16** (PR #5083: 1.3.84 done, 1.3.85 closed unrun, regression re-pointed 13 → 20);
-**+2 · 13 on 09-17** (US-42.25 for #5072, and US-42.26 as the v1.3.90 release gate — both opened and
-closed the same day). Each batch added the day it landed. Rows marked *tester* were placed by the
+**+3 · 16 on 09-17** (US-5.17, a shipped commit with no story until then; US-42.25 for #5072 and
+US-42.26 as the v1.3.90 release gate — both opened and closed the same day). Each batch added the day it landed. Rows marked *tester* were placed by the
 tester's own commits and are listed, never moved. **Four more sub-tasks were added on 09-17 for 1.3.87 to 1.3.90 and sit in `backlog` with no sprint; the other twenty are all on a window.**
 
 ## US-12.23 — a fourth window
@@ -39,10 +40,13 @@ tester's own commits and are listed, never moved. **Four more sub-tasks were add
 | QC | 16/16 on 2026-08-27, against a branch nobody builds; **18 days old** at open |
 | Release | dropped from 1.3.89; in no branch that ships |
 
-Carried from W35 → W36 → W37 → here with the same four facts each time. **This is the window to
-decide**, and the decision is binary: merge #5065 into `subwallet-dev` and let it ride the next
-release, or close it and set the story `backlog`. A fifth carry would be the docs pretending a
-choice is pending when the choice is being made by not making it.
+Carried from W35 → W36 → W37 → here with the same four facts each time. **Decided 2026-09-17:
+merged at 03:51 and shipped in v1.3.90 at 09:06** — five hours from a four-window wait to
+production. saltict approved the final head that morning; `dev` took it at `01dff40dea`. The code
+that shipped is byte-identical to what QC'd 16/16 on 08-27. `done`, `version_shipped: 1.3.90`,
+seven ACs ticked against the merged code — with **AC-4 corrected at ship time**: the story said the
+threshold fallback was `500000` rao, the shipped code's is `0`. The story's two open items — no
+test, empty issue body — shipped with it.
 
 ## US-10.21 — first window it is scoped, second window it has been live
 
@@ -51,13 +55,46 @@ choice is pending when the choice is being made by not making it.
 since the same day. The story is written from the PR's diff, not the issue — #5072 has no body — and
 its EPIC-10 placement is marked provisional in the story.
 
-**Reviewed 2026-09-15, fixed 2026-09-16, approval still pending.** saltict's review (a comment, not
-a formal approval) found three things — the warning named a stripped domain while the key is bound
-to the full origin, so three URLs on one host read as one; the header said *Signature request*; and
-the QR / Ledger / injected approve path could complete a VRF request with a 64-byte plain signature.
-`67939c4315` fixes all three. Left: the unit test the reviewer asked for on the third, and a formal
-approval against the new head. The PR also carries `89e3c05e17`, a passkey-unlock setup modal with
-no issue and no story — a US-5.16 follow-up riding in the wrong PR. Split or story; open call.
+**Reviewed 2026-09-15, fixed 2026-09-16, merged 2026-09-17.** saltict's review found three
+things — the warning named a stripped domain while the key is bound to the full origin, so three
+URLs on one host read as one; the header said *Signature request*; and the QR / Ledger / injected
+approve path could complete a VRF request with a 64-byte plain signature. `67939c4315` fixed all
+three; saltict approved that head on 09-16 and merged at 03:53 on 09-17 (`a4799cfbb1`); **shipped
+in v1.3.90 at 09:06**. #5072 closed. **Shipped without the unit test the reviewer asked for** on the
+third finding — the background assert has nothing that fails if it is removed. `done`, 7 of 10 ACs
+verified against code; AC-1 / 3 / 8 need a running build and went to a release gate.
+
+The PR also carried `89e3c05e17`, a passkey-unlock setup modal with no issue and no story. Once
+merged, *split* stopped being an option, so it is now
+[US-5.17](stories/US-5.17-passkey-unlock-setup-offer.md) — written from the diff, in this window,
+shipped in 1.3.90 the same day, **and absent from the release note**.
+
+## v1.3.90 shipped 2026-09-17 — and its gate closed the same day
+
+`1f9b2a4cb6`, 09:06 UTC, from `master`: #5072 and #5064, plus the unlisted passkey offer. Lineage
+verified per commit — all seven feature/merge SHAs are ancestors and `git tag --contains` returns
+exactly `v1.3.90`. `VERSION`, `docs/CHANGELOG.md`, `PRD.md` and `CONTEXT.md` updated the same day;
+the root `CHANGELOG.md` will arrive when `master` is merged, as with 1.3.89.
+
+**This time the gate did not lag the release.** 1.3.89's [US-42.21](stories/US-42.21-qc-release-extension-v1-3-89.md)
+finished ten days after production. For 1.3.90 the tester opened
+[US-42.25](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) (VRF, 11 of 11 on the PR build —
+including the passkey modal nobody had a story for yet) and
+[US-42.26](stories/US-42.26-qc-release-extension-v1-3-90.md) (the release gate, dev-merge → master
+→ draft → production, **12 of 14**) and closed both on 09-17, PR #5084. The three dev stories'
+build-level checks are covered by those two, bar one: US-5.17's enrollment-failure path.
+
+**The two unticked gate ACs are the property VRF exists for.** AC-13 (the same dApp from two
+origins derives two different keys) and AC-14 (the screen shows the full origin with its scheme) are
+*skipped, not passed* — the test dApp is reachable from one origin only. The PR's unit test covers
+the `https`-vs-`http` case; no human has seen two keys on a screen. Review finding 1 was about
+exactly this, and it shipped verified in code and never by hand. Serving the test dApp from a second
+origin is the one thing that closes it.
+
+**The programme was extended to 1.3.90** in the same PR: four new sub-tasks (1.3.87 → 1.3.90,
+US-42.24.21–24, 29 pts) in `backlog` with no sprint; the parent story renamed. Item 63 on #2057 —
+WalletConnect on an EVM network — was logged as **two P1s** (`BUG-42.24.19-17`, `-18`), and
+`BUG-42.24.19-10` (Android back on History, item 18) closed **no fix**: blocked on purpose.
 
 ## The web-runner QC programme — the tester scopes it
 

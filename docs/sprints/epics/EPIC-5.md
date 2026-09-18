@@ -77,7 +77,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | 5 | **Audit hardening** | [US-5.10](../stories/US-5.10-verichains-audit-remediation-hardening.md) | Remediate security audit and false-positive findings (UX-bounty audit, secret hygiene, web hardening, phishing accuracy) |
 | 6 | **Second factor** *(unscoped)* | [US-5.11](../stories/US-5.11-two-factor-authentication-for-outgoing-transfers.md) | Authenticate the *person* approving an outgoing transfer, not just the transaction (#4125) |
 | 7 | **Signing-prompt integrity** | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | A signature may only be produced over the artefact the confirmation prompt displayed — a dApp cannot render an extrinsic as an inert message (#5042) |
-| 8 | **Alternative unlock** | [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | A passkey path into the wallet that **wraps** the master password rather than replacing it — `wrapWalletPassword()` AES-GCM under a WebAuthn-PRF key (#5058) |
+| 8 | **Alternative unlock** | [US-5.16](../stories/US-5.16-biometric-passkey-login.md), [US-5.17](../stories/US-5.17-passkey-unlock-setup-offer.md) | A passkey path into the wallet that **wraps** the master password rather than replacing it — `wrapWalletPassword()` AES-GCM under a WebAuthn-PRF key (#5058) |
 
 ### Out of scope
 
@@ -139,6 +139,7 @@ proxy (AD-19) so their keys never ship in the bundle.
 | [US-5.14](../stories/US-5.14-open-security-improvements-recovered-from-uncategorized.md) | Open security improvements (recovered) | Open security work not yet delivered (rule 9) | 📋 backlog | — |
 | [US-5.15](../stories/US-5.15-signing-prompt-mode-confusion.md) | Signing-prompt mode confusion | Refuse to sign an extrinsic request carrying a raw-message payload, and name it to the user (#5042) | ✅ done | 1.3.85 |
 | [US-5.16](../stories/US-5.16-biometric-passkey-login.md) | Biometric / passkey login for the extension | Opt-in passkey unlock that **wraps** the master password (AES-GCM under a WebAuthn-PRF key) rather than replacing it, so the non-recoverable-by-design model is untouched. QC 14/14; the no-passkey fallback holds (#5058) | ✅ done | 1.3.89 |
+| [US-5.17](../stories/US-5.17-passkey-unlock-setup-offer.md) | Offer passkey unlock once, right after a password unlock | Post-unlock *Enable / Not now* offer that enrolls with the password just typed; once per install, never in side-panel mode. **No issue** — one commit that rode in the VRF PR (#5076), story written from the diff; shipped **unlisted** in the 1.3.90 release note | ✅ done | 1.3.90 |
 
 > 9 of 11 FRs are shipped in the PRD; US-5.8 (FR-61 Blockaid) and US-5.9 (FR-62
 > Merkle Science) are the two planned threat-screening integrations. US-5.10 is

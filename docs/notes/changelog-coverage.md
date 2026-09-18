@@ -1152,6 +1152,8 @@ two buckets — **the residue** — are the only issues a genuinely-new story co
 | [#5051](https://github.com/Koniverse/SubWallet-Extension/issues/5051) | Migrate the ParaSpell HTTP integration from `/v1` to `/v2` across every XCM endpoint the wallet calls (#5051) | 1.3.88 | 2026-08-19 | US-13.18 |
 | [#5058](https://github.com/Koniverse/SubWallet-Extension/issues/5058) | Support biometric/passkey login for extension (#5058) | 1.3.89 | 2026-08-28 | US-5.16 |
 | [#5062](https://github.com/Koniverse/SubWallet-Extension/issues/5062) | Repoint KAH<>PAH XCM refs (#5062) | 1.3.89 | 2026-08-28 | US-13.19 |
+| [#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072) | Support sr25519 VRF signing for dApp key derivation (#5072) | 1.3.90 | 2026-09-17 | US-10.21 |
+| [#5064](https://github.com/Koniverse/SubWallet-Extension/issues/5064) | Support manual claim for Bittensor native staking (#5064) | 1.3.90 | 2026-09-17 | US-12.23 |
 
 ## Linked — no citation, but an existing story owns the capability (inferred)
 

@@ -13,8 +13,10 @@ classification:
   complexity: 'High'
   projectContext: 'Brownfield'
 workflowType: 'prd'
-lastEdited: '2026-09-03'
+lastEdited: '2026-09-17'
 editHistory:
+  - date: '2026-09-17'
+    changes: 'Version header 1.3.89 → 1.3.90 (release 1.3.90: #5072 sr25519 VRF signing for dApp key derivation, #5064 Bittensor manual claim; plus an unlisted passkey-unlock setup offer, US-5.17). No FR changed here. #5072 is a new dApp-facing signing capability no FR describes; #5064 is a claim path under FR-114 native staking; the passkey offer sits in the same FR-55 gap US-5.16 named. Two new FRs are warranted (VRF signing; passkey unlock) and are called out in US-10.21 / US-5.16 rather than invented here.'
   - date: '2026-09-03'
     changes: 'Version header 1.3.88 → 1.3.89 (release 1.3.89: #5058 passkey unlock, #5062 KAH↔PAH USDt XCM repoint). #5062 changes no requirement — it corrects asset data and adds a guard under FR-126. #5058 adds a capability FR-55 does not cover; a new FR is warranted and is called out in US-5.16 rather than invented here.'
   - date: '2026-08-25'
@@ -33,7 +35,7 @@ editHistory:
 
 # SubWallet — Product Requirements Document
 
-**Version:** 1.3.89
+**Version:** 1.3.90
 **Date:** 2026-06-04
 **Status:** Live (browser extension, web app, mobile)
 **Dual-Audience:** Human stakeholders + LLM implementation agents

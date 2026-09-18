@@ -41,6 +41,17 @@ previous version, anchored on this block, per the koni-docs changelog template)
 
 ---
 
+## [1.3.90] — 2026-09-17 — Release 1.3.90 (Koni) — v1.3.90
+
+### Added
+- sr25519 VRF signing for dApp key derivation: `signer.signVrf` on sr25519 accounts, the context bound to the dApp's full origin (scheme + host — `https://app.com`, `https://www.app.com` and `http://app.com` derive three different keys), with its own *Key derivation request* confirmation and a background assert that keeps VRF requests off the QR / Ledger / injected approve path (#5072)
+- Manual claim for Bittensor native (root) staking: a user-triggered claim of root-basket rewards, filtered to validators owing at least the chain's `rootClaimableThreshold` — an `I96F32` fixed-point read scaled by 2³² — so a claim is never built purely from positions the chain would skip (#5064)
+- Offer passkey unlock once, right after a password unlock — an *Enable / Not now* prompt that enrolls with the password just typed, once per install, never in side-panel mode. **Not in the release note**; one commit (`89e3c05e17`) that rode in the #5072 PR with no issue of its own → [US-5.17](sprints/stories/US-5.17-passkey-unlock-setup-offer.md)
+
+**Commit**: 1f9b2a4cb6
+
+---
+
 ## [1.3.89] — 2026-08-28 — Release 1.3.89 (Koni) — v1.3.89
 
 ### Added
