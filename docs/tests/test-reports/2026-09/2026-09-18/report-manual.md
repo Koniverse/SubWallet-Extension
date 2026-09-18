@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.19, US-42.24.20 |
+| Stories tested | US-42.24.19, US-42.24.20, US-42.24.22, US-42.24.24; US-42.24.21 — closed |
 | Total bugs found | 4 |
 | P0 | 0 |
 | P1 | 0 |
@@ -60,9 +60,76 @@ BUG-42.24.19-19 is the tenth entry point from BUG-42.24.19-14, split out because
 
 BUG-42.24.19-20 sits on the same scan screen as BUG-42.24.19-15, which passed its recheck today. The error message now appears; what it does not do is leave the screen usable afterwards. Intermittent, so it takes a few attempts to see.
 
+## US-42.24.21 — Web-runner 1.3.87 on Mobile
+
+Opened and closed in the same session. The version carries one item, the nominator unstaking eras ([#5055](https://github.com/Koniverse/SubWallet-Extension/issues/5055), [PR #5056](https://github.com/Koniverse/SubWallet-Extension/pull/5056)). Its issue body is empty, so the AC were written from what the change does.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | The unstaking period shown before confirming an unstake matches what the chain actually enforces — Android + iOS fresh | ✅ Pass | |
+| AC-2 | A position already unstaking shows the right remaining time, counted in the updated eras — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Withdraw becomes available when the period ends, and not before — Android + iOS fresh | ✅ Pass | |
+| AC-4 | AC-1 to AC-3 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-5 | After upgrading, positions that were already unstaking keep the right remaining time and are not reset — both platforms | ✅ Pass | |
+
+5 of 5 pass, no bugs. Story closed.
+
+### Bugs
+
+None.
+
+## US-42.24.22 — Web-runner 1.3.88 on Mobile
+
+Opened at the end of the session. Its AC were written out today from the release note, taking the story from 8 AC to 17 — the chain-list half was missing entirely, and the route removals turned one AC on its head.
+
+Both chain-list entries ran: PRDCTR as a new substrate chain ([ChainList #708](https://github.com/Koniverse/SubWallet-ChainList/issues/708)) and the Bittensor TUSDT symbol change ([#707](https://github.com/Koniverse/SubWallet-ChainList/issues/707)).
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-12 | PRDCTR appears as a new substrate chain with its logo, connects on its RPC and loads balances — Android + iOS fresh | ✅ Pass | |
+| AC-13 | Its token shows as PRD with the right logo and price, and a transfer goes through with the explorer link opening the transaction — Android + iOS fresh | ✅ Pass | |
+| AC-14 | The Bittensor TUSDT symbol reads TUSDT, not tUSDT — Android + iOS fresh | ✅ Pass | [ChainList #707](https://github.com/Koniverse/SubWallet-ChainList/issues/707) |
+| AC-15 | The symbol change did not break the token — balance, transfer and history still work, and an existing holding is not shown twice under the two spellings — Android + iOS fresh | ✅ Pass | |
+
+Left for the next session: ParaSpell API v2 itself, the fifteen removed routes, and the upgrade AC.
+
+### Bugs
+
+None.
+
+## US-42.24.24 — Web-runner 1.3.90 on Mobile
+
+Opened at the end of the session. Only the VRF signing half ran ([#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072)); the Bittensor manual claim is still to come.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-1 | A dApp asks for a VRF signature on an sr25519 account, the Key derivation request screen appears, and approving returns a result — Android + iOS fresh | ✅ Pass | |
+| AC-2 | Rejecting the prompt returns an error to the dApp and produces no signature — Android + iOS fresh | ✅ Pass | |
+| AC-3 | Asking twice from the same site with the same data gives the same derived key — Android + iOS fresh | ✅ Pass | |
+| AC-4 | The screen shows the full origin with its scheme — Android + iOS fresh | ✅ Pass | |
+| AC-5 | The same dApp served from two origins derives two different keys — Android + iOS fresh | ⏭️ Skipped | The test dApp is still reachable from one origin only |
+| AC-6 | The screen names the account being used and shows the permanent-key warning — Android + iOS fresh | ✅ Pass | |
+| AC-7 | The details view shows Bound to and Context, and the values match what the dApp asked for — Android + iOS fresh | ✅ Pass | |
+| AC-8 | Ordinary dApp signing still works, and a dApp that never asks for a derived key behaves as before — Android + iOS fresh | ✅ Pass | |
+| AC-9 | AC-1 to AC-8 pass on Android + iOS upgrade | ✅ Pass | |
+
+8 of 9 pass, 1 skipped. AC-5 is the two-origin comparison, and this is the third story to leave it open after US-42.25 and US-42.26 — the property the VRF feature exists for still has no manual test behind it on either platform. Setting up a second origin would close it in all three.
+
+Left for the next session: the Bittensor manual claim, AC-10 to AC-22.
+
+### Bugs
+
+None.
+
 ## US-42.24.20 — Verify the bugs found during this update
 
-61 of 77 bugs verified, 3 closed no fix, 13 still open — three P1, four P2 and six P3. The three P1s: the app loading forever after being left in the background, and the two WalletConnect bugs logged yesterday.
+65 of 77 bugs verified, 3 closed no fix, 9 still open — one P1, four P2 and four P3. The last P1 is the app loading forever after being left in the background.
 
 ### Bugs rechecked
 
@@ -75,6 +142,10 @@ BUG-42.24.19-20 sits on the same scan screen as BUG-42.24.19-15, which passed it
 | BUG-42.24.19-14 | US-42.24.19 | P2 | A loading spinner appeared on every character typed into the account name and amount fields, across ten entry points | ✅ Fixed on nine of the ten — the account name field is smooth everywhere. The tenth is still there and is now BUG-42.24.19-19 |
 | BUG-42.24.19-16 | US-42.24.19 | P1 | The app crashed on the History screen after switching to the Multisig tab and back | ✅ Fixed — History opens on the tab tapped, no crash |
 | BUG-42.24.19-15 | US-42.24.19 | P2 | Uploading an invalid QR image on the scan screen showed no error message, across eleven entry points | ✅ Fixed — an error message is shown on every one |
+| BUG-42.24.13-06 | US-42.24.13 | P3 | The cards on the NFT detail screen had no padding above or below them | ✅ Fixed — the cards are spaced |
+| BUG-42.24.13-03 | US-42.24.13 | P3 | The NFT detail screen laid its fields out differently from the Extension | ✅ Fixed — the layout matches |
+| BUG-42.24.19-17 | US-42.24.19 | P1 | WalletConnect offered no account to connect on an EVM network the wallet already has | ✅ Fixed — the unified account is offered and Approve goes through |
+| BUG-42.24.19-18 | US-42.24.19 | P1 | The WalletConnect popup could not be dismissed after closing and reopening the app | ✅ Fixed — Cancel closes it |
 
 ## Summary
 
