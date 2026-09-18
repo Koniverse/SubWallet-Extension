@@ -53,13 +53,16 @@ None found yet.
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-55 of 73 bugs verified, 3 closed no fix, 15 still open — four P1, six P2 and five P3. The four P1s: the app loading forever after being left in the background, the History crash after the Multisig tab, and the two WalletConnect bugs logged yesterday.
+58 of 73 bugs verified, 3 closed no fix, 12 still open — four P1, four P2 and four P3. The four P1s: the app loading forever after being left in the background, the History crash after the Multisig tab, and the two WalletConnect bugs logged yesterday.
 
 ### Bugs rechecked
 
 | Item | Found in | Severity | What it is | State |
 |---|---|---|---|---|
 | BUG-42.24.7-16 | US-42.24.7 | P2 | The toast on a pending multisig transaction was hidden behind the detail sheet | ✅ Fixed — the toast is visible |
+| BUG-42.24.7-09 | US-42.24.7 | P2 | Tapping a multisig notification only opened History, not the pending transaction it names | ✅ Fixed — the notification opens the transaction |
+| BUG-42.24.7-28 | US-42.24.7 | P2 | The signatory picker was still shown on a network that does not support multisig, including when signing for a dApp | ✅ Fixed — the picker is gone there |
+| BUG-42.24.11-02 | US-42.24.11 | P3 | Manage networks did not match the Extension after turning all networks off — a wifi badge on each logo and the wrong toggle colour | ✅ Fixed — the screen matches |
 
 ## Summary
 
