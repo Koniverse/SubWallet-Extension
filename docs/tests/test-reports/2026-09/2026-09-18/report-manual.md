@@ -26,6 +26,14 @@ Carried on from [2026-09-17](../2026-09-17/report-manual.md), which reached 9 of
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| REG-A-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | Android |
+| REG-A-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | Android |
+| REG-A-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | Android |
+| REG-A-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | Android |
+| REG-A-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | Android |
+| REG-A-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | Android |
+
+15 of 77 Android lines done. iOS has not started.
 
 ### Bugs
 
