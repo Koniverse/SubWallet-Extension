@@ -79,7 +79,7 @@ An epic can have 20-30 stories. One QA page per story would be too many files. S
 | [US-42.24.23](../stories/US-42.24.23-qc-web-runner-1-3-89.md) | Web-runner 1.3.89 — repoint KAH↔PAH XCM refs (#5062), the P0; 6 AC | backlog |
 | [US-42.24.24](../stories/US-42.24.24-qc-web-runner-1-3-90.md) | Web-runner 1.3.90 — sr25519 VRF signing (#5072) and Bittensor manual claim (#5064); 22 AC, picks up the two-origin check US-42.25 could not run | backlog |
 | [US-42.24.19](../stories/US-42.24.19-qc-web-runner-regression.md) | Web-runner 1.3.86 — full wallet regression, Android and iOS, fresh install and upgrade; round 1 logged 16 bugs, 10 now fixed; round 2 runs a rewritten checklist of 77 lines per platform | in-progress |
-| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 54 of 73 verified, 3 closed no fix, their AC rerun and passing | in-progress |
+| [US-42.24.20](../stories/US-42.24.20-qc-web-runner-verify-bugs.md) | Web-runner 1.3.86 — verify the bugs found during the update; 55 of 73 verified, 3 closed no fix, their AC rerun and passing | in-progress |
 | [US-42.25](../stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) | sr25519 VRF signing for dApp key derivation (#5072) — PR #5076, AC written from the diff; 11 / 11 AC, no bugs; the multi-origin, locale and refusal checks were dropped from scope, not run | done |
 | [US-42.26](../stories/US-42.26-qc-release-extension-v1-3-90.md) | Release gate for Extension v1.3.90 — sr25519 VRF signing (#5072) and Bittensor manual claim (#5064), four build stages; all four pass, 16 of 18 AC, 2 skipped for want of a second origin | done |
 
