@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W38
-status: in-progress
+status: closed
 start: 2026-09-14
 end: 2026-09-20
 goal: "Two dev stories, both with an open PR and neither moving on its own. US-12.23 enters a fourth window with PR #5065 unchanged since 2026-08-27 — the decision is merge or drop, and this window should make it. US-10.21 is the first window that scopes it, though it has been in progress with PR #5076 open since 2026-09-09. The tester's web-runner QC programme is scoped by the tester and appears here only if they put it here. Opened 2026-09-14 from tracker, PR and git evidence."
@@ -21,15 +21,21 @@ goal: "Two dev stories, both with an open PR and neither moving on its own. US-1
 | US-42.24 | QC — Update web-runner to 1.3.90 (#2057) — parent | EPIC-42 | P2 | 0 | in-progress | tester ← W37 | [link](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | US-42.24.19 | QC — web-runner 1.3.86 full regression | EPIC-42 | P2 | **20** | in-progress | tester ← W37 · re-pointed 13 → 20 on 09-16 | [link](stories/US-42.24.19-qc-web-runner-regression.md) |
 | US-42.24.20 | QC — verify the bugs found during the update | EPIC-42 | P2 | 8 | in-progress | tester ← W37 | [link](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| US-42.24.21 | QC — web-runner 1.3.87 | EPIC-42 | P2 | 3 | done | tester · 09-18 | [link](stories/US-42.24.21-qc-web-runner-1-3-87.md) |
+| US-42.24.22 | QC — web-runner 1.3.88 | EPIC-42 | P2 | 13 | in-progress | tester · 09-18 | [link](stories/US-42.24.22-qc-web-runner-1-3-88.md) |
+| US-42.24.23 | QC — web-runner 1.3.89 | EPIC-42 | P2 | 5 | done | tester · 09-18 | [link](stories/US-42.24.23-qc-web-runner-1-3-89.md) |
+| US-42.24.24 | QC — web-runner 1.3.90 | EPIC-42 | P2 | 13 | **blocked** | tester · 09-18 — `BUG-42.24.24-01` | [link](stories/US-42.24.24-qc-web-runner-1-3-90.md) |
 | US-42.25 | QC — sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | done | tester · 09-17 | [link](stories/US-42.25-qc-issue-5072-sr25519-vrf-signing.md) |
 | US-42.26 | QC — release Extension v1.3.90 | EPIC-42 | P2 | 8 | done | tester · 09-17 | [link](stories/US-42.26-qc-release-extension-v1-3-90.md) |
 
-**13 stories · 96 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081: 1.3.78,
-1.3.79, 1.3.80, plus parent / regression / verify carried from W37 by `d8d84e15a0`); **+2 · 16 and
-+7 on 09-16** (PR #5083: 1.3.84 done, 1.3.85 closed unrun, regression re-pointed 13 → 20);
-**+3 · 16 on 09-17** (US-5.17, a shipped commit with no story until then; US-42.25 for #5072 and
-US-42.26 as the v1.3.90 release gate — both opened and closed the same day). Each batch added the day it landed. Rows marked *tester* were placed by the
-tester's own commits and are listed, never moved. **Four more sub-tasks were added on 09-17 for 1.3.87 to 1.3.90 and sit in `backlog` with no sprint; the other twenty are all on a window.**
+**17 stories · 130 points** — 2 · 10 at open on 09-14; **+6 · 47** the same day (PR #5081); **+2 ·
+16 and +7 on 09-16** (PR #5083); **+3 · 16 on 09-17** (US-5.17, US-42.25, US-42.26); **+4 · 34 on
+09-18**, when the tester moved the four 1.3.87–1.3.90 sub-tasks off `backlog` onto this window
+(PR #5086). **The last batch was found at closeout, not on the day** — the table read 13 · 96 from
+09-17 to 09-24 while 17 · 130 carried `sprint: sprint-2026-W38`. Third window running; the fix is
+the one already written down — re-read every story's `sprint:` field at each sync — and it was not
+applied between 09-18 and 09-24 because nobody synced. Rows marked *tester* were placed by the
+tester's own commits and are listed, never moved.
 
 ## US-12.23 — a fourth window
 
@@ -126,3 +132,39 @@ planning call is still open and still nobody's.
 
 `projectV2` needs `read:project`; the token has `gist, read:org, repo`. This file is built from
 `gh issue view`, `gh pr view` and git. No board column is claimed as current.
+
+## Closeout — 2026-09-24
+
+Window ended **2026-09-20**. Closed four days late, from `gh`, git and the merged QC pages; the
+board still could not be read. Nothing was synced between 09-18 and 09-24, which is why the last
+batch of rows arrived at closeout.
+
+### 12 of 17 stories · 76 of 130 points
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **Done** | US-12.23, US-10.21, US-5.17, US-42.25, US-42.26, US-42.24.11, .12, .13, .16, .21, .23 | 68 |
+| **Closed unrun** | US-42.24.17 (1.3.85 — 0 of 11 AC testable on Mobile) | 8 |
+| **Blocked** | US-42.24.24 (1.3.90 — `BUG-42.24.24-01`) | 13 |
+| **→ [W39](sprint-2026-W39.md) — tester's to move** | US-42.24 (parent), US-42.24.19, US-42.24.20, US-42.24.22 | 41 |
+
+> The five unfinished rows keep `sprint: sprint-2026-W38` and were **not** moved. Which window the
+> tester's work sits in is the tester's call; same boundary as the test reports.
+
+**The best dev week in the record, and it was three stories long.** US-12.23 landed after four
+windows, US-10.21 in its first, US-5.17 without ever having been planned — all three merged 09-17
+and shipped in v1.3.90 the same morning, with a release gate that closed the same day rather than
+ten days late. Every other point in the window is the tester's.
+
+**`blocked` is a new status value.** US-42.24.24 is the only story in 336 that carries it, and
+`validate` does not check the enum ([AGENTS.md](../../AGENTS.md) §"legal"), so nothing flags it.
+Left as the tester wrote it — it is accurate, and inventing a rule at closeout is worse than one
+outlier. Worth a line in AGENTS.md if it is to be used again.
+
+**1.3.90's QC is blocked on the feature this window shipped.** `BUG-42.24.24-01`: unclaimed rewards
+read **0 TAO on Mobile** for every Bittensor native position — two accounts checked, 133,160.31 TAO
+and 1.02 TAO staked, both zero, while the **same accounts on the Extension the same day read
+497.71 TAO and 0.0068 TAO**. So the manual-claim capability US-12.23 shipped works on Extension and
+returns nothing on Mobile. US-42.24.24 AC-12 to AC-18 cannot be reached — there is nothing to claim
+— and the story sits `blocked` rather than failing ACs it never ran. It is **item 68** on #2057,
+open.
