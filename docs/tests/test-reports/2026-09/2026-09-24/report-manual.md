@@ -14,7 +14,7 @@
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 1 |
-| Status | in-progress |
+| Status | done |
 
 ---
 
@@ -112,7 +112,7 @@ Skipped after logging. The same screen loads normally on another device, so the 
 
 Two stories closed. US-42.24.22 (1.3.88) finishes at 17 of 17 with no bug: ParaSpell API v2 itself ran today along with the two upgrade checks left on the chain-list half. US-42.24.24 (1.3.90) finishes at 21 of 22 — BUG-42.24.24-01 was fixed, which unblocked the claim half, and AC-11 to AC-22 then all passed.
 
-Every version sub-task of the web-runner update is now closed. What is left of US-42.24 is the regression (US-42.24.19, 29 of 77 Android lines, iOS not started) and the bug verification (US-42.24.20).
+Every version sub-task of the web-runner update is now closed. What is left of US-42.24 is the regression (US-42.24.19) and the bug verification (US-42.24.20). The regression added two Android lines today, REG-A-73 and REG-A-74, and stands at 29 of 77; iOS has not started.
 
 Nine bugs settled: BUG-42.24.24-01, BUG-42.24.7-30, BUG-42.24.19-19 and BUG-42.24.19-20 at P2, BUG-42.24.13-04, BUG-42.24.19-21 and BUG-42.24.19-22 at P3, and two closed without a fix — BUG-42.24.11-04 and BUG-42.24.24-02. 72 of 79 verified, 5 closed no fix, 2 open — one P1 and one P2, with no P3 left. Every bug round 2 of the regression found is now fixed.
 
