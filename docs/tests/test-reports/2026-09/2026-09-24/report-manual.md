@@ -61,9 +61,7 @@ None.
 
 ## US-42.24.24 — Web-runner 1.3.90 on Mobile
 
-Unblocked. BUG-42.24.24-01 is fixed and AC-10 was rerun in US-42.24.20 and passes, so the unclaimed figure now reads through on Mobile and the story moves from `blocked` to `in-progress`.
-
-With the figure reading through, the next three checks ran and pass.
+Unblocked and closed. BUG-42.24.24-01 is fixed and AC-10 was rerun in US-42.24.20 and passes, so the unclaimed figure now reads through on Mobile. With the figure reading through, the rest of the claim half ran in this session — AC-11 to AC-22 — and all pass, taking the story from `blocked` to `done` at 21 of 22 with AC-5 skipped.
 
 ### AC results
 
@@ -74,21 +72,20 @@ With the figure reading through, the next three checks ran and pass.
 | AC-12 | The claim screen lists only accounts with an unclaimed reward above zero — Android + iOS fresh | ✅ Pass | |
 | AC-13 | The unclaimed figure matches the chain and is scaled in TAO rather than rao — Android + iOS fresh | ✅ Pass | Checked against the Extension, not against an explorer or a runtime query as the AC asks. The Extension reading is itself QC'd in [US-42.23](../../../../sprints/stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md), 16 of 16 on #5064, so this compares against a checked figure rather than the app's own display. A wrong scale shared by both surfaces would still pass |
 
-13 of 22 AC done. Nine still to run — AC-14 to AC-22, the claim itself and the upgrade half:
+| AC-14 | A claim with one claimable validator goes through, with the right fee on the confirmation screen — Android + iOS fresh | ✅ Pass | |
+| AC-15 | A claim with several claimable validators goes through and settles all of them — Android + iOS fresh | ✅ Pass | |
+| AC-16 | After a claim the unclaimed figure drops to zero, or to the dust under the threshold, and the staked balance reflects it — Android + iOS fresh | ✅ Pass | |
+| AC-17 | With rewards pending but all below the threshold, the claim is refused with a message naming the threshold, not a raw key — Android + iOS fresh | ✅ Pass | |
+| AC-18 | The claim appears correctly in transaction history — Android + iOS fresh | ✅ Pass | |
+| AC-19 | The root claim type removed in 1.3.86 has not come back — one claim path, not two — Android + iOS fresh | ✅ Pass | |
+| AC-20 | Bittensor stake, unstake and change validator all still work, since the handler was edited — Android + iOS fresh | ✅ Pass | |
+| AC-21 | AC-10 to AC-20 pass on Android + iOS upgrade | ✅ Pass | |
+| AC-22 | After upgrading, Bittensor positions and their unclaimed figures are carried over, and dApp connections still work — both platforms | ✅ Pass | |
+| AC-5 | The same dApp served from two origins derives two different keys — Android + iOS fresh | ⏭️ Skipped | The test dApp is still reachable from one origin only |
 
-| AC | What to retest |
-|---|---|
-| AC-14 | A claim with one claimable validator goes through, with the right fee on the confirmation screen |
-| AC-15 | A claim with several claimable validators goes through and settles all of them |
-| AC-16 | After a claim the unclaimed figure drops to zero, or to the dust under the threshold, and the staked balance reflects it |
-| AC-17 | With rewards pending but all below the threshold, the claim is refused with a message naming the threshold, not a raw key |
-| AC-18 | The claim appears correctly in transaction history |
-| AC-19 | The root claim type removed in 1.3.86 has not come back — one claim path, not two |
-| AC-20 | Bittensor stake, unstake and change validator all still work, since the handler was edited |
-| AC-21 | AC-10 to AC-20 pass on Android + iOS upgrade |
-| AC-22 | After upgrading, Bittensor positions and their unclaimed figures are carried over, and dApp connections still work |
+21 of 22 pass, 1 skipped. Story closed.
 
-AC-5 on the VRF half also stays open, skipped for want of a second origin to serve the test dApp from.
+AC-5 is the one check this story never got a verdict on, and it is the third story to leave it open after US-42.25 and US-42.26. The property the VRF feature exists for still has no manual test behind it on any platform. One second origin — the same site at two hosts, or at `http://` and `https://` — would close it in all three.
 
 One display bug was found on the claim rewards screen while looking at it again.
 
