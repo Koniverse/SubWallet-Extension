@@ -20,12 +20,16 @@
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-Five bugs settled — one P2 and four P3. 69 of 79 verified, 4 closed no fix, 6 still open — one P1, four P2 and one P3, the P3 being BUG-42.24.24-02 logged today.
+Six bugs settled — two P2 and four P3. 70 of 79 verified, 4 closed no fix, 5 still open — one P1, three P2 and one P3, the P3 being BUG-42.24.24-02 logged today.
+
+BUG-42.24.24-01 is the one that matters: it was blocking US-42.24.24, and AC-10 was rerun here on the fixed build and passes.
 
 ### Bugs rechecked
 
 | Item | Found in | Severity | What it is | State |
 |---|---|---|---|---|
+| BUG-42.24.24-01 | US-42.24.24 | P2 | Unclaimed rewards always showed 0 TAO on Bittensor native staking, so nothing could be claimed | ✅ Fixed — the figure reads through |
+| → AC-10 | US-42.24.24 | — | On a Bittensor root (netuid 0) position, the rewards panel shows Unclaimed rewards with a value and a working Claim button | ✅ Rerun, passes — this unblocks US-42.24.24 |
 | BUG-42.24.7-30 | US-42.24.7 | P2 | The Call data row on the Signature request screen had no info button when signing for a dApp through a multisig account | ✅ Fixed |
 | BUG-42.24.13-04 | US-42.24.13 | P3 | The NFT transfer confirmation screen did not match the Extension | ✅ Fixed |
 | BUG-42.24.19-21 | US-42.24.19 | P3 | The dApp logos in the Recent row were different sizes | ✅ Fixed |
@@ -57,7 +61,36 @@ None.
 
 ## US-42.24.24 — Web-runner 1.3.90 on Mobile
 
-Still blocked on BUG-42.24.24-01. One display bug found on the claim rewards screen while looking at it again.
+Unblocked. BUG-42.24.24-01 is fixed and AC-10 was rerun in US-42.24.20 and passes, so the unclaimed figure now reads through on Mobile and the story moves from `blocked` to `in-progress`.
+
+With the figure reading through, the next three checks ran and pass.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-10 | On a Bittensor root (netuid 0) position, the rewards panel shows Unclaimed rewards with a value and a working Claim button — Android + iOS fresh | ✅ Pass | Rerun in US-42.24.20 after BUG-42.24.24-01 was fixed |
+| AC-11 | On a Bittensor subnet (alpha) position there is no claim button and no unclaimed figure — Android + iOS fresh | ✅ Pass | |
+| AC-12 | The claim screen lists only accounts with an unclaimed reward above zero — Android + iOS fresh | ✅ Pass | |
+| AC-13 | The unclaimed figure matches the chain and is scaled in TAO rather than rao — Android + iOS fresh | ✅ Pass | Checked against the Extension, not against an explorer or a runtime query as the AC asks. The Extension reading is itself QC'd in [US-42.23](../../../../sprints/stories/US-42.23-qc-issue-5064-bittensor-manual-claim.md), 16 of 16 on #5064, so this compares against a checked figure rather than the app's own display. A wrong scale shared by both surfaces would still pass |
+
+13 of 22 AC done. Nine still to run — AC-14 to AC-22, the claim itself and the upgrade half:
+
+| AC | What to retest |
+|---|---|
+| AC-14 | A claim with one claimable validator goes through, with the right fee on the confirmation screen |
+| AC-15 | A claim with several claimable validators goes through and settles all of them |
+| AC-16 | After a claim the unclaimed figure drops to zero, or to the dust under the threshold, and the staked balance reflects it |
+| AC-17 | With rewards pending but all below the threshold, the claim is refused with a message naming the threshold, not a raw key |
+| AC-18 | The claim appears correctly in transaction history |
+| AC-19 | The root claim type removed in 1.3.86 has not come back — one claim path, not two |
+| AC-20 | Bittensor stake, unstake and change validator all still work, since the handler was edited |
+| AC-21 | AC-10 to AC-20 pass on Android + iOS upgrade |
+| AC-22 | After upgrading, Bittensor positions and their unclaimed figures are carried over, and dApp connections still work |
+
+AC-5 on the VRF half also stays open, skipped for want of a second origin to serve the test dApp from.
+
+One display bug was found on the claim rewards screen while looking at it again.
 
 ### Bugs
 
