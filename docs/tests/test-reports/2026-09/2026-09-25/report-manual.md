@@ -20,7 +20,7 @@
 
 ## US-42.24.19 — Full wallet regression, round 2
 
-iOS started, thirteen lines run. Android added the migration line, taking it to 30. Android 30 of 82, iOS 13 of 82.
+iOS started, twenty-one lines run. Android added eight, closing the transfer section on both platforms. Android 37 of 82, iOS 21 of 82.
 
 The checklist grew from 77 lines to 82 today. Reading the SubWallet user guide against it turned up four documented features with no line of their own — import from Trust Wallet, transfer through a bridge, parachain (collator) staking, and change validator — now REG-78 to REG-81 on both platforms.
 
@@ -44,6 +44,22 @@ The fifth change is a split. REG-70 read "Migrate account; configure the Subscan
 | REG-I-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | iOS |
 | REG-I-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | iOS |
 | REG-I-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | iOS |
+| REG-I-18 | Transfer an EVM token — single-chain and cross-chain; native and local; edit the fee | ✅ Pass | iOS |
+| REG-I-19 | Transfer a substrate token — single-chain and cross-chain; native and local; choose which token pays the fee | ✅ Pass | iOS |
+| REG-I-20 | Transfer a BTC token | ✅ Pass | iOS |
+| REG-I-21 | Transfer a TON token | ✅ Pass | iOS |
+| REG-I-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | iOS |
+| REG-I-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | iOS |
+| REG-A-20 | Transfer a BTC token | ✅ Pass | Android |
+| REG-A-21 | Transfer a TON token | ✅ Pass | Android |
+| REG-A-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | Android |
+| REG-A-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | Android |
+| REG-A-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | Android |
+| REG-A-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | Android |
+| REG-A-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | Android |
+| REG-32 | Remove a custom NFT | ⏭️ Skipped | Both platforms. NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything |
+| REG-I-14 | Transferable balance is right on token details; transfer on-chain; transfer cross-chain; send NFT; swap; earning actions | ✅ Pass | iOS |
+| REG-I-15 | Show and hide balance; refresh balance; customize asset display; search token; token detail | ✅ Pass | iOS |
 
 ### Bugs
 
@@ -54,6 +70,10 @@ The fifth change is a split. REG-70 read "Migrate account; configure the Subscan
 
 ## Summary
 
-Regression round 2 started on iOS, the platform that had not been touched yet — thirteen lines pass there: lock and unlock, migrating solo accounts to a unified account, buying a token, importing and sending an NFT, and the whole of general settings and security settings. The same migration line passed on Android too. Two bugs found on iOS, both display defects: BUG-42.24.19-23, a P3 on the Transfer screen, and BUG-42.24.19-24, a P2 on the Claim rewards confirm popup.
+Regression round 2 started on iOS, the platform that had not been touched yet — twenty-one lines pass there: lock and unlock, migrating solo accounts to a unified account, buying a token, importing and sending an NFT, the balance lines, the whole of the transfer section, and the whole of general settings and security settings. Android added the migration line, the four transfer lines it was missing and three NFT lines, so the transfer section is now closed on both platforms. Two bugs found on iOS, both display defects: BUG-42.24.19-23, a P3 on the Transfer screen, and BUG-42.24.19-24, a P2 on the Claim rewards confirm popup.
 
-The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks. Android is now 30 of 82 and iOS 13 of 82.
+The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks.
+
+The transfer lines were rewritten as well. Send funds, XCM transfer and Transfer screen were three headings over one flow, with single-chain and cross-chain split across them although both run from the same screen. They are now one Transfer section with a line per token family — EVM, substrate, BTC, TON — each covering single-chain and cross-chain, native and local. BTC and TON had no line before. The transfer count is unchanged: the two XCM lines became the BTC and TON lines.
+
+Android is now 37 of 82 and iOS 21 of 82.
