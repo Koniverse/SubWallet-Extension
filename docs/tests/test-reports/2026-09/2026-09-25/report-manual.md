@@ -20,7 +20,7 @@
 
 ## US-42.24.19 — Full wallet regression, round 2
 
-iOS started, six lines run. Android added the migration line, taking it to 30. Android 30 of 82, iOS 6 of 82.
+iOS started, ten lines run. Android added the migration line, taking it to 30. Android 30 of 82, iOS 10 of 82.
 
 The checklist grew from 77 lines to 82 today. Reading the SubWallet user guide against it turned up four documented features with no line of their own — import from Trust Wallet, transfer through a bridge, parachain (collator) staking, and change validator — now REG-78 to REG-81 on both platforms.
 
@@ -37,6 +37,10 @@ The fifth change is a split. REG-70 read "Migrate account; configure the Subscan
 | REG-I-50 | Change the currency, and the select currency popup | ✅ Pass | iOS |
 | REG-I-51 | Change the language, and search within the language list | ✅ Pass | iOS |
 | REG-I-52 | Turn in-app notifications off and on. Wallet theme is coming soon and is not checked | ✅ Pass | iOS |
+| REG-I-53 | Change the wallet password — current password; new password; confirm; the I understand checkbox; the learn more link; save | ✅ Pass | iOS |
+| REG-I-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | iOS |
+| REG-I-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | iOS |
+| REG-I-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | iOS |
 
 ### Bugs
 
@@ -44,6 +48,8 @@ None.
 
 ## Summary
 
-Regression round 2 started on iOS, the platform that had not been touched yet — six lines pass there: lock and unlock, migrating solo accounts to a unified account, and the three general settings lines for currency, language and in-app notifications. The same migration line passed on Android too. No bug found.
+Regression round 2 started on iOS, the platform that had not been touched yet — ten lines pass there: lock and unlock, migrating solo accounts to a unified account, the three general settings lines, three of the four security settings lines, and buying a token. The same migration line passed on Android too. No bug found.
 
-The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks. Android is now 30 of 82 and iOS 6 of 82.
+REG-I-55, Face ID or Touch ID, is the one security line left; it has not been run.
+
+The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks. Android is now 30 of 82 and iOS 10 of 82.
