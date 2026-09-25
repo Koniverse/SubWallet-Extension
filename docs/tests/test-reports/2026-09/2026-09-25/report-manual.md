@@ -9,18 +9,18 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.19 |
-| Total bugs found | 0 |
+| Total bugs found | 2 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 0 |
-| P3 | 0 |
+| P2 | 1 |
+| P3 | 1 |
 | Status | in-progress |
 
 ---
 
 ## US-42.24.19 — Full wallet regression, round 2
 
-iOS started, ten lines run. Android added the migration line, taking it to 30. Android 30 of 82, iOS 10 of 82.
+iOS started, thirteen lines run. Android added the migration line, taking it to 30. Android 30 of 82, iOS 13 of 82.
 
 The checklist grew from 77 lines to 82 today. Reading the SubWallet user guide against it turned up four documented features with no line of their own — import from Trust Wallet, transfer through a bridge, parachain (collator) staking, and change validator — now REG-78 to REG-81 on both platforms.
 
@@ -41,15 +41,19 @@ The fifth change is a split. REG-70 read "Migrate account; configure the Subscan
 | REG-I-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | iOS |
 | REG-I-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | iOS |
 | REG-I-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | iOS |
+| REG-I-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | iOS |
+| REG-I-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | iOS |
+| REG-I-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | iOS |
 
 ### Bugs
 
-None.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-23 | The recipient address field on the Transfer screen is out of line (iOS) | Open a token → Send → on the Transfer screen, look at the To row | The To label sits hard against the left edge of the field while the Account address placeholder starts well to the right of it, so the row does not line up with the token and network fields above it | The To row lines up with the fields above it, with the label and the address placeholder spaced the way the rest of the form is | P3 | todo | ![](img/BUG-42.24.19-23.png) |
+| BUG-42.24.19-24 | The "Pay attention!" popup on Claim rewards confirm does not match the Extension (iOS) | Earning → open a Bittensor position whose rewards are smaller than the network fee → Claim rewards → Approve → look at the popup that appears | The popup is a plain grey box floating in the middle of the screen. It has no close button, no warning icon, and the "I understand" button is grey like the box behind it. The Extension shows the same warning as a sheet from the bottom with an X to close, a yellow warning triangle, and "I understand" as a blue button with a tick | The popup matches the Extension — a bottom sheet with a close button, the warning icon, and a blue confirm button | P2 | todo | on iOS: ![](img/BUG-42.24.19-24.png) · on the Extension, as it should look: ![](img/BUG-42.24.19-24-expected.png) |
 
 ## Summary
 
-Regression round 2 started on iOS, the platform that had not been touched yet — ten lines pass there: lock and unlock, migrating solo accounts to a unified account, the three general settings lines, three of the four security settings lines, and buying a token. The same migration line passed on Android too. No bug found.
+Regression round 2 started on iOS, the platform that had not been touched yet — thirteen lines pass there: lock and unlock, migrating solo accounts to a unified account, buying a token, importing and sending an NFT, and the whole of general settings and security settings. The same migration line passed on Android too. Two bugs found on iOS, both display defects: BUG-42.24.19-23, a P3 on the Transfer screen, and BUG-42.24.19-24, a P2 on the Claim rewards confirm popup.
 
-REG-I-55, Face ID or Touch ID, is the one security line left; it has not been run.
-
-The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks. Android is now 30 of 82 and iOS 10 of 82.
+The checklist was also compared against the SubWallet user guide and went from 77 lines to 82: four documented features had no line of their own, and REG-70 was split because it carried two unrelated checks. Android is now 30 of 82 and iOS 13 of 82.
