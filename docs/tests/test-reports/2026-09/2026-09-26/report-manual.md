@@ -50,6 +50,8 @@
 | REG-65 | Define a network — add a provider; switch provider | ✅ Pass | Android + iOS |
 | REG-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | Android + iOS |
 | REG-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | Android + iOS |
+| REG-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | Android + iOS |
+| REG-45 | Back up the seed phrase through export account | ✅ Pass | Android + iOS |
 
 ### Bugs
 
@@ -71,4 +73,6 @@ REG-77 passes on both platforms as well, so all four removed features are now ch
 
 Receive and mission pools close on iOS too, their Android halves having passed on 2026-09-18. Manage network and WalletConnect both run in full on both platforms. WalletConnect matters here because round 2 found two P1s on it — no account offered on an EVM network, and a popup that could not be dismissed — and both were verified fixed on 2026-09-18; these two lines confirm the screen works end to end.
 
-Android 51 of 83, iOS 42 of 83.
+Backup seed phrase closes on both platforms as well.
+
+Android 53 of 83, iOS 44 of 83.
