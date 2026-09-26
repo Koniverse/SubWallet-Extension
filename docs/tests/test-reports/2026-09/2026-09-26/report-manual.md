@@ -9,10 +9,10 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.19, US-42.24.20 |
-| Total bugs found | 0 |
+| Total bugs found | 1 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 0 |
+| P2 | 1 |
 | P3 | 0 |
 | Status | in-progress |
 
@@ -62,10 +62,19 @@
 | REG-I-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS. Closes manage website access on both platforms |
 | REG-I-73 | The MKT campaign | ✅ Pass | iOS. The Android line was already ticked |
 | REG-I-74 | Add an API key | ✅ Pass | iOS. The Android line was already ticked |
+| REG-84 | Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only | ✅ Pass | Android + iOS. New line, added today |
+| REG-I-23 | Swap without XCM; swap with XCM | ✅ Pass | iOS. The Android lines were already ticked |
+| REG-I-24 | Search token and account; the prompt to enable a network that is off; filter token | ✅ Pass | iOS |
+| REG-I-25 | Input the amount and the recipient address — by QR, by typing, from the address book | ✅ Pass | iOS |
+| REG-I-26 | The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee | ✅ Pass | iOS |
+| REG-I-27 | Validation cases; submit | ✅ Pass | iOS |
+| REG-I-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | iOS. Closes manage NFT on both platforms, REG-32 aside |
 
 ### Bugs
 
-None found today.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-25 | The Account name popup is shown twice when saving the name while importing by seed phrase | Import an account by seed phrase → type an account name → save it → watch the screens that follow | The Account name popup appears, is saved, and then appears a second time, so the name has to be confirmed twice before the import carries on | The popup appears once, and saving the name takes the import to the next step | P2 | todo | |
 
 ## US-42.24.20 — Verify the bugs found during this update
 
@@ -75,14 +84,16 @@ None found today.
 |---|---|---|---|---|
 | BUG-42.24.19-24 | US-42.24.19 | P2 | The "Pay attention!" popup on Claim rewards confirm did not match the Extension (iOS) | ✅ Fixed |
 
-73 of 81 verified, 5 closed no fix, 3 open — one P1, one P2 and one P3.
+73 of 82 verified, 5 closed no fix, 4 open — one P1, two P2 and one P3.
 
 ## Summary
 
+Swap and manage NFT close on iOS, their Android halves having passed earlier. Manage NFT is complete on both platforms now, REG-32 aside, which is skipped.
+
 Sections closed on both platforms: history, manage network, manage token, WalletConnect, backup seed phrase, community and support, the address book, account settings, manage website access, the MKT campaign and API key, Trust Wallet import, and the removed-feature checks. Receive and mission pools closed on iOS, their Android halves having passed earlier.
 
-REG-83 is new — Crowdloans must be gone on a fresh install, which REG-77 only checked after an upgrade. It passes on both. Each list now holds 83 lines.
+Two lines are new. REG-83 — Crowdloans must be gone on a fresh install, which REG-77 only checked after an upgrade — passes on both. REG-84 checks the account details screen itself: the name, the address per network with its QR code and copy button, and the badges for account family and type. The screen was only ever reached on the way somewhere else, so what it displays had no check of its own. It passes on both platforms. Each list now holds 84 lines.
 
-BUG-42.24.19-24 verified fixed. Three bugs open: BUG-42.24.19-06 at P1, BUG-42.24.19-03 at P2, BUG-42.24.19-23 at P3.
+BUG-42.24.19-24 verified fixed. One bug logged, BUG-42.24.19-25 at P2: the Account name popup is shown twice when importing by seed phrase, on both platforms. Four bugs open: BUG-42.24.19-06 at P1, BUG-42.24.19-03 and -25 at P2, BUG-42.24.19-23 at P3.
 
-Android 60 of 83, iOS 54 of 83. No bug found today.
+Android 61 of 84, iOS 61 of 84.
