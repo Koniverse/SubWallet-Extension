@@ -57,6 +57,11 @@
 | REG-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | Android + iOS |
 | REG-71 | Contact support; user guide; request a feature | ✅ Pass | Android + iOS |
 | REG-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | Android + iOS |
+| REG-69 | Add an address; remove one; edit a name; search and filter | ✅ Pass | Android + iOS |
+| REG-82 | Configure the Subscan API key | ✅ Pass | Android + iOS. Closes account settings, whose other line is the unified-account migration |
+| REG-I-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS. Closes manage website access on both platforms |
+| REG-I-73 | The MKT campaign | ✅ Pass | iOS. The Android line was already ticked |
+| REG-I-74 | Add an API key | ✅ Pass | iOS. The Android line was already ticked |
 
 ### Bugs
 
@@ -74,12 +79,10 @@ None found today.
 
 ## Summary
 
-Sections closed on both platforms: history, manage network, manage token, WalletConnect, backup seed phrase, community and support, Trust Wallet import, and the removed-feature checks. Receive and mission pools closed on iOS, their Android halves having passed earlier.
+Sections closed on both platforms: history, manage network, manage token, WalletConnect, backup seed phrase, community and support, the address book, account settings, manage website access, the MKT campaign and API key, Trust Wallet import, and the removed-feature checks. Receive and mission pools closed on iOS, their Android halves having passed earlier.
 
 REG-83 is new — Crowdloans must be gone on a fresh install, which REG-77 only checked after an upgrade. It passes on both. Each list now holds 83 lines.
 
-REG-I-57, the connected-website list with its search and filter, has not been run.
-
 BUG-42.24.19-24 verified fixed. Three bugs open: BUG-42.24.19-06 at P1, BUG-42.24.19-03 at P2, BUG-42.24.19-23 at P3.
 
-Android 58 of 83, iOS 49 of 83. No bug found today.
+Android 60 of 83, iOS 54 of 83. No bug found today.
