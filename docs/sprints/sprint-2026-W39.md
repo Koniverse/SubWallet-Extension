@@ -15,6 +15,9 @@ goal: "A window that opened empty and did not stay empty. It was opened 2026-09-
 **One piece of dev work, and it is a version pin.** [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089)
 — *"Support ERC-20 ERC-721 for X Layer"*, opened **2026-09-25 04:49 UTC** by tunghp2002 onto
 `subwallet-dev`, one commit (`6fb298cc73`, *"Chore: update chainlist version"*), **one file, +1/−1**:
+(**#5088 is the same work, not a second piece** — opened 04:40 against `master`, closed 04:49, and
+reopened as #5089 on the right base with the same head branch and the same commit; `master` carries
+releases, feature branches go to `subwallet-dev`.)
 `ChainListVersion` in `chain-service/utils/patch.ts` moves `0.2.129` → `0.2.131`. Open, no body, no
 review. **The capability itself is not in this repository** — X Layer's ERC-20 and ERC-721 support
 lands in [SubWallet-ChainList #711](https://github.com/Koniverse/SubWallet-ChainList/issues/711)
@@ -82,11 +85,15 @@ US-42.24.20's retest reads **72 fixed · 5 no-fix · 4 not fixed yet** across 81
 not verify — including `BUG-42.24.19-16`, a **P1 crash** — have all been rerun and passed, and
 nothing has taken their place.
 
-Of the four rows still open, three were never ticked: `-19-03` and `-19-06` (**P1**, both since
-09-03) and `-19-24` (item 71, P2, filed 09-25). The fourth, `-19-23` (item 70), **was ticked
-2026-09-26 04:42 — after the 09-25 retest that recorded it** — so it is out of step by lag rather
-than by disagreement, the shape item 58 had, and one rerun settles it. #2057 is at **65 of 71**.
-Detail in [notes/2026-09-04.md](../notes/2026-09-04.md).
+Of the four rows still open, two were never ticked: `-19-03` and `-19-06` (**P1**, both since
+09-03). The other two, `-19-23` and `-19-24` (items 70 and 71), **were both ticked 2026-09-26, at
+04:42 and 07:18 — after the 09-25 retest that recorded them** — so they are out of step by lag
+rather than by disagreement, the shape item 58 had, and one rerun settles both.
+
+**#2057 is at 66 of 71, the cleanest it has been**: every item filed after 09-03 is ticked, and
+what remains is the two originals (6, 9), one that is verified fixed and merely unticked (35), and
+two deferred with a stated reason (42, 69). Detail in
+[notes/2026-09-04.md](../notes/2026-09-04.md).
 
 ## Not in this window — the eight stalled W33 stories
 
