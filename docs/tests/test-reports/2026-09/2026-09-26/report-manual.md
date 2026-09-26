@@ -37,6 +37,19 @@
 | REG-39 | Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp | ✅ Pass | Android + iOS |
 | REG-I-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
 | REG-I-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | Android + iOS. New line, added today |
+| REG-77 | No screen is broken where a removed feature used to be — Crowdloans, Polygon zkEVM, stDOT, the old Bittensor root claim | ✅ Pass | Android + iOS, on an upgrade |
+| REG-I-16 | The QR code shows in all accounts mode and in single account mode | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-I-17 | The explorer link opens for a network that has one, and is handled for a network that does not | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-I-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-I-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-I-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | iOS. The Android line was already ticked on 2026-09-18 |
+| REG-62 | Search network; filter network; turn a network on and off | ✅ Pass | Android + iOS |
+| REG-63 | Import a custom network; import a provider; switch provider | ✅ Pass | Android + iOS |
+| REG-64 | Remove a custom network with the network on, and with it off | ✅ Pass | Android + iOS |
+| REG-65 | Define a network — add a provider; switch provider | ✅ Pass | Android + iOS |
+| REG-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | Android + iOS |
+| REG-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | Android + iOS |
 
 ### Bugs
 
@@ -52,4 +65,10 @@ History was then run in full on both platforms — all four lines pass, closing 
 
 The dApp lines followed — connecting to a substrate and an EVM dApp with block and unblock on both platforms, and the connected-website detail and dApp configuration screens on iOS, whose Android counterparts were already ticked. REG-I-57, the connected-website list with its search and filter, has not been run.
 
-Android 43 of 82, iOS 29 of 82.
+The checklist gained one line, REG-83: Crowdloans, removed in 1.3.73, must be gone from the build. It was already named in REG-77, but that line only looks after an upgrade and covers four removed features at once, so a fresh install had no check that the tab is absent. The new line checks it on its own and passes on both platforms — no tab, no entry point, nothing left behind that opens it. Each list now holds 83 lines.
+
+REG-77 passes on both platforms as well, so all four removed features are now checked from both sides: REG-83 confirms Crowdloans is absent on a fresh install, and REG-77 confirms none of the four leaves a broken screen behind after an upgrade.
+
+Receive and mission pools close on iOS too, their Android halves having passed on 2026-09-18. Manage network and WalletConnect both run in full on both platforms. WalletConnect matters here because round 2 found two P1s on it — no account offered on an EVM network, and a popup that could not be dismissed — and both were verified fixed on 2026-09-18; these two lines confirm the screen works end to end.
+
+Android 51 of 83, iOS 42 of 83.
