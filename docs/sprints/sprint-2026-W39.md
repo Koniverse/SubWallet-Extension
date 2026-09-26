@@ -75,14 +75,18 @@ without. The record never says which of the two it was, or whether the fix was E
 Mobile-side. That is the thing to carry: a named failure mode with no test behind it took six days
 and a release blocker to find.
 
-## For the first time, the two QC sides agree
+## No tick is contradicted by a retest any more
 
 US-42.24.20's retest reads **72 fixed · 5 no-fix · 4 not fixed yet** across 81 rows, against
 **54 · 2 · 15** across 71 on 09-16. The eleven rows the developer had ticked and the tester could
-not verify — including `BUG-42.24.19-16`, a **P1 crash** — have all been rerun and passed. The four
-rows still open are **exactly the four items the developer never ticked**: `-19-03` and `-19-06`
-(P1, both open since 09-03) and `-19-23` / `-19-24`, filed 09-25. Detail in
-[notes/2026-09-04.md](../notes/2026-09-04.md).
+not verify — including `BUG-42.24.19-16`, a **P1 crash** — have all been rerun and passed, and
+nothing has taken their place.
+
+Of the four rows still open, three were never ticked: `-19-03` and `-19-06` (**P1**, both since
+09-03) and `-19-24` (item 71, P2, filed 09-25). The fourth, `-19-23` (item 70), **was ticked
+2026-09-26 04:42 — after the 09-25 retest that recorded it** — so it is out of step by lag rather
+than by disagreement, the shape item 58 had, and one rerun settles it. #2057 is at **65 of 71**.
+Detail in [notes/2026-09-04.md](../notes/2026-09-04.md).
 
 ## Not in this window — the eight stalled W33 stories
 
