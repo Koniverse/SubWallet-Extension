@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.19 |
+| Stories tested | US-42.24.19, US-42.24.20 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -52,27 +52,34 @@
 | REG-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | Android + iOS |
 | REG-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | Android + iOS |
 | REG-45 | Back up the seed phrase through export account | ✅ Pass | Android + iOS |
+| REG-66 | Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR | ✅ Pass | Android + iOS |
+| REG-67 | Remove a custom token with the token on, and with it off | ✅ Pass | Android + iOS |
+| REG-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | Android + iOS |
+| REG-71 | Contact support; user guide; request a feature | ✅ Pass | Android + iOS |
+| REG-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | Android + iOS |
 
 ### Bugs
 
-None.
+None found today.
+
+## US-42.24.20 — Verify the bugs found during this update
+
+### Bugs rechecked
+
+| Item | Found in | Severity | What it is | State |
+|---|---|---|---|---|
+| BUG-42.24.19-24 | US-42.24.19 | P2 | The "Pay attention!" popup on Claim rewards confirm did not match the Extension (iOS) | ✅ Fixed |
+
+73 of 81 verified, 5 closed no fix, 3 open — one P1, one P2 and one P3.
 
 ## Summary
 
-Importing from Trust Wallet passes on both platforms, closing the first of the four lines added on 2026-09-25 after the checklist was compared against the user guide.
+Sections closed on both platforms: history, manage network, manage token, WalletConnect, backup seed phrase, community and support, Trust Wallet import, and the removed-feature checks. Receive and mission pools closed on iOS, their Android halves having passed earlier.
 
-Lock and unlock were rerun across both platforms — by hand, by password, and by Face ID, Touch ID or fingerprint, along with the auto-lock time and the biometric toggle. All four lines were already ticked from earlier sessions, so the count does not move; this run confirms them.
+REG-83 is new — Crowdloans must be gone on a fresh install, which REG-77 only checked after an upgrade. It passes on both. Each list now holds 83 lines.
 
-History was then run in full on both platforms — all four lines pass, closing the section on each.
+REG-I-57, the connected-website list with its search and filter, has not been run.
 
-The dApp lines followed — connecting to a substrate and an EVM dApp with block and unblock on both platforms, and the connected-website detail and dApp configuration screens on iOS, whose Android counterparts were already ticked. REG-I-57, the connected-website list with its search and filter, has not been run.
+BUG-42.24.19-24 verified fixed. Three bugs open: BUG-42.24.19-06 at P1, BUG-42.24.19-03 at P2, BUG-42.24.19-23 at P3.
 
-The checklist gained one line, REG-83: Crowdloans, removed in 1.3.73, must be gone from the build. It was already named in REG-77, but that line only looks after an upgrade and covers four removed features at once, so a fresh install had no check that the tab is absent. The new line checks it on its own and passes on both platforms — no tab, no entry point, nothing left behind that opens it. Each list now holds 83 lines.
-
-REG-77 passes on both platforms as well, so all four removed features are now checked from both sides: REG-83 confirms Crowdloans is absent on a fresh install, and REG-77 confirms none of the four leaves a broken screen behind after an upgrade.
-
-Receive and mission pools close on iOS too, their Android halves having passed on 2026-09-18. Manage network and WalletConnect both run in full on both platforms. WalletConnect matters here because round 2 found two P1s on it — no account offered on an EVM network, and a popup that could not be dismissed — and both were verified fixed on 2026-09-18; these two lines confirm the screen works end to end.
-
-Backup seed phrase closes on both platforms as well.
-
-Android 53 of 83, iOS 44 of 83.
+Android 58 of 83, iOS 49 of 83. No bug found today.
