@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-24 02:25:34 UTC
+> Last generated: 2026-09-26 02:29:16 UTC
 > Total stories: 330
 
 ## 📋 Backlog (71)
@@ -89,7 +89,7 @@
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (14)
+## 🟡 In Progress (13)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -104,7 +104,6 @@
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 20 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
-| US-42.24.22 | QC — Web-runner 1.3.88 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24 | QC — Update web-runner to 1.3.90 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W38 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
@@ -119,7 +118,7 @@
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (233)
+## ✅ Done (235)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -266,7 +265,9 @@
 | US-42.24.18 | QC — Web-runner 1.3.86 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.24.2 | QC — Web-runner 1.3.69 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.21 | QC — Web-runner 1.3.87 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24.22 | QC — Web-runner 1.3.88 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.23 | QC — Web-runner 1.3.89 on Mobile | EPIC-42 | P2 | 5 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.24.24 | QC — Web-runner 1.3.90 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.4 | QC — Web-runner 1.3.71 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.24.5 | QC — Web-runner 1.3.72 on Mobile | EPIC-42 | P2 | 20 | sprint-2026-W37 | MaiThuongNinni |
 | US-42.24.6 | QC — Web-runner 1.3.73 on Mobile | EPIC-42 | P2 | 5 | sprint-2026-W37 | MaiThuongNinni |
@@ -357,11 +358,9 @@
 | US-9.20 | Client-side NFT Service & SDK migration | EPIC-9 | P3 | 1 | sprint-2026-M02 | frenkie-ng |
 | US-9.27 | NFT fixes recovered from Uncategorized | EPIC-9 | P3 | 1 | sprint-2023-M07 | nulllpc |
 
-## 🚫 Blocked (1)
+## 🚫 Blocked (0)
 
-| ID | Title | Epic | Pri | Points | Sprint | Assignee |
-|---|---|---|---|---|---|---|
-| US-42.24.24 | QC — Web-runner 1.3.90 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
+_No stories_
 
 ## 🗑️ Deprecated (1)
 
@@ -375,10 +374,10 @@
 
 - 📋 **Backlog**: 71
 - 🟢 **Ready**: 4
-- 🟡 **In Progress**: 14
+- 🟡 **In Progress**: 13
 - 👀 **Review**: 6
-- ✅ **Done**: 233
-- 🚫 **Blocked**: 1
+- ✅ **Done**: 235
+- 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 14 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 13 stories in-progress (limit: 3).

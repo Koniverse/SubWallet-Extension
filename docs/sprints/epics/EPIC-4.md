@@ -218,7 +218,7 @@ EPIC-4 owns the *registry, ecosystems, and token surface* layered on top.
 
 ## Umbrella issues owned by this epic
 
-Three tracker issues here have children and no CHANGELOG line of their own. They are **the epic's**,
+Four tracker issues here have no CHANGELOG line of their own. They are **the epic's**,
 not any story's ([AGENTS.md](../../../AGENTS.md) rule 10) — repeating an umbrella as a row would
 double-count the work its children already carry.
 
@@ -227,12 +227,22 @@ double-count the work its children already carry.
 | [#4187](https://github.com/Koniverse/SubWallet-Extension/issues/4187) | Asset Hub Migration | 17 (6 in this ledger) | the 6 in-ledger children (#3714, #3710, #4522, #4170, #4790, #4354) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md), beside the rest of the migration |
 | [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | Update chain-list stable v0.2.124 | 6 (1 in this ledger) | the one in-ledger child (#301) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) |
 | [#4567](https://github.com/Koniverse/SubWallet-Extension/issues/4567) | Improve "Filter To token based on From token" (Round 2) | 1 (0 in this ledger) | its only child (#98) is out of this area; the Round-1 delivery #4468 keeps its own row in [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) |
+| [ChainList #711](https://github.com/Koniverse/SubWallet-ChainList/issues/711) | Support ERC-20 ERC-721 for X Layer | — (cross-repo) | the capability is in the **ChainList** repo; the Extension side is [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089), one line — `ChainListVersion` `0.2.129` → `0.2.131` in `chain-service/utils/patch.ts`. Open, unreviewed, no CHANGELOG line, so the epic holds it |
 
 > **The chain-list release train has both shapes.** #4861 … #4730 (*"Update chain-list stable
 > v0.2.118 … v0.2.123"*) each shipped a CHANGELOG line and keep their rows in
 > [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md); only #4935 (v0.2.124) has
 > no line yet and is the umbrella. The distinction is the line, not the children — the same rule that
 > keeps #4606 (*"ParaSpell V4"*) a row rather than an umbrella even though it, too, has sub-issues.
+>
+> **ChainList #711 (X Layer, 2026-09-25) is the train's third shape**: the issue is not on this
+> repo at all. The Extension carries only the version pin, which is
+> [FR-34](../../PRD.md#epic-4--chain-management) behaving as designed — data updates reach users
+> without a release. It sits here on the same footing as #4935 and moves to a
+> [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) row **if and when it
+> ships with a CHANGELOG line**. Note the naming: the PR is on Extension and titled from the
+> *ChainList* issue, the mirror image of the #5062 / ChainList #709 case that
+> [LESSONS §69](../../LESSONS.md) was written on.
 
 ## Object map & user-story interactions
 
