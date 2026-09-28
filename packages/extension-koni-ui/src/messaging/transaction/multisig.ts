@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { RequestGetPendingTxs } from '@subwallet/extension-base/services/multisig-service';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, PrepareMultisigSignRequest, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
@@ -26,4 +27,8 @@ export async function prepareMultisigSignRequest (request: PrepareMultisigSignRe
 
 export async function getSignableAccountInfos (request: RequestGetSignableAccountInfos) {
   return sendMessage('pri(multisig.getSignableAccountInfos)', request);
+}
+
+export async function getPendingMultisigTxs (request: RequestGetPendingTxs) {
+  return sendMessage('pri(multisig.getPendingMultisigTxs)', request);
 }
