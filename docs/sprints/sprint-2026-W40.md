@@ -3,7 +3,7 @@ id: sprint-2026-W40
 status: in-progress
 start: 2026-09-28
 end: 2026-10-04
-goal: "Opened 2026-09-28 on its own first day at 0 points, and the drought broke the same day. #5093 — Improve multisig notification — was filed 05:12, the first issue on the Extension repo since #5072 on 09-05, 23 days earlier, and it arrived with an empty body, so it is claimed by US-18.5 and carries no ACs and no FR. PR #5089, the one-line chain-list pin, carries over from W39 still unreviewed since 09-25. The tester's regression is half run at 122 of 168 lines. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points, with three identical anchor readings saying no work is in flight on any of them."
+goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester's regression is past half at 122 of 168 lines. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
 ---
 
 ## Sprint scope
@@ -11,24 +11,29 @@ goal: "Opened 2026-09-28 on its own first day at 0 points, and the drought broke
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
-| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Improve multisig notification | [EPIC-18](epics/EPIC-18.md) | P3 | 0 | 📋 backlog — **not scoped** | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
+| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 
-**Opened 2026-09-28 day one at 0 points, and the drought broke the same day.**
+**Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig
 notification"* — was filed **05:12 UTC by tunghp2002**, the first issue on this repo since
 [#5072](https://github.com/Koniverse/SubWallet-Extension/issues/5072) on 09-05, **23 days**. It
-arrived with an **empty body**, no label, no milestone, no assignee and no PR.
+arrived with an empty body; by **08:20** it had a full one naming five root causes, and by **08:36**
+[PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095) was open — one commit
+`f836222c51`, **10 files, +233/−46**, base `subwallet-dev`, no review.
 
-**It is claimed but not scoped.** [US-18.5](stories/US-18.5-multisig-notification-improvement.md)
-exists so the issue does not read as uncovered at the next sync, and it carries **no acceptance
-criteria and no FR** — *an FR is earned when a capability is specified, not when someone files a
-request* ([D104](../CONTEXT.md#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)).
-Its `sprint:` is left **empty on purpose**: putting it in this window would claim work that has no
-spec, no estimate and no owner. **It moves into scope when a PR gives it a diff to be written
-from.** Placement in EPIC-18 is provisional — if the diff turns out narrow it folds into a US-18.2
-row, the way #4963 is a row in US-18.1.
+**Scoped as [US-18.5](stories/US-18.5-multisig-notification-improvement.md), 5 points,
+`in-progress`**, with eleven ACs read from the diff. The substance: multisig approval notifications
+were **deleted** whenever the subscription re-ran, so any incomplete storage read looked like *no
+pending transaction*. They are now **updated with a status** — `APPROVED`, `RESOLVED`, or absent —
+an incomplete read throws and resubscribes instead of clearing, and a tx whose extrinsic cannot be
+resolved keeps its last known data. Two things it does **not** carry: **no test** (the fourth story
+running), and **5 of its 6 new strings ship as English in vi, ja, ru and zh** while the sixth is
+translated — US-12.23's locale finding again, sharper.
 
-**Fifth empty-body issue in seven weeks** — #5058, #5064, #5072, ChainList #711, now #5093.
+*Corrected: at 05:14 this file recorded #5093 as unspecified, unscoped and the fifth of five
+empty-body issues **none of which ever gained a body**. It gained one three hours later. The count
+at filing time stands; the claim about what happens afterwards was a snapshot read as a permanent
+property.* **#5093 is the first of the five to gain a body.**
 
 Every story's `sprint:` field was read at W39's closeout: none of the 336 named
 `sprint-2026-W39`, and none names `sprint-2026-W40` either. W39 was opened mid-window and W36–W38

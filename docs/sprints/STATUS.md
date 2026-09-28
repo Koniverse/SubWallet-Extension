@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-28 05:17:50 UTC
+> Last generated: 2026-09-28 08:39:37 UTC
 > Total stories: 331
 
-## 📋 Backlog (72)
+## 📋 Backlog (71)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -39,7 +39,6 @@
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
-| US-18.5 | Improve multisig notification | EPIC-18 | P3 | 0 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
 | US-19.10 | WebApp marketing campaign, round 2 (improvement on US-19.4) | EPIC-19 | P3 | 1 | — | — |
@@ -90,13 +89,14 @@
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (13)
+## 🟡 In Progress (14)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
+| US-18.5 | Multisig approval notification reliability & status lifecycle | EPIC-18 | P2 | 5 | sprint-2026-W40 | tunghp2002 |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W31 | nulllpc |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
@@ -373,12 +373,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 72
+- 📋 **Backlog**: 71
 - 🟢 **Ready**: 4
-- 🟡 **In Progress**: 13
+- 🟡 **In Progress**: 14
 - 👀 **Review**: 6
 - ✅ **Done**: 235
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 13 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 14 stories in-progress (limit: 3).
