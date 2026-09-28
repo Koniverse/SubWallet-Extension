@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W39
-status: in-progress
+status: closed
 start: 2026-09-21
 end: 2026-09-27
 goal: "A window that opened empty and did not stay empty. It was opened 2026-09-24 mid-window with 0 points of dev work — nothing filed on the Extension repo since #5072 on 09-05 and every W38 dev story shipped. On 09-25 one piece of dev work arrived: PR #5089, a chain-list version pin bump for X Layer ERC-20/ERC-721 support (SubWallet-ChainList #711). The tester's QC programme scopes itself and had the bigger week: BUG-42.24.24-01 was verified fixed, US-42.24.24 closed done, and for the first time no bug row is disputed between the developer's ticks and the retest."
@@ -10,7 +10,18 @@ goal: "A window that opened empty and did not stay empty. It was opened 2026-09-
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | in review | — | — |
+| — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | **still open** | → W40 | — |
+
+**Closed 2026-09-28 at 0 stories and 0 points, and that figure is verified rather than assumed.**
+Every story's `sprint:` field was re-read at closeout: **not one of the 336 names
+`sprint-2026-W39`.** The window really did carry no story-level work. Its one piece of dev work,
+the chain-list pin, is owned by EPIC-4 and never became a story; it is **still open and unreviewed
+three days on**, so it carries to W40 as the thing to chase.
+
+**This is the first window in four that did not under-report at closeout** — W36 (2/13 stated,
+10/63 real), W37 (1/5 vs 12/103), W38 (13/96 vs 17/130). Nothing changed about the rule; what
+changed is that it was run. The three misses were all the same mechanism: trusting the scope table
+instead of re-reading each story's own field, and a window where nobody syncs still breaks it.
 
 **One piece of dev work, and it is a version pin.** [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089)
 — *"Support ERC-20 ERC-721 for X Layer"*, opened **2026-09-25 04:49 UTC** by tunghp2002 onto
