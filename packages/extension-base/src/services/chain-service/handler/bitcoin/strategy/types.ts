@@ -9,7 +9,6 @@ export interface BitcoinApiStrategy extends Omit<ApiRequestStrategy, 'addRequest
   getBlockTime (): Promise<number>;
   computeBlockTime (): Promise<number>;
   getAddressSummaryInfo (address: string): Promise<BitcoinAddressSummaryInfo>;
-  getRunes (address: string): Promise<RunesInfoByAddress[]>;
   // getRuneTxsUtxos (address: string): Promise<RuneTxs[]>; // noted: all rune utxos come in account
   getRuneUtxos (address: string): Promise<RuneUtxo[]>;
   // getAddressBRC20FreeLockedBalance (address: string, ticker: string): Promise<Brc20BalanceItem>;
@@ -70,56 +69,6 @@ export interface BitcoinAddressSummaryInfo extends BlockstreamAddressResponse{
   total_inscription: number,
   balance_rune: string,
   balance_inscription: string,
-}
-
-// todo: combine RunesByAddressResponse & RunesCollectionInfoResponse
-
-export interface RunesInfoByAddressResponse {
-  statusCode: number,
-  data: RunesInfoByAddressFetchedData
-}
-
-export interface RunesInfoByAddressFetchedData {
-  limit: number,
-  offset: number,
-  total: number,
-  runes: RunesInfoByAddress[]
-}
-
-// todo: check is_hot and turbo and cenotaph attributes meaning in RuneInfoByAddress
-
-export interface RunesInfoByAddress {
-  amount: string,
-  address: string,
-  rune_id: string,
-  rune: {
-    rune: string,
-    rune_name: string,
-    divisibility: number,
-    premine: string,
-    spacers: string,
-    symbol: string
-  }
-}
-
-export interface RunesCollectionInfoResponse {
-  statusCode: number,
-  data: RunesCollectionInfoFetchedData
-}
-
-interface RunesCollectionInfoFetchedData {
-  limit: number,
-  offset: number,
-  total: number,
-  runes: RunesCollectionInfo[]
-}
-
-export interface RunesCollectionInfo {
-  rune_id: string,
-  rune: string,
-  rune_name: string,
-  divisibility: string,
-  spacers: string
 }
 
 export interface RuneTxsResponse {
@@ -306,31 +255,69 @@ interface RuneInject {
   divisibility: number
 }
 
-export interface RuneMetadata {
-  id: string,
-  mintable: boolean,
-  parent: string,
-  entry: RuneInfo
+export interface UniSatApiResponse<T> {
+  code: number,
+  msg: string,
+  data: T
 }
 
-interface RuneInfo {
-  block: number,
-  burned: string,
-  divisibility: number,
-  etching: string,
-  mints: string,
-  number: number,
-  premine: string,
-  spaced_rune: string,
-  symbol: string,
-  terms: RuneTerms
-  timestamp: string,
-  turbo: boolean
+export interface UniSatInscriptionUtxoResponse {
+  cursor: number,
+  total: number,
+  totalConfirmed: number,
+  totalUnconfirmed: number,
+  totalUnconfirmedSpend: number,
+  utxo: UniSatInscriptionUtxo[]
 }
 
-interface RuneTerms {
+export interface UniSatInscriptionUtxo {
+  address: string,
+  codeType: number,
+  height: number,
+  idx: number,
+  inscriptions: UniSatInscriptionInUtxo[],
+  isOpInRBF: boolean,
+  satoshi: number,
+  scriptPk: string,
+  scriptType: string,
+  txid: string,
+  vout: number
+}
+
+export interface UniSatInscriptionInUtxo {
+  inscriptionId: string,
+  inscriptionNumber: number,
+  isBRC20: boolean,
+  moved: boolean,
+  offset: number
+}
+
+export interface UniSatRuneBalanceListResponse {
+  start: number,
+  total: number,
+  detail: UniSatRuneBalance[]
+}
+
+export interface UniSatRuneBalance {
   amount: string,
-  cap: string,
-  height: string[],
-  offset: string[]
+  runeid: string,
+  rune: string,
+  spacedRune: string,
+  symbol: string,
+  divisibility: number
+}
+
+export interface UniSatRuneUtxoResponse {
+  start: number,
+  total: number,
+  utxo: UniSatRuneUtxo[]
+}
+
+export interface UniSatRuneUtxo {
+  address: string,
+  satoshi: number,
+  scriptPk: string,
+  txid: string,
+  vout: number,
+  runes: UniSatRuneBalance[]
 }
