@@ -5,7 +5,7 @@ import { COMMON_CHAIN_SLUGS } from '@subwallet/chain-list';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { isClaimedPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
-import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _NotificationInfo, BridgeTransactionStatus, ClaimAvailBridgeNotificationMetadata, ClaimPolygonBridgeNotificationMetadata, MultisigApprovalNotificationMetadata, MultisigApprovalNotificationStatus, NotificationActionType, NotificationSetup, NotificationTab, ProcessNotificationMetadata, WithdrawClaimNotificationMetadata } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { GetNotificationParams, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -17,8 +17,8 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
 import { useAlert, useDefaultNavigate, useGetChainAndExcludedTokenByCurrentAccountProxy, useNotification, useSelector } from '@subwallet/extension-koni-ui/hooks';
 import { useLocalStorage } from '@subwallet/extension-koni-ui/hooks/common/useLocalStorage';
-import { enableChain, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
-import { fetchInappNotifications, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
+import { enableChain, getPendingMultisigTxs, saveNotificationSetup } from '@subwallet/extension-koni-ui/messaging';
+import { fetchInappNotifications, getInappNotification, getIsClaimNotificationStatus, markAllReadNotification, switchReadNotificationStatus } from '@subwallet/extension-koni-ui/messaging/transaction/notification';
 import NotificationItem from '@subwallet/extension-koni-ui/Popup/Settings/Notifications/NotificationItem';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { NotificationScreenParam, Theme, ThemeProps } from '@subwallet/extension-koni-ui/types';
@@ -28,7 +28,7 @@ import { SwIconProps } from '@subwallet/react-ui/es/icon';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
 import { ArrowsLeftRight, ArrowSquareDownLeft, ArrowSquareUpRight, BellSimpleRinging, BellSimpleSlash, CheckCircle, Checks, Coins, Database, DownloadSimple, FadersHorizontal, GearSix, Gift, ListBullets, UserSwitch, XCircle } from 'phosphor-react';
-import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -119,10 +119,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   const [viewDetailItem, setViewDetailItem] = useState<NotificationInfoItem | undefined>(undefined);
   const [notifications, setNotifications] = useState<_NotificationInfo[]>([]);
   const [allNotifications, setAllNotifications] = useState<_NotificationInfo[]>([]);
-  const [currentProxyId] = useState<string | undefined>(currentAccountProxy?.id);
+  // Follow the current account so switching account (e.g. to All account) on this page refetches its notifications
+  const currentProxyId = currentAccountProxy?.id;
   const [loadingNotification, setLoadingNotification] = useState<boolean>(false);
   const [isTrigger, setTrigger] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const checkingMultisigNotification = useRef(false);
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
   // use this to trigger get date when click read/unread
   const [currentTimestampMs, setCurrentTimestampMs] = useState(Date.now());
@@ -153,10 +155,25 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     };
 
     return notifications.map((item) => {
+      let { description, title } = item;
+
+      if (item.actionType === NotificationActionType.MULTISIG_APPROVAL) {
+        const { status } = item.metadata as MultisigApprovalNotificationMetadata;
+        const accountPrefix = item.title.match(/^\[.*\]\s*/)?.[0] || '';
+
+        if (status === MultisigApprovalNotificationStatus.APPROVED) {
+          title = accountPrefix + t('ui.SETTINGS.screen.Setting.Notifications.multisigTxApprovedTitle');
+          description = t('ui.SETTINGS.screen.Setting.Notifications.multisigTxApprovedContent');
+        } else if (status === MultisigApprovalNotificationStatus.RESOLVED) {
+          title = accountPrefix + t('ui.SETTINGS.screen.Setting.Notifications.multisigTxNoLongerPendingTitle');
+          description = t('ui.SETTINGS.screen.Setting.Notifications.multisigTxNoLongerPendingContent');
+        }
+      }
+
       return {
         id: item.id,
-        title: item.title,
-        description: item.description,
+        title,
+        description,
         address: item.address,
         time: item.time,
         extrinsicType: item.extrinsicType,
@@ -168,7 +185,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         proxyId: item.proxyId
       };
     }).filter(filterTabFunction).sort(sortByTimeFunc);
-  }, [notifications, selectedFilterTab, token]);
+  }, [notifications, selectedFilterTab, t, token]);
 
   const filteredNotificationItems = useMemo(() => {
     return notificationItems.filter((item) => {
@@ -238,7 +255,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
     goHome();
   }, [goHome]);
 
-  const showActiveChainModal = useCallback((chainSlug: string, action: NotificationActionType.WITHDRAW | NotificationActionType.CLAIM) => {
+  const showActiveChainModal = useCallback((chainSlug: string, action: NotificationActionType.WITHDRAW | NotificationActionType.CLAIM | NotificationActionType.MULTISIG_APPROVAL) => {
     const onOk = () => {
       updateAlertProps({
         okLoading: true,
@@ -265,9 +282,12 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
     const chainInfo = chainInfoMap[chainSlug];
 
-    const content = action === NotificationActionType.WITHDRAW
-      ? detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToWithdraw')
-      : detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToClaim');
+    const contentMap: Record<typeof action, string> = {
+      [NotificationActionType.WITHDRAW]: detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToWithdraw'),
+      [NotificationActionType.CLAIM]: detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToClaim'),
+      [NotificationActionType.MULTISIG_APPROVAL]: detectTranslate('ui.SETTINGS.screen.Setting.Notifications.enableNetworkToViewMultisigTx')
+    };
+    const content = contentMap[action];
 
     openAlert({
       title: t('ui.SETTINGS.screen.Setting.Notifications.enableNetwork'),
@@ -301,6 +321,86 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       }
     });
   }, [closeAlert, openAlert, t]);
+
+  const showMultisigStatusModal = useCallback((status: MultisigApprovalNotificationStatus) => {
+    const isApproved = status === MultisigApprovalNotificationStatus.APPROVED;
+
+    openAlert({
+      title: isApproved
+        ? t('ui.SETTINGS.screen.Setting.Notifications.multisigTxApprovedTitle')
+        : t('ui.SETTINGS.screen.Setting.Notifications.multisigTxNoLongerPendingTitle'),
+      type: NotificationType.INFO,
+      content: isApproved
+        ? t('ui.SETTINGS.screen.Setting.Notifications.multisigTxApprovedContent')
+        : t('ui.SETTINGS.screen.Setting.Notifications.multisigTxNoLongerPendingContent'),
+      okButton: {
+        text: t('ui.SETTINGS.screen.Setting.Notifications.iUnderstand'),
+        onClick: closeAlert,
+        icon: CheckCircle
+      }
+    });
+  }, [closeAlert, openAlert, t]);
+
+  const onClickMultisigNotification = useCallback(async (item: NotificationInfoItem) => {
+    if (checkingMultisigNotification.current) {
+      return;
+    }
+
+    checkingMultisigNotification.current = true;
+
+    const showUnavailable = () => notify({
+      message: t('ui.SETTINGS.screen.Setting.Notifications.multisigTxStatusUnavailable'),
+      type: 'warning'
+    });
+
+    try {
+      const notification = await getInappNotification(item.id);
+
+      if (!notification) {
+        showUnavailable();
+
+        return;
+      }
+
+      setNotifications((items) => items.map((value) => value.id === notification.id ? notification : value));
+
+      const metadata = notification.metadata as MultisigApprovalNotificationMetadata;
+
+      if (!metadata.status) {
+        if (!chainStateMap[metadata.chain]?.active) {
+          showActiveChainModal(metadata.chain, NotificationActionType.MULTISIG_APPROVAL);
+
+          return;
+        }
+
+        // Read the background cache; an absent tx does not prove it was executed or cancelled.
+        const pendingTxs = await getPendingMultisigTxs({ chain: metadata.chain, multisigAddress: metadata.multisigAddress });
+
+        if (!pendingTxs.some((tx) => tx.id === metadata.multisigKey)) {
+          showUnavailable();
+
+          return;
+        }
+      }
+
+      if (!notification.isRead) {
+        await switchReadNotificationStatus({ id: notification.id, isRead: false });
+        setTrigger((value) => !value);
+      }
+
+      if (metadata.status) {
+        showMultisigStatusModal(metadata.status);
+      } else {
+        setNotiMultisigPendingTxStorage(notification.id);
+        navigate('/home/history');
+      }
+    } catch (error) {
+      console.error(error);
+      showUnavailable();
+    } finally {
+      checkingMultisigNotification.current = false;
+    }
+  }, [chainStateMap, navigate, notify, setNotiMultisigPendingTxStorage, showActiveChainModal, showMultisigStatusModal, t]);
 
   const onClickItem = useCallback((item: NotificationInfoItem) => {
     return () => {
@@ -458,12 +558,9 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         }
 
         case NotificationActionType.MULTISIG_APPROVAL: {
-          setNotiMultisigPendingTxStorage(item.id);
-          switchReadNotificationStatus(switchStatusParams).then(() => {
-            navigate('/home/history');
-          }).catch(console.error);
+          onClickMultisigNotification(item).catch(console.error);
 
-          break;
+          return;
         }
       }
 
@@ -475,7 +572,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
           });
       }
     };
-  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, notify, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setNotiMultisigPendingTxStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
+  }, [accounts, allowedChains, chainStateMap, currentAccountProxy, currentTimestampMs, earningRewards, excludedTokens, isAllAccount, isTrigger, navigate, notify, onClickMultisigNotification, openTransactionProcessModal, poolInfoMap, setClaimAvailBridgeStorage, setClaimRewardStorage, setWithdrawStorage, showActiveChainModal, showWarningModal, yieldPositions]);
 
   const renderItem = useCallback((item: NotificationInfoItem) => {
     return (

@@ -6,11 +6,10 @@ import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
 import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
-import { _isChainEnabled } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { InappNotificationService } from '@subwallet/extension-base/services/inapp-notification-service';
 import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
-import { _BaseNotificationInfo, MultisigApprovalNotificationMetadata, NotificationActionType, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
+import { _BaseNotificationInfo, _NotificationInfo, MultisigApprovalNotificationMetadata, MultisigApprovalNotificationStatus, NotificationActionType, NotificationTab } from '@subwallet/extension-base/services/inapp-notification-service/interfaces';
 import { KeyringService } from '@subwallet/extension-base/services/keyring-service';
 import { decodeCallData, DecodeCallDataResponse, DEFAULT_BLOCK_HASH, genPendingMultisigTxKey, getCallData, getMultisigTxType } from '@subwallet/extension-base/services/multisig-service/utils';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
@@ -454,6 +453,13 @@ export class MultisigService implements StoppableServiceInterface {
       try {
         const items: RawPendingMultisigTx[] = [];
         const pendingMultisigEntries = rs[keyQuery];
+
+        // subscribeDataWithMulti turns an RPC error into an empty result and completes the stream,
+        // which would look like every pending tx is gone and clear their notifications, so resubscribe instead
+        if (!pendingMultisigEntries || pendingMultisigEntries.length !== rawKeysArgs.length) {
+          throw new Error(`Incomplete multisig storage result: expected ${rawKeysArgs.length} entries, got ${pendingMultisigEntries?.length ?? 0}`);
+        }
+
         const blockCache: Record<number, {
           blockHash: BlockHash,
           signedBlock: SignedBlock,
@@ -576,26 +582,47 @@ export class MultisigService implements StoppableServiceInterface {
     const currentMap = this.getPendingMultisigTxMap();
     const excludedPrefix = `${chain}___${multisigAddress}___`;
     const filteredMap: PendingMultisigTxMap = {};
+    const newTxMap: PendingMultisigTxMap = {};
+    const newNotifiedTxs: PendingMultisigTx[] = [];
+
+    // Txs still on chain whose extrinsic could not be resolved this time, keyed by call hash
+    const unresolvedTxMap = rawPendingTxs.reduce<Record<string, RawPendingMultisigTx>>((map, rawTx) => {
+      if (!rawTx.extrinsicHash) {
+        map[rawTx.callHash] = rawTx;
+      }
+
+      return map;
+    }, {});
 
     // 1. Clean old extrinsics of multisigAddress and chain
     for (const [key, value] of Object.entries(currentMap)) {
-      if (key.startsWith(excludedPrefix)) {
-        this.notifiedTxKeys.delete(key);
-      } else {
+      if (!key.startsWith(excludedPrefix)) {
         filteredMap[key] = value;
+        continue;
+      }
+
+      const unresolvedTx = unresolvedTxMap[value.callHash];
+
+      if (unresolvedTx) {
+        // Keep the last known data of a tx that is still pending, only refresh its on-chain state
+        newTxMap[key] = { ...value, approvals: unresolvedTx.approvals, depositAmount: unresolvedTx.depositAmount };
+      } else {
+        this.notifiedTxKeys.delete(key);
       }
     }
-
-    const newTxMap: PendingMultisigTxMap = {};
-    const newNotifiedTxs: PendingMultisigTx[] = [];
 
     // 2. Create new extrinsics of multisigAddress and chain
     for (const rawTx of rawPendingTxs) {
       const extrinsicHash = rawTx.extrinsicHash;
       const signerAddresses = rawTx.signerAddresses;
 
-      if (!extrinsicHash || !signerAddresses || signerAddresses.length === 0) {
-        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: extrinsicHash or signerAddresses');
+      if (!extrinsicHash) {
+        multisigServiceLogger.warn(`Unable to resolve extrinsic of multisig call ${rawTx.callHash} on ${chain}, keeping its last known data`);
+        continue;
+      }
+
+      if (!signerAddresses || signerAddresses.length === 0) {
+        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: signerAddresses');
         continue;
       }
 
@@ -627,9 +654,9 @@ export class MultisigService implements StoppableServiceInterface {
     }
 
     // 3. Replace the extrinsics of multisigAddress and chain
-    // Find approved transactions to clear notifications
-    this.clearMultisigApprovalNotifications(newTxMap, multisigAddress, chain)
-      .catch((e) => multisigServiceLogger.error('Failed to clear multisig approval notifications:', e));
+    // Mark notifications of approved or no longer pending transactions
+    this.updateMultisigApprovalNotifications(newTxMap, new Set(Object.keys(unresolvedTxMap)), multisigAddress, chain)
+      .catch((e) => multisigServiceLogger.error('Failed to update multisig approval notifications:', e));
 
     this.pendingMultisigTxSubject.next({
       ...filteredMap,
@@ -645,13 +672,15 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   /**
-   * Clears notifications for approved pending multisig transactions
+   * Updates the status of multisig approval notifications instead of removing them,
+   * so the user still sees why a notification needs no more action when clicking it
    * @private
    * @param newTxMap - Map of current pending multisig transactions
+   * @param unresolvedCallHashes - Call hashes of txs still on chain whose extrinsic could not be resolved
    * @param multisigAddress - Multisig address
    * @param chain - ChainSlug of the multisig transactions
    */
-  private async clearMultisigApprovalNotifications (newTxMap: PendingMultisigTxMap, multisigAddress: string, chain: string): Promise<void> {
+  private async updateMultisigApprovalNotifications (newTxMap: PendingMultisigTxMap, unresolvedCallHashes: Set<string>, multisigAddress: string, chain: string): Promise<void> {
     const currentNotifications = await this.inappNotificationService.fetchNotificationsByParams({
       notificationTab: NotificationTab.MULTISIG,
       proxyId: ALL_ACCOUNT_KEY,
@@ -661,26 +690,38 @@ export class MultisigService implements StoppableServiceInterface {
       }
     });
 
-    const unapprovedPendingTxs = Object.values(newTxMap).reduce<Set<string>>((set, tx) => {
-      if (!tx.approvals.find((address) => isSameAddress(tx.currentSigner, address))) {
-        set.add(tx.id);
+    const updatedNotifications = currentNotifications.reduce<_NotificationInfo[]>((rs, notification) => {
+      const metadata = notification.metadata as MultisigApprovalNotificationMetadata;
+      const pendingTx = newTxMap[metadata.multisigKey];
+      let status: MultisigApprovalNotificationStatus | undefined;
+
+      if (pendingTx) {
+        const isApproved = pendingTx.approvals.some((address) => isSameAddress(pendingTx.currentSigner, address));
+
+        status = isApproved ? MultisigApprovalNotificationStatus.APPROVED : undefined;
+      } else if (unresolvedCallHashes.has(metadata.callHash)) {
+        // The tx is still on chain but has no known data yet, so its approval state cannot be verified
+        return rs;
+      } else {
+        status = MultisigApprovalNotificationStatus.RESOLVED;
       }
 
-      return set;
-    }, new Set<string>());
-
-    const notificationsIdsToDelete = currentNotifications.reduce<string[]>((ids, notification) => {
-      const metadata = (notification.metadata as MultisigApprovalNotificationMetadata).multisigKey;
-
-      if (!unapprovedPendingTxs.has(metadata)) {
-        ids.push(notification.id);
+      if (metadata.status === status) {
+        return rs;
       }
 
-      return ids;
+      rs.push({
+        ...notification,
+        // No more action is needed once approved or resolved, so it should not stay in the unread count
+        isRead: status ? true : notification.isRead,
+        metadata: { ...metadata, status, approvals: pendingTx?.approvals ?? metadata.approvals }
+      });
+
+      return rs;
     }, []);
 
-    if (notificationsIdsToDelete.length > 0) {
-      await this.inappNotificationService.cleanUpNotificationByIds(notificationsIdsToDelete);
+    if (updatedNotifications.length > 0) {
+      await this.inappNotificationService.updateNotifications(updatedNotifications);
     }
   }
 
