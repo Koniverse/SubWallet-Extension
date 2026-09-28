@@ -135,17 +135,23 @@ two are explicitly *not* the same thing (see Out of scope).
 | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | Pending-tx detection + role-differentiated approval | Detect pending multisig txs on-chain (no indexer) and approve/reject with initiator-vs-co-signer flows | ✅ done | 1.3.74 |
 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | Auto-detection + indexer history + Phase-2 optimization | Auto-detect activated multisig accounts and enrich history/detail via indexer (planned) | 📋 backlog | — |
 | [US-18.4](../stories/US-18.4-multisig-on-mobile-and-web.md) | Multisig on mobile & web (platform ports) | Port the shipped extension capability to SubWallet Mobile (#4697, out-of-repo) and the WebApp (#4698) | 📋 backlog | — |
+| [US-18.5](../stories/US-18.5-multisig-notification-improvement.md) | Improve multisig notification | Unspecified — [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) was filed 2026-09-28 with an empty body and has no PR; the page claims the issue and carries no ACs | 📋 backlog | — |
 
 > US-18.1/US-18.2 are retroactive (shipped); US-18.3 is forward (Phase 2) and absorbs
 > the three leaves of the #4839 umbrella (#4844, #4845, #4927). US-18.4 carries **no FR** —
 > a platform port ships no new requirement, and an FR is earned when a capability is
 > specified, not when someone files a request
 > ([D104](../../CONTEXT.md#d104-an-id-is-a-promise-that-a-document-exists--do-not-mint-one-for-an-intention)).
+> **US-18.5 carries no FR for the same reason, more sharply**: #5093 is a request with an empty
+> body and no diff, so nothing is specified yet. Its placement is provisional — if the eventual
+> diff is a narrow fix it folds into a US-18.2 row, the way #4963 is a row in US-18.1.
 
 ### Issue coverage
 
-All **26** multisig issues on the tracker are claimed: 7 umbrellas above, and 19 leaves as rows in
-the four stories — 7 in US-18.1, 7 in US-18.2, 3 in US-18.3, 2 in US-18.4. Six of them
+All **27** multisig issues on the tracker are claimed: 7 umbrellas above, 19 leaves as rows in
+US-18.1 – US-18.4 (7 · 7 · 3 · 2), and **#5093 on its own page,
+[US-18.5](../stories/US-18.5-multisig-notification-improvement.md)**, opened 2026-09-28 with an
+empty body. Six of them
 (#4839, #4845, #4855, #4872, #4875, #4963) had no story before the 2026-07-22 consolidation; two
 (#4872, #4875) are still `OPEN` on the board although their code is in `v1.3.74`. Both facts are
 evidenced in the [consolidation note](../../notes/2026-07-22.md#c-epic-38-maintenance--multisig-merged-into-epic-18).

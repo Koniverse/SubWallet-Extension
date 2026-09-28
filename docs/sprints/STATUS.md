@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-28 02:57:35 UTC
-> Total stories: 330
+> Last generated: 2026-09-28 05:17:50 UTC
+> Total stories: 331
 
-## 📋 Backlog (71)
+## 📋 Backlog (72)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -39,6 +39,7 @@
 | US-17.3 | Proxy stake allocation in earning history | EPIC-17 | P3 | 1 | — | — |
 | US-18.3 | Auto-detection + indexer history + Phase-2 optimization | EPIC-18 | P2 | 5 | — | — |
 | US-18.4 | Multisig on mobile & web (platform ports) | EPIC-18 | P3 | 1 | — | — |
+| US-18.5 | Improve multisig notification | EPIC-18 | P3 | 0 | — | — |
 | US-19.3 | Additional UI languages (DE/FR/…) | EPIC-19 | P3 | 3 | — | — |
 | US-19.6 | NFT mint campaigns | EPIC-19 | P2 | 3 | — | — |
 | US-19.10 | WebApp marketing campaign, round 2 (improvement on US-19.4) | EPIC-19 | P3 | 1 | — | — |
@@ -372,7 +373,7 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 71
+- 📋 **Backlog**: 72
 - 🟢 **Ready**: 4
 - 🟡 **In Progress**: 13
 - 👀 **Review**: 6
