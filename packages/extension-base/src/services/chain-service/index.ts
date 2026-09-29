@@ -928,14 +928,15 @@ export class ChainService {
   }
 
   handleLatestData () {
-    this.fetchLatestChainData().then((latestChainInfo) => {
-      this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
-      this.handleLatestChainData(latestChainInfo);
-      this.lockChainInfoMap = false;
-    }).catch((e) => {
-      this.lockChainInfoMap = false;
-      console.error('Error update latest chain data', e);
-    });
+    // TODO: TEMP - disabled online chain data override to test local chain-list RPCs. Revert before commit.
+    // this.fetchLatestChainData().then((latestChainInfo) => {
+    //   this.lockChainInfoMap = true; // do not need to check current lockChainInfoMap because all remains action is fast enough and don't affect this feature.
+    //   this.handleLatestChainData(latestChainInfo);
+    //   this.lockChainInfoMap = false;
+    // }).catch((e) => {
+    //   this.lockChainInfoMap = false;
+    //   console.error('Error update latest chain data', e);
+    // });
 
     // this.fetchLatestPriceIdsData().then((latestPriceIds) => {
     //   this.handleLatestPriceId(latestPriceIds);
@@ -1233,6 +1234,7 @@ export class ChainService {
     return duplicatedSlug;
   }
 
+  // @ts-ignore TODO: TEMP - unused while online chain data override is disabled. Revert before commit.
   private async fetchLatestChainData () {
     return await fetchStaticData<_ChainInfo[]>('chains');
     // try {
