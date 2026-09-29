@@ -11,6 +11,7 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
+| — | *ChainList #710 RPC maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 open, unreviewed | — | — |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 
 **Opened day one at 0 points, and that held for about three hours.**
@@ -39,13 +40,29 @@ Every story's `sprint:` field was read at W39's closeout: none of the 336 named
 `sprint-2026-W39`, and none names `sprint-2026-W40` either. W39 was opened mid-window and W36–W38
 were each under-reported at closeout because nobody synced; this one was opened on day one.
 
-## Not this team's work — [ChainList #712](https://github.com/Koniverse/SubWallet-ChainList/issues/712)
+## The biggest thing in flight is not in this repo — [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710)
 
-*"[Blockchain] [XGRChain] [XGR] Add XGRChain Mainnet (chain ID 1643)"*, opened 2026-09-27 09:44 by
-**oliverboehm-xgr** — an external submitter, not the team. It is a third-party chain-listing
-request into ChainList's own intake, with a full body, and it has **no PR on either repo**.
-Recorded here **only so a later sync does not count it as Extension work**; it is not scoped, not
-carried, and needs no story. Contrast ChainList #711, which the team did act on with #5089.
+*Maintenance of RPC endpoints*, opened **2026-08-25** by tunghp2002 and rewritten **2026-09-28**;
+delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713)
+(`koni/dev/issue-710`, 4 commits, **53 files, +1295/−204**, base `dev`, **no review**).
+
+**67 chains set `chainStatus: INACTIVE`** — 30 mainnet, 37 testnet — **24 chains added**, and
+**60 chains' RPC lists rewritten** (~95 endpoints out, ~80 in). Every IBP endpoint is gone:
+`*.ibp.network` NXDOMAIN, `*.dotters.network` SERVFAIL. Most deactivations are *the chain is gone*
+rather than *our endpoint broke* — Moonbeam and Moonriver shut down 31/07, Centrifuge migrated to
+EVM, Manta Atlantic deprecated 01/08, Interlay halted ~63 days.
+
+**No Extension code changes**, and that is the point of [FR-34](../PRD.md#epic-4--chain-management):
+the Extension consumes it through the `ChainListVersion` pin. But it needs **another pin bump after
+#713 merges and a chain-list release cuts** — a second step beyond #5089, which is itself still
+unreviewed. **EPIC-4 owns it** under rule 10; five follow-ups are still open inside the issue.
+Detail and the open edges in [notes/2026-09-29.md](../notes/2026-09-29.md).
+
+*Corrected 2026-09-28→29: this file recorded [#712](https://github.com/Koniverse/SubWallet-ChainList/issues/712)
+(XGRChain) as "not scoped, not carried, needs no story". The submitter, `oliverboehm-xgr`, is still
+external — but the team **is** acting on it, inside #710, in a commit named `[Issue-712]`. The
+error came from sweeping GitHub on `createdAt`, which never returned #710 at all; sweep on
+`updatedAt`.*
 
 ## The one open thing — [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089)
 
