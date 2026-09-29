@@ -228,7 +228,7 @@ double-count the work its children already carry.
 | [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | Update chain-list stable v0.2.124 | 6 (1 in this ledger) | the one in-ledger child (#301) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) |
 | [#4567](https://github.com/Koniverse/SubWallet-Extension/issues/4567) | Improve "Filter To token based on From token" (Round 2) | 1 (0 in this ledger) | its only child (#98) is out of this area; the Round-1 delivery #4468 keeps its own row in [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) |
 | [ChainList #711](https://github.com/Koniverse/SubWallet-ChainList/issues/711) | Support ERC-20 ERC-721 for X Layer | — (cross-repo) | the capability is in the **ChainList** repo; the Extension side is [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089), one line — `ChainListVersion` `0.2.129` → `0.2.131` in `chain-service/utils/patch.ts`. Open, unreviewed, no CHANGELOG line, so the epic holds it |
-| [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710) | Maintenance of RPC endpoints | 3 (0 in this ledger) | #704 (Rotko), #712 (XGRChain) and [Extension PR #5010](https://github.com/Koniverse/SubWallet-Extension/pull/5010) (Gatotech, IBP removal). Delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713) — **53 files, +1295/−204**: **67 chains set `INACTIVE`**, 24 added, 60 chains' RPCs rewritten. Open, unreviewed, no CHANGELOG line. Detail in [notes/2026-09-29.md](../../notes/2026-09-29.md) |
+| [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710) | Maintenance of chainlist *(retitled from "Maintenance of RPC endpoints" 2026-09-29)* | 4 (0 in this ledger) | #704 (Rotko), **#711 (X Layer)**, #712 (XGRChain) and [Extension PR #5010](https://github.com/Koniverse/SubWallet-Extension/pull/5010) (Gatotech, IBP removal). Delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713) — **100 files, +1468/−329**, 3 beta releases cut: **61 chains set `INACTIVE`**, 24 added, 69 RPC lists rewritten, **102 Bittensor subnets resynced**. Open, unreviewed, no CHANGELOG line; **13 follow-ups open**. Extension side is [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096) — **see the note, it currently disables FR-34**. Detail in [notes/2026-09-29.md](../../notes/2026-09-29.md) |
 
 > **The chain-list release train has both shapes.** #4861 … #4730 (*"Update chain-list stable
 > v0.2.118 … v0.2.123"*) each shipped a CHANGELOG line and keep their rows in
@@ -236,10 +236,16 @@ double-count the work its children already carry.
 > no line yet and is the umbrella. The distinction is the line, not the children — the same rule that
 > keeps #4606 (*"ParaSpell V4"*) a row rather than an umbrella even though it, too, has sub-issues.
 >
-> **ChainList #710 is the largest entry the train has carried** — 67 chains deactivated, 24 added,
-> 60 RPC lists rewritten — and it is an umbrella by this epic's own test: it has children (#704,
-> #712, Extension #5010) and no CHANGELOG line. It also **absorbs #712**, an external submitter's
-> listing request, into one of its commits, so #712 needs no entry of its own.
+> **ChainList #710 is the largest entry the train has carried** — 61 chains deactivated, 24 added,
+> 69 RPC lists rewritten, 102 Bittensor subnets resynced — and it is an umbrella by this epic's own
+> test: it has children (#704, #711, #712, Extension #5010) and no CHANGELOG line. Its branch now
+> carries **#711 and #712 as named commits**, so neither needs an entry of its own.
+>
+> ⚠️ **Its Extension half, [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096),
+> currently comments out `fetchLatestChainData()` in `chain-service/index.ts`** — test scaffolding
+> the author marked *Revert before commit*. Merged as-is it would switch off
+> [FR-34](../../PRD.md#epic-4--chain-management) and this epic's *data updates ship without a
+> release* invariant. Open, empty body, no review, not draft.
 >
 > **ChainList #711 (X Layer, 2026-09-25) is the train's third shape**: the issue is not on this
 > repo at all. The Extension carries only the version pin, which is

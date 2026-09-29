@@ -11,7 +11,7 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
-| — | *ChainList #710 RPC maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 open, unreviewed | — | — |
+| — | *ChainList #710 chainlist maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 + Extension PR #5096, both open, unreviewed | — | — |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 
 **Opened day one at 0 points, and that held for about three hours.**
@@ -42,20 +42,29 @@ were each under-reported at closeout because nobody synced; this one was opened 
 
 ## The biggest thing in flight is not in this repo — [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710)
 
-*Maintenance of RPC endpoints*, opened **2026-08-25** by tunghp2002 and rewritten **2026-09-28**;
-delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713)
-(`koni/dev/issue-710`, 4 commits, **53 files, +1295/−204**, base `dev`, **no review**).
+**Maintenance of chainlist** *(retitled from "Maintenance of RPC endpoints" on 09-29)*, opened
+**2026-08-25** by tunghp2002 and still being rewritten; delivered by
+[ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713) (`koni/dev/issue-710`,
+**12 commits, 100 files, +1468/−329**, base `dev`, **no review**, three beta releases cut from it).
 
-**67 chains set `chainStatus: INACTIVE`** — 30 mainnet, 37 testnet — **24 chains added**, and
-**60 chains' RPC lists rewritten** (~95 endpoints out, ~80 in). Every IBP endpoint is gone:
-`*.ibp.network` NXDOMAIN, `*.dotters.network` SERVFAIL. Most deactivations are *the chain is gone*
-rather than *our endpoint broke* — Moonbeam and Moonriver shut down 31/07, Centrifuge migrated to
-EVM, Manta Atlantic deprecated 01/08, Interlay halted ~63 days.
+**61 chains set `chainStatus: INACTIVE`** — 30 mainnet, 31 testnet — **24 chains added**,
+**69 RPC lists rewritten**, and **102 Bittensor subnets resynced** against taostats (85 names,
+7 symbols, 21 priceIds, 86 icons, slugs deliberately unchanged so users keep their tokens). Every
+IBP endpoint is gone. Most deactivations are *the chain is gone* rather than *our endpoint broke* —
+Moonbeam and Moonriver shut down 31/07, Centrifuge migrated to EVM, Manta Atlantic deprecated
+01/08, Interlay halted ~63 days. The branch now carries **#711 and #712 as named commits** too.
 
-**No Extension code changes**, and that is the point of [FR-34](../PRD.md#epic-4--chain-management):
-the Extension consumes it through the `ChainListVersion` pin. But it needs **another pin bump after
-#713 merges and a chain-list release cuts** — a second step beyond #5089, which is itself still
-unreviewed. **EPIC-4 owns it** under rule 10; five follow-ups are still open inside the issue.
+**⚠️ The Extension half is [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096),
+and it is not safe to merge as it stands.** Opened 09-29 04:43, 2 commits, 6 files, **empty body,
+no review, not draft**. Five files bump `@subwallet/chain-list` `0.2.131` →
+`0.2.132-beta.2-pr-713-7aa00e22` — **a PR build, not a release**. The sixth,
+`chain-service/index.ts`, **comments out `fetchLatestChainData()`** with the author's own marker
+*"TODO: TEMP … Revert before commit"*. That switches off
+[FR-34](../PRD.md#epic-4--chain-management) and this epic's *data updates ship without a release*
+invariant. Test scaffolding, correctly labelled — but nothing outside the diff says *do not merge*.
+
+**EPIC-4 owns #710** under rule 10. **13 follow-ups open** inside the issue, including
+`validate-tokens` crashing on `bittensor-LOCAL-Ё` so **every asset after it goes unvalidated**.
 Detail and the open edges in [notes/2026-09-29.md](../notes/2026-09-29.md).
 
 *Corrected 2026-09-28→29: this file recorded [#712](https://github.com/Koniverse/SubWallet-ChainList/issues/712)
