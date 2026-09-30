@@ -53,8 +53,38 @@ The two skipped lines stay skipped for the same reasons: REG-32, because NFTs ar
 | REG-I-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS |
 | REG-I-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | iOS |
 | REG-I-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | iOS |
+| REG-I-18 | Transfer an EVM token — single-chain and cross-chain; native and local; edit the fee | ✅ Pass | iOS |
+| REG-I-19 | Transfer a substrate token — single-chain and cross-chain; native and local; choose which token pays the fee | ✅ Pass | iOS |
+| REG-I-20 | Transfer a BTC token | ✅ Pass | iOS |
+| REG-I-21 | Transfer a TON token | ✅ Pass | iOS |
+| REG-I-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | iOS |
+| REG-I-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | iOS |
+| REG-I-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | iOS |
+| REG-I-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | iOS |
+| REG-I-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | iOS |
+| REG-I-32 | Remove a custom NFT | ⏭️ Skipped | iOS — NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything. Same reason as round 2 |
+| REG-I-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | iOS |
+| REG-I-14 | Transferable balance is right on token details; transfer on-chain; transfer cross-chain; send NFT; swap; earning actions | ✅ Pass | iOS |
+| REG-I-15 | Show and hide balance; refresh balance; customize asset display; search token; token detail | ✅ Pass | iOS |
+| REG-I-16 | The QR code shows in all accounts mode and in single account mode | ✅ Pass | iOS |
+| REG-I-17 | The explorer link opens for a network that has one, and is handled for a network that does not | ✅ Pass | iOS |
+| REG-I-23 | Swap without XCM; swap with XCM | ✅ Pass | iOS |
+| REG-I-24 | Search token and account; the prompt to enable a network that is off; filter token | ✅ Pass | iOS |
+| REG-I-25 | Input the amount and the recipient address — by QR, by typing, from the address book | ✅ Pass | iOS |
+| REG-I-26 | The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee | ✅ Pass | iOS |
+| REG-I-27 | Validation cases; submit | ✅ Pass | iOS |
+| REG-I-11 | Lock the wallet by hand | ✅ Pass | iOS |
+| REG-I-12 | Unlock by typing the password; unlock by Face ID or Touch ID | ✅ Pass | iOS |
+| REG-I-13 | Forgot password — reset account; erase all | ✅ Pass | iOS |
+| REG-I-85 | The app opens, backgrounds and resumes without losing state — it comes back to where it was, and does not hang on a loading screen | ✅ Pass | iOS — the line BUG-42.24.19-06 was fixed against, passing again on the build going to beta |
+| REG-I-71 | Contact support; user guide; request a feature | ✅ Pass | iOS |
+| REG-I-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | iOS |
+| REG-I-73 | The MKT campaign | ✅ Pass | iOS |
+| REG-I-74 | Add an API key | ✅ Pass | iOS |
+| REG-I-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | iOS |
+| REG-I-82 | Configure the Subscan API key | ✅ Pass | iOS |
 
-23 of 85 iOS lines done. Android has not started this round.
+52 of 85 iOS lines done, with REG-I-32 skipped. Android has not started this round.
 
 ### Bugs
 
