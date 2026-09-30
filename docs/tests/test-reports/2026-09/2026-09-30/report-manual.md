@@ -18,9 +18,13 @@
 
 ---
 
-## US-42.24.19 — Full wallet regression, round 2
+## US-42.24.19 — Full wallet regression, round 3
 
-Carried on from [2026-09-29](../2026-09-29/report-manual.md), which closed Manage account and dApps on both platforms and reached 83 of 85 lines on each. The two left on each list are skipped and stay that way: REG-32, because NFTs are auto-detected so removing one no longer does anything, and REG-76, because the Polkadot API key that history check needs no longer works.
+Round 2 closed on [2026-09-29](../2026-09-29/report-manual.md) at 83 of 85 lines on each platform, with no P1 left in the programme. Round 3 opened today on the build going to beta, with the ticks cleared and the lines unchanged.
+
+Round 2 ran against web-runner versions as each one landed, over several weeks and several builds. The beta is one build carrying all of it, so a check that passed on the build where its feature landed has not yet been run on the build that ships. That is what this round is for, and it is the last run on the development build before [US-42.27](../../../../sprints/stories/US-42.27-qc-release-mobile.md) takes the same checklist to TestFlight and the Google Play beta track.
+
+The two skipped lines stay skipped for the same reasons: REG-32, because NFTs are auto-detected so removing one no longer does anything, and REG-76, because the Polkadot API key that history check needs no longer works.
 
 ### AC results
 
