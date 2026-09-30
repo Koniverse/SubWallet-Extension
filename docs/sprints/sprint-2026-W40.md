@@ -3,7 +3,7 @@ id: sprint-2026-W40
 status: in-progress
 start: 2026-09-28
 end: 2026-10-04
-goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; the regression is at 166 of 170 lines and no P1 is left in the programme. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
+goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; the regression is at 166 of 170 lines and no P1 is left in the programme. US-42.27 opened 09-30 at 21 points, the release gate for the Mobile build carrying that update — a full regression on each beta build, a quick recheck on each production one. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
 ---
 
 ## Sprint scope
@@ -16,9 +16,11 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | 🔄 in-progress | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 2 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 🔄 in-progress — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🔄 in-progress — 1 bug open | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 📋 ready | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
 
-**33 points across four stories** — US-18.5 at 5, and the three the tester moved over from W38 on
-09-30 at 28.
+**54 points across five stories** — US-18.5 at 5, the three the tester moved over from W38 on 09-30
+at 28, and US-42.27 at 21, opened the same day: the release gate for the Mobile build that carries
+web-runner 1.3.90.
 
 **Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig
