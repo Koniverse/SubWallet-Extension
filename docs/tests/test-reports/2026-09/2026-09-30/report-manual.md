@@ -9,11 +9,11 @@
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
 | Stories tested | US-42.24.19, US-42.24.20 |
-| Total bugs found | 0 |
+| Total bugs found | 1 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 0 |
-| P3 | 0 |
+| P3 | 1 |
 | Status | in progress |
 
 ---
@@ -30,10 +30,36 @@ The two skipped lines stay skipped for the same reasons: REG-32, because NFTs ar
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| REG-I-33 | The earning options list; the earning positions list; position detail; earning instructions | ✅ Pass | iOS |
+| REG-I-34 | Stake — direct nomination; nomination pool; liquid stake; subnet staking | ✅ Pass | iOS |
+| REG-I-35 | Stake more | ✅ Pass | iOS |
+| REG-I-36 | Fast unstake — part of the position, and all of it | ✅ Pass | iOS |
+| REG-I-37 | Slow unstake — part of the position, and all of it | ✅ Pass | iOS — BUG-42.24.19-27 is on this screen, but it is the Max button flickering, not the unstake |
+| REG-I-38 | Cancel unstake; withdraw; claim rewards | ✅ Pass | iOS |
+| REG-I-80 | Parachain (collator) staking — start staking; stake more; claim rewards; unstake; cancel unstake; withdraw | ✅ Pass | iOS |
+| REG-I-81 | Change validator — on direct nomination, and on subnet staking | ✅ Pass | iOS |
+| REG-I-39 | Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp | ✅ Pass | iOS |
+| REG-I-40 | Sign a message or transaction with a substrate account; with an EVM account; with an EVM account using a substrate provider | ✅ Pass | iOS |
+| REG-I-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | iOS |
+| REG-I-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | iOS |
+| REG-I-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | iOS |
+| REG-I-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | iOS |
+| REG-I-45 | Back up the seed phrase through export account | ✅ Pass | iOS |
+| REG-I-50 | Change the currency, and the select currency popup | ✅ Pass | iOS |
+| REG-I-51 | Change the language, and search within the language list | ✅ Pass | iOS |
+| REG-I-52 | Turn in-app notifications off and on. Wallet theme is coming soon and is not checked | ✅ Pass | iOS |
+| REG-I-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | iOS |
+| REG-I-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | iOS |
+
+20 of 85 iOS lines done. Android has not started this round.
 
 ### Bugs
 
-None yet.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.24.19-27 | The amount field flickers several times when Max is tapped on the Unstake screen (iOS) | Earning → open a Bittensor native staking position → Unstake → select a validator → tap Max | The field flashes several times before it settles on the staked amount, rather than filling once. It lands on the right figure, so this is what the user sees rather than what is sent | Tapping Max fills the field once, with no flicker | P3 | todo | ![](img/BUG-42.24.19-27.png) |
+
+The first bug of round 3, and the first on the Unstake screen. BUG-42.24.19-19 was the same symptom — a spinner on every keystroke — but on the subnet staking change-validator screen and driven by typing, not by the Max button; it was fixed and verified in round 2.
 
 ## US-42.24.20 — Verify the bugs found during this update
 
