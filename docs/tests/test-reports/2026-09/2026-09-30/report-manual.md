@@ -50,8 +50,11 @@ The two skipped lines stay skipped for the same reasons: REG-32, because NFTs ar
 | REG-I-52 | Turn in-app notifications off and on. Wallet theme is coming soon and is not checked | ✅ Pass | iOS |
 | REG-I-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | iOS |
 | REG-I-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | iOS |
+| REG-I-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS |
+| REG-I-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | iOS |
+| REG-I-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | iOS |
 
-20 of 85 iOS lines done. Android has not started this round.
+23 of 85 iOS lines done. Android has not started this round.
 
 ### Bugs
 
