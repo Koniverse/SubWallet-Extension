@@ -3,7 +3,7 @@ id: sprint-2026-W40
 status: in-progress
 start: 2026-09-28
 end: 2026-10-04
-goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester's regression is past half at 122 of 168 lines. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
+goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; round 3 of the regression opened 09-30 on the build going to beta, after round 2 finished at 166 of 170 lines with no P1 left in the programme. US-42.27 opened 09-30 at 21 points, the release gate for the Mobile build carrying that update — a full regression on each beta build, a quick recheck on each production one. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
 ---
 
 ## Sprint scope
@@ -13,6 +13,14 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
 | — | *ChainList #710 chainlist maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 + Extension PR #5096, both open, unreviewed | — | — |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
+| [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | 🔄 in-progress | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
+| [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 2 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 🔄 in-progress — round 3 opened 09-30, ticks cleared | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
+| [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🔄 in-progress — 1 bug open | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 📋 ready | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
+
+**54 points across five stories** — US-18.5 at 5, the three the tester moved over from W38 on 09-30
+at 28, and US-42.27 at 21, opened the same day: the release gate for the Mobile build that carries
+web-runner 1.3.90.
 
 **Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig
@@ -90,24 +98,25 @@ reopened as #5089 on the right base with the same head branch and the same commi
 
 ## The web-runner QC programme — the tester scopes it
 
-Three rows carry `sprint: sprint-2026-W38` and are unfinished. They are listed because a reader of
-this window needs to know what is live. **This file does not move them**:
-
-| US | Title | Points | Status |
-| --- | --- | --- | --- |
-| [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | parent (#2057) | 0 | in-progress |
-| [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | 1.3.86 full regression | 20 | in-progress |
-| [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | verify the bugs found | 8 | in-progress |
+The three unfinished rows now carry `sprint: sprint-2026-W40` — the tester set the field on 09-30
+and they are in the scope table above. They had been listed here while they still read W38, so a
+reader of this window could see what was live without this file moving them.
 
 Programme total: **23 sub-tasks** (numbered .1–.24, **.3 absent**) plus the parent —
 **20 done (166 pts), 1 closed unrun (8), 2 in progress (28)**. Nothing in `backlog`, nothing
 `blocked`.
 
-**Round 2 of the regression is half run**: the checklist grew 77 → 82 → **84 lines** per platform
-as the tester read the user guide against it, and stands at **Android 61 of 84, iOS 61 of 84** —
-122 of 168, dead even. The retest reads **73 fixed · 5 no-fix · 4 not fixed yet** across 82 rows.
+**Round 2 of the regression is nearly run**: the checklist grew 77 → 82 → 84 → **85 lines** per
+platform as the tester read the user guide against it, and stands at **Android 83 of 85, iOS 83 of
+85** — 166 of 170, dead even. The four left are two skips on each list, both outside the build:
+REG-32, because NFTs are auto-detected so removing one no longer does anything, and REG-76, because
+the Polkadot API key that history check needs no longer works. The retest reads **76 fixed · 6
+no-fix · 1 not fixed yet** across 83 rows, and **no P1 is left in the programme** — BUG-42.24.19-06,
+the app hanging after a spell in the background, was fixed and verified on 09-29.
 
-If the tester sets `sprint: sprint-2026-W40` on any row, add it here **that day**.
+**The three rows moved on 09-30, W38 → W40.** W38's closeout listed them as the tester's to move
+into W39; that did not happen, so they carry two windows in one hop. The `sprint:` field on each
+story is the source — this table follows it, and rows the tester places are listed, never moved.
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
