@@ -146,10 +146,13 @@ batch of rows arrived at closeout.
 | **Done** | US-12.23, US-10.21, US-5.17, US-42.25, US-42.26, US-42.24.11, .12, .13, .16, .21, .23 | 68 |
 | **Closed unrun** | US-42.24.17 (1.3.85 — 0 of 11 AC testable on Mobile) | 8 |
 | **Blocked** | US-42.24.24 (1.3.90 — `BUG-42.24.24-01`) | 13 |
-| **→ [W39](sprint-2026-W39.md) — tester's to move** | US-42.24 (parent), US-42.24.19, US-42.24.20, US-42.24.22 | 41 |
+| **→ [W40](sprint-2026-W40.md) — tester moved them 09-30** | US-42.24 (parent), US-42.24.19, US-42.24.20 | 28 |
+| **→ closed in W39** | US-42.24.22 (1.3.88, done 09-24), US-42.24.24 (1.3.90, done 09-24) | 26 |
 
-> The five unfinished rows keep `sprint: sprint-2026-W38` and were **not** moved. Which window the
-> tester's work sits in is the tester's call; same boundary as the test reports.
+> The five unfinished rows kept `sprint: sprint-2026-W38` at closeout and were **not** moved by this
+> file. Which window the tester's work sits in is the tester's call; same boundary as the test
+> reports. Two closed in W39 and the other three moved to **W40** on 2026-09-30, skipping W39 — the
+> `sprint:` field on each story is what settles it.
 
 **The best dev week in the record, and it was three stories long.** US-12.23 landed after four
 windows, US-10.21 in its first, US-5.17 without ever having been planned — all three merged 09-17
