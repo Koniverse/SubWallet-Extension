@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { APIItemState, ChainType, ExtrinsicType, NominationInfo, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
-import { calculateChainStakedReturnV2, calculateInflation, getAvgValidatorEraReward, getExistUnstakeErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, getSupportedDaysByHistoryDepth, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { calculateChainStakedReturnV2, calculateInflation, getAvgValidatorEraReward, getExistUnstakeErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, getPoolSlashingSpanCount, getSupportedDaysByHistoryDepth, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
@@ -682,14 +682,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
     const chainApi = await this.substrateApi.isReady;
 
     if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-      let slashingSpanCount: string | number;
-
-      if (chainApi.api.call?.nominationPoolsApi?.memberPendingSlash) {
-        slashingSpanCount = await chainApi.api.call.nominationPoolsApi.memberPendingSlash(address);
-      } else {
-        // Incase api call not exists
-        slashingSpanCount = chainApi.api.consts.staking.historyDepth.toPrimitive();
-      }
+      const slashingSpanCount = await getPoolSlashingSpanCount(chainApi.api, address);
 
       return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: address }, slashingSpanCount);
     } else {

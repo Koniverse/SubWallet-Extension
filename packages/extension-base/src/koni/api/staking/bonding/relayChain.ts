@@ -6,7 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainStakingMetadata, NominationInfo, NominatorMetadata, StakingType, UnstakingInfo, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { MAX_NOMINATIONS } from '@subwallet/extension-base/constants';
 import { PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
-import { calculateAlephZeroValidatorReturn, calculateChainStakedReturn, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getCommission, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { calculateAlephZeroValidatorReturn, calculateChainStakedReturn, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getCommission, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, getPoolSlashingSpanCount, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
@@ -1026,8 +1026,7 @@ export async function getPoolingWithdrawalExtrinsic (substrateApi: _SubstrateApi
   const chainApi = await substrateApi.isReady;
 
   if (chainApi.api.tx.nominationPools.withdrawUnbonded.meta.args.length === 2) {
-    const _slashingSpans = (await chainApi.api.query.staking.slashingSpans(nominatorMetadata.address)).toHuman() as Record<string, any>;
-    const slashingSpanCount = _slashingSpans !== null ? _slashingSpans.spanIndex as string : '0';
+    const slashingSpanCount = await getPoolSlashingSpanCount(chainApi.api, nominatorMetadata.address);
 
     return chainApi.api.tx.nominationPools.withdrawUnbonded({ Id: nominatorMetadata.address }, slashingSpanCount);
   } else {
