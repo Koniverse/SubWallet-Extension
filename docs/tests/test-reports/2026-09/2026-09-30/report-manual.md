@@ -14,7 +14,7 @@
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 1 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -96,13 +96,16 @@ The first bug of round 3, and the first on the Unstake screen. BUG-42.24.19-19 w
 
 ## US-42.24.20 — Verify the bugs found during this update
 
-One bug is open coming into today: BUG-42.24.19-26, P2 on iOS, the close button on Settings often not responding to the first tap.
-
-### Bugs rechecked
-
-| Item | Found in | Severity | What it is | State |
-|---|---|---|---|---|
+Nothing was rechecked today. One bug was open coming into the session — BUG-42.24.19-26, P2 on iOS, the close button on Settings often not responding to the first tap — and it stayed open; BUG-42.24.19-27, logged today, joined it. Both were verified fixed on [2026-10-01](../../2026-10/2026-10-01/report-manual.md).
 
 ## Summary
 
-Session in progress.
+Round 3 of the regression opened today on the build going to beta, with the ticks cleared and the lines unchanged, and reached 52 of 85 on iOS in one session. Transfer, Manage NFT, Buy token, Balances, Receive, Swap, Earning, dApps, Mission pools, Backup seed phrase, General settings, WalletConnect, Manage website access, Lock and unlock, Community and support and Other all pass. Android has not started this round.
+
+REG-I-85 passing is worth noting: it is the line added at the end of round 2 to confirm BUG-42.24.19-06, the last P1 in the programme, and it holds on the build going to beta.
+
+One bug logged: BUG-42.24.19-27, P3 on iOS — the amount field flickers when Max is tapped on the Unstake screen. The figure it lands on is right, so this is what the user sees rather than what is sent.
+
+US-42.27 was opened today as well, the release gate that takes this checklist to TestFlight and the Google Play beta track once round 3 finishes.
+
+Read against what came after: REG-I-38 was ticked in this session, and that tick was cleared on 2026-10-01 when a P1 was found on the same line — withdrawing from a nomination pool could not be encoded. The count of 52 above is what this session saw; from 10-01 the story reads 51.
