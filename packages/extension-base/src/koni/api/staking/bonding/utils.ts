@@ -134,6 +134,26 @@ export function parsePoolStashAddress (api: ApiPromise, index: number, poolId: n
     .toString();
 }
 
+// `num_slashing_spans` of nominationPools.withdrawUnbonded is the slashing span count of the POOL's bonded account (not the member's)
+export async function getPoolSlashingSpanCount (api: ApiPromise, memberAddress: string): Promise<number> {
+  if (!api.query.staking?.slashingSpans) {
+    return 0;
+  }
+
+  const poolMember = (await api.query.nominationPools.poolMembers(memberAddress)).toPrimitive() as { poolId: number } | null;
+
+  if (!poolMember) {
+    return 0;
+  }
+
+  const poolsPalletId = api.consts.nominationPools.palletId.toString();
+  const poolStashAccount = parsePoolStashAddress(api, 0, poolMember.poolId, poolsPalletId);
+  const slashingSpans = (await api.query.staking.slashingSpans(poolStashAccount)).toPrimitive() as { prior: number[] } | null;
+
+  // Same as pallet-staking SlashingSpans::iter().count(): prior spans + the current one
+  return slashingSpans ? slashingSpans.prior.length + 1 : 0;
+}
+
 export function transformPoolName (input: string): string {
   return input.replace(/[^\x20-\x7E]/g, '');
 }
