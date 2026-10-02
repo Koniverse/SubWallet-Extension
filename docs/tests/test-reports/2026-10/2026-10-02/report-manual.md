@@ -5,16 +5,16 @@
 | Epic | EPIC-42 — QA Coverage Tracking |
 | Date | 2026-10-02 |
 | Tester | MaiThuongNinni |
-| Environment | Mobile — Android + iOS |
-| Runner | manual (mobile) |
-| Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.19, US-42.24.20 — both closed; US-42.24 parent closed |
+| Environment | Mobile — Android + iOS; Extension |
+| Runner | manual (mobile + extension) |
+| Build under test | to fill in — Mobile: build number + web-runner version; Extension: version + chain-list version |
+| Stories tested | US-42.24.19, US-42.24.20 — both closed; US-42.24 parent closed; US-42.28 — started |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -132,7 +132,93 @@ Three bugs were open coming into today, all P3 and all logged on 10-01.
 
 BUG-42.24.19-31 is set to monitoring — intermittent, no reliable steps to reproduce yet. The programme reads 88 rows — 81 fixed, 6 closed no fix, 1 monitoring.
 
+## US-42.28 — Maintenance of chainlist (ChainList #710)
+
+Opened today. Every one of the 69 chains whose provider lists were rewritten has been run: 68 connect on their first RPC with that first RPC unchanged, and `shibuya` is skipped because the network is not in the wallet.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| RPC-1 | `polkadot` | ✅ Pass | Extension |
+| RPC-2 | `kusama` | ✅ Pass | Extension |
+| RPC-3 | `ethereum` | ✅ Pass | Extension |
+| RPC-4 | `astarEvm` | ✅ Pass | Extension |
+| RPC-5 | `statemint` | ✅ Pass | Extension |
+| RPC-6 | `astar` | ✅ Pass | Extension |
+| RPC-7 | `polygon` | ✅ Pass | Extension |
+| RPC-8 | `optimism` | ✅ Pass | Extension |
+| RPC-9 | `acala` | ✅ Pass | Extension |
+| RPC-10 | `westend` | ✅ Pass | Extension |
+| RPC-11 | `bifrost_dot` | ✅ Pass | Extension |
+| RPC-12 | `hydradx_main` | ✅ Pass | Extension |
+| RPC-13 | `darwinia2` | ✅ Pass | Extension |
+| RPC-14 | `polkadex` | ✅ Pass | Extension |
+| RPC-15 | `statemine` | ✅ Pass | Extension |
+| RPC-16 | `unique_network` | ✅ Pass | Extension |
+| RPC-17 | `encointer` | ✅ Pass | Extension |
+| RPC-18 | `collectives` | ✅ Pass | Extension |
+| RPC-19 | `ajunaPolkadot` | ✅ Pass | Extension |
+| RPC-20 | `sora_substrate` | ✅ Pass | Extension |
+| RPC-21 | `fantom` | ✅ Pass | Extension |
+| RPC-22 | `bridgeHubPolkadot` | ✅ Pass | Extension |
+| RPC-23 | `bridgeHubKusama` | ✅ Pass | Extension |
+| RPC-24 | `bitlayer` | ✅ Pass | Extension |
+| RPC-25 | `mythos` | ✅ Pass | Extension |
+| RPC-26 | `paseoTest` | ✅ Pass | Extension |
+| RPC-27 | `availTuringTest` | ✅ Pass | Extension |
+| RPC-28 | `avail_mainnet` | ✅ Pass | Extension |
+| RPC-29 | `hyperbridge` | ✅ Pass | Extension |
+| RPC-30 | `peopleKusama` | ✅ Pass | Extension |
+| RPC-31 | `base_sepolia` | ✅ Pass | Extension |
+| RPC-32 | `arbitrum_sepolia` | ✅ Pass | Extension |
+| RPC-33 | `zircuit` | ✅ Pass | Extension |
+| RPC-34 | `polygon_amoy` | ✅ Pass | Extension |
+| RPC-35 | `polkadot_people` | ✅ Pass | Extension |
+| RPC-36 | `sophon` | ✅ Pass | Extension |
+| RPC-37 | `paseo_assethub` | ✅ Pass | Extension |
+| RPC-38 | `westend_assethub` | ✅ Pass | Extension |
+| RPC-39 | `polkadot_coretime` | ✅ Pass | Extension |
+| RPC-40 | `kusama_coretime` | ✅ Pass | Extension |
+| RPC-41 | `subtensor_evm` | ✅ Pass | Extension |
+| RPC-42 | `stable_testnet` | ✅ Pass | Extension |
+| RPC-43 | `xode` | ✅ Pass | Extension |
+| RPC-44 | `base_mainnet` | ✅ Pass | Extension |
+| RPC-45 | `arbitrum_one` | ✅ Pass | Extension |
+| RPC-46 | `binance` | ✅ Pass | Extension |
+| RPC-47 | `avalanche_c` | ✅ Pass | Extension |
+| RPC-48 | `lineaZkEvm` | ✅ Pass | Extension |
+| RPC-49 | `scroll` | ✅ Pass | Extension |
+| RPC-50 | `zksync_era` | ✅ Pass | Extension |
+| RPC-51 | `blast_mainnet` | ✅ Pass | Extension |
+| RPC-52 | `mantle` | ✅ Pass | Extension |
+| RPC-53 | `gnosis` | ✅ Pass | Extension |
+| RPC-54 | `sonic` | ✅ Pass | Extension |
+| RPC-55 | `unichain` | ✅ Pass | Extension |
+| RPC-56 | `celo` | ✅ Pass | Extension |
+| RPC-57 | `world_chain` | ✅ Pass | Extension |
+| RPC-58 | `soneium` | ✅ Pass | Extension |
+| RPC-59 | `ink` | ✅ Pass | Extension |
+| RPC-60 | `sepolia_ethereum` | ✅ Pass | Extension |
+| RPC-61 | `acurast` | ✅ Pass | Extension |
+| RPC-62 | `karura` | ✅ Pass | Extension |
+| RPC-63 | `shiden` | ✅ Pass | Extension |
+| RPC-64 | `shibuya` | ⏭️ Skipped | Extension — the network is not in the wallet, so there is nothing to connect |
+| RPC-65 | `xx_network` | ✅ Pass | Extension |
+| RPC-66 | `enjin_relaychain` | ✅ Pass | Extension |
+| RPC-67 | `enjin_matrixchain` | ✅ Pass | Extension |
+| RPC-68 | `peaq` | ✅ Pass | Extension |
+| RPC-69 | `analog_timechain` | ✅ Pass | Extension |
+
+All 69 RPC lines are done: 68 pass and RPC-64 is skipped. RPC-X1 to RPC-X3 — the IBP sweep, switching provider, and a custom provider surviving the upgrade — have not run. The deactivated chains, the new chains and the Bittensor subnets have not started.
+
+### Bugs
+
+None.
+
 ## Summary
+
+A long session on two fronts: the web-runner programme closed, and the chainlist QC opened.
 
 Android ran the whole of round 3 in one session and finished at 83 of 85. iOS had finished at the same figure yesterday, so round 3 is complete on both platforms and US-42.24.19 is closed.
 
@@ -144,4 +230,8 @@ Two bugs verified fixed on both platforms: the dollar sign on Your balance drawn
 
 BUG-42.24.19-31 is set to monitoring rather than left open. It is intermittent, with no reliable steps to reproduce yet, so it is watched in US-42.24.20 until it can be pinned down. The programme reads 88 rows: 81 fixed, 6 closed no fix, 1 monitoring.
 
-US-42.24.20 and the parent US-42.24 close with it. The whole web-runner programme is settled: 23 sub-tasks, 22 done and one closed unrun. What comes next is US-42.27, the release gate, which takes this checklist to the TestFlight and Google Play beta builds.
+US-42.24.20 and the parent US-42.24 close with it. The whole web-runner programme is settled: 23 sub-tasks, 22 done and one closed unrun.
+
+US-42.28 started in the same session, on the chainlist maintenance from ChainList #710. All 69 of its per-chain RPC lines ran: 68 pass and one is skipped, `shibuya`, which is not in the wallet. The deactivated chains, the new chains and the Bittensor subnets have not started.
+
+What comes next is US-42.27, the release gate, which takes the regression checklist to the TestFlight and Google Play beta builds.
