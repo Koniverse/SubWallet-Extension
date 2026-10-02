@@ -14,7 +14,7 @@
 | P1 | 1 |
 | P2 | 0 |
 | P3 | 3 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -89,7 +89,7 @@ REG-38 is the line BUG-42.24.19-28 was found on. Its iOS tick from 09-30 predate
 
 ## Summary
 
-Four bugs logged. BUG-42.24.19-28, a P1, was found and fixed the same day — withdrawing from a nomination pool could not be encoded, so funds that had finished unbonding could not be collected; the parameter `num_slashing_spans` is a `u32` and the app was passing it a 53-bit value. Three P3s are open: BUG-42.24.19-29, the dollar sign on the Your balance row drawn too large; BUG-42.24.19-30, the watch-only warning on NFT details in the wrong colour; and BUG-42.24.19-31, the app sometimes taking several seconds to move to the next screen.
+Four bugs logged. BUG-42.24.19-28, a P1, was found and fixed the same day — withdrawing from a nomination pool could not be encoded, so funds that had finished unbonding could not be collected. Three P3s are open: BUG-42.24.19-29, the dollar sign on the Your balance row drawn too large; BUG-42.24.19-30, the watch-only warning on NFT details in the wrong colour; and BUG-42.24.19-31, the app sometimes taking several seconds to move to the next screen.
 
 The two bugs carried in from 2026-09-30 are both verified fixed: the Settings close button on iOS, and the Max button flicker on the Unstake screen.
 
