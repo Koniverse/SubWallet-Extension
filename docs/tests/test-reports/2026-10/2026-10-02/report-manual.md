@@ -8,7 +8,7 @@
 | Environment | Mobile — Android + iOS |
 | Runner | manual (mobile) |
 | Build under test | to fill in — build number + web-runner version |
-| Stories tested | US-42.24.19, US-42.24.20 |
+| Stories tested | US-42.24.19, US-42.24.20 — both closed; US-42.24 parent closed |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -65,13 +65,58 @@ iOS finished on [2026-10-01](../2026-10-01/report-manual.md) at 83 of 85, with R
 | REG-A-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | Android |
 | REG-A-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | Android |
 | REG-A-45 | Back up the seed phrase through export account | ✅ Pass | Android |
+| REG-A-1 | Create an account with a new seed phrase — unified account; TON account | ✅ Pass | Android |
+| REG-A-2 | Derive an account from the create account screen — unified account; substrate type; ethereum type | ✅ Pass | Android |
+| REG-A-3 | Derive an account from account details | ✅ Pass | Android |
+| REG-A-4 | Import an account — seed phrase; JSON file single; JSON file multi covering normal, QR and watch-only; QR code substrate; QR code EVM; private key | ✅ Pass | Android |
+| REG-A-78 | Import from Trust Wallet | ✅ Pass | Android |
+| REG-A-5 | Attach an account — polkadot vault; keystone; watch-only | ✅ Pass | Android |
+| REG-A-6 | Export an account — every account family and type, and the exported file imports back | ✅ Pass | Android |
+| REG-A-7 | Proxy account — add a proxy; remove a proxy; view the proxy list; act through a proxy | ✅ Pass | Android |
+| REG-A-8 | Multisig account — create one; open its details; approve and reject a pending transaction; sign for a multisig | ✅ Pass | Android |
+| REG-A-9 | Remove an account | ✅ Pass | Android |
+| REG-A-10 | Edit an account name | ✅ Pass | Android |
+| REG-A-84 | Account details — the name, the address per network with QR and copy, the account family and type | ✅ Pass | Android |
+| REG-A-46 | All accounts mode — select account; search account; scroll the account list | ✅ Pass | Android |
+| REG-A-47 | Separate account mode does not show the account picker | ✅ Pass | Android |
+| REG-A-48 | Search network; scroll the network list; select network; filter | ✅ Pass | Android |
+| REG-A-49 | The explorer link opens from a history record | ✅ Pass | Android |
+| REG-A-50 | Change the currency, and the select currency popup | ✅ Pass | Android |
+| REG-A-51 | Change the language, and search within the language list | ✅ Pass | Android |
+| REG-A-52 | Turn in-app notifications off and on | ✅ Pass | Android |
+| REG-A-53 | Change the wallet password — current; new; confirm; the I understand checkbox; the learn more link; save | ✅ Pass | Android |
+| REG-A-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | Android |
+| REG-A-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | Android |
+| REG-A-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | Android |
+| REG-A-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | Android |
+| REG-A-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | Android |
+| REG-A-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | Android |
+| REG-A-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | Android |
+| REG-A-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | Android |
+| REG-A-62 | Search network; filter network; turn a network on and off | ✅ Pass | Android |
+| REG-A-63 | Import a custom network; import a provider; switch provider | ✅ Pass | Android |
+| REG-A-64 | Remove a custom network with the network on, and with it off | ✅ Pass | Android |
+| REG-A-65 | Define a network — add a provider; switch provider | ✅ Pass | Android |
+| REG-A-66 | Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR | ✅ Pass | Android |
+| REG-A-67 | Remove a custom token with the token on, and with it off | ✅ Pass | Android |
+| REG-A-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | Android |
+| REG-A-69 | Add an address; remove one; edit a name; search and filter | ✅ Pass | Android |
+| REG-A-70 | Migrate solo accounts to a unified account — the migration runs to the end, and every migrated account can still sign afterwards | ✅ Pass | Android |
+| REG-A-82 | Configure the Subscan API key | ✅ Pass | Android |
+| REG-A-71 | Contact support; user guide; request a feature | ✅ Pass | Android |
+| REG-A-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | Android |
+| REG-A-73 | The MKT campaign | ✅ Pass | Android |
+| REG-A-74 | Add an API key | ✅ Pass | Android |
+| REG-A-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | Android |
+| REG-A-75 | After upgrading, accounts, balances, NFTs, staking and earning positions, dApp connections and settings are all still there and correct | ✅ Pass | Android |
+| REG-A-76 | Transaction history from before the upgrade is still readable | ⏭️ Skipped | Android — the Polkadot API key that check needs no longer works. Adding a key still works (REG-A-74, REG-A-82) |
+| REG-A-77 | No screen is broken where a removed feature used to be — Crowdloans, Polygon zkEVM, stDOT, the old Bittensor root claim | ✅ Pass | Android |
 
-38 of 85 Android lines done, with REG-A-32 skipped. REG-A-38 is the line BUG-42.24.19-28 was found on, so the tick stands on a run of the fixed build.
+Android finishes round 3 at 83 of 85, with REG-A-32 and REG-A-76 skipped. Both platforms now stand at 83 of 85 and round 3 is complete. REG-A-38 is the line BUG-42.24.19-28 was found on, so its tick stands on a run of the fixed build.
 
 ### Bugs
 
-| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
-|---|---|---|---|---|---|---|---|
+None.
 
 ## US-42.24.20 — Verify the bugs found during this update
 
@@ -83,9 +128,20 @@ Three bugs were open coming into today, all P3 and all logged on 10-01.
 |---|---|---|---|---|
 | BUG-42.24.19-29 | US-42.24.19 | P3 | The dollar sign on Your balance was drawn too large | ✅ Fixed — verified on Android and iOS |
 | BUG-42.24.19-30 | US-42.24.19 | P3 | The watch-only warning on NFT details was the wrong colour | ✅ Fixed — verified on Android and iOS |
+| BUG-42.24.19-31 | US-42.24.19 | P3 | The app sometimes takes several seconds to move to the next screen | 👁️ Monitoring — intermittent, no reliable steps to reproduce yet |
 
-One bug is left open: BUG-42.24.19-31, the app sometimes taking several seconds to move to the next screen. The programme reads 88 rows — 81 fixed, 6 closed no fix, 1 open.
+BUG-42.24.19-31 is set to monitoring — intermittent, no reliable steps to reproduce yet. The programme reads 88 rows — 81 fixed, 6 closed no fix, 1 monitoring.
 
 ## Summary
 
-Session in progress.
+Android ran the whole of round 3 in one session and finished at 83 of 85. iOS had finished at the same figure yesterday, so round 3 is complete on both platforms and US-42.24.19 is closed.
+
+The two lines left on each list are REG-32 and REG-76, skipped for the reasons they carried from round 2: NFTs are auto-detected so removing one no longer does anything, and the Polkadot API key the history check needs no longer works. Both sit outside the build.
+
+REG-A-38 is worth naming. It is the line BUG-42.24.19-28 was found on — the P1 that stopped a nomination pool withdrawal from being built — and the Android run came after the fix. iOS had its tick cleared and rerun for the same reason, so both platforms now carry that line on a fixed build.
+
+Two bugs verified fixed on both platforms: the dollar sign on Your balance drawn too large, and the watch-only warning on NFT details in the wrong colour.
+
+BUG-42.24.19-31 is set to monitoring rather than left open. It is intermittent, with no reliable steps to reproduce yet, so it is watched in US-42.24.20 until it can be pinned down. The programme reads 88 rows: 81 fixed, 6 closed no fix, 1 monitoring.
+
+US-42.24.20 and the parent US-42.24 close with it. The whole web-runner programme is settled: 23 sub-tasks, 22 done and one closed unrun. What comes next is US-42.27, the release gate, which takes this checklist to the TestFlight and Google Play beta builds.

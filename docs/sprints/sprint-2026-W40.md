@@ -3,7 +3,7 @@ id: sprint-2026-W40
 status: in-progress
 start: 2026-09-28
 end: 2026-10-04
-goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; round 3 of the regression opened 09-30 on the build going to beta, after round 2 finished at 166 of 170 lines with no P1 left in the programme. US-42.27 opened 09-30 at 21 points, the release gate for the Mobile build carrying that update — a full regression on each beta build, a quick recheck on each production one. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
+goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; round 3 of the regression ran 09-30 to 10-02 on the build going to beta and closed at 83 of 85 on each platform, ending the web-runner programme. US-42.27 opened 09-30 at 21 points, the release gate for the Mobile build carrying that update — a full regression on each beta build, a quick recheck on each production one. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
 ---
 
 ## Sprint scope
@@ -13,15 +13,21 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
 | — | *ChainList #710 chainlist maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 + Extension PR #5096, both open, unreviewed | — | — |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | 🔄 in-progress | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
-| [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 2 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 🔄 in-progress — round 3 opened 09-30, ticks cleared | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
-| [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🔄 in-progress — 1 bug open | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
+| [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | ✅ done 10-02 — all 23 sub-tasks settled | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
+| [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 3 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | ✅ done 10-02 — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
+| [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | ✅ done 10-02 — 88 rows settled, 1 on monitoring | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 | [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 📋 ready | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
-| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 📋 ready | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
+| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 34 | 📋 ready | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
 
-**74 points across six stories** — US-18.5 at 5, the three the tester moved over from W38 on 09-30
-at 28, US-42.27 at 21, opened the same day — the release gate for the Mobile build that carries
-web-runner 1.3.90 — and US-42.28 at 20, opened 10-02 for ChainList #710.
+88 points across six stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
+28, US-42.27 at 21, opened the same day, and US-42.28 at 34, opened 10-02 for ChainList #710.
+
+The three moved rows all closed on 10-02, which ends the web-runner programme: the parent US-42.24,
+the regression US-42.24.19 at 83 of 85 on each platform after three rounds, and the bug
+verification US-42.24.20 with all 88 rows settled. 28 of the window's 88 points are done. What is
+left is US-42.27, the release gate that takes the regression checklist to the beta builds, and
+US-42.28 for the chainlist maintenance, which is written out as 184 checklist lines — one per
+chain, so a session can tick what it actually got through rather than leaving a whole group open.
 
 **Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig
