@@ -17,10 +17,11 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 2 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 🔄 in-progress — round 3 opened 09-30, ticks cleared | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🔄 in-progress — 1 bug open | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 | [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 📋 ready | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
+| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | 📋 ready | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
 
-**54 points across five stories** — US-18.5 at 5, the three the tester moved over from W38 on 09-30
-at 28, and US-42.27 at 21, opened the same day: the release gate for the Mobile build that carries
-web-runner 1.3.90.
+**74 points across six stories** — US-18.5 at 5, the three the tester moved over from W38 on 09-30
+at 28, US-42.27 at 21, opened the same day — the release gate for the Mobile build that carries
+web-runner 1.3.90 — and US-42.28 at 20, opened 10-02 for ChainList #710.
 
 **Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig

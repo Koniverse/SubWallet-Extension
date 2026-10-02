@@ -46,8 +46,27 @@ iOS finished on [2026-10-01](../2026-10-01/report-manual.md) at 83 of 85, with R
 | REG-A-26 | The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee | ✅ Pass | Android |
 | REG-A-27 | Validation cases; submit | ✅ Pass | Android |
 | REG-A-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | Android |
+| REG-A-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | Android |
+| REG-A-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | Android |
+| REG-A-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | Android |
+| REG-A-32 | Remove a custom NFT | ⏭️ Skipped | Android — NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything |
+| REG-A-33 | The earning options list; the earning positions list; position detail; earning instructions | ✅ Pass | Android |
+| REG-A-34 | Stake — direct nomination; nomination pool; liquid stake; subnet staking | ✅ Pass | Android |
+| REG-A-35 | Stake more | ✅ Pass | Android |
+| REG-A-36 | Fast unstake — part of the position, and all of it | ✅ Pass | Android |
+| REG-A-37 | Slow unstake — part of the position, and all of it | ✅ Pass | Android |
+| REG-A-38 | Cancel unstake; withdraw; claim rewards | ✅ Pass | Android — the line BUG-42.24.19-28 was found on, now run on the fixed build |
+| REG-A-80 | Parachain (collator) staking — start staking; stake more; claim rewards; unstake; cancel unstake; withdraw | ✅ Pass | Android |
+| REG-A-81 | Change validator — on direct nomination, and on subnet staking | ✅ Pass | Android |
+| REG-A-39 | Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp | ✅ Pass | Android |
+| REG-A-40 | Sign a message or transaction with a substrate account; with an EVM account; with an EVM account using a substrate provider | ✅ Pass | Android |
+| REG-A-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | Android |
+| REG-A-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | Android |
+| REG-A-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | Android |
+| REG-A-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | Android |
+| REG-A-45 | Back up the seed phrase through export account | ✅ Pass | Android |
 
-20 of 85 Android lines done.
+38 of 85 Android lines done, with REG-A-32 skipped. REG-A-38 is the line BUG-42.24.19-28 was found on, so the tick stands on a run of the fixed build.
 
 ### Bugs
 
