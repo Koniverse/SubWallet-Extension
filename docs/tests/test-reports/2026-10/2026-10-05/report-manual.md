@@ -104,7 +104,7 @@ None.
 
 ## US-42.27 — Release SubWallet Mobile
 
-Started today on the beta builds. Twenty-seven lines pass on each platform, the same set on the TestFlight build and on the Google Play beta build, with REG-32 skipped on both.
+Started today on the beta builds. Forty lines pass on each platform, the same set on the TestFlight build and on the Google Play beta build, with REG-32 skipped on both.
 
 ### AC results
 
@@ -138,8 +138,21 @@ Started today on the beta builds. Twenty-seven lines pass on each platform, the 
 | REG-IOS-15 / REG-AND-15 | Show and hide balance; refresh balance; customize asset display; search token; token detail | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-16 / REG-AND-16 | The QR code shows in all accounts mode and in single account mode | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-17 / REG-AND-17 | The explorer link opens for a network that has one, and is handled for a network that does not | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-33 / REG-AND-33 | The earning options list; the earning positions list; position detail; earning instructions | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-34 / REG-AND-34 | Stake — direct nomination; nomination pool; liquid stake; subnet staking | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-35 / REG-AND-35 | Stake more | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-36 / REG-AND-36 | Fast unstake — part of the position, and all of it | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-37 / REG-AND-37 | Slow unstake — part of the position, and all of it | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-38 / REG-AND-38 | Cancel unstake; withdraw; claim rewards | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-80 / REG-AND-80 | Parachain (collator) staking — start staking; stake more; claim rewards; unstake; cancel unstake; withdraw | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-81 / REG-AND-81 | Change validator — on direct nomination, and on subnet staking | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-39 / REG-AND-39 | Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-40 / REG-AND-40 | Sign a message or transaction with a substrate account; with an EVM account; with an EVM account using a substrate provider | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-41 / REG-AND-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-42 / REG-AND-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-43 / REG-AND-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | iOS beta + Android beta |
 
-27 of 82 lines done on each platform, with REG-32 skipped — the transfer, swap, buy token, manage NFT, balances and receive sections. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
+40 of 82 lines done on each platform, with REG-32 skipped — transfer, swap, buy token, manage NFT, balances, receive, earning, dApps and mission pools. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
 
 ### Bugs
 
