@@ -104,7 +104,7 @@ None.
 
 ## US-42.27 — Release SubWallet Mobile
 
-Started today on the beta builds. Fourteen lines pass on each platform, the same fourteen on the TestFlight build and on the Google Play beta build.
+Started today on the beta builds. Twenty-seven lines pass on each platform, the same set on the TestFlight build and on the Google Play beta build, with REG-32 skipped on both.
 
 ### AC results
 
@@ -124,8 +124,22 @@ Started today on the beta builds. Fourteen lines pass on each platform, the same
 | REG-IOS-21 / REG-AND-21 | Transfer a TON token | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-79 / REG-AND-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-22 / REG-AND-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-23 / REG-AND-23 | Swap without XCM; swap with XCM | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-24 / REG-AND-24 | Search token and account; the prompt to enable a network that is off; filter token | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-25 / REG-AND-25 | Input the amount and the recipient address — by QR, by typing, from the address book | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-26 / REG-AND-26 | The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-27 / REG-AND-27 | Validation cases; submit | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-28 / REG-AND-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-29 / REG-AND-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-30 / REG-AND-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-31 / REG-AND-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-32 / REG-AND-32 | Remove a custom NFT | ⏭️ Skipped | Both — NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything |
+| REG-IOS-14 / REG-AND-14 | Transferable balance is right on token details; transfer on-chain; transfer cross-chain; send NFT; swap; earning actions | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-15 / REG-AND-15 | Show and hide balance; refresh balance; customize asset display; search token; token detail | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-16 / REG-AND-16 | The QR code shows in all accounts mode and in single account mode | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-17 / REG-AND-17 | The explorer link opens for a network that has one, and is handled for a network that does not | ✅ Pass | iOS beta + Android beta |
 
-14 of 82 lines done on each platform, the transfer section among them. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
+27 of 82 lines done on each platform, with REG-32 skipped — the transfer, swap, buy token, manage NFT, balances and receive sections. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
 
 ### Bugs
 
