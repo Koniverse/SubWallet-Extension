@@ -5,10 +5,10 @@
 | Epic | EPIC-42 — QA Coverage Tracking |
 | Date | 2026-10-05 |
 | Tester | MaiThuongNinni |
-| Environment | Extension |
-| Runner | manual (extension) |
-| Build under test | to fill in — Extension version + chain-list version |
-| Stories tested | US-42.28 |
+| Environment | Extension; Mobile — Android + iOS beta |
+| Runner | manual (extension + mobile) |
+| Build under test | to fill in — Extension: version + chain-list version; Mobile: TestFlight and Google Play beta build numbers |
+| Stories tested | US-42.28, US-42.27 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -97,6 +97,29 @@ What is left: RPC-64, the three provider checks that are not per-chain, the 61 d
 All 69 per-chain RPC lines now pass. RPC-X1 and RPC-X3 are still open; RPC-X3 needs an upgrade rather than a fresh install.
 
 All 61 deactivated chains are gone from Manage networks, the token picker, and the send and swap flows — 30 mainnet and 31 testnet. GEN-1 to GEN-6 have not run: those are the lines that say what deactivation must not break, and they need an upgrade carrying balances and history from before it.
+
+### Bugs
+
+None.
+
+## US-42.27 — Release SubWallet Mobile
+
+Started today on the beta builds. Eight lines pass on each platform, the same eight on the TestFlight build and on the Google Play beta build.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| REG-IOS-69 / REG-AND-69 | Add an address; remove one; edit a name; search and filter | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-70 / REG-AND-70 | Migrate solo accounts to a unified account — the migration runs to the end, and every migrated account can still sign afterwards | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-82 / REG-AND-82 | Configure the Subscan API key | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-71 / REG-AND-71 | Contact support; user guide; request a feature | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-72 / REG-AND-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-73 / REG-AND-73 | The MKT campaign | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-74 / REG-AND-74 | Add an API key | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-83 / REG-AND-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | iOS beta + Android beta |
+
+8 of 82 lines done on each platform. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
 
 ### Bugs
 
