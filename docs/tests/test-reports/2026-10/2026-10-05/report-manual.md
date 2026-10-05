@@ -104,7 +104,7 @@ None.
 
 ## US-42.27 — Release SubWallet Mobile
 
-Started today on the beta builds. Eight lines pass on each platform, the same eight on the TestFlight build and on the Google Play beta build.
+Started today on the beta builds. Fourteen lines pass on each platform, the same fourteen on the TestFlight build and on the Google Play beta build.
 
 ### AC results
 
@@ -118,8 +118,14 @@ Started today on the beta builds. Eight lines pass on each platform, the same ei
 | REG-IOS-73 / REG-AND-73 | The MKT campaign | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-74 / REG-AND-74 | Add an API key | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-83 / REG-AND-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-18 / REG-AND-18 | Transfer an EVM token — single-chain and cross-chain; native and local; edit the fee | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-19 / REG-AND-19 | Transfer a substrate token — single-chain and cross-chain; native and local; choose which token pays the fee | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-20 / REG-AND-20 | Transfer a BTC token | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-21 / REG-AND-21 | Transfer a TON token | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-79 / REG-AND-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-22 / REG-AND-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | iOS beta + Android beta |
 
-8 of 82 lines done on each platform. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
+14 of 82 lines done on each platform, the transfer section among them. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
 
 ### Bugs
 
