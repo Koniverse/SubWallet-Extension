@@ -104,7 +104,7 @@ None.
 
 ## US-42.27 — Release SubWallet Mobile
 
-Started today on the beta builds. Forty lines pass on each platform, the same set on the TestFlight build and on the Google Play beta build, with REG-32 skipped on both.
+Started today on the beta builds. Forty-five lines pass on each platform, the same set on the TestFlight build and on the Google Play beta build, with REG-32 skipped on both.
 
 ### AC results
 
@@ -151,8 +151,13 @@ Started today on the beta builds. Forty lines pass on each platform, the same se
 | REG-IOS-41 / REG-AND-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-42 / REG-AND-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-43 / REG-AND-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-57 / REG-AND-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-58 / REG-AND-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-59 / REG-AND-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-60 / REG-AND-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-61 / REG-AND-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | iOS beta + Android beta |
 
-40 of 82 lines done on each platform, with REG-32 skipped — transfer, swap, buy token, manage NFT, balances, receive, earning, dApps and mission pools. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
+45 of 82 lines done on each platform, with REG-32 skipped — transfer, swap, buy token, manage NFT, balances, receive, earning, dApps, mission pools, manage website access and WalletConnect. AC-1 and AC-3 need the full list, so they are not settled yet. The upgrade rechecks have not started, and stages 3 and 4 only begin once the beta stage has passed in full.
 
 ### Bugs
 
