@@ -79,14 +79,57 @@ None.
 
 ## US-42.28 — Maintenance of chainlist (ChainList #710)
 
-At 131 of 194 lines. The RPC half and all 61 deactivated chains are done.
+Three commits landed on the branch today, after the RPC half and the deactivated chains had already been checked. The story gains a FIX group for them, taking it to 201 lines.
 
-Left to run: RPC-X1 and RPC-X3, the 24 new chains, the Bittensor subnets, GEN-1 to GEN-6, and the upgrade runs. GEN-1 to GEN-6 and RPC-X3 all need an upgrade carrying data from before the change.
+The developer flagged two of the three. The third, 07dec91840, is the one that unblocks `validate-tokens` — subnet 111's assetType went from null to LOCAL, and the tooling had been crashing on it, leaving every subnet after it unvalidated.
 
 ### AC results
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| FIX-1 | The four chains whose broken RPCs were replaced still connect — Blast, Kaia, Cronos Testnet and Karura | ✅ Pass | Extension |
+| FIX-2 | The removed endpoints are gone from the provider lists — Pocket and Tenderly on Blast, 1RPC on Kaia, Tatum on Cronos Testnet, LuckyFriday on Karura | ✅ Pass | Extension |
+| FIX-3 | Multisig is offered on Bittensor and Bittensor testnet — creating a multisig, opening its details, and the signatory picker all appear where they did not before | ✅ Pass | Extension |
+| NEW-M-1 | XGRChain (`xgr`, chain ID 1643, native XGR) | ✅ Pass | Extension |
+| NEW-M-2 | Robinhood Chain (`robinhood_chain`, chain ID 4663, native ETH) | ✅ Pass | Extension |
+| NEW-M-3 | MegaETH (`megaeth`, chain ID 4326, native ETH) | ✅ Pass | Extension |
+| NEW-M-4 | Plasma (`plasma`, chain ID 9745, native XPL) | ✅ Pass | Extension |
+| NEW-M-5 | Somnia (`somnia`, chain ID 5031, native SOMI) | ✅ Pass | Extension |
+| NEW-M-6 | Arc (`arc`, chain ID 5042, native USDC) | ✅ Pass | Extension |
+| NEW-M-7 | Sei EVM (`sei_evm`, chain ID 1329, native SEI) | ✅ Pass | Extension |
+| NEW-M-8 | Kaia (`kaia`, chain ID 8217, native KAIA) | ✅ Pass | Extension |
+| NEW-M-9 | Cronos (`cronos`, chain ID 25, native CRO) | ✅ Pass | Extension |
+| NEW-M-10 | Berachain (`berachain`, chain ID 80094, native BERA) | ✅ Pass | Extension |
+| NEW-M-11 | Ronin (`ronin`, chain ID 2020, native RON) | ✅ Pass | Extension |
+| NEW-M-12 | Flow EVM (`flow_evm`, chain ID 747, native FLOW) | ✅ Pass | Extension |
+| NEW-T-1 | XGR Testnet (`xgr_testnet`, chain ID 1879, native XGR) | ✅ Pass | Extension |
+| NEW-T-2 | Robinhood Chain Testnet (`robinhood_chain_testnet`, chain ID 46630, native ETH) | ✅ Pass | Extension |
+| NEW-T-3 | MegaETH Testnet (`megaeth_testnet`, chain ID 6343, native ETH) | ✅ Pass | Extension |
+| NEW-T-4 | Plasma Testnet (`plasma_testnet`, chain ID 9746, native XPL) | ✅ Pass | Extension |
+| NEW-T-5 | Somnia Testnet (`somnia_testnet`, chain ID 50312, native STT) | ✅ Pass | Extension |
+| NEW-T-6 | Arc Testnet (`arc_testnet`, chain ID 5042002, native USDC) | ✅ Pass | Extension |
+| NEW-T-7 | Sei EVM Testnet (`sei_evm_testnet`, chain ID 1328, native SEI) | ✅ Pass | Extension |
+| NEW-T-8 | Kaia Kairos Testnet (`kaia_kairos`, chain ID 1001, native KAIA) | ✅ Pass | Extension |
+| NEW-T-9 | Cronos Testnet (`cronos_testnet`, chain ID 338, native TCRO) | ✅ Pass | Extension |
+| NEW-T-10 | Berachain Bepolia (`berachain_bepolia`, chain ID 80069, native BERA) | ✅ Pass | Extension |
+| NEW-T-11 | Ronin Saigon Testnet (`ronin_saigon`, chain ID 202601, native RON) | ✅ Pass | Extension |
+| NEW-T-12 | Flow EVM Testnet (`flow_evm_testnet`, chain ID 545, native FLOW) | ✅ Pass | Extension |
+| NEW-1 | A transfer goes through on at least two new chains, and the explorer link opens the transaction | ✅ Pass | Extension |
+| NEW-2 | Each new chain's native token shows the right symbol and price | ✅ Pass | Extension |
+| NEW-3 | The ETH on Robinhood Chain and MegaETH is the same `ETH-Ethereum` multi-chain asset rather than a separate token, and Robinhood Chain Testnet uses `ETH-EthereumSepolia` | ✅ Pass | Extension |
+| NEW-4 | Arc shows USDC as its native token — unusual, so confirm it on the balance screen and in a transfer | ✅ Pass | Extension |
+| BIT-11 | Renamed subnets show their new name and icon | ✅ Pass | Extension |
+| BIT-12 | Subnets with placeholder names from taostats — Unknown, for sale, deprecated, Parked, Available — render without breaking the list | ✅ Pass | Extension |
+| BIT-13 | Netuids 83, 95 and 101 have no price and show no price rather than zero or a stale figure | ✅ Pass | Extension |
+| FIX-7 | Subnet 103 reads Deprecated with the default icon, and subnet 116 reads Carbon with its own logo | ✅ Pass | Extension |
+
+166 of 201 lines done. The 24 new chains are in and working, and the four checks that go with them pass — a transfer on two of them with the explorer link opening, the native symbols and prices, the shared ETH-Ethereum asset on Robinhood Chain and MegaETH, and USDC as the native token on Arc.
+
+The Bittensor table was read against taostats as well: the renamed subnets carry their new names and icons, the placeholder names from taostats render without breaking the list, the three netuids with no CoinGecko coin show no price rather than zero, and SN103 and SN116 read Deprecated and Carbon.
+
+FIX-4, FIX-5 and FIX-6 have not run — a multisig transaction on Bittensor end to end, subnet 111 showing its alpha balance, and the subnets after it that the tooling never validated.
+
+Still open elsewhere: RPC-X1 and RPC-X3, the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, and the upgrade runs. GEN-1 to GEN-6 and RPC-X3 all need an upgrade carrying data from before the change.
 
 ### Bugs
 
