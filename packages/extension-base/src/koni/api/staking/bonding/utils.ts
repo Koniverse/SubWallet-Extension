@@ -800,3 +800,14 @@ export const getExistUnstakeErrorMessage = (chain: string, type?: StakingType, i
     }
   }
 };
+
+export async function getNominatorUnstakingEras (api: ApiPromise): Promise<string> {
+  const fastDuration = api.consts.staking.nominatorFastUnbondDuration;
+  const areNominatorsSlashable = api.query.staking?.areNominatorsSlashable;
+
+  if (fastDuration && areNominatorsSlashable && (await areNominatorsSlashable()).toString() === 'false') {
+    return fastDuration.toString();
+  }
+
+  return api.consts.staking.bondingDuration.toString();
+}

@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
-import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
-import { BaseYieldPositionInfo, BasicTxErrorType, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, TransactionData, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
@@ -85,6 +84,18 @@ const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecim
 export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHandler {
   // @ts-ignore
   public override readonly type = YieldPoolType.SUBNET_STAKING;
+
+  // Root claims redeem the basket of a netuid 0 position, subnet (alpha) positions have nothing to claim
+  public override readonly availableMethod: YieldPoolMethodInfo = {
+    join: true,
+    defaultUnstake: true,
+    fastUnstake: false,
+    cancelUnstake: false,
+    withdraw: false,
+    claimReward: false,
+    changeValidator: true
+  };
+
   public override slug: string;
   protected override name: string;
   protected override shortName: string;
@@ -420,12 +431,4 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
   }
 
   /* Subscribe pool position */
-
-  /* Unimplemented function  */
-
-  public override handleChangeRootClaimType (): Promise<TransactionData> {
-    return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
-  }
-
-  /* Unimplemented function  */
 }

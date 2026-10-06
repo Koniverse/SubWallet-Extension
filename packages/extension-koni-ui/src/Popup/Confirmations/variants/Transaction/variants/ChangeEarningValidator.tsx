@@ -275,6 +275,10 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
       marginBottom: '0px'
     },
 
+    '.alert-box': {
+      marginTop: token.marginSM
+    },
+
     '.validator-group__info': {
       display: 'flex',
       alignItems: 'center',

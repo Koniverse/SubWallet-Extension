@@ -12,7 +12,7 @@ import { _getSystemPalletReservedBalance, _getSystemPalletTotalBalance, _getSyst
 import { _getTokensPalletLocked, _getTokensPalletTransferable } from '@subwallet/extension-base/core/substrate/tokens-pallet';
 import { FrameBalancesFreezesInfo, FrameBalancesHoldsInfo, FrameBalancesLocksInfo, FrameSystemAccountInfo, OrmlTokensAccountData, PalletAssetsAssetAccount, PalletAssetsAssetAccountWithStatus, PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
 import { _adaptX1Interior } from '@subwallet/extension-base/core/substrate/xcm-parser';
-import { getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
+import { getPSP22BalanceOfMethod, getPSP22ContractPromise } from '@subwallet/extension-base/koni/api/contract-handler/wasm';
 import { getDefaultWeightV2 } from '@subwallet/extension-base/koni/api/contract-handler/wasm/utils';
 import { _BALANCE_CHAIN_GROUP, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX, USE_MULTILOCATION_INDEX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
@@ -335,7 +335,11 @@ const subscribeForeignAssetBalance = async ({ addresses, assetMap, callback, cha
   };
 };
 
-function extractOkResponse<T> (response: Record<string, T>): T | undefined {
+function extractOkResponse<T> (response?: Record<string, T>): T | undefined {
+  if (!response) {
+    return undefined;
+  }
+
   if ('ok' in response) {
     return response.ok;
   }
@@ -353,18 +357,19 @@ const subscribePSP22Balance = ({ addresses, assetMap, callback, chainInfo, subst
   const tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.PSP22]);
 
   Object.entries(tokenList).forEach(([slug, tokenInfo]) => {
-    psp22ContractMap[slug] = getPSP22ContractPromise(substrateApi.api, _getContractAddressOfToken(tokenInfo));
+    psp22ContractMap[slug] = getPSP22ContractPromise(substrateApi.api, _getContractAddressOfToken(tokenInfo), chain);
   });
 
   const getTokenBalances = () => {
     Object.values(tokenList).map(async (tokenInfo) => {
       try {
         const contract = psp22ContractMap[tokenInfo.slug];
+        const balanceOfMethod = getPSP22BalanceOfMethod(chain);
         const balances: BalanceItem[] = await Promise.all(addresses.map(async (address): Promise<BalanceItem> => {
           try {
-            const _balanceOf = await contract.query['psp22::balanceOf'](address, { gasLimit: getDefaultWeightV2(substrateApi.api) }, address);
-            const balanceObj = _balanceOf?.output?.toPrimitive() as Record<string, any>;
-            const freeResponse = extractOkResponse(balanceObj) as number | string;
+            const _balanceOf = await contract.query[balanceOfMethod](address, { gasLimit: getDefaultWeightV2(substrateApi.api) }, address);
+            const balanceObj = _balanceOf?.output?.toPrimitive() as Record<string, unknown> | undefined;
+            const freeResponse = extractOkResponse(balanceObj) as number | string | undefined;
             const free: string = freeResponse ? new BigN(freeResponse).toString() : '0';
 
             return {

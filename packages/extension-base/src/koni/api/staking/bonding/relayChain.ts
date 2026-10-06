@@ -6,7 +6,7 @@ import { TransactionError } from '@subwallet/extension-base/background/errors/Tr
 import { ChainStakingMetadata, NominationInfo, NominatorMetadata, StakingType, UnstakingInfo, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { MAX_NOMINATIONS } from '@subwallet/extension-base/constants';
 import { PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
-import { calculateAlephZeroValidatorReturn, calculateChainStakedReturn, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getCommission, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { calculateAlephZeroValidatorReturn, calculateChainStakedReturn, calculateInflation, calculateTernoaValidatorReturn, calculateValidatorStakedReturn, getCommission, getExistUnstakeErrorMessage, getMaxValidatorErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import { _EXPECTED_BLOCK_TIME, _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { _getChainSubstrateAddressPrefix } from '@subwallet/extension-base/services/chain-service/utils';
@@ -128,7 +128,7 @@ export function subscribeRelayChainStakingMetadata (chainInfo: _ChainInfo, subst
     const currentEra = _currentEra.toString();
     const maxNominations = substrateApi.api.consts.staking?.maxNominations?.toString() || MAX_NOMINATIONS; // TODO
     const maxUnlockingChunks = substrateApi.api.consts.staking.maxUnlockingChunks.toString();
-    const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
+    const unlockingEras = await getNominatorUnstakingEras(substrateApi.api);
 
     const [_totalEraStake, _totalIssuance, _auctionCounter, _minNominatorBond, _minPoolJoin, _minimumActiveStake] = await Promise.all([
       substrateApi.api.query.staking.erasTotalStake(parseInt(currentEra)),
@@ -181,7 +181,7 @@ export async function getRelayChainStakingMetadata (chainInfo: _ChainInfo, subst
   const currentEra = _era.toString();
   const maxNominations = chainApi.api.consts.staking?.maxNominations?.toString() || '16'; // TODO
   const maxUnlockingChunks = chainApi.api.consts.staking.maxUnlockingChunks.toString();
-  const unlockingEras = chainApi.api.consts.staking.bondingDuration.toString();
+  const unlockingEras = await getNominatorUnstakingEras(chainApi.api);
 
   const [_totalEraStake, _totalIssuance, _auctionCounter, _minimumActiveStake, _minNominatorBond, _minPoolJoin, _eraStakers] = await Promise.all([
     chainApi.api.query.staking.erasTotalStake(parseInt(currentEra)),

@@ -16,6 +16,7 @@ export { default as TransactionProcessDetailModal } from './TransactionProcessDe
 export { default as TransactionStepsModal } from './TransactionStepsModal';
 export { default as SwitchNetworkAuthorizeModal } from './SwitchNetworkAuthorizeModal';
 export { default as NftCollectionModal } from './NftCollectionModal';
+export { default as PasskeyUnlockSetupModal } from './PasskeyUnlockSetupModal';
 export { SortingModal } from './SortingModal';
 export { DAppConfigurationModal } from './DAppConfigurationModal';
 

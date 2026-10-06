@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { APIItemState, ChainType, ExtrinsicType, NominationInfo, StakingType, UnstakingInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { PalletNominationPoolsPoolMember } from '@subwallet/extension-base/core/substrate/types';
-import { calculateChainStakedReturnV2, calculateInflation, getAvgValidatorEraReward, getExistUnstakeErrorMessage, getMinStakeErrorMessage, getSupportedDaysByHistoryDepth, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
+import { calculateChainStakedReturnV2, calculateInflation, getAvgValidatorEraReward, getExistUnstakeErrorMessage, getMinStakeErrorMessage, getNominatorUnstakingEras, getSupportedDaysByHistoryDepth, parsePoolStashAddress } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _STAKING_ERA_LENGTH_MAP } from '@subwallet/extension-base/services/chain-service/constants';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
@@ -109,7 +109,7 @@ export default class NominationPoolHandler extends BasePoolHandler {
 
       const currentEra = _currentEra.toString();
       const maxUnlockingChunks = substrateApi.api.consts.staking.maxUnlockingChunks.toString();
-      const unlockingEras = substrateApi.api.consts.staking.bondingDuration.toString();
+      const unlockingEras = await getNominatorUnstakingEras(substrateApi.api);
 
       const maxSupportedEras = substrateApi.api.consts.staking.historyDepth.toString();
       const eraInHours = _STAKING_ERA_LENGTH_MAP[chainInfo.slug] || _STAKING_ERA_LENGTH_MAP.default; // in hours

@@ -144,7 +144,7 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       useBackupApi = true;
 
       try {
-        response = await fetch(`https://api-cache.subwallet.app/api/price/get?ids=${idStr}`);
+        response = await fetch(`${apiCacheDomain}/api/price/get?ids=${idStr}`);
       } catch (e) {}
 
       if (response?.status !== 200) {

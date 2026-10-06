@@ -48,27 +48,33 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
   const isDAppStaking = useMemo(() => _STAKING_CHAIN_GROUP.astar.includes(compound.chain), [compound.chain]);
   const isMythosStaking = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(compound.chain), [compound.chain]);
   const isTanssiStaking = useMemo(() => _STAKING_CHAIN_GROUP.tanssi.includes(compound.chain), [compound.chain]);
+  // Only the netuid 0 position accrues a claimable root basket, the subnet ones don't
+  const isBittensorRootStaking = useMemo(() => type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.bittensor.includes(compound.chain), [compound.chain, type]);
 
   const canClaim = useMemo((): boolean => {
     switch (type) {
       case YieldPoolType.LENDING:
       case YieldPoolType.LIQUID_STAKING:
-        return false;
       case YieldPoolType.SUBNET_STAKING:
+        return false;
       case YieldPoolType.NATIVE_STAKING:
-        return isDAppStaking || isMythosStaking || isTanssiStaking;
+        return isDAppStaking || isMythosStaking || isTanssiStaking || isBittensorRootStaking;
       case YieldPoolType.NOMINATION_POOL:
         return true;
     }
-  }, [isDAppStaking, isMythosStaking, isTanssiStaking, type]);
+  }, [isBittensorRootStaking, isDAppStaking, isMythosStaking, isTanssiStaking, type]);
+
+  const showRewardValue = useMemo(() => {
+    return type === YieldPoolType.NOMINATION_POOL || isMythosStaking || isTanssiStaking || isBittensorRootStaking;
+  }, [isBittensorRootStaking, isMythosStaking, isTanssiStaking, type]);
 
   const title = useMemo(() => {
-    if (type === YieldPoolType.NOMINATION_POOL) {
+    if (type === YieldPoolType.NOMINATION_POOL || isBittensorRootStaking) {
       return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.unclaimedRewards');
     } else {
       return t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewards');
     }
-  }, [t, type]);
+  }, [isBittensorRootStaking, t, type]);
 
   const onClaimReward = useCallback(() => {
     if (type === YieldPoolType.NATIVE_STAKING && isDAppStaking) {
@@ -131,10 +137,10 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         </MetaInfo>
       </div>
 
-      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking || isTanssiStaking))) && (
+      {(type === YieldPoolType.NOMINATION_POOL || (type === YieldPoolType.NATIVE_STAKING && (isDAppStaking || isMythosStaking || isTanssiStaking || isBittensorRootStaking))) && (
         <>
           <div className={'__claim-reward-area'}>
-            { type === YieldPoolType.NOMINATION_POOL || isMythosStaking || isTanssiStaking
+            { showRewardValue
               ? total
                 ? (
                   <Number
