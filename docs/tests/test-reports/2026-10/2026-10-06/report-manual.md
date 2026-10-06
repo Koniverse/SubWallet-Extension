@@ -22,9 +22,9 @@
 
 Carried on from [2026-10-05](../2026-10-05/report-manual.md), which reached 45 of 82 lines on each beta build with REG-32 skipped.
 
-Manage account closes today — all twelve lines on each platform, the largest section that was left.
+Manage account closes today — all twelve lines on each platform, the largest section that was left — and manage network and manage token close with it.
 
-Still to run on the beta stage: lock and unlock, backup seed phrase, history, general settings, security settings, manage network, manage token, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
+Still to run on the beta stage: lock and unlock, backup seed phrase, history, general settings, security settings, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
 
 ### AC results
 
@@ -42,8 +42,15 @@ Still to run on the beta stage: lock and unlock, backup seed phrase, history, ge
 | REG-IOS-9 / REG-AND-9 | Remove an account | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-10 / REG-AND-10 | Edit an account name | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-84 / REG-AND-84 | Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-62 / REG-AND-62 | Search network; filter network; turn a network on and off | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-63 / REG-AND-63 | Import a custom network; import a provider; switch provider | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-64 / REG-AND-64 | Remove a custom network with the network on, and with it off | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-65 / REG-AND-65 | Define a network — add a provider; switch provider | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-66 / REG-AND-66 | Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-67 / REG-AND-67 | Remove a custom token with the token on, and with it off | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-68 / REG-AND-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | iOS beta + Android beta |
 
-57 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
+64 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
 
 ### Bugs
 
