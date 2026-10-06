@@ -8,10 +8,12 @@ import { AccountChainType, AccountProxy, SUPPORTED_ACCOUNT_CHAIN_TYPES } from '@
 import { createAccountProxyId, getDefaultKeypairTypeFromAccountChainType, getSuri } from '@subwallet/extension-base/utils';
 import { generateRandomString } from '@subwallet/extension-base/utils/getId';
 import { keyring } from '@subwallet/ui-keyring';
+import { filter, firstValueFrom, race, timer } from 'rxjs';
 
 import { keyExtractSuri } from '@polkadot/util-crypto';
 
 export const SESSION_TIMEOUT = 10000;
+const ACCOUNT_READY_TIMEOUT = 1800;
 
 interface SessionInfo {
   password: string,
@@ -69,12 +71,56 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     };
   }
 
+  // Decrypting the PKCS8 secret to export a mnemonic runs a heavy synchronous scrypt KDF.
+  // The same proxyId can be requested multiple times across a single migration, so we cache
+  // the plaintext result in a caller-owned map to avoid re-decrypting. The map MUST stay
+  // local to one migration call and be cleared once done (see callers' `finally` blocks) so
+  // the plaintext mnemonic never outlives the operation or leaks into persisted state.
+  private exportMnemonicWithCache (password: string, proxyId: string, cache: Record<string, string>): string {
+    if (cache[proxyId] !== undefined) {
+      return cache[proxyId];
+    }
+
+    const mnemonic = this.parentService.context.exportAccountProxyMnemonic({
+      password,
+      proxyId
+    }).result;
+
+    cache[proxyId] = mnemonic;
+
+    return mnemonic;
+  }
+
+  // After adding the master pairs, AccountState rebuilds its account map asynchronously (debounced
+  // `combineAccounts`). Deriving child accounts reads `state.value.accounts[masterId]`, so we must
+  // wait until every freshly migrated master account is present in that map before proceeding.
+  // This replaces a blind `setTimeout(1800)` with a real readiness check: it resolves as soon as
+  // the rebuild lands (typically ~300ms) and falls back to ACCOUNT_READY_TIMEOUT only if it never does.
+  private async waitForMasterAccountsReady (masterProxyIds: string[]): Promise<void> {
+    if (!masterProxyIds.length) {
+      return;
+    }
+
+    const isReady = (accounts: Record<string, unknown>) => masterProxyIds.every((id) => !!accounts[id]);
+
+    if (isReady(this.state.value.accounts)) {
+      return;
+    }
+
+    const ready$ = this.state.observable.accounts.pipe(
+      filter((accounts) => isReady(accounts))
+    );
+
+    await firstValueFrom(race(ready$, timer(ACCOUNT_READY_TIMEOUT)));
+  }
+
   public async migrateUnifiedToUnifiedAccount (password: string, accountProxies: AccountProxy[], setMigratingModeFn: () => void): Promise<string[]> {
     keyring.unlockKeyring(password);
     this.parentService.updateKeyringState();
     setMigratingModeFn();
 
     const unifiedAccountIds: string[] = [];
+    const mnemonicCache: Record<string, string> = {};
     const modifiedPairs = structuredClone(this.state.modifyPairs);
 
     const { derivedUnifiedAccounts, masterUnifiedAccounts } = accountProxies.reduce((accountInfo, account: AccountProxy) => {
@@ -88,10 +134,7 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     try {
       for (const unifiedAccount of masterUnifiedAccounts) {
         const proxyId = unifiedAccount.id;
-        const mnemonic = this.parentService.context.exportAccountProxyMnemonic({
-          password,
-          proxyId
-        }).result;
+        const mnemonic = this.exportMnemonicWithCache(password, proxyId, mnemonicCache);
 
         const newChainTypes = Object.values(AccountChainType).filter((type) => !unifiedAccount.chainTypes.includes(type) && SUPPORTED_ACCOUNT_CHAIN_TYPES.includes(type));
         const keypairTypes = newChainTypes.flatMap((chainType) => getDefaultKeypairTypeFromAccountChainType(chainType));
@@ -123,7 +166,10 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         unifiedAccountIds.push(proxyId);
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1800)); // Wait last master unified account migrated. // todo: can be optimized later by await a promise resolve if master account is migrating
+      // Wait until every migrated master account is present in the rebuilt account map before
+      // deriving child accounts (which read those masters from state). `unifiedAccountIds` holds
+      // exactly the master proxyIds at this point.
+      await this.waitForMasterAccountsReady([...unifiedAccountIds]);
 
       for (const unifiedAccount of derivedUnifiedAccounts) {
         this.parentService.context.derivationAccountProxyCreate({
@@ -136,6 +182,8 @@ export class AccountMigrationHandler extends AccountBaseHandler {
     } catch (error) {
       console.error('Migration unified account failed with error:', error);
     } finally {
+      // Drop plaintext mnemonics from memory as soon as the migration finishes.
+      Object.keys(mnemonicCache).forEach((key) => delete mnemonicCache[key]);
       keyring.lockAll(false);
       this.parentService.updateKeyringState();
     }
@@ -152,24 +200,26 @@ export class AccountMigrationHandler extends AccountBaseHandler {
   }
 
   public groupSoloAccountByMnemonic (password: string, accountProxies: AccountProxy[]) {
-    const parentService = this.parentService;
+    const mnemonicCache: Record<string, string> = {};
 
-    return accountProxies.reduce(function (rs: Record<string, AccountProxy[]>, item) {
-      const oldProxyId = item.id;
-      const mnemonic = parentService.context.exportAccountProxyMnemonic({
-        password,
-        proxyId: oldProxyId
-      }).result;
-      const upcomingProxyId = createAccountProxyId(mnemonic);
+    try {
+      return accountProxies.reduce((rs: Record<string, AccountProxy[]>, item) => {
+        const oldProxyId = item.id;
+        const mnemonic = this.exportMnemonicWithCache(password, oldProxyId, mnemonicCache);
+        const upcomingProxyId = createAccountProxyId(mnemonic);
 
-      if (!rs[upcomingProxyId]) {
-        rs[upcomingProxyId] = [];
-      }
+        if (!rs[upcomingProxyId]) {
+          rs[upcomingProxyId] = [];
+        }
 
-      rs[upcomingProxyId].push(item);
+        rs[upcomingProxyId].push(item);
 
-      return rs;
-    }, {});
+        return rs;
+      }, {});
+    } finally {
+      // Drop plaintext mnemonics from memory as soon as grouping is done.
+      Object.keys(mnemonicCache).forEach((key) => delete mnemonicCache[key]);
+    }
   }
 
   public accountProxiesToEligibleSoloAccountMap (accountProxyMap: Record<string, AccountProxy[]>): Record<string, SoloAccountToBeMigrated[]> {
@@ -233,9 +283,9 @@ export class AccountMigrationHandler extends AccountBaseHandler {
         };
 
         const rs = keyring.addUri(suri, metadata, type);
-
-        soloAccountProxyIds.push(rs.json.address);
         const address = rs.pair.address;
+
+        soloAccountProxyIds.push(address);
 
         this.state._addAddressToAuthList(address, true);
       });

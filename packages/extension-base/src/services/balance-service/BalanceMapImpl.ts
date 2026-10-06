@@ -4,7 +4,7 @@
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { AccountProxyType, BalanceInfo, BalanceItem, BalanceMap } from '@subwallet/extension-base/types';
-import { isAccountAll } from '@subwallet/extension-base/utils';
+import { addLazy, isAccountAll } from '@subwallet/extension-base/utils';
 import { BehaviorSubject } from 'rxjs';
 
 import { groupBalance } from './helpers';
@@ -39,7 +39,12 @@ export class BalanceMapImpl {
       this.computeBalance(proxyId);
     }
 
-    this._mapSubject.next(this._map);
+    // Debounce rapid-fire emissions: batch concurrent per-token/per-address
+    // updates into a single subject emit. fireOnFirst=true keeps the UI
+    // responsive on the very first balance load.
+    addLazy('balanceMapTriggerChange', () => {
+      this._mapSubject.next(this._map);
+    }, 200, 1500, true);
   }
 
   public updateBalanceItem (balanceItem: BalanceItem, trigger = false): void {
@@ -96,30 +101,32 @@ export class BalanceMapImpl {
       return rs;
     }, {});
 
-    const proxyIds = Object.keys(unifiedAccountsMap);
+    const proxyIdsSet = new Set(Object.keys(unifiedAccountsMap));
 
-    Object.keys(this._map)
-      .filter((a) => !isAccountAll(a) && !proxyIds.includes(a))
-      .forEach((address) => {
-        const addItemToMap = (key: string) => {
-          const unifiedAccountBalance = compoundMap[key] || {};
+    for (const address of Object.keys(this._map)) {
+      if (isAccountAll(address) || proxyIdsSet.has(address)) {
+        continue;
+      }
 
-          Object.keys(this._map[address]).forEach((tokenSlug) => {
-            if (!unifiedAccountBalance[tokenSlug]) {
-              unifiedAccountBalance[tokenSlug] = [];
-            }
+      const addItemToMap = (key: string) => {
+        const unifiedAccountBalance = compoundMap[key] || {};
 
-            unifiedAccountBalance[tokenSlug].push(this._map[address][tokenSlug]);
-          });
+        Object.keys(this._map[address]).forEach((tokenSlug) => {
+          if (!unifiedAccountBalance[tokenSlug]) {
+            unifiedAccountBalance[tokenSlug] = [];
+          }
 
-          compoundMap[key] = unifiedAccountBalance;
-        };
+          unifiedAccountBalance[tokenSlug].push(this._map[address][tokenSlug]);
+        });
 
-        const proxyId = revertUnifiedAccountsMap[address];
+        compoundMap[key] = unifiedAccountBalance;
+      };
 
-        isAll && addItemToMap(ALL_ACCOUNT_KEY);
-        proxyId && addItemToMap(proxyId);
-      });
+      const proxyId = revertUnifiedAccountsMap[address];
+
+      isAll && addItemToMap(ALL_ACCOUNT_KEY);
+      proxyId && addItemToMap(proxyId);
+    }
 
     Object.entries(compoundMap).forEach(([compoundKey, balanceMap]) => {
       const rs: BalanceInfo = {};

@@ -20,7 +20,7 @@ import { SessionStorage, ThemeProps, TransactionHistoryDisplayData, TransactionH
 import { customFormatDate, formatHistoryDate, isTypeGov, isTypeManageSubstrateProxy, isTypeMultisig, isTypeStaking, isTypeTransfer } from '@subwallet/extension-koni-ui/utils';
 import { ButtonProps, Form, Icon, ModalContext, SwIconProps, SwList, SwSubHeader } from '@subwallet/react-ui';
 import { Aperture, ArrowDownLeft, ArrowsLeftRight, ArrowUpRight, Clock, ClockCounterClockwise, Database, FadersHorizontal, NewspaperClipping, Pencil, Rocket, Spinner, TreeStructure, UserSwitch } from 'phosphor-react';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -511,8 +511,10 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }), [t]);
 
   // Fill display data to history list
-  const historyMap = useMemo(() => {
+  const { deepLinkMap, historyMap } = useMemo(() => {
     const finalHistoryMap: Record<string, TransactionHistoryDisplayItem> = {};
+    // Secondary map keyed by "chain|hash" for O(1) deep-link lookups
+    const dlMap: Record<string, TransactionHistoryDisplayItem> = {};
 
     rawHistoryList.forEach((item: TransactionHistoryItem) => {
       const fromName = accountMap[quickFormatAddressToCompare(item.from) || ''];
@@ -525,16 +527,28 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
       const key = getHistoryItemKey(item);
       const displayTime = item.blockTime || item.time;
 
-      finalHistoryMap[key] = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap), displayTime };
+      const displayItem: TransactionHistoryDisplayItem = { ...item, fromName, toName, displayData: getDisplayData(item, typeNameMap, typeTitleMap), displayTime };
+
+      finalHistoryMap[key] = displayItem;
+
+      // Register in deepLinkMap by both extrinsicHash and transactionId
+      if (item.extrinsicHash) {
+        dlMap[`${item.chain}|${item.extrinsicHash}`] = displayItem;
+      }
+
+      if (item.transactionId) {
+        dlMap[`${item.chain}|${item.transactionId}`] = displayItem;
+      }
     });
 
-    return finalHistoryMap;
+    return { historyMap: finalHistoryMap, deepLinkMap: dlMap };
   }, [accountMap, rawHistoryList, typeNameMap, typeTitleMap]);
 
-  const [currentItemDisplayCount, setCurrentItemDisplayCount] = useState<number>(DEFAULT_ITEMS_COUNT);
-
-  const getHistoryItems = useCallback((count: number) => {
-    return Object.values(historyMap).filter(filterFunction)
+  // Pre-sort & pre-filter list once when historyMap or filterFunction changes.
+  // This avoids re-sorting the full list on every getHistoryItems(count) call.
+  const sortedFilteredHistory = useMemo(() => {
+    return Object.values(historyMap)
+      .filter(filterFunction)
       .sort((a, b) => {
         if (PROCESSING_STATUSES.includes(a.status) && !PROCESSING_STATUSES.includes(b.status)) {
           return -1;
@@ -545,11 +559,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         } else {
           return (a.apiTxIndex ?? 0) - (b.apiTxIndex ?? 0);
         }
-      })
-      .slice(0, count);
+      });
   }, [filterFunction, historyMap]);
 
-  const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(getHistoryItems(DEFAULT_ITEMS_COUNT));
+  const [historyItems, setHistoryItems] = useState<TransactionHistoryDisplayItem[]>(() => sortedFilteredHistory.slice(0, DEFAULT_ITEMS_COUNT));
+
+  // Debounce ref to batch rapid successive updates into a single render tick.
+  const historyUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [currentItemDisplayCount, setCurrentItemDisplayCount] = useState<number>(DEFAULT_ITEMS_COUNT);
 
   const [currentAccountProxyid] = useState(currentAccountProxy?.id);
 
@@ -608,7 +626,8 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   useEffect(() => {
     if (extrinsicHashOrId && chain && openDetailLink) {
-      const existed = Object.values(historyMap).find((item) => item.chain === chain && (item.transactionId === extrinsicHashOrId || item.extrinsicHash === extrinsicHashOrId));
+      // O(1) lookup via deepLinkMap — no need to scan all history items
+      const existed = deepLinkMap[`${chain}|${extrinsicHashOrId}`];
 
       if (existed && !isActiveCallData) {
         setSelectedItem(existed);
@@ -616,7 +635,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         activeModal(modalId);
       }
     }
-  }, [activeModal, chain, extrinsicHashOrId, openDetailLink, historyMap, inactiveModal, isActiveCallData]);
+  }, [activeModal, chain, deepLinkMap, extrinsicHashOrId, inactiveModal, isActiveCallData, openDetailLink]);
 
   useEffect(() => {
     if (!notiMultisigPendingTxItem) {
@@ -635,7 +654,7 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
         if (selected) {
           const key = getHistoryItemKey(selected);
 
-          return historyMap[key] || null;
+          return historyMap[key] || selected;
         } else {
           return selected;
         }
@@ -861,19 +880,15 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
 
   const onLoadMoreItems = useCallback(() => {
     setCurrentItemDisplayCount((prev) => {
-      const rawItemsLength = rawHistoryList.filter(filterFunction).length;
+      const nextCount = prev + NEXT_ITEMS_COUNT;
 
-      if (prev + NEXT_ITEMS_COUNT > rawItemsLength) {
-        return rawItemsLength;
-      } else {
-        return prev + NEXT_ITEMS_COUNT;
-      }
+      return nextCount > sortedFilteredHistory.length ? sortedFilteredHistory.length : nextCount;
     });
-  }, [filterFunction, rawHistoryList]);
+  }, [sortedFilteredHistory.length]);
 
   const hasMoreItems = useMemo(() => {
-    return rawHistoryList.filter(filterFunction).length > historyItems.length;
-  }, [filterFunction, historyItems.length, rawHistoryList]);
+    return sortedFilteredHistory.length > historyItems.length;
+  }, [historyItems.length, sortedFilteredHistory.length]);
 
   const listSection = useMemo(() => (
     <>
@@ -979,8 +994,23 @@ function Component ({ className = '' }: Props): React.ReactElement<Props> {
   }, [isSelectedChainEvm, selectedAddress, selectedChain]);
 
   useEffect(() => {
-    setHistoryItems(getHistoryItems(currentItemDisplayCount));
-  }, [currentItemDisplayCount, getHistoryItems]);
+    // Debounce rapid updates: clear any pending timer and set a new one so we
+    // only call setHistoryItems once after the burst settles (max 50 ms lag).
+    if (historyUpdateTimerRef.current) {
+      clearTimeout(historyUpdateTimerRef.current);
+    }
+
+    historyUpdateTimerRef.current = setTimeout(() => {
+      setHistoryItems(sortedFilteredHistory.slice(0, currentItemDisplayCount));
+      historyUpdateTimerRef.current = null;
+    }, 50);
+
+    return () => {
+      if (historyUpdateTimerRef.current) {
+        clearTimeout(historyUpdateTimerRef.current);
+      }
+    };
+  }, [currentItemDisplayCount, sortedFilteredHistory]);
 
   useEffect(() => {
     if (!multisigChainItems.some((item) => item.slug === multisigSelectedChain)) {

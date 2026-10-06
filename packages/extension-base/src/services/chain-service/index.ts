@@ -15,7 +15,7 @@ import { SubstrateChainHandler } from '@subwallet/extension-base/services/chain-
 import { TonChainHandler } from '@subwallet/extension-base/services/chain-service/handler/TonChainHandler';
 import { _CHAIN_VALIDATION_ERROR } from '@subwallet/extension-base/services/chain-service/handler/types';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _CUSTOM_PREFIX, _DataMap, _EvmApi, _NetworkUpsertParams, _NFT_CONTRACT_STANDARDS, _SMART_CONTRACT_STANDARDS, _SmartContractTokenInfo, _SubstrateApi, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse } from '@subwallet/extension-base/services/chain-service/types';
-import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainBitcoinCompatible, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getTokenOnChainAssetId, _isAssetAutoEnable, _isAssetCanPayTxFee, _isAssetFungibleToken, _isChainBitcoinCompatible, _isChainEnabled, _isCustomAsset, _isCustomChain, _isCustomProvider, _isEqualContractAddress, _isEqualSmartContractAsset, _isLocalToken, _isMantaZkAsset, _isPureEvmChain, _isPureSubstrateChain, _parseAssetRefKey, randomizeProvider, updateLatestChainInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { MYTHOS_MIGRATION_KEY } from '@subwallet/extension-base/services/migration-service/scripts';
 import { convertUtxoRawToUtxo } from '@subwallet/extension-base/services/request-service/helper';
@@ -1733,6 +1733,7 @@ export class ChainService {
         evmChainId: params.chainSpec.evmChainId,
         existentialDeposit: params.chainSpec.existentialDeposit,
         symbol: params.chainEditInfo.symbol as string,
+        multicall3: null,
         abiExplorer: null
       };
     }

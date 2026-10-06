@@ -321,6 +321,22 @@ export async function waitTimeout (ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
+export async function processInChunks<T> (items: T[], fn: (chunk: T[]) => Promise<void>, size: number, delayMs = 0): Promise<void> {
+  if (size <= 0) {
+    throw new Error('Chunk size must be greater than 0');
+  }
+
+  for (let i = 0; i < items.length; i += size) {
+    const chunk = items.slice(i, i + size);
+
+    await fn(chunk);
+
+    if (i + size < items.length && delayMs > 0) {
+      await waitTimeout(delayMs);
+    }
+  }
+}
+
 export const stripUrl = (url: string): string => {
   assert(url && (url.startsWith('http:') || url.startsWith('https:') || url.startsWith('ipfs:') || url.startsWith('ipns:')), t('bg.utils.invalidUrlForProvider'));
 

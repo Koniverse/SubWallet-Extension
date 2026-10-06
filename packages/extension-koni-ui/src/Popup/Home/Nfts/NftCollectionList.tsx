@@ -25,17 +25,29 @@ function Component ({ className = '', id }: Props): React.ReactElement<Props> {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { inactiveModal } = useContext(ModalContext);
-  const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
-    const nftList: NftItem[] = [];
+  // Index items by collection once (O(items)) instead of rescanning all items per collection.
+  // Previously getNftsByCollection ran nftItems.forEach for every collection rendered, i.e.
+  // O(collections × items) — a hotspot in all-account mode with many items/collections.
+  const nftItemsByCollection = useMemo(() => {
+    const map = new Map<string, NftItem[]>();
 
     nftItems.forEach((nftItem) => {
-      if (nftItem.collectionId === nftCollection.collectionId && nftItem.chain === nftCollection.chain) {
-        nftList.push(nftItem);
+      const key = `${nftItem.chain}__${nftItem.collectionId}`;
+      const list = map.get(key);
+
+      if (list) {
+        list.push(nftItem);
+      } else {
+        map.set(key, [nftItem]);
       }
     });
 
-    return nftList;
+    return map;
   }, [nftItems]);
+
+  const getNftsByCollection = useCallback((nftCollection: NftCollection) => {
+    return nftItemsByCollection.get(`${nftCollection.chain}__${nftCollection.collectionId}`) ?? [];
+  }, [nftItemsByCollection]);
 
   const onCloseNftModal = useCallback(() => {
     inactiveModal(id);

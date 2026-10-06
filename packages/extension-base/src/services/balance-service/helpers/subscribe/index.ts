@@ -48,6 +48,111 @@ const handleUnsupportedOrPendingAddresses = (
   });
 };
 
+export interface SubscribeBalanceByChainInfoProps {
+  addresses: string[];
+  chainInfo: _ChainInfo;
+  // Should already be filtered to the visible tokens for this subscription
+  chainAssetMap: Record<string, _ChainAsset>;
+  substrateApiMap: Record<string, _SubstrateApi>;
+  evmApiMap: Record<string, _EvmApi>;
+  tonApiMap: Record<string, _TonApi>;
+  cardanoApiMap: Record<string, _CardanoApi>;
+  bitcoinApiMap: Record<string, _BitcoinApi>;
+  callback: (rs: BalanceItem[]) => void;
+  extrinsicType?: ExtrinsicType;
+}
+
+// Subscribe balance for a SINGLE chain (all addresses, the given tokens).
+// Returns the chain's own unsubscribe function so callers can manage subscriptions
+// per chain (e.g. diff-based re-subscribe instead of tearing everything down).
+export async function subscribeBalanceByChainInfo ({ addresses,
+  bitcoinApiMap,
+  callback,
+  cardanoApiMap,
+  chainAssetMap,
+  chainInfo,
+  evmApiMap,
+  extrinsicType,
+  substrateApiMap,
+  tonApiMap }: SubscribeBalanceByChainInfoProps): Promise<(() => void) | undefined> {
+  const chainSlug = chainInfo.slug;
+  const [useAddresses, notSupportAddresses] = filterAddressByChainInfo(addresses, chainInfo);
+
+  if (notSupportAddresses.length) {
+    handleUnsupportedOrPendingAddresses(
+      notSupportAddresses,
+      chainSlug,
+      chainAssetMap,
+      APIItemState.NOT_SUPPORT,
+      callback
+    );
+  }
+
+  const evmApi = evmApiMap[chainSlug];
+
+  if (_isPureEvmChain(chainInfo)) {
+    return subscribeEVMBalance({
+      addresses: useAddresses,
+      assetMap: chainAssetMap,
+      callback,
+      chainInfo,
+      evmApi,
+      substrateApiMap
+    });
+  }
+
+  const tonApi = tonApiMap[chainSlug];
+
+  if (_isPureTonChain(chainInfo)) {
+    return subscribeTonBalance({
+      addresses: useAddresses,
+      assetMap: chainAssetMap,
+      callback,
+      chainInfo,
+      tonApi
+    });
+  }
+
+  const cardanoApi = cardanoApiMap[chainSlug];
+
+  if (_isPureCardanoChain(chainInfo)) {
+    return subscribeCardanoBalance({
+      addresses: useAddresses,
+      assetMap: chainAssetMap,
+      callback,
+      chainInfo,
+      cardanoApi
+    });
+  }
+
+  const bitcoinApi = bitcoinApiMap[chainSlug];
+
+  if (_isPureBitcoinChain(chainInfo)) {
+    return subscribeBitcoinBalance({
+      addresses: useAddresses,
+      assetMap: chainAssetMap,
+      bitcoinApi,
+      callback,
+      chainInfo
+    });
+  }
+
+  // If the chain is not ready, return pending state
+  if (!substrateApiMap[chainSlug].isApiReady) {
+    handleUnsupportedOrPendingAddresses(
+      useAddresses,
+      chainSlug,
+      chainAssetMap,
+      APIItemState.PENDING,
+      callback
+    );
+  }
+
+  const substrateApi = await substrateApiMap[chainSlug].isReady;
+
+  return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
+}
+
 // main subscription, use for multiple chains, multiple addresses and multiple tokens
 export function subscribeBalance (
   addresses: string[],
@@ -68,84 +173,18 @@ export function subscribeBalance (
   const chainInfoMap: Record<string, _ChainInfo> = Object.fromEntries(Object.entries(_chainInfoMap).filter(([chain]) => chains.includes(chain)));
 
   // Looping over each chain
-  const unsubList = Object.values(chainInfoMap).map(async (chainInfo) => {
-    const chainSlug = chainInfo.slug;
-    const [useAddresses, notSupportAddresses] = filterAddressByChainInfo(addresses, chainInfo);
-
-    if (notSupportAddresses.length) {
-      handleUnsupportedOrPendingAddresses(
-        notSupportAddresses,
-        chainSlug,
-        chainAssetMap,
-        APIItemState.NOT_SUPPORT,
-        callback
-      );
-    }
-
-    const evmApi = evmApiMap[chainSlug];
-
-    if (_isPureEvmChain(chainInfo)) {
-      return subscribeEVMBalance({
-        addresses: useAddresses,
-        assetMap: chainAssetMap,
-        callback,
-        chainInfo,
-        evmApi,
-        substrateApiMap
-      });
-    }
-
-    const tonApi = tonApiMap[chainSlug];
-
-    if (_isPureTonChain(chainInfo)) {
-      return subscribeTonBalance({
-        addresses: useAddresses,
-        assetMap: chainAssetMap,
-        callback,
-        chainInfo,
-        tonApi
-      });
-    }
-
-    const cardanoApi = cardanoApiMap[chainSlug];
-
-    if (_isPureCardanoChain(chainInfo)) {
-      return subscribeCardanoBalance({
-        addresses: useAddresses,
-        assetMap: chainAssetMap,
-        callback,
-        chainInfo,
-        cardanoApi
-      });
-    }
-
-    const bitcoinApi = bitcoinApiMap[chainSlug];
-
-    if (_isPureBitcoinChain(chainInfo)) {
-      return subscribeBitcoinBalance({
-        addresses: useAddresses,
-        assetMap: chainAssetMap,
-        bitcoinApi,
-        callback,
-        chainInfo
-      });
-    }
-
-    // If the chain is not ready, return pending state
-    if (!substrateApiMap[chainSlug].isApiReady) {
-      handleUnsupportedOrPendingAddresses(
-        useAddresses,
-        chainSlug,
-        chainAssetMap,
-        APIItemState.PENDING,
-        callback
-      );
-    }
-
-    const substrateApi = await substrateApiMap[chainSlug].isReady;
-
-    return subscribeSubstrateBalance(useAddresses, chainInfo, chainAssetMap, substrateApi, evmApi, callback, extrinsicType);
-  });
+  const unsubList = Object.values(chainInfoMap).map((chainInfo) => subscribeBalanceByChainInfo({
+    addresses,
+    bitcoinApiMap,
+    callback,
+    cardanoApiMap,
+    chainAssetMap,
+    chainInfo,
+    evmApiMap,
+    extrinsicType,
+    substrateApiMap,
+    tonApiMap
+  }));
 
   return () => {
     unsubList.forEach((subProm) => {
