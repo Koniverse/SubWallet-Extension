@@ -22,12 +22,28 @@
 
 Carried on from [2026-10-05](../2026-10-05/report-manual.md), which reached 45 of 82 lines on each beta build with REG-32 skipped.
 
-Left to run on the beta stage: manage account, lock and unlock, backup seed phrase, history, general settings, security settings, manage network, manage token, and REG-84 and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
+Manage account closes today — all twelve lines on each platform, the largest section that was left.
+
+Still to run on the beta stage: lock and unlock, backup seed phrase, history, general settings, security settings, manage network, manage token, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
 
 ### AC results
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| REG-IOS-1 / REG-AND-1 | Create an account with a new seed phrase — unified account; TON account | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-2 / REG-AND-2 | Derive an account from the create account screen — unified account; substrate type; ethereum type | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-3 / REG-AND-3 | Derive an account from account details | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-4 / REG-AND-4 | Import an account — seed phrase; JSON file single; JSON file multi covering normal, QR and watch-only; QR code substrate; QR code EVM; private key | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-78 / REG-AND-78 | Import from Trust Wallet | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-5 / REG-AND-5 | Attach an account — polkadot vault; keystone; watch-only. Ledger is coming soon and is not checked | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-6 / REG-AND-6 | Export an account — unified with seed phrase and JSON; TON with seed phrase, JSON and private key; substrate with JSON and QR; ethereum with JSON, private key and QR; all accounts covering normal, QR signer and watch-only; watch-only offers no export; the exported file imports back | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-7 / REG-AND-7 | Proxy account — add a proxy; remove a proxy; view the proxy list; act through a proxy | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-8 / REG-AND-8 | Multisig account — create one; open its details; approve and reject a pending transaction; sign for a multisig | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-9 / REG-AND-9 | Remove an account | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-10 / REG-AND-10 | Edit an account name | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-84 / REG-AND-84 | Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only | ✅ Pass | iOS beta + Android beta |
+
+57 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
 
 ### Bugs
 
