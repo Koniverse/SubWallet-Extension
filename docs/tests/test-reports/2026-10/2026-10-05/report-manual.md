@@ -14,7 +14,7 @@
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -165,4 +165,16 @@ None.
 
 ## Summary
 
-Session in progress.
+Two stories moved, one on the Extension and one on both Mobile beta builds.
+
+US-42.28 finished the RPC half of the chainlist maintenance and cleared every deactivated chain. All 69 chains whose provider lists were rewritten connect on their first RPC with that first RPC unchanged, and all 61 chains set INACTIVE are gone from Manage networks, the token picker, and the send and swap flows — 30 mainnet and 31 testnet.
+
+RPC-64 was corrected along the way. It had been recorded as skipped on 10-02 because `shibuya` was not in the wallet; a recheck today found it there, so the line reopened and then passed.
+
+What the deactivation work still owes is GEN-1 to GEN-6, and those carry the point of the change. The issue kept each chain's entry and assets so references would not break, so someone holding GLMR on Moonbeam or MANTA on Manta Atlantic must still see the balance, read the history, and open the account without error. Those lines need an upgrade carrying data from before the deactivation, so they could not run here.
+
+US-42.27 opened its first stage and reached 45 of 82 lines on each beta build, the same set on TestFlight and on Google Play beta. Eleven sections are closed. REG-32 is skipped on both for the reason it carried through the regression: NFTs are auto-detected now, so a removed one comes straight back.
+
+AC-1 and AC-3 ask for the full list, so neither is settled. The upgrade rechecks have not started, and the two production stages only begin once the beta stage has passed in full.
+
+No bugs found.
