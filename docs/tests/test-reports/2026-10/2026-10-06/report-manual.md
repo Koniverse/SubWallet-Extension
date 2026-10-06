@@ -22,9 +22,9 @@
 
 Carried on from [2026-10-05](../2026-10-05/report-manual.md), which reached 45 of 82 lines on each beta build with REG-32 skipped.
 
-Manage account closes today — all twelve lines on each platform, the largest section that was left — and manage network and manage token close with it.
+Six sections close today on each platform: manage account with all twelve of its lines, manage network, manage token, history, general settings and security settings.
 
-Still to run on the beta stage: lock and unlock, backup seed phrase, history, general settings, security settings, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
+Still to run on the beta stage: lock and unlock, backup seed phrase, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
 
 ### AC results
 
@@ -49,8 +49,19 @@ Still to run on the beta stage: lock and unlock, backup seed phrase, history, ge
 | REG-IOS-66 / REG-AND-66 | Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-67 / REG-AND-67 | Remove a custom token with the token on, and with it off | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-68 / REG-AND-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-46 / REG-AND-46 | All accounts mode — select account; search account; scroll the account list | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-47 / REG-AND-47 | Separate account mode does not show the account picker | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-48 / REG-AND-48 | Search network; scroll the network list; select network; filter | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-49 / REG-AND-49 | The explorer link opens from a history record | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-50 / REG-AND-50 | Change the currency, and the select currency popup | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-51 / REG-AND-51 | Change the language, and search within the language list | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-52 / REG-AND-52 | Turn in-app notifications off and on. Wallet theme is coming soon and is not checked | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-53 / REG-AND-53 | Change the wallet password — current password; new password; confirm; the I understand checkbox; the learn more link; save | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-54 / REG-AND-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-55 / REG-AND-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-56 / REG-AND-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | iOS beta + Android beta |
 
-64 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
+75 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
 
 ### Bugs
 
