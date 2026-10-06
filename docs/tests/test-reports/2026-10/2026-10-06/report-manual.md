@@ -22,9 +22,9 @@
 
 Carried on from [2026-10-05](../2026-10-05/report-manual.md), which reached 45 of 82 lines on each beta build with REG-32 skipped.
 
-Six sections close today on each platform: manage account with all twelve of its lines, manage network, manage token, history, general settings and security settings.
+Nine sections close today on each platform: manage account with all twelve of its lines, manage network, manage token, history, general settings, security settings, lock and unlock, backup seed phrase, and the background-and-resume check.
 
-Still to run on the beta stage: lock and unlock, backup seed phrase, and REG-85. Then the upgrade rechecks, which need the previous production version installed with its data.
+The fresh-install half of the beta stage finishes today. What remains is the upgrade recheck on each build.
 
 ### AC results
 
@@ -60,8 +60,18 @@ Still to run on the beta stage: lock and unlock, backup seed phrase, and REG-85.
 | REG-IOS-54 / REG-AND-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-55 / REG-AND-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | iOS beta + Android beta |
 | REG-IOS-56 / REG-AND-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-11 / REG-AND-11 | Lock the wallet by hand | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-12 / REG-AND-12 | Unlock by typing the password; unlock by Face ID or Touch ID | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-13 / REG-AND-13 | Forgot password — reset account; erase all | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-44 / REG-AND-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-45 / REG-AND-45 | Back up the seed phrase through export account | ✅ Pass | iOS beta + Android beta |
+| REG-IOS-85 / REG-AND-85 | The app opens, backgrounds and resumes without losing state — it comes back to where it was, and does not hang on a loading screen | ✅ Pass | iOS beta + Android beta |
+| AC-1 | Stage 1, iOS beta on TestFlight — every REG-IOS line passes on a fresh install | ✅ Pass | 81 of 82, REG-32 skipped |
+| AC-3 | Stage 2, Android beta on Google Play beta — every REG-AND line passes on a fresh install | ✅ Pass | 81 of 82, REG-32 skipped |
 
-75 of 82 lines done on each platform, with REG-32 skipped. AC-1 and AC-3 need the full list, so they are not settled yet.
+81 of 82 lines done on each platform, with REG-32 skipped. That settles AC-1 and AC-3: the fresh-install regression passes on both beta builds.
+
+What the beta stage still owes is the upgrade recheck on each build, AC-2 and AC-4. Those need the previous production version installed with its data first. Stages 3 and 4, the production rechecks, only begin once the beta stage has passed in full.
 
 ### Bugs
 

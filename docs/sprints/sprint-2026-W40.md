@@ -16,7 +16,7 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | ✅ done 10-02 — all 23 sub-tasks settled | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 3 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | ✅ done 10-02 — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | ✅ done 10-02 — 88 rows settled, 1 on monitoring | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
-| [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 🔄 in-progress — 75 of 82 lines on each beta build | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
+| [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 🔄 in-progress — fresh install done on both beta builds | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
 | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 34 | 🔄 in-progress — RPC done, all 61 deactivated chains gone | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
 
 88 points across six stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
@@ -27,7 +27,7 @@ the regression US-42.24.19 at 83 of 85 on each platform after three rounds, and 
 verification US-42.24.20 with all 88 rows settled. 28 of the window's 88 points are done.
 
 Both remaining stories are running. US-42.27, the release gate, started on the beta builds and has
-75 of 82 lines on each, with the upgrade rechecks and the two production stages still to come.
+the fresh-install regression done on both at 81 of 82, with the upgrade rechecks and the two production stages still to come.
 US-42.28, the chainlist maintenance, is written out as 184 checklist lines, one per chain, so a
 session can tick what it actually got through rather than leaving a whole group open; the RPC half
 and all 61 deactivated chains are done.
