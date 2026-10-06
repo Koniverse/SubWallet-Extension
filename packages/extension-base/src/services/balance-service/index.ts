@@ -169,6 +169,10 @@ export class BalanceService implements StoppableServiceInterface {
         removedAddresses.push(event.data[0] as string);
         lazyTime = 1000;
       }
+
+      if (event.type === 'chain.updateState') {
+        this._staleChainBalanceSubs.add(event.data[0] as string);
+      }
     });
 
     if (removedAddresses.length > 0) {
@@ -442,9 +446,13 @@ export class BalanceService implements StoppableServiceInterface {
   /** Subscribe area */
 
   // One live subscription per chain, keyed by chain slug. `signature` captures the
-  // (addresses + visible tokens) the chain was subscribed with, so we can diff and only
+  // (addresses + chain/token metadata) the chain was subscribed with, so we can diff and only
   // re-subscribe the chains that actually changed instead of tearing everything down.
   private _chainBalanceSubs: Map<string, { signature: string; cancel: () => void }> = new Map();
+  // Chains that emitted `chain.updateState` since the last run. They are re-subscribed even
+  // with an unchanged signature: e.g. switching provider replaces the substrate ApiPromise
+  // the old subscription is bound to.
+  private _staleChainBalanceSubs = new Set<string>();
   private _unsubscribeMantaPay: VoidFunction | undefined;
   // Serialize runs so two overlapping calls can't double-subscribe the same chain.
   private _subscribeChain: Promise<void> = Promise.resolve();
@@ -499,6 +507,11 @@ export class BalanceService implements StoppableServiceInterface {
     // Drop balances for tokens that are no longer active/visible (targeted, not a full wipe).
     await this.handleResetBalance();
 
+    // A run queued before stop()/sleep must not subscribe again once the service is stopped.
+    if (this.status === ServiceStatus.STOPPING || this.status === ServiceStatus.STOPPED) {
+      return;
+    }
+
     const addressKey = [...addresses].sort().join(',');
 
     // Desired per-chain descriptors with a signature for diffing.
@@ -510,16 +523,23 @@ export class BalanceService implements StoppableServiceInterface {
       }
 
       const sortedTokens = [...tokens].sort();
-      const signature = `${addressKey}|${sortedTokens.join(',')}`;
+      // Include chain/asset metadata so a patched contract or multicall3 address re-subscribes
+      // the chain even when its token slugs are unchanged.
+      const metadataKey = JSON.stringify([chainInfoMap[chainSlug], sortedTokens.map((slug) => assetMap[slug])]);
+      const signature = `${addressKey}|${metadataKey}`;
 
       desired.set(chainSlug, { signature, tokens: sortedTokens });
     });
 
-    // 1) Tear down chains that disappeared or whose signature changed.
+    const staleChains = this._staleChainBalanceSubs;
+
+    this._staleChainBalanceSubs = new Set();
+
+    // 1) Tear down chains that disappeared, changed, or were updated since the last run.
     for (const [chainSlug, entry] of this._chainBalanceSubs) {
       const next = desired.get(chainSlug);
 
-      if (!next || next.signature !== entry.signature) {
+      if (!next || next.signature !== entry.signature || staleChains.has(chainSlug)) {
         entry.cancel();
         this._chainBalanceSubs.delete(chainSlug);
       }
@@ -542,7 +562,17 @@ export class BalanceService implements StoppableServiceInterface {
 
       let cancelled = false;
 
-      const unsubProm = subscribeBalanceByChainInfo({
+      const entry: { signature: string; cancel: () => void } = {
+        signature: desc.signature,
+        cancel: () => {
+          cancelled = true;
+          unsubProm.then((unsub) => unsub && unsub()).catch(console.error);
+        }
+      };
+
+      this._chainBalanceSubs.set(chainSlug, entry);
+
+      const unsubProm: Promise<VoidFunction | undefined> = subscribeBalanceByChainInfo({
         addresses,
         bitcoinApiMap,
         callback: (result) => {
@@ -558,15 +588,14 @@ export class BalanceService implements StoppableServiceInterface {
       }).catch((error): undefined => {
         console.error(`Subscribe balance failed for chain ${chainSlug}:`, error);
 
+        // Forget the failed subscription so the next run retries this chain, unless a newer
+        // run has already cancelled or replaced it.
+        if (!cancelled && this._chainBalanceSubs.get(chainSlug) === entry) {
+          this._chainBalanceSubs.delete(chainSlug);
+        }
+
         return undefined;
       });
-
-      const cancel = () => {
-        cancelled = true;
-        unsubProm.then((unsub) => unsub && unsub()).catch(console.error);
-      };
-
-      this._chainBalanceSubs.set(chainSlug, { signature: desc.signature, cancel });
     }
 
     // MantaPay depends on the current account; keep a single handle re-subscribed each run.

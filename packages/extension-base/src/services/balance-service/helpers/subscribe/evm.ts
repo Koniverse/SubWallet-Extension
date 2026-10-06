@@ -59,14 +59,48 @@ interface AddressEntry {
 // ---------------------------------------------------------------------------
 
 /**
+ * A balance read that failed is `undefined`, never '0': callers skip it so the
+ * last known balance stays instead of an RPC error showing up as a zero balance.
+ */
+type BalanceResult = string | undefined;
+
+function decodeUint256 (evmApi: _EvmApi, returnData: string): string {
+  if (returnData === '0x' || returnData === '0x0') {
+    return '0';
+  }
+
+  try {
+    return evmApi.api.eth.abi.decodeParameter('uint256', returnData) as unknown as string;
+  } catch {
+    return '0';
+  }
+}
+
+async function fetchERC20BalanceOf (contract: Contract | undefined, address: string, tokenSlug: string): Promise<BalanceResult> {
+  if (!contract) {
+    return undefined;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    return await contract.methods.balanceOf(address).call() as string;
+  } catch (e) {
+    console.error(`[ERC20 fallback] balanceOf failed: address=${address} token=${tokenSlug}`, e);
+
+    return undefined;
+  }
+}
+
+/**
  * Fetches ERC-20 balances for all (token, address) pairs in a single
  * Multicall3 call (or multiple batched calls if the pair count exceeds
- * MULTICALL_BATCH_SIZE).
+ * MULTICALL_BATCH_SIZE). Pairs whose batch failed or whose call reverted are
+ * retried with individual calls.
  *
  * Returns a nested map:  tokenSlug → address → rawBalance (decimal string).
+ * Pairs that still fail are left out.
  */
 async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: Record<string, ReturnType<typeof filterAssetsByChainAndType>[string]>, multicall3Address: string, evmApi: _EvmApi, erc20ContractMap: Record<string, Contract>): Promise<Record<string, Record<string, string>>> {
-  const web3 = evmApi.api;
   const multicall = getMulticall3Contract(multicall3Address, evmApi);
 
   // Build full call + metadata list
@@ -92,6 +126,15 @@ async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: R
   }
 
   const balanceMap: Record<string, Record<string, string>> = {};
+  const failedEntries: CallEntry[] = [];
+
+  const setBalance = ({ address, tokenSlug }: CallEntry, balance: string) => {
+    if (!balanceMap[tokenSlug]) {
+      balanceMap[tokenSlug] = {};
+    }
+
+    balanceMap[tokenSlug][address] = balance;
+  };
 
   if (allCalls.length === 0) {
     return balanceMap;
@@ -108,30 +151,30 @@ async function fetchERC20BalancesViaMulticall (addresses: string[], tokenList: R
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       results = await multicall.methods.aggregate3(callBatch).call() as Multicall3Result[];
     } catch (err) {
-      console.error('[Multicall3] batch failed, zeroing entries', err);
-      results = callBatch.map(() => ({ success: false, returnData: '0x' }));
+      console.error('[Multicall3] ERC-20 batch failed, falling back to individual calls', err);
+      failedEntries.push(...entryBatch);
+
+      continue;
     }
 
     results.forEach((result, idx) => {
-      const { address, tokenSlug } = entryBatch[idx];
-
-      if (!balanceMap[tokenSlug]) {
-        balanceMap[tokenSlug] = {};
-      }
-
-      if (result.success && result.returnData !== '0x' && result.returnData !== '0x0') {
-        try {
-          const decoded = web3.eth.abi.decodeParameter('uint256', result.returnData) as unknown as string;
-
-          balanceMap[tokenSlug][address] = decoded;
-        } catch {
-          balanceMap[tokenSlug][address] = '0';
-        }
+      if (result.success) {
+        setBalance(entryBatch[idx], decodeUint256(evmApi, result.returnData));
       } else {
-        balanceMap[tokenSlug][address] = '0';
+        failedEntries.push(entryBatch[idx]);
       }
     });
   }
+
+  await processInChunks(failedEntries, async (chunk) => {
+    await Promise.all(chunk.map(async (entry) => {
+      const balance = await fetchERC20BalanceOf(erc20ContractMap[entry.tokenSlug], entry.address, entry.tokenSlug);
+
+      if (balance !== undefined) {
+        setBalance(entry, balance);
+      }
+    }));
+  }, FALLBACK_ADDRESS_CHUNK, FALLBACK_CHUNK_DELAY_MS);
 
   return balanceMap;
 }
@@ -154,27 +197,24 @@ async function fetchERC20BalancesViaChunks (addresses: string[], tokenList: Reco
 
           await processInChunks(addresses, async (addrChunk) => {
             const balances = await Promise.all(
-              addrChunk.map(async (address): Promise<string> => {
-                try {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-                  return await contract.methods.balanceOf(address).call() as string;
-                } catch (e) {
-                  console.error(`[ERC20 fallback] balanceOf failed: address=${address} token=${tokenInfo.slug}`, e);
-
-                  return '0';
-                }
-              })
+              addrChunk.map((address) => fetchERC20BalanceOf(contract, address, tokenInfo.slug))
             );
 
-            const items: BalanceItem[] = balances.map((balance, i): BalanceItem => ({
-              address: addrChunk[i],
-              tokenSlug: tokenInfo.slug,
-              free: new BN(balance || 0).toString(),
-              locked: '0',
-              state: APIItemState.READY
-            }));
+            const items: BalanceItem[] = [];
 
-            callback(items);
+            balances.forEach((balance, i) => {
+              if (balance !== undefined) {
+                items.push({
+                  address: addrChunk[i],
+                  tokenSlug: tokenInfo.slug,
+                  free: new BN(balance || 0).toString(),
+                  locked: '0',
+                  state: APIItemState.READY
+                });
+              }
+            });
+
+            items.length && callback(items);
           }, FALLBACK_ADDRESS_CHUNK, FALLBACK_CHUNK_DELAY_MS);
         } catch (err) {
           console.error(`[ERC20 fallback] token=${tokenInfo.slug}`, err);
@@ -184,8 +224,11 @@ async function fetchERC20BalancesViaChunks (addresses: string[], tokenList: Reco
     }, FALLBACK_TOKEN_CHUNK, FALLBACK_CHUNK_DELAY_MS);
 }
 
-async function fetchEVMNativeBalancesViaMulticall (addresses: string[], multicall3Address: string, evmApi: _EvmApi): Promise<string[]> {
-  const web3 = evmApi.api;
+/**
+ * Throws when the batch call itself fails so the caller can fall back to
+ * individual calls; addresses whose call failed inside the batch are `undefined`.
+ */
+async function fetchEVMNativeBalancesViaMulticall (addresses: string[], multicall3Address: string, evmApi: _EvmApi): Promise<BalanceResult[]> {
   const multicall = getMulticall3Contract(multicall3Address, evmApi);
 
   const calls: Multicall3Call[] = addresses.map((address) => {
@@ -199,33 +242,19 @@ async function fetchEVMNativeBalancesViaMulticall (addresses: string[], multical
     };
   });
 
-  let results: Multicall3Result[];
+  // Single RPC call for all addresses
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const results = await multicall.methods.aggregate3(calls).call() as Multicall3Result[];
 
-  try {
-    // Single RPC call for all addresses
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    results = await multicall.methods.aggregate3(calls).call() as Multicall3Result[];
-  } catch (err) {
-    console.error('[Multicall3] fetchNativeBalancesViaMulticall failed, will fall back to individual calls', err);
+  return addresses.map((_, index) => {
+    const result = results[index];
 
-    return [];
-  }
-
-  return results.map((result) => {
-    if (result.success && result.returnData !== '0x' && result.returnData !== '0x0') {
-      try {
-        return web3.eth.abi.decodeParameter('uint256', result.returnData) as unknown as string;
-      } catch {
-        return '0';
-      }
-    }
-
-    return '0';
+    return result?.success ? decodeUint256(evmApi, result.returnData) : undefined;
   });
 }
 
-async function fetchEVMNativeBalancesViaChunks (addresses: string[], evmApi: _EvmApi): Promise<string[]> {
-  const results: string[] = new Array<string>(addresses.length).fill('0');
+async function fetchEVMNativeBalancesViaChunks (addresses: string[], evmApi: _EvmApi): Promise<BalanceResult[]> {
+  const results = new Array<BalanceResult>(addresses.length).fill(undefined);
 
   await processInChunks(addresses.map((address, index): AddressEntry => ({ address, index })), async (chunk) => {
     const settled = await Promise.allSettled(
@@ -239,7 +268,6 @@ async function fetchEVMNativeBalancesViaChunks (addresses: string[], evmApi: _Ev
         results[originalIdx] = outcome.value;
       } else {
         console.error(`[subscribeEVMBalance] getBalance failed: address=${chunk[i].address}`, outcome.reason);
-        results[originalIdx] = '0';
       }
     });
   }, FALLBACK_ADDRESS_CHUNK, FALLBACK_CHUNK_DELAY_MS);
@@ -327,89 +355,82 @@ export function subscribeERC20Interval ({ addresses, assetMap, callback, chainIn
 
 export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, callback, chainInfo, evmApi: _evmApi, substrateApiMap }: SubscribeEvmPalletBalance): () => void {
   const chain = chainInfo.slug;
-  const tokenList = filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]);
+  const alphaTokens = Object.values(filterAssetsByChainAndType(assetMap, chain, [_AssetType.ERC20]))
+    .filter((tokenInfo) => tokenInfo.metadata?.isAlphaToken);
 
   let cancelled = false;
 
   const getTokenBalances = async () => {
-    if (cancelled) {
+    if (cancelled || !alphaTokens.length || !substrateApiMap) {
       return;
     }
 
-    await Promise.all(
-      Object.values(tokenList).map(async (tokenInfo) => {
-        try {
-          if (!tokenInfo.metadata?.isAlphaToken || !substrateApiMap) {
-            return;
-          }
+    try {
+      // Map EVM addresses → SS58 for the substrate call
+      const ss58ToEvmMap: Record<string, string> = {};
+      const subtensorEvmSs58Addresses: string[] = [];
 
-          // Map EVM addresses → SS58 for the substrate call
-          const ss58ToEvmMap: Record<string, string> = {};
-          const subtensorEvmSs58Addresses: string[] = [];
+      addresses.forEach((address) => {
+        const ss58Address = evmToSs58(address);
 
-          addresses.forEach((address) => {
-            const ss58Address = evmToSs58(address);
+        subtensorEvmSs58Addresses.push(ss58Address);
+        ss58ToEvmMap[ss58Address] = address;
+      });
 
-            subtensorEvmSs58Addresses.push(ss58Address);
-            ss58ToEvmMap[ss58Address] = address;
-          });
+      // One stake query per refresh for every alpha token, then split by netuid
+      const substrateApi = await substrateApiMap.bittensor.isReady;
+      const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(
+        subtensorEvmSs58Addresses
+      );
 
-          if (cancelled) {
-            return;
-          }
+      if (cancelled) {
+        return;
+      }
 
-          const substrateApi = await substrateApiMap.bittensor.isReady;
-          const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(
-            subtensorEvmSs58Addresses
-          );
+      const values = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+      const converted: Record<string, Record<number, BigN>> = {};
 
-          if (cancelled) {
-            return;
-          }
+      for (let i = 0; i < values.length; i++) {
+        const [, stakes] = values[i];
+        const s58Address = subtensorEvmSs58Addresses[i];
+        const address = ss58ToEvmMap[s58Address];
 
-          const values = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-          const converted: Record<string, Record<number, BigN>> = {};
-
-          for (let i = 0; i < values.length; i++) {
-            const [, stakes] = values[i];
-            const s58Address = subtensorEvmSs58Addresses[i];
-            const address = ss58ToEvmMap[s58Address];
-
-            if (!address) {
-              continue;
-            }
-
-            converted[address] = {};
-
-            stakes.forEach((stakeInfo) => {
-              const { netuid, stake } = stakeInfo;
-              const currentValue = converted[address][netuid] || BigN(0);
-
-              converted[address][netuid] = currentValue.plus(stake);
-            });
-          }
-
-          const netuid = _getAssetNetuid(tokenInfo);
-          const items: BalanceItem[] = Object.entries(converted).map(([address, stakeMap]): BalanceItem => {
-            const value = stakeMap[netuid] || BigN(0);
-
-            return {
-              address,
-              tokenSlug: tokenInfo.slug,
-              state: APIItemState.READY,
-              free: value.toFixed(0),
-              locked: '0'
-            };
-          });
-
-          if (!cancelled && items.length > 0) {
-            callback(items);
-          }
-        } catch (err) {
-          console.error(`[subscribeERC20IntervalForSubtensorEvm] token=${tokenInfo.slug}`, err);
+        if (!address) {
+          continue;
         }
-      })
-    );
+
+        converted[address] = {};
+
+        stakes.forEach((stakeInfo) => {
+          const { netuid, stake } = stakeInfo;
+          const currentValue = converted[address][netuid] || BigN(0);
+
+          converted[address][netuid] = currentValue.plus(stake);
+        });
+      }
+
+      const items: BalanceItem[] = alphaTokens.flatMap((tokenInfo) => {
+        const netuid = _getAssetNetuid(tokenInfo);
+
+        return Object.entries(converted).map(([address, stakeMap]): BalanceItem => {
+          const value = stakeMap[netuid] || BigN(0);
+
+          return {
+            address,
+            tokenSlug: tokenInfo.slug,
+            state: APIItemState.READY,
+            free: value.toFixed(0),
+            locked: '0'
+          };
+        });
+      });
+
+      if (!cancelled && items.length > 0) {
+        callback(items);
+      }
+    } catch (err) {
+      console.error(`[subscribeERC20IntervalForSubtensorEvm] chain=${chain}`, err);
+    }
   };
 
   getTokenBalances().catch(console.error);
@@ -424,7 +445,7 @@ export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, ca
   };
 }
 
-async function fetchEVMNativeBalances (addresses: string[], chainInfo: SubscribeEvmPalletBalance['chainInfo'], evmApi: _EvmApi): Promise<string[]> {
+async function fetchEVMNativeBalances (addresses: string[], chainInfo: SubscribeEvmPalletBalance['chainInfo'], evmApi: _EvmApi): Promise<BalanceResult[]> {
   if (!addresses.length) {
     return [];
   }
@@ -435,13 +456,28 @@ async function fetchEVMNativeBalances (addresses: string[], chainInfo: Subscribe
     return fetchEVMNativeBalancesViaChunks(addresses, evmApi);
   }
 
+  let balances: BalanceResult[];
+
   try {
-    return await fetchEVMNativeBalancesViaMulticall(addresses, multicall3Address, evmApi);
+    balances = await fetchEVMNativeBalancesViaMulticall(addresses, multicall3Address, evmApi);
   } catch (e) {
     console.error('[Multicall3] native balance batch failed, fallback to individual calls', e);
 
     return fetchEVMNativeBalancesViaChunks(addresses, evmApi);
   }
+
+  // Retry only the addresses whose call failed inside the batch
+  const failedIndexes = balances.flatMap((balance, index) => balance === undefined ? [index] : []);
+
+  if (failedIndexes.length) {
+    const retried = await fetchEVMNativeBalancesViaChunks(failedIndexes.map((index) => addresses[index]), evmApi);
+
+    failedIndexes.forEach((addressIndex, i) => {
+      balances[addressIndex] = retried[i];
+    });
+  }
+
+  return balances;
 }
 
 export function subscribeEVMBalance (params: SubscribeEvmPalletBalance): () => void {
@@ -464,29 +500,24 @@ export function subscribeEVMBalance (params: SubscribeEvmPalletBalance): () => v
         return;
       }
 
-      const items: BalanceItem[] = balances.map((balance, index): BalanceItem => ({
-        address: addresses[index],
-        tokenSlug: nativeTokenSlug,
-        state: APIItemState.READY,
-        free: new BN(balance || '0').toString(),
-        locked: '0'
-      }));
+      const items: BalanceItem[] = [];
 
-      callback(items);
-    } catch (e) {
-      console.error(`[subscribeEVMBalance] native token=${nativeTokenSlug}`, e);
-
-      if (!cancelled) {
-        callback(
-          addresses.map((address): BalanceItem => ({
-            address,
+      // Failed reads are skipped so the last known balance stays instead of becoming 0
+      balances.forEach((balance, index) => {
+        if (balance !== undefined) {
+          items.push({
+            address: addresses[index],
             tokenSlug: nativeTokenSlug,
             state: APIItemState.READY,
-            free: '0',
+            free: new BN(balance || '0').toString(),
             locked: '0'
-          }))
-        );
-      }
+          });
+        }
+      });
+
+      items.length && callback(items);
+    } catch (e) {
+      console.error(`[subscribeEVMBalance] native token=${nativeTokenSlug}`, e);
     }
   };
 
