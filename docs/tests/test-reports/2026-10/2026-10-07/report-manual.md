@@ -37,7 +37,7 @@ None.
 
 BIT-11 was one line covering all 102 subnets the resync changed, which meant a session could read fifty of them and still tick nothing. It is replaced today by SUB-2 to SUB-128, one line per netuid naming what changed on it — the same shape the new chains already had with NEW-M-1 to NEW-M-12.
 
-The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 81 are read and pass.
+The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 89 are read and pass.
 
 ### AC results
 
@@ -103,8 +103,14 @@ The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 81 are r
 | SUB-78 | `bittensor-LOCAL-و` — name Loosh → Umi; priceId `dtao-78` → `loosh`; new logo | ✅ Pass | Extension |
 | SUB-80 | `bittensor-LOCAL-ى` — name dogelayer → OpenRoboto; new logo | ✅ Pass | Extension |
 | SUB-81 | `bittensor-LOCAL-ᚠ` — name grail → Reliquary; new logo | ✅ Pass | Extension |
+| SUB-82 | `bittensor-LOCAL-ᚢ` — name Hermes → Unknown; priceId `dtao-82` → `hermes-3` | ✅ Pass | Extension |
+| SUB-83 | `bittensor-LOCAL-ᚦ` — priceId `dtao-83` → `null` | ✅ Pass | Extension |
+| SUB-84 | `bittensor-LOCAL-モ` — name Chipforge (tatsu) → Unknown; symbol モ → ᚨ; default icon | ✅ Pass | Extension |
+| SUB-86 | `bittensor-LOCAL-ᚳ` — name Miao → Unknown; default icon | ✅ Pass | Extension |
+| SUB-87 | `bittensor-LOCAL-Ы` — name Luminar Network → Provenonce; new logo | ✅ Pass | Extension |
+| SUB-89 | `bittensor-LOCAL-ᛒ` — name InfiniteHash → InfiniteQuant; new logo | ✅ Pass | Extension |
 
-60 of 102 subnets read. The next is netuid 82.
+66 of 102 subnets read. The next is netuid 90.
 
 Still open elsewhere: the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, RPC-X1 and RPC-X3, the upgrade runs, and FIX-4 to FIX-6.
 
