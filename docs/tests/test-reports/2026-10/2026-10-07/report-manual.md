@@ -7,7 +7,7 @@
 | Tester | MaiThuongNinni |
 | Environment | Extension; Mobile — Android + iOS beta |
 | Runner | manual (extension + mobile) |
-| Build under test | to fill in — Extension: version + chain-list version; Mobile: TestFlight and Google Play beta build numbers |
+| Build under test | to fill in — Extension: version + chain-list version; Mobile: TestFlight build number, and the newer Google Play beta build released today |
 | Stories tested | US-42.27, US-42.28, US-42.29 |
 | Total bugs found | 0 |
 | P0 | 0 |
@@ -21,6 +21,8 @@
 ## US-42.27 — Release SubWallet Mobile
 
 The fresh-install half of the beta stage closed on [2026-10-06](../2026-10-06/report-manual.md) at 81 of 82 lines on each build.
+
+A newer Android beta build came out today and the session ran on it as well. Nothing in the story changes — the checklist is the same and the lines already ticked stay ticked — but the build the run was made against is not the one 10-06 recorded, so it is noted here.
 
 Left to run: the upgrade recheck on each beta build, then the two production stages. The upgrade rechecks need the previous production version installed with its data first.
 
@@ -37,7 +39,7 @@ None.
 
 BIT-11 was one line covering all 102 subnets the resync changed, which meant a session could read fifty of them and still tick nothing. It is replaced today by SUB-2 to SUB-128, one line per netuid naming what changed on it — the same shape the new chains already had with NEW-M-1 to NEW-M-12.
 
-The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 100 are read and pass.
+The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 110 are read and pass.
 
 ### AC results
 
@@ -119,10 +121,25 @@ The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 100 are 
 | SUB-98 | `bittensor-LOCAL-ბ` — name ForeverMoney → NeverPlayAlone; new logo | ✅ Pass | Extension |
 | SUB-99 | `bittensor-LOCAL-გ` — name Problems → Thirty Spokes; default icon | ✅ Pass | Extension |
 | SUB-100 | `bittensor-LOCAL-დ` — name Plaτform → Cortex; priceId `dtao-100` → `pla-form`; new logo | ✅ Pass | Extension |
+| SUB-101 | `bittensor-LOCAL-ე` — name Eni → Tag101; priceId `dtao-101` → `null` | ✅ Pass | Extension |
+| SUB-102 | `bittensor-LOCAL-ვ` — name ViewCast → ConnitoAI; new logo | ✅ Pass | Extension |
+| SUB-103 | `bittensor-LOCAL-Ա` — name Djinn → Capcomp; new logo | ✅ Pass | Extension |
+| SUB-104 | `bittensor-LOCAL-Բ` — name Ben → TAOstatus; priceId `dtao-104` → `masx-ai` | ✅ Pass | Extension |
+| SUB-105 | `bittensor-LOCAL-Գ` — name Soundsright → Beam; new logo | ✅ Pass | Extension |
+| SUB-106 | `bittensor-LOCAL-Դ` — name Voidai → Nodexo; new logo | ✅ Pass | Extension |
+| SUB-107 | `bittensor-LOCAL-ミ` — new logo | ✅ Pass | Extension |
+| SUB-108 | `bittensor-LOCAL-Զ` — name TalkHead → ChipForge; symbol Զ → モ; new logo | ✅ Pass | Extension |
+| SUB-109 | `bittensor-LOCAL-՞` — name Reserved → Finsight; default icon | ✅ Pass | Extension |
+| SUB-110 | `bittensor-LOCAL-Ѐ` — name Rich Kids of TAO → Green Compute; priceId `dtao-110` → `rich-kids-of-tao`; new logo | ✅ Pass | Extension |
+| FIX-4a | A multisig transaction on Bittensor is created and signed by the initiating signatory | ✅ Pass | Extension |
+| FIX-4b | Another signatory approves it, and the approval count goes up | ✅ Pass | Extension |
+| FIX-4c | The transaction executes once the threshold is reached, and the result lands on chain | ✅ Pass | Extension |
+| FIX-4d | The multisig notification fires at each step — pending approval, and again when the transaction resolves | ✅ Pass | Extension |
+| FIX-4e | The multisig transaction appears in history with the right status and figures | ✅ Pass | Extension |
 
-76 of 102 subnets read. The next is netuid 101.
+86 of 102 subnets read. The next is netuid 111.
 
-Still open elsewhere: the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, RPC-X1 and RPC-X3, the upgrade runs, and FIX-4 to FIX-6.
+Still open elsewhere: the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, RPC-X1 and RPC-X3, the upgrade runs, and FIX-5 and FIX-6.
 
 ### Bugs
 
