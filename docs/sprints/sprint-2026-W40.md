@@ -17,23 +17,24 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 3 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | ✅ done 10-02 — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | ✅ done 10-02 — 88 rows settled, 1 on monitoring | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 | [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 🔄 in-progress — fresh install done on both beta builds | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
-| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 42 | 🔄 in-progress — RPC done, 61 deactivated chains gone, 24 new chains in, 10-06 fixes and the Bittensor table split per subnet, 60 of 102 read | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
+| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 42 | ✅ done 10-07 — all 306 lines pass | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
 | [US-42.29](stories/US-42.29-qc-issue-5093-multisig-notifications.md) | QC — Improve multisig notification (#5093) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 13 | 📋 ready | new | [US-42.29](stories/US-42.29-qc-issue-5093-multisig-notifications.md) |
 
-103 points across seven stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
-28, US-42.27 at 21, opened the same day, US-42.28 at 36, opened 10-02 for ChainList #710 and
-re-pointed from 34 on 10-06 when three more commits landed on its branch, and US-42.29 at 13,
+109 points across seven stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
+28, US-42.27 at 21, opened the same day, US-42.28 at 42, opened 10-02 for ChainList #710 and
+re-pointed twice as it grew — 34 to 36 when three commits landed on its branch, 36 to 42 when the Bittensor table was split per subnet — and US-42.29 at 13,
 opened 10-06 to QC US-18.5's own PR.
 
 The three moved rows all closed on 10-02, which ends the web-runner programme: the parent US-42.24,
 the regression US-42.24.19 at 83 of 85 on each platform after three rounds, and the bug
 verification US-42.24.20 with all 88 rows settled. 28 of the window's 88 points are done.
 
-Both remaining stories are running. US-42.27, the release gate, started on the beta builds and has
-the fresh-install regression done on both at 81 of 82, with the upgrade rechecks and the two production stages still to come.
-US-42.28, the chainlist maintenance, is written out as 184 checklist lines, one per chain, so a
-session can tick what it actually got through rather than leaving a whole group open; the RPC half
-and all 61 deactivated chains are done.
+US-42.28, the chainlist maintenance, closed 10-07 at all 306 of its lines. It was written out one
+line per chain and, from 10-07, one per Bittensor netuid as well — a single line for 102 subnets
+could not be ticked until every one had been read, so a session's work left no mark. 42 points.
+
+US-42.27, the release gate, has the fresh-install regression done on both beta builds at 81 of 82,
+with the upgrade rechecks and the two production stages still to come. US-42.29 has not started.
 
 **Opened day one at 0 points, and that held for about three hours.**
 [#5093](https://github.com/Koniverse/SubWallet-Extension/issues/5093) — *"Improve multisig
