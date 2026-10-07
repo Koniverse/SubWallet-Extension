@@ -118,7 +118,7 @@ The developer flagged two of the three. The third, 07dec91840, is the one that u
 | NEW-2 | Each new chain's native token shows the right symbol and price | ✅ Pass | Extension |
 | NEW-3 | The ETH on Robinhood Chain and MegaETH is the same `ETH-Ethereum` multi-chain asset rather than a separate token, and Robinhood Chain Testnet uses `ETH-EthereumSepolia` | ✅ Pass | Extension |
 | NEW-4 | Arc shows USDC as its native token — unusual, so confirm it on the balance screen and in a transfer | ✅ Pass | Extension |
-| BIT-11 | Renamed subnets show their new name and icon | ✅ Pass | Extension |
+| BIT-11 | Renamed subnets show their new name and icon | ✅ Pass | Extension — this line was split into SUB-2 to SUB-128 on 10-07, one per netuid; what was read that day is netuids 2 to 55 |
 | BIT-12 | Subnets with placeholder names from taostats — Unknown, for sale, deprecated, Parked, Available — render without breaking the list | ✅ Pass | Extension |
 | BIT-13 | Netuids 83, 95 and 101 have no price and show no price rather than zero or a stale figure | ✅ Pass | Extension |
 | FIX-7 | Subnet 103 reads Deprecated with the default icon, and subnet 116 reads Carbon with its own logo | ✅ Pass | Extension |
