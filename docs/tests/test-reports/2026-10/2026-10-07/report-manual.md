@@ -37,7 +37,7 @@ None.
 
 BIT-11 was one line covering all 102 subnets the resync changed, which meant a session could read fifty of them and still tick nothing. It is replaced today by SUB-2 to SUB-128, one line per netuid naming what changed on it — the same shape the new chains already had with NEW-M-1 to NEW-M-12.
 
-The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 55 are read and pass.
+The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 73 are read and pass.
 
 ### AC results
 
@@ -84,8 +84,21 @@ The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 55 are r
 | SUB-53 | `bittensor-LOCAL-ب` — name Efficientfrontier → engy; new logo | ✅ Pass | Extension |
 | SUB-54 | `bittensor-LOCAL-ت` — name Yanez MIID → Yanez; new logo | ✅ Pass | Extension |
 | SUB-55 | `bittensor-LOCAL-ث` — new logo | ✅ Pass | Extension |
+| SUB-57 | `bittensor-LOCAL-ح` — name Sparket.AI → Unknown; default icon | ✅ Pass | Extension |
+| SUB-58 | `bittensor-LOCAL-خ` — name Handshake → Unknown; default icon | ✅ Pass | Extension |
+| SUB-59 | `bittensor-LOCAL-د` — name Babelbit → Unknown; default icon | ✅ Pass | Extension |
+| SUB-61 | `bittensor-LOCAL-ر` — name Redteam → RedTeam | ✅ Pass | Extension |
+| SUB-63 | `bittensor-LOCAL-س` — name Quantum innovate → Enigma; new logo | ✅ Pass | Extension |
+| SUB-65 | `bittensor-LOCAL-ص` — name Tao private network → True Performance Network | ✅ Pass | Extension |
+| SUB-66 | `bittensor-LOCAL-ض` — name AlphaCore → conjectures; new logo | ✅ Pass | Extension |
+| SUB-67 | `bittensor-LOCAL-ط` — name Ta → Harnyx; priceId `dtao-67` → `tenex`; new logo | ✅ Pass | Extension |
+| SUB-68 | `bittensor-LOCAL-ظ` — name Nova → NOVA; new logo | ✅ Pass | Extension |
+| SUB-69 | `bittensor-LOCAL-ع` — name Ain → Herald; priceId `dtao-69` → `herald`; new logo | ✅ Pass | Extension |
+| SUB-70 | `bittensor-LOCAL-غ` — name Vericore → Unknown; default icon | ✅ Pass | Extension |
+| SUB-72 | `bittensor-LOCAL-ق` — name Streetvision by natix → StreetVision by NATIX | ✅ Pass | Extension |
+| SUB-73 | `bittensor-LOCAL-ك` — name Metahash → Parked; default icon | ✅ Pass | Extension |
 
-41 of 102 subnets read. The next is netuid 57.
+54 of 102 subnets read. The next is netuid 74.
 
 Still open elsewhere: the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, RPC-X1 and RPC-X3, the upgrade runs, and FIX-4 to FIX-6.
 
