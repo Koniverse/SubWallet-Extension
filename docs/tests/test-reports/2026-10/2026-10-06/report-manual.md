@@ -14,7 +14,7 @@
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -118,7 +118,7 @@ The developer flagged two of the three. The third, 07dec91840, is the one that u
 | NEW-2 | Each new chain's native token shows the right symbol and price | ✅ Pass | Extension |
 | NEW-3 | The ETH on Robinhood Chain and MegaETH is the same `ETH-Ethereum` multi-chain asset rather than a separate token, and Robinhood Chain Testnet uses `ETH-EthereumSepolia` | ✅ Pass | Extension |
 | NEW-4 | Arc shows USDC as its native token — unusual, so confirm it on the balance screen and in a transfer | ✅ Pass | Extension |
-| BIT-11 | Renamed subnets show their new name and icon | ✅ Pass | Extension |
+| BIT-11 | Renamed subnets show their new name and icon | ✅ Pass | Extension — this line was split into SUB-2 to SUB-128 on 10-07, one per netuid; what was read that day is netuids 2 to 55 |
 | BIT-12 | Subnets with placeholder names from taostats — Unknown, for sale, deprecated, Parked, Available — render without breaking the list | ✅ Pass | Extension |
 | BIT-13 | Netuids 83, 95 and 101 have no price and show no price rather than zero or a stale figure | ✅ Pass | Extension |
 | FIX-7 | Subnet 103 reads Deprecated with the default icon, and subnet 116 reads Carbon with its own logo | ✅ Pass | Extension |
@@ -137,4 +137,18 @@ None.
 
 ## Summary
 
-Session in progress.
+Two stories moved and a third opened.
+
+US-42.27 finished the fresh-install half of its beta stage. Both builds now run the full checklist and pass at 81 of 82 lines each, the same set on TestFlight and on Google Play beta, with REG-32 skipped for the reason it carried through the regression. Nine sections closed in this session alone, manage account among them. That settles AC-1 and AC-3.
+
+What the beta stage still owes is the upgrade recheck on each build. Those need the previous production version installed with its data first, and the two production stages only begin once the beta stage has passed in full.
+
+US-42.28 had three commits land on its branch mid-run, after the RPC half and the deactivated chains were already checked. The story gained a FIX group for them and went from 184 lines to 201, re-pointed 34 to 36.
+
+Two of the three were flagged by the developer and pass: five endpoints that failed every round of a re-benchmark are gone, and multisig is now offered on Bittensor and its testnet. The third was not flagged and matters more than it looks — subnet 111's assetType went from null to LOCAL, which is the entry validate-tokens crashed on, so every subnet after it went unvalidated and the balance was never fetched either. The issue records that fault as pre-existing on dev rather than arriving with this branch.
+
+Also done: all 24 new chains with the four checks that go with them, and the Bittensor table read against taostats for names, icons and prices. 166 of 201.
+
+US-42.29 opened for the multisig notification work on PR #5095. 22 AC written from the issue's three symptoms and five root causes, 13 points. The weight sits in the error conditions rather than the screens, so several ACs ask for a flaky RPC or an unreadable block to be provoked deliberately.
+
+No bugs found.
