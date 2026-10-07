@@ -37,7 +37,7 @@ None.
 
 BIT-11 was one line covering all 102 subnets the resync changed, which meant a session could read fifty of them and still tick nothing. It is replaced today by SUB-2 to SUB-128, one line per netuid naming what changed on it — the same shape the new chains already had with NEW-M-1 to NEW-M-12.
 
-The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 73 are read and pass.
+The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 81 are read and pass.
 
 ### AC results
 
@@ -97,8 +97,14 @@ The story goes from 201 lines to 302, re-pointed 36 to 42. Netuids 2 to 73 are r
 | SUB-70 | `bittensor-LOCAL-غ` — name Vericore → Unknown; default icon | ✅ Pass | Extension |
 | SUB-72 | `bittensor-LOCAL-ق` — name Streetvision by natix → StreetVision by NATIX | ✅ Pass | Extension |
 | SUB-73 | `bittensor-LOCAL-ك` — name Metahash → Parked; default icon | ✅ Pass | Extension |
+| SUB-74 | `bittensor-LOCAL-ل` — priceId `dtao-74` → `gittensor` | ✅ Pass | Extension |
+| SUB-75 | `bittensor-LOCAL-م` — new logo | ✅ Pass | Extension |
+| SUB-76 | `bittensor-LOCAL-ن` — name Safe scan → Ormas; new logo | ✅ Pass | Extension |
+| SUB-78 | `bittensor-LOCAL-و` — name Loosh → Umi; priceId `dtao-78` → `loosh`; new logo | ✅ Pass | Extension |
+| SUB-80 | `bittensor-LOCAL-ى` — name dogelayer → OpenRoboto; new logo | ✅ Pass | Extension |
+| SUB-81 | `bittensor-LOCAL-ᚠ` — name grail → Reliquary; new logo | ✅ Pass | Extension |
 
-54 of 102 subnets read. The next is netuid 74.
+60 of 102 subnets read. The next is netuid 82.
 
 Still open elsewhere: the Bittensor balance checks BIT-1 to BIT-10 and BIT-14, GEN-1 to GEN-6, RPC-X1 and RPC-X3, the upgrade runs, and FIX-4 to FIX-6.
 
