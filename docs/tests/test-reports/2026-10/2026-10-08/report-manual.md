@@ -208,7 +208,7 @@ None.
 
 ## US-42.29 — Improve multisig notification (#5093)
 
-Started today, against PR #5095. The first two lines cover the symptom the issue opens with: a notification that appeared and then disappeared on its own, sometimes coming back later as a new unread one with a new timestamp.
+Started today against PR #5095. The AC were corrected against the diff first — two described behaviour the code cannot have, and two paths the code takes had no AC at all — taking the story from 22 AC to 24.
 
 ### AC results
 
@@ -216,8 +216,23 @@ Started today, against PR #5095. The first two lines cover the symptom the issue
 |---|---|---|---|
 | AC-1 | A pending multisig transaction raises a notification, and it is still there after a minute of the app sitting idle | ✅ Pass | Extension |
 | AC-2 | The notification does not disappear and reappear with a new timestamp while the transaction stays pending | ✅ Pass | Extension |
+| AC-3 | The notification shows under the signatory account and under All accounts | ✅ Pass | Extension |
+| AC-4 | Switching account on the notification screen itself refetches — opening on one account and switching to All accounts shows the right list, not the first account's | ✅ Pass | Extension |
+| AC-5 | Adding or removing an account leaves the notification in place | ✅ Pass | Extension |
+| AC-6 | Enabling, disabling or updating a chain leaves notifications of other chains in place | ✅ Pass | Extension |
+| AC-10 | After the current signer approves, the notification reads "Multisig transaction approved" with the content about waiting for other signatories, instead of disappearing | ✅ Pass | Extension |
+| AC-11 | After the transaction executes, the notification reads "Transaction no longer pending" with the content saying no further action is needed | ✅ Pass | Extension |
+| AC-12 | A cancelled transaction reads the same "no longer pending" wording as an executed one. The code has one branch for both — a transaction that is no longer on chain becomes RESOLVED without asking why — so this confirms they are indistinguishable rather than looking for a difference | ✅ Pass | Extension |
+| AC-13 | The account prefix in square brackets at the start of the title is kept when the title is replaced | ✅ Pass | Extension |
+| AC-14 | Clicking a notification whose transaction is still pending opens History with that transaction, as before | ✅ Pass | Extension |
+| AC-15 | Clicking an approved or resolved notification opens a modal naming the status, with an "I understand" button, rather than navigating to a transaction that is not there | ✅ Pass | Extension |
+| AC-16 | Clicking a notification on a disabled chain offers to enable the network, with the message naming that network, and works on re-click after enabling | ✅ Pass | Extension |
 
-2 of 22. What is left needs the conditions provoked on purpose — a failing RPC for AC-7 to AC-9, and a transaction driven through approve, execute and cancel for AC-10 to AC-17.
+13 of 24. The notification stays where it should and says what happened: it holds through account and chain changes, follows the account on its own screen, and reads approved or no longer pending at each step with the account prefix kept.
+
+AC-12 is worth naming. A cancelled transaction reads the same as an executed one, and the code has one branch for both — nothing reads why a transaction left the chain — so this confirms they cannot be told apart rather than finding a difference.
+
+Left to run: AC-7 to AC-9 need a failing RPC, AC-17 to AC-17b need the background to lose a transaction the notification still names, and AC-18 to AC-22 are the locales and the rest of the notification screen.
 
 ### Bugs
 
