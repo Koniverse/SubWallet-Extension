@@ -20,7 +20,7 @@
 
 ## US-42.27 — Release SubWallet Mobile
 
-The whole Android checklist was run again today on the beta build: all 82 lines, 81 passing with REG-AND-32 skipped for the reason it carried through the regression. The iOS beta build was run on the Manage account section, twelve lines, all passing.
+Both beta builds were run through the whole checklist again today. Android: all 82 lines, 81 passing with REG-AND-32 skipped for the reason it carried through the regression. iOS: the same, 81 passing with REG-IOS-32 skipped.
 
 This is recorded here only. The story's checklist is unchanged.
 
@@ -111,9 +111,7 @@ This is recorded here only. The story's checklist is unchanged.
 | REG-AND-74 | Add an API key | ✅ Pass | Android beta |
 | REG-AND-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | Android beta |
 
-81 of 82 pass on the Android beta build, with REG-AND-32 skipped.
-
-The iOS beta build was run on the Manage account section as well, all twelve lines:
+The same checklist on the iOS beta build:
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
@@ -129,6 +127,78 @@ The iOS beta build was run on the Manage account section as well, all twelve lin
 | REG-IOS-9 | Remove an account | ✅ Pass | iOS beta |
 | REG-IOS-10 | Edit an account name | ✅ Pass | iOS beta |
 | REG-IOS-84 | Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only | ✅ Pass | iOS beta |
+| REG-IOS-11 | Lock the wallet by hand | ✅ Pass | iOS beta |
+| REG-IOS-12 | Unlock by typing the password; unlock by Face ID or Touch ID | ✅ Pass | iOS beta |
+| REG-IOS-13 | Forgot password — reset account; erase all | ✅ Pass | iOS beta |
+| REG-IOS-85 | The app opens, backgrounds and resumes without losing state — it comes back to where it was, and does not hang on a loading screen | ✅ Pass | iOS beta |
+| REG-IOS-14 | Transferable balance is right on token details; transfer on-chain; transfer cross-chain; send NFT; swap; earning actions | ✅ Pass | iOS beta |
+| REG-IOS-15 | Show and hide balance; refresh balance; customize asset display; search token; token detail | ✅ Pass | iOS beta |
+| REG-IOS-16 | The QR code shows in all accounts mode and in single account mode | ✅ Pass | iOS beta |
+| REG-IOS-17 | The explorer link opens for a network that has one, and is handled for a network that does not | ✅ Pass | iOS beta |
+| REG-IOS-18 | Transfer an EVM token — single-chain and cross-chain; native and local; edit the fee | ✅ Pass | iOS beta |
+| REG-IOS-19 | Transfer a substrate token — single-chain and cross-chain; native and local; choose which token pays the fee | ✅ Pass | iOS beta |
+| REG-IOS-20 | Transfer a BTC token | ✅ Pass | iOS beta |
+| REG-IOS-21 | Transfer a TON token | ✅ Pass | iOS beta |
+| REG-IOS-79 | Transfer a token through a bridge — TAO to Subtensor EVM and back | ✅ Pass | iOS beta |
+| REG-IOS-22 | The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit | ✅ Pass | iOS beta |
+| REG-IOS-23 | Swap without XCM; swap with XCM | ✅ Pass | iOS beta |
+| REG-IOS-24 | Search token and account; the prompt to enable a network that is off; filter token | ✅ Pass | iOS beta |
+| REG-IOS-25 | Input the amount and the recipient address — by QR, by typing, from the address book | ✅ Pass | iOS beta |
+| REG-IOS-26 | The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee | ✅ Pass | iOS beta |
+| REG-IOS-27 | Validation cases; submit | ✅ Pass | iOS beta |
+| REG-IOS-28 | Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup | ✅ Pass | iOS beta |
+| REG-IOS-29 | View NFT collections; search; reload collections; view the NFT list; NFT detail | ✅ Pass | iOS beta |
+| REG-IOS-30 | Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import | ✅ Pass | iOS beta |
+| REG-IOS-31 | Send an NFT on a supported network, and on one with no support | ✅ Pass | iOS beta |
+| REG-IOS-32 | Remove a custom NFT | ⏭️ Skipped | iOS beta — NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything |
+| REG-IOS-33 | The earning options list; the earning positions list; position detail; earning instructions | ✅ Pass | iOS beta |
+| REG-IOS-34 | Stake — direct nomination; nomination pool; liquid stake; subnet staking | ✅ Pass | iOS beta |
+| REG-IOS-35 | Stake more | ✅ Pass | iOS beta |
+| REG-IOS-36 | Fast unstake — part of the position, and all of it | ✅ Pass | iOS beta |
+| REG-IOS-37 | Slow unstake — part of the position, and all of it | ✅ Pass | iOS beta |
+| REG-IOS-38 | Cancel unstake; withdraw; claim rewards | ✅ Pass | iOS beta |
+| REG-IOS-80 | Parachain (collator) staking — start staking; stake more; claim rewards; unstake; cancel unstake; withdraw | ✅ Pass | iOS beta |
+| REG-IOS-81 | Change validator — on direct nomination, and on subnet staking | ✅ Pass | iOS beta |
+| REG-IOS-39 | Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp | ✅ Pass | iOS beta |
+| REG-IOS-40 | Sign a message or transaction with a substrate account; with an EVM account; with an EVM account using a substrate provider | ✅ Pass | iOS beta |
+| REG-IOS-41 | The mission pool list; search; filter; status; tabs | ✅ Pass | iOS beta |
+| REG-IOS-42 | Sorting by status — live, upcoming, archived — and by ordinal low to high, matching the Extension | ✅ Pass | iOS beta |
+| REG-IOS-43 | View mission pool details; the actions inside a mission pool go where they should; scroll up and down, left and right | ✅ Pass | iOS beta |
+| REG-IOS-44 | The backup reminder popup — learn how to back up; remind me later; do not show again | ✅ Pass | iOS beta |
+| REG-IOS-45 | Back up the seed phrase through export account | ✅ Pass | iOS beta |
+| REG-IOS-46 | All accounts mode — select account; search account; scroll the account list | ✅ Pass | iOS beta |
+| REG-IOS-47 | Separate account mode does not show the account picker | ✅ Pass | iOS beta |
+| REG-IOS-48 | Search network; scroll the network list; select network; filter | ✅ Pass | iOS beta |
+| REG-IOS-49 | The explorer link opens from a history record | ✅ Pass | iOS beta |
+| REG-IOS-50 | Change the currency, and the select currency popup | ✅ Pass | iOS beta |
+| REG-IOS-51 | Change the language, and search within the language list | ✅ Pass | iOS beta |
+| REG-IOS-52 | Turn in-app notifications off and on. Wallet theme is coming soon and is not checked | ✅ Pass | iOS beta |
+| REG-IOS-53 | Change the wallet password — current password; new password; confirm; the I understand checkbox; the learn more link; save | ✅ Pass | iOS beta |
+| REG-IOS-54 | Require unlock — change the auto-lock time; the wallet auto-locks | ✅ Pass | iOS beta |
+| REG-IOS-55 | Face ID or Touch ID — turn the toggle off; turn it on by password; turn it on by face or touch scan | ✅ Pass | iOS beta |
+| REG-IOS-56 | Sign for multiple transactions — turn the toggle on and off | ✅ Pass | iOS beta |
+| REG-IOS-57 | Search website; filter; the list of connected websites; scroll the list | ✅ Pass | iOS beta |
+| REG-IOS-58 | Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock | ✅ Pass | iOS beta |
+| REG-IOS-59 | dApp configuration — forget all; disconnect all; connect all | ✅ Pass | iOS beta |
+| REG-IOS-60 | Create a new connection on a supported network, and on one that is not supported | ✅ Pass | iOS beta |
+| REG-IOS-61 | Search; website detail; sign a message or transaction with a substrate and an EVM account; disconnect | ✅ Pass | iOS beta |
+| REG-IOS-62 | Search network; filter network; turn a network on and off | ✅ Pass | iOS beta |
+| REG-IOS-63 | Import a custom network; import a provider; switch provider | ✅ Pass | iOS beta |
+| REG-IOS-64 | Remove a custom network with the network on, and with it off | ✅ Pass | iOS beta |
+| REG-IOS-65 | Define a network — add a provider; switch provider | ✅ Pass | iOS beta |
+| REG-IOS-66 | Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR | ✅ Pass | iOS beta |
+| REG-IOS-67 | Remove a custom token with the token on, and with it off | ✅ Pass | iOS beta |
+| REG-IOS-68 | Search token; filter token; turn a token on and off; token detail | ✅ Pass | iOS beta |
+| REG-IOS-69 | Add an address; remove one; edit a name; search and filter | ✅ Pass | iOS beta |
+| REG-IOS-70 | Migrate solo accounts to a unified account — the migration runs to the end, and every migrated account can still sign afterwards | ✅ Pass | iOS beta |
+| REG-IOS-82 | Configure the Subscan API key | ✅ Pass | iOS beta |
+| REG-IOS-71 | Contact support; user guide; request a feature | ✅ Pass | iOS beta |
+| REG-IOS-72 | About SubWallet — website; term of use; X; rate our app | ✅ Pass | iOS beta |
+| REG-IOS-73 | The MKT campaign | ✅ Pass | iOS beta |
+| REG-IOS-74 | Add an API key | ✅ Pass | iOS beta |
+| REG-IOS-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | iOS beta |
+
+81 of 82 pass on each build, with REG-32 skipped on both. That is the whole fresh-install checklist run again on the builds as they stand today.
 
 Left to run: the upgrade recheck on each build — UPG-IOS-1 to 3 and UPG-AND-1 to 3, which settle AC-2 and AC-4 — then the two production stages. The upgrade rechecks need the previous production version installed with its data first.
 

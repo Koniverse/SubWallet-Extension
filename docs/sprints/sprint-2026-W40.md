@@ -17,12 +17,12 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 3 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | ✅ done 10-02 — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | ✅ done 10-02 — 88 rows settled, 1 on monitoring | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
 | [US-42.27](stories/US-42.27-qc-release-mobile.md) | QC — Release SubWallet Mobile, the build carrying web-runner 1.3.90 | [EPIC-42](epics/EPIC-42.md) | P2 | 21 | 🔄 in-progress — fresh install done on both beta builds | new | [US-42.27](stories/US-42.27-qc-release-mobile.md) |
-| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 42 | ✅ done 10-07 — all 306 lines pass | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
+| [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) | QC — Maintenance of chainlist (ChainList #710) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 13 | ✅ done 10-07 — all 306 lines pass | new | [US-42.28](stories/US-42.28-qc-chainlist-710-maintenance.md) |
 | [US-42.29](stories/US-42.29-qc-issue-5093-multisig-notifications.md) | QC — Improve multisig notification (#5093) on Extension | [EPIC-42](epics/EPIC-42.md) | P2 | 13 | 🔄 in-progress — AC-1 and AC-2 pass | new | [US-42.29](stories/US-42.29-qc-issue-5093-multisig-notifications.md) |
 
-109 points across seven stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
-28, US-42.27 at 21, opened the same day, US-42.28 at 42, opened 10-02 for ChainList #710 and
-re-pointed twice as it grew — 34 to 36 when three commits landed on its branch, 36 to 42 when the Bittensor table was split per subnet — and US-42.29 at 13,
+80 points across seven stories — US-18.5 at 5, the three the tester moved over from W38 on 09-30 at
+28, US-42.27 at 21, opened the same day, US-42.28 at 13, opened 10-02 for ChainList #710 and
+re-scored as the checklist was rewritten — 20, then 34, then 36 — and corrected to 13 on 10-08. The line count went from 25 to 306 because each chain and subnet got a line of its own, but writing the same work out in more detail does not make it more work. US-42.29 is also 13,
 opened 10-06 to QC US-18.5's own PR.
 
 The three moved rows all closed on 10-02, which ends the web-runner programme: the parent US-42.24,
@@ -31,7 +31,7 @@ verification US-42.24.20 with all 88 rows settled. 28 of the window's 88 points 
 
 US-42.28, the chainlist maintenance, closed 10-07 at all 306 of its lines. It was written out one
 line per chain and, from 10-07, one per Bittensor netuid as well — a single line for 102 subnets
-could not be ticked until every one had been read, so a session's work left no mark. 42 points.
+could not be ticked until every one had been read, so a session's work left no mark. 13 points — the line count grew with the rewriting, the work did not.
 
 US-42.27, the release gate, has the fresh-install regression done on both beta builds at 81 of 82,
 with the upgrade rechecks and the two production stages still to come. US-42.29 started 10-08 with AC-1 and AC-2.
