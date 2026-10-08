@@ -20,7 +20,7 @@
 
 ## US-42.27 — Release SubWallet Mobile
 
-The whole Android checklist was run again today on the beta build. All 82 lines are recorded below — 81 pass and REG-AND-32 stays skipped for the reason it carried through the regression.
+The whole Android checklist was run again today on the beta build: all 82 lines, 81 passing with REG-AND-32 skipped for the reason it carried through the regression. The iOS beta build was run on the Manage account section, twelve lines, all passing.
 
 This is recorded here only. The story's checklist is unchanged.
 
@@ -112,6 +112,23 @@ This is recorded here only. The story's checklist is unchanged.
 | REG-AND-83 | Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it | ✅ Pass | Android beta |
 
 81 of 82 pass on the Android beta build, with REG-AND-32 skipped.
+
+The iOS beta build was run on the Manage account section as well, all twelve lines:
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| REG-IOS-1 | Create an account with a new seed phrase — unified account; TON account | ✅ Pass | iOS beta |
+| REG-IOS-2 | Derive an account from the create account screen — unified account; substrate type; ethereum type | ✅ Pass | iOS beta |
+| REG-IOS-3 | Derive an account from account details | ✅ Pass | iOS beta |
+| REG-IOS-4 | Import an account — seed phrase; JSON file single; JSON file multi covering normal, QR and watch-only; QR code substrate; QR code EVM; private key | ✅ Pass | iOS beta |
+| REG-IOS-78 | Import from Trust Wallet | ✅ Pass | iOS beta |
+| REG-IOS-5 | Attach an account — polkadot vault; keystone; watch-only. Ledger is coming soon and is not checked | ✅ Pass | iOS beta |
+| REG-IOS-6 | Export an account — unified with seed phrase and JSON; TON with seed phrase, JSON and private key; substrate with JSON and QR; ethereum with JSON, private key and QR; all accounts covering normal, QR signer and watch-only; watch-only offers no export; the exported file imports back | ✅ Pass | iOS beta |
+| REG-IOS-7 | Proxy account — add a proxy; remove a proxy; view the proxy list; act through a proxy | ✅ Pass | iOS beta |
+| REG-IOS-8 | Multisig account — create one; open its details; approve and reject a pending transaction; sign for a multisig | ✅ Pass | iOS beta |
+| REG-IOS-9 | Remove an account | ✅ Pass | iOS beta |
+| REG-IOS-10 | Edit an account name | ✅ Pass | iOS beta |
+| REG-IOS-84 | Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only | ✅ Pass | iOS beta |
 
 Left to run: the upgrade recheck on each build — UPG-IOS-1 to 3 and UPG-AND-1 to 3, which settle AC-2 and AC-4 — then the two production stages. The upgrade rechecks need the previous production version installed with its data first.
 
