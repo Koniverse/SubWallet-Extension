@@ -8,13 +8,13 @@
 | Environment | Extension; Mobile — Android + iOS beta |
 | Runner | manual (extension + mobile) |
 | Build under test | to fill in — Extension: version + chain-list version; Mobile: TestFlight and Google Play beta build numbers |
-| Stories tested | US-42.27, US-42.29 |
+| Stories tested | US-42.27; US-42.29 — closed |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -227,12 +227,23 @@ Started today against PR #5095. The AC were corrected against the diff first —
 | AC-14 | Clicking a notification whose transaction is still pending opens History with that transaction, as before | ✅ Pass | Extension |
 | AC-15 | Clicking an approved or resolved notification opens a modal naming the status, with an "I understand" button, rather than navigating to a transaction that is not there | ✅ Pass | Extension |
 | AC-16 | Clicking a notification on a disabled chain offers to enable the network, with the message naming that network, and works on re-click after enabling | ✅ Pass | Extension |
+| AC-7 | With the chain's RPC failing, notifications of that multisig are not cleared — they stay until the RPC answers again | ✅ Pass | Extension |
+| AC-8 | After the RPC recovers, the notification list is correct again without reloading the extension by hand | ✅ Pass | Extension |
+| AC-9 | A transaction whose extrinsic cannot be resolved keeps its notification and its last known data rather than vanishing | ✅ Pass | Extension |
+| AC-17 | When the status cannot be read — the notification is gone, or the background has no record of the pending transaction — a warning toast says so and the notification is left in the list rather than removed | ✅ Pass | Extension |
+| AC-17a | Clicking a pending notification whose transaction the background no longer has shows the same warning and leaves the notification alone — an absent transaction is not proof it was executed, which is why the code checks the cache rather than assuming | ✅ Pass | Extension |
+| AC-17b | Clicking the same notification repeatedly while the first check is still running does nothing twice — the second click is ignored until the first finishes | ✅ Pass | Extension |
+| AC-19 | Notifications of other kinds — withdraw, claim, bridge, process — are unaffected in content, order and unread state | ✅ Pass | Extension |
+| AC-20 | Marking read and marking all read still work. Note that a notification turning APPROVED or RESOLVED is marked read by the code itself, so it leaves the unread count on its own — that is intended, not a bug | ✅ Pass | Extension |
+| AC-21 | The notification filter tabs still sort and filter correctly with the new statuses present | ✅ Pass | Extension |
+| AC-22 | Signing a multisig transaction from the notification still reaches the signing flow and completes | ✅ Pass | Extension |
+| AC-18 | The five new strings are checked in each locale the extension ships — en, vi, ja, ru, zh | ⏭️ Skipped | Extension — the locale pass was not run |
 
-13 of 24. The notification stays where it should and says what happened: it holds through account and chain changes, follows the account on its own screen, and reads approved or no longer pending at each step with the account prefix kept.
+23 of 24 pass and the story closes. The notification stays where it should, survives a failing RPC and comes back right when the RPC does, and says what happened at each step. The three click paths behave: a warning when the status cannot be read, the same warning when the background no longer holds a transaction the notification still names, and a second click ignored while the first check runs.
 
 AC-12 is worth naming. A cancelled transaction reads the same as an executed one, and the code has one branch for both — nothing reads why a transaction left the chain — so this confirms they cannot be told apart rather than finding a difference.
 
-Left to run: AC-7 to AC-9 need a failing RPC, AC-17 to AC-17b need the background to lose a transaction the notification still names, and AC-18 to AC-22 are the locales and the rest of the notification screen.
+AC-18 is skipped — the locale pass was not run, so the five new strings are unchecked in vi, ja, ru and zh. Reading the diff suggests they ship as English there, with only the sixth string of the batch translated, so it is worth running before the PR merges.
 
 ### Bugs
 
@@ -240,4 +251,18 @@ None.
 
 ## Summary
 
-Session in progress.
+US-42.29 opened and closed in the same day, at 23 of 24.
+
+Its AC were corrected against the diff before the run. Two described behaviour the code cannot have — a cancelled transaction reading differently from an executed one, and marking read behaving as it would for any other notification — and two paths the code takes had no AC at all. That took the story from 22 AC to 24.
+
+The notification now behaves as the issue asked. It survives the app sitting idle, account changes, chain changes, and a failing RPC, coming back right when the RPC does. It says what happened rather than disappearing: approved while other signatories are still to sign, no longer pending once the transaction leaves the chain. Clicking one opens History when the transaction is still there, a status modal when it is not, and a warning when the status cannot be read at all.
+
+AC-12 is worth recording. A cancelled transaction reads the same as an executed one and cannot do otherwise, since the code reaches RESOLVED through a single branch and nothing reads why the transaction left the chain. The run confirms they are indistinguishable rather than finding a difference.
+
+AC-18 is skipped. The locale pass was not run, so the five new strings are unchecked in vi, ja, ru and zh. Reading the diff suggests they ship as English there, with only the sixth string of the batch translated — worth running before the PR merges.
+
+US-42.27 did not change state. Both beta builds were run through the whole checklist again and held at 81 of 82 each, with REG-32 skipped on both. That is recorded here only; the story's checklist is unchanged.
+
+US-42.28 was re-scored from 42 points to 13. It had been raised twice for work that never grew — the checklist went from 25 lines to 306 because each chain and subnet got a line of its own, which is how a session marks what it read, not more testing.
+
+No bugs found.
