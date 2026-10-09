@@ -8,13 +8,13 @@
 | Environment | Mobile — Android + iOS, beta and production |
 | Runner | manual (mobile) |
 | Build under test | Mobile v1.2.45(534)b-v16 |
-| Stories tested | US-42.27 — closed |
+| Stories tested | US-42.27 — closed; US-42.30 — started |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | done |
+| Status | in progress |
 
 ---
 
@@ -42,6 +42,38 @@ The upgrade rechecks pass on each beta build, and the App Store and Google Play 
 | UPG-AND-3 | No screen is broken where a removed feature used to be — Crowdloans, Polygon zkEVM, stDOT, the old Bittensor root claim | ✅ Pass | Mobile |
 | PROD-IOS | Quick recheck on the App Store build — the version shown in the app is the one published, the wallet opens and unlocks, balances load, and a transfer goes through | ✅ Pass | Mobile |
 | PROD-AND | Quick recheck on the Google Play build — the version shown in the app is the one published, the wallet opens and unlocks, balances load, and a transfer goes through | ✅ Pass | Mobile |
+
+### Bugs
+
+None.
+
+## US-42.30 — Chainlist final RPC re-check (ChainList #710)
+
+Opened today. Two commits landed on the ChainList branch after US-42.28 closed on 10-07, and they touch chains that story already ticked — a 455-endpoint re-check that removed 28 RPCs and added 20, and two more Bittensor subnets resynced.
+
+The story is separate rather than a reopening of US-42.28, so each result stays attached to the day it was true. It carries a table naming the US-42.28 ticks each item invalidates.
+
+### AC results
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| SUB2-58 | `bittensor-LOCAL-ح` — name Unknown → Attune, new icon | ✅ Pass | Extension |
+| SUB2-113 | `bittensor-LOCAL-ƒ` — name LongShort → Unknown, default icon | ✅ Pass | Extension |
+| SUB2-X | The balance on each of the two is unchanged — only the name and icon moved | ✅ Pass | Extension |
+| RPC2-1 | `polkadot` — Helixstreet removed | ✅ Pass | Extension |
+| RPC2-2 | `kusama` — Helixstreet removed | ✅ Pass | Extension |
+| RPC2-3 | `statemint` — Helixstreet and Rotko removed | ✅ Pass | Extension |
+| RPC2-4 | `polkadot_people` — Helixstreet removed | ✅ Pass | Extension |
+| RPC2-5 | `shiden` — OnFinality removed | ✅ Pass | Extension |
+| RPC2-6 | `basilisk` — Dwellir 2 removed | ✅ Pass | Extension |
+| RPC2-7 | `acurast` — the papers.tech endpoint removed | ✅ Pass | Extension |
+| RPC2-8 | `sepolia_ethereum` — 0xrpc removed, it was 61 hours behind | ✅ Pass | Extension |
+| RPC2-9 | `polkadotHub_evm` — OpsLayer removed | ✅ Pass | Extension |
+| RPC2-10 | `polkadotHub_evm_testnet` — OpsLayer removed | ✅ Pass | Extension |
+
+13 of 33. The two subnets carry their new names and icons with neither balance moving, and the ten chains whose dead RPCs were removed all still connect.
+
+Left to run: the seven Stakeworld domain moves, the two RPCs added to Sepolia, the three newly deactivated chains, the BEVM to GEB rename, and the Atleta testnet reset.
 
 ### Bugs
 
