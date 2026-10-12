@@ -49,17 +49,30 @@ AC-13 will find it on release day unless it is fixed first.
 US-42.28 and US-42.30 together check **64** by slug. The missing one is `polkadexTest`, a testnet.
 Low stakes, recorded so the figure is reconciled rather than rounded.
 
-## Not in v1.3.91, and maybe should be looked at — the pool-withdrawal fix
+## Not in v1.3.91 — the pool-withdrawal fix, handled in PR #5001
 
 Mobile's P1 `BUG-42.24.19-28` — *withdrawing from a nomination pool fails to encode* — was fixed on
-10-01 by `b1e2e4f514`, **in `extension-base`**, on `origin/web-runner` only. The Extension's
-`master` and `subwallet-dev` still pass `nominationPoolsApi.memberPendingSlash(address)` — a pending
-slash **amount** — as `withdrawUnbonded`'s `num_slashing_spans`, a **count**; the fix computes the
-pool stash's span count instead. Nobody has tested the Extension's pool withdrawal against this, and
-the fix is not in 1.3.91's release note. It rides only in PR #5001, via a cherry-pick, which is
-itself blocked. **Not a story** — no one has scoped it and an ID is earned by a file
-([AGENTS.md](../../AGENTS.md) rule 7) — but it is shared code with a known failure on the other
-client, and the cheapest moment to check it is the 1.3.91 gate.
+10-01 by `b1e2e4f514`, **in `extension-base`**, on `origin/web-runner`. The Extension's `master` and
+`subwallet-dev` still pass `nominationPoolsApi.memberPendingSlash(address)` — a pending slash
+**amount** — as `withdrawUnbonded`'s `num_slashing_spans`, a **count**; the fix computes the pool
+stash's span count instead.
+
+**The Extension's fix is [PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001)** —
+confirmed by the owner 2026-10-12: `a7a2a8dd4f` on `koni/dev/issue-4984` is the same change,
+cherry-picked on 10-06. So it is handled, not unowned. What follows from where it lives:
+
+- **It is not in 1.3.91.** The release note names #5093 and #710 only, and #5001 is open, unreviewed
+  and has an empty body.
+- **#5001 cannot merge yet.** Its merge pins `@subwallet/chain-list` to
+  `0.2.128-beta.0-pr-695-…` for `evmInfo.multicall3`, which no release carries — `0.2.132` included.
+  Until a chain-list release has that field, the Extension keeps the old pool-withdrawal code.
+- **It has no story or issue of its own here.** It ships under #4984's PR, beside balance-service
+  resilience that is not #4984's scope either. [US-20.4](stories/US-20.4-many-account-submit-performance.md)
+  records all three; when #5001 merges, its CHANGELOG line should name the pool fix, or it ships
+  unlisted the way the passkey offer did in 1.3.90.
+
+*Corrected 2026-10-12: this section first said the fix "rides only in PR #5001, via a cherry-pick"
+and that "no one has scoped it". The cherry-pick is the deliberate Extension fix; the owner said so.*
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
