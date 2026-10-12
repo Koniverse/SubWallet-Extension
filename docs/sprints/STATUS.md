@@ -1,8 +1,8 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-09-29 08:35:33 UTC
-> Total stories: 331
+> Last generated: 2026-10-12 08:25:41 UTC
+> Total stories: 336
 
 ## 📋 Backlog (71)
 
@@ -80,46 +80,44 @@
 | US-9.25 | NFT display & UI open defects (improvement on US-9.10) | EPIC-9 | P3 | 1 | — | — |
 | US-9.26 | ERC-1155 on Ethereum (improvement on US-9.4) | EPIC-9 | P3 | 1 | — | — |
 
-## 🟢 Ready (4)
+## 🟢 Ready (5)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-1.4 | Online i18n hot-update (runtime remote translations) | EPIC-1 | P0 | 3 | sprint-2026-W31 | frenkie-ng |
 | US-1.5 | Build, CI, packaging & supply-chain hardening | EPIC-1 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-16.3 | Additional hardware wallets (Trezor, Tangem, D'Cent, Keystone 3 Pro) | EPIC-16 | P3 | 8 | sprint-2026-W31 | S2kael |
+| US-42.31 | QC — Release SubWallet Extension v1.3.91 | EPIC-42 | P2 | 8 | sprint-2026-W42 | MaiThuongNinni |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (14)
+## 🟡 In Progress (10)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
-| US-18.5 | Multisig approval notification reliability & status lifecycle | EPIC-18 | P2 | 5 | sprint-2026-W40 | tunghp2002 |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
 | US-20.2 | Request economy — in-flight dedup, app-wide cap, notification-fetch flood | EPIC-20 | P1 | 5 | sprint-2026-W31 | nulllpc |
 | US-4.14 | Midnight network support | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.15 | Flow network support (Cadence & EVM) | EPIC-4 | P1 | 5 | sprint-2026-W31 | bluezdot |
 | US-4.19 | Account-abstraction standards (ERC-4337 / EIP-7702 / EIP-7683) | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
 | US-4.20 | AI / DeFAI features | EPIC-4 | P2 | 8 | sprint-2026-W31 | saltict |
-| US-42.24.19 | QC — Web-runner 1.3.86 full regression on Mobile | EPIC-42 | P2 | 20 | sprint-2026-W38 | MaiThuongNinni |
-| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.86 update | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
-| US-42.24 | QC — Update web-runner to 1.3.90 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W38 | MaiThuongNinni |
 | US-5.10 | Security audit & remediation hardening | EPIC-5 | P1 | 5 | sprint-2026-W33 | frenkie-ng |
 
-## 👀 Review (6)
+## 👀 Review (7)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
+| US-18.5 | Multisig approval notification reliability & status lifecycle | EPIC-18 | P2 | 5 | sprint-2026-W42 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.23 | Bitcoin-API path hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 
-## ✅ Done (235)
+## ✅ Done (242)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -264,7 +262,9 @@
 | US-42.24.15 | QC — Web-runner 1.3.83 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.24.16 | QC — Web-runner 1.3.84 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.18 | QC — Web-runner 1.3.86 on Mobile | EPIC-42 | P2 | 2 | sprint-2026-W37 | MaiThuongNinni |
+| US-42.24.19 | QC — Web-runner 1.3.90 full regression on Mobile | EPIC-42 | P2 | 20 | sprint-2026-W40 | MaiThuongNinni |
 | US-42.24.2 | QC — Web-runner 1.3.69 on Mobile | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
+| US-42.24.20 | QC — Verify the bugs found during the web-runner 1.3.90 update | EPIC-42 | P2 | 8 | sprint-2026-W40 | MaiThuongNinni |
 | US-42.24.21 | QC — Web-runner 1.3.87 on Mobile | EPIC-42 | P2 | 3 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.22 | QC — Web-runner 1.3.88 on Mobile | EPIC-42 | P2 | 13 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.24.23 | QC — Web-runner 1.3.89 on Mobile | EPIC-42 | P2 | 5 | sprint-2026-W38 | MaiThuongNinni |
@@ -297,8 +297,13 @@
 | US-42.21 | QC — Release SubWallet Extension v1.3.89 | EPIC-42 | P2 | 8 | sprint-2026-W36 | MaiThuongNinni |
 | US-42.22 | QC — Repoint KAH↔PAH USDt XCM refs (#5062) | EPIC-42 | P0 | 5 | sprint-2026-W35 | MaiThuongNinni |
 | US-42.23 | QC — Support manual claim for Bittensor native staking (#5064) | EPIC-42 | P2 | 5 | sprint-2026-W35 | MaiThuongNinni |
+| US-42.24 | QC — Update web-runner to 1.3.90 (#2057) | EPIC-42 | P2 | 0 | sprint-2026-W40 | MaiThuongNinni |
 | US-42.25 | QC — Support sr25519 VRF signing for dApp key derivation (#5072) | EPIC-42 | P2 | 5 | sprint-2026-W38 | MaiThuongNinni |
 | US-42.26 | QC — Release SubWallet Extension v1.3.90 | EPIC-42 | P2 | 8 | sprint-2026-W38 | MaiThuongNinni |
+| US-42.27 | QC — Release SubWallet Mobile v1.2.45(534)b-v16 | EPIC-42 | P2 | 21 | sprint-2026-W40 | MaiThuongNinni |
+| US-42.28 | QC — Maintenance of chainlist (ChainList #710) on Extension | EPIC-42 | P2 | 13 | sprint-2026-W40 | MaiThuongNinni |
+| US-42.29 | QC — Improve multisig notification (#5093) on Extension | EPIC-42 | P2 | 13 | sprint-2026-W40 | MaiThuongNinni |
+| US-42.30 | QC — Chainlist final RPC re-check and late syncs (ChainList #710) on Extension | EPIC-42 | P2 | 8 | sprint-2026-W41 | MaiThuongNinni |
 | US-5.1 | Phishing site blocking (@polkadot/phishing denylist) | EPIC-5 | P0 | 5 | sprint-2022-M01 | Tbaut |
 | US-5.2 | Master password & strength policy | EPIC-5 | P0 | 3 | sprint-2023-M04 | S2kael |
 | US-5.3 | Forgot password → reset wallet | EPIC-5 | P0 | 3 | sprint-2023-M05 | S2kael |
@@ -374,11 +379,11 @@ _No stories_
 ## Summary
 
 - 📋 **Backlog**: 71
-- 🟢 **Ready**: 4
-- 🟡 **In Progress**: 14
-- 👀 **Review**: 6
-- ✅ **Done**: 235
+- 🟢 **Ready**: 5
+- 🟡 **In Progress**: 10
+- 👀 **Review**: 7
+- ✅ **Done**: 242
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 14 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).

@@ -13,7 +13,7 @@ depends_on: [US-8.3]
 assignee: bluezdot
 commit: f964b504bd, 38d890fa7f
 created: 2026-06-12
-updated: 2026-06-12
+updated: 2026-10-12
 ---
 
 ## Goal
@@ -135,9 +135,11 @@ former one-issue-per-story maintenance ledger (2026-07-24).
 > Asset Hub support (#3590) landed in 1.3.18 and Hydration (#4045) in 1.3.24. The surface with the
 > looser release cadence is where this capability was tried out.
 >
-> **The open continuation is Hollar** ([#4709](https://github.com/Koniverse/SubWallet-Extension/issues/4709)),
+> **The continuation was Hollar** ([#4709](https://github.com/Koniverse/SubWallet-Extension/issues/4709)),
 > tracked in [US-11.17](US-11.17-swap-coverage-expansion.md) because it arrived through the swap
-> tracker — the same fee-token question reaching a different queue.
+> tracker — the same fee-token question reaching a different queue. **Closed `NOT_PLANNED`
+> 2026-10-09**, on the Hollarnet testnet's deactivation; Hollar on Hydration mainnet is still a live
+> asset, and the close does not say whether that case is dropped too. Detail in US-11.17.
 
 ## Cross-references
 

@@ -135,7 +135,7 @@ two are explicitly *not* the same thing (see Out of scope).
 | [US-18.2](../stories/US-18.2-pending-transaction-detection-and-approval.md) | Pending-tx detection + role-differentiated approval | Detect pending multisig txs on-chain (no indexer) and approve/reject with initiator-vs-co-signer flows | ✅ done | 1.3.74 |
 | [US-18.3](../stories/US-18.3-auto-detection-indexer-history-and-optimization.md) | Auto-detection + indexer history + Phase-2 optimization | Auto-detect activated multisig accounts and enrich history/detail via indexer (planned) | 📋 backlog | — |
 | [US-18.4](../stories/US-18.4-multisig-on-mobile-and-web.md) | Multisig on mobile & web (platform ports) | Port the shipped extension capability to SubWallet Mobile (#4697, out-of-repo) and the WebApp (#4698) | 📋 backlog | — |
-| [US-18.5](../stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | An approval notification survives subscription reloads and RPC failures, and when it no longer needs action it says why (approved / no longer pending) instead of vanishing | 🔄 in-progress | — |
+| [US-18.5](../stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | An approval notification survives subscription reloads and RPC failures, and when it no longer needs action it says why (approved / no longer pending) instead of vanishing | 👀 review — PR #5095 approved 09-28, unmerged; #5093 closed 10-08 on the QC pass | — |
 
 > US-18.1/US-18.2 are retroactive (shipped); US-18.3 is forward (Phase 2) and absorbs
 > the three leaves of the #4839 umbrella (#4844, #4845, #4927). US-18.4 carries **no FR** —
@@ -156,7 +156,9 @@ All **27** multisig issues on the tracker are claimed: 7 umbrellas above, 19 lea
 US-18.1 – US-18.4 (7 · 7 · 3 · 2), and **#5093 on its own page,
 [US-18.5](../stories/US-18.5-multisig-notification-improvement.md)** — opened 2026-09-28 05:12 with
 an empty body, which it **gained three hours later** along with
-[PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095). Six of them
+[PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095). **#5093 reads `CLOSED` on
+the tracker from 2026-10-08, but PR #5095 is not merged** — the tester closed it on the QC pass, so
+the tracker state is ahead of the code. Six of them
 (#4839, #4845, #4855, #4872, #4875, #4963) had no story before the 2026-07-22 consolidation; two
 (#4872, #4875) are still `OPEN` on the board although their code is in `v1.3.74`. Both facts are
 evidenced in the [consolidation note](../../notes/2026-07-22.md#c-epic-38-maintenance--multisig-merged-into-epic-18).

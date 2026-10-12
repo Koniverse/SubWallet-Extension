@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W40
-status: in-progress
+status: closed
 start: 2026-09-28
 end: 2026-10-04
 goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Improve multisig notification was filed 05:12 — the first Extension issue in 23 days — with an empty body, gained a full body naming five root causes by 08:20, and had PR #5095 open by 08:36: 10 files, +233/-46, multisig approval notifications now updated with a status rather than deleted on every subscription reload. Scoped as US-18.5, 5 points, in-progress. PR #5089, the one-line chain-list pin, still carries from W39 unreviewed since 09-25. The tester moved three QC rows over from W38 on 09-30 — the parent, the regression and the bug verification, 28 points — taking the window to 33; round 3 of the regression ran 09-30 to 10-02 on the build going to beta and closed at 83 of 85 on each platform, ending the web-runner programme. US-42.27 opened 09-30 at 21 points, the release gate for the Mobile build carrying that update — a full regression on each beta build, a quick recheck on each production one. The standing decision this window inherits is 20 stories in W31 and W33 that still carry ready / in-progress / review, 96 points."
@@ -10,9 +10,9 @@ goal: "Opened 2026-09-28 at 0 points and it did not hold for a morning. #5093 Im
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | open, unreviewed | ← W39 | — |
-| — | *ChainList #710 chainlist maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ChainList PR #713 + Extension PR #5096, both open, unreviewed | — | — |
-| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 🔄 in-progress — PR #5095 open | new | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
+| — | *chain-list pin bump — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W39 · → W42 | — |
+| — | *ChainList #710 chainlist maintenance — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | #710 closed 10-08 by the tester · ChainList PR #713 merged 10-12 · Extension PR #5096 open | → W42 | — |
+| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095 approved 09-28, not merged | new · → W42 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) | QC — Update web-runner to 1.3.90 (#2057) — parent | [EPIC-42](epics/EPIC-42.md) | P2 | 0 | ✅ done 10-02 — all 23 sub-tasks settled | tester ← W38 | [US-42.24](stories/US-42.24-qc-web-runner-1-3-90.md) |
 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) | QC — web-runner full regression, round 3 | [EPIC-42](epics/EPIC-42.md) | P2 | 20 | ✅ done 10-02 — 83 of 85 on each platform | tester ← W38 | [US-42.24.19](stories/US-42.24.19-qc-web-runner-regression.md) |
 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) | QC — verify the bugs found during the update | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | ✅ done 10-02 — 88 rows settled, 1 on monitoring | tester ← W38 | [US-42.24.20](stories/US-42.24.20-qc-web-runner-verify-bugs.md) |
@@ -150,3 +150,56 @@ in five windows running. These are the rows most likely to make *this* window's 
 
 `projectV2` needs `read:project`; the token has `gist, read:org, repo`. Built from `gh issue view`,
 `gh pr view` and git. No board column is claimed as current.
+
+## Closeout — 2026-10-12
+
+Window ended **2026-10-04**. Closed **eight days late**, from `gh`, git, npm and the merged QC pages;
+the board still could not be read. Nothing was synced on the docs side between 09-29 and 10-12, so
+the tester's pages were the only running record — they kept the scope table above current, which is
+why this closeout has no missing rows to find.
+
+Every story's `sprint:` field was re-read: **seven name `sprint-2026-W40`**, the same seven as the
+table. One names W41 (US-42.30) and one W42 (US-42.31); both were set by the tester.
+
+### 6 of 7 stories · 75 of 80 points
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **Done** | US-42.24 (parent), US-42.24.19, US-42.24.20 — all 10-02 | 28 |
+| **Done after the window ended** | US-42.28 (10-07), US-42.29 (10-08), US-42.27 (10-09) | 47 |
+| **→ [W42](sprint-2026-W42.md), through [W41](sprint-2026-W41.md)** | US-18.5 — `review`: approved, QC'd, not merged | 5 |
+
+> **The window is 80 points, not 88.** The *"28 of the window's 88 points"* line earlier in this file
+> was written before US-42.28 was re-scored from 21 to 13 on 10-08. The scope table carries the
+> current figure.
+
+> The three that closed after 10-04 keep `sprint: sprint-2026-W40` because the tester set it there —
+> rows the tester places are listed, never moved. US-18.5 is a dev row, so this closeout moves it:
+> `sprint-2026-W42`. W41 was never opened while it ran, so the carry is two windows in one hop, the
+> same shape as W38 → W40.
+
+**Every point delivered was QC.** The one dev story was approved by lw-cdm on day one (09-28 10:26)
+and then did not merge — **`subwallet-dev` has taken nothing since 09-17**, 25 days. QC ran it on
+10-08 as US-42.29 and passed it 23 of 24, and the tester **closed #5093 `COMPLETED` the same
+afternoon**, with PR #5095 still open. So by 10-12 the tracker says *done*, QC says *passed*, and
+the code is on no branch that ships. That is [LESSONS §69](../LESSONS.md)'s *issue state* shape
+again: a closed issue is a claim about the tracker, not about the code.
+
+**ChainList #710 closed the same way, four days ahead of its PR.** The tester closed it `COMPLETED`
+on 10-08 01:43 after US-42.28 passed; [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713)
+merged **10-12 07:48 UTC, by saltict, with no review** — 20 commits, 144 files — and
+`@subwallet/chain-list` **`0.2.132`** was published at 07:57. Its Extension half,
+[PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096), is **still open, still pinned
+to `0.2.132-beta.5-pr-713-…`, and still comments out `fetchLatestChainData()`** — so the warning this
+window opened with stands, and now has a released version to re-pin to.
+
+**The web-runner programme closed inside this window** — #2057 closed 10-02 at 72 of 77, the
+regression at 83 of 85 on each platform, all 88 bug rows settled — and **Mobile v1.2.45(534)b-v16
+reached both stores** behind a gate that passed every stage (US-42.27, 10-09).
+
+**`check-ids` now exits 1 on two rows, not one.** US-42.27 records `version_shipped: 1.2.45(534)b-v16`,
+a SubWallet-**Mobile** build — the same thing US-42.10 has carried since 07-29 and the same fix that
+was applied and reverted on 08-13. It is the tester's field on the tester's page, so it is listed,
+not changed. Two rows make it a convention rather than a slip: either `check-ids` learns a Mobile
+version space, or the field stays empty on Mobile gates. **That is a call for the owner, not a
+closeout.**

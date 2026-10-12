@@ -227,8 +227,8 @@ double-count the work its children already carry.
 | [#4187](https://github.com/Koniverse/SubWallet-Extension/issues/4187) | Asset Hub Migration | 17 (6 in this ledger) | the 6 in-ledger children (#3714, #3710, #4522, #4170, #4790, #4354) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md), beside the rest of the migration |
 | [#4935](https://github.com/Koniverse/SubWallet-Extension/issues/4935) | Update chain-list stable v0.2.124 | 6 (1 in this ledger) | the one in-ledger child (#301) in [US-4.3](../stories/US-4.3-auto-update-chain-list-and-token-metadata.md) |
 | [#4567](https://github.com/Koniverse/SubWallet-Extension/issues/4567) | Improve "Filter To token based on From token" (Round 2) | 1 (0 in this ledger) | its only child (#98) is out of this area; the Round-1 delivery #4468 keeps its own row in [US-4.12](../stories/US-4.12-token-registry-enable-disable.md) |
-| [ChainList #711](https://github.com/Koniverse/SubWallet-ChainList/issues/711) | Support ERC-20 ERC-721 for X Layer | — (cross-repo) | the capability is in the **ChainList** repo; the Extension side is [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089), one line — `ChainListVersion` `0.2.129` → `0.2.131` in `chain-service/utils/patch.ts`. Open, unreviewed, no CHANGELOG line, so the epic holds it |
-| [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710) | Maintenance of chainlist *(retitled from "Maintenance of RPC endpoints" 2026-09-29)* | 4 (0 in this ledger) | #704 (Rotko), **#711 (X Layer)**, #712 (XGRChain) and [Extension PR #5010](https://github.com/Koniverse/SubWallet-Extension/pull/5010) (Gatotech, IBP removal). Delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713) — **100 files, +1468/−329**, 3 beta releases cut: **61 chains set `INACTIVE`**, 24 added, 69 RPC lists rewritten, **102 Bittensor subnets resynced**. Open, unreviewed, no CHANGELOG line; **13 follow-ups open**. Extension side is [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096) — **see the note, it currently disables FR-34**. Detail in [notes/2026-09-29.md](../../notes/2026-09-29.md) |
+| [ChainList #711](https://github.com/Koniverse/SubWallet-ChainList/issues/711) | Support ERC-20 ERC-721 for X Layer | — (cross-repo) | the capability is in the **ChainList** repo; the Extension side is [PR #5089](https://github.com/Koniverse/SubWallet-Extension/pull/5089), one line — `ChainListVersion` `0.2.129` → `0.2.131` in `chain-service/utils/patch.ts`. Open, unreviewed, no CHANGELOG line, so the epic holds it. **Still open on both repos at 2026-10-12**, though its commit is inside ChainList PR #713, which merged that day — so the X Layer change is in chain-list `0.2.132` while #711 and the pin PR both read open |
+| [ChainList #710](https://github.com/Koniverse/SubWallet-ChainList/issues/710) | Maintenance of chainlist *(retitled from "Maintenance of RPC endpoints" 2026-09-29)* | 4 (0 in this ledger) | #704 (Rotko), **#711 (X Layer)**, #712 (XGRChain) and [Extension PR #5010](https://github.com/Koniverse/SubWallet-Extension/pull/5010) (Gatotech, IBP removal). Delivered by [ChainList PR #713](https://github.com/Koniverse/SubWallet-ChainList/pull/713) — **merged 2026-10-12 07:48 UTC by saltict, no review**: 20 commits, **144 files, +1484/−354**, six betas cut. **Published as `@subwallet/chain-list` `0.2.132` at 07:57.** Against `0.2.131`: **65 chains newly `INACTIVE`** (33 mainnet, 32 testnet), **24 added**, none reactivated. #710 itself was **closed `COMPLETED` 10-08 by the tester** — four days before the PR merged; #712 closed 10-09; **Extension PR #5010 closed unmerged 10-09**, superseded. No CHANGELOG line. Extension side is [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096) — **still open, still pinned to a PR build and still disabling FR-34; see the note**. Detail in [notes/2026-09-29.md](../../notes/2026-09-29.md) and [notes/2026-10-12.md](../../notes/2026-10-12.md) |
 
 > **The chain-list release train has both shapes.** #4861 … #4730 (*"Update chain-list stable
 > v0.2.118 … v0.2.123"*) each shipped a CHANGELOG line and keep their rows in
@@ -236,7 +236,8 @@ double-count the work its children already carry.
 > no line yet and is the umbrella. The distinction is the line, not the children — the same rule that
 > keeps #4606 (*"ParaSpell V4"*) a row rather than an umbrella even though it, too, has sub-issues.
 >
-> **ChainList #710 is the largest entry the train has carried** — 61 chains deactivated, 24 added,
+> **ChainList #710 is the largest entry the train has carried** — 65 chains deactivated in the
+> published `0.2.132` (61 when first recorded on 09-29, 64 by the QC count on 10-09), 24 added,
 > 69 RPC lists rewritten, 102 Bittensor subnets resynced — and it is an umbrella by this epic's own
 > test: it has children (#704, #711, #712, Extension #5010) and no CHANGELOG line. Its branch now
 > carries **#711 and #712 as named commits**, so neither needs an entry of its own.
@@ -246,6 +247,14 @@ double-count the work its children already carry.
 > the author marked *Revert before commit*. Merged as-is it would switch off
 > [FR-34](../../PRD.md#epic-4--chain-management) and this epic's *data updates ship without a
 > release* invariant. Open, empty body, no review, not draft.
+>
+> **Re-read 2026-10-12: unchanged in substance, now overtaken.** Four commits (last `b6175560a2`,
+> 10-09); every `package.json` pins `0.2.132-beta.5-pr-713-885df11c` — **still a PR build** — and the
+> TEMP block is still there, now with a `@ts-ignore` on `fetchLatestChainData` to keep the build
+> quiet about the unused method. The real `0.2.132` has been on npm since 07:57 today, so the PR now
+> needs two edits before it can merge: **re-pin to `0.2.132`** and **revert the TEMP block**. Both are
+> what the v1.3.91 gate checks as [US-42.31](../stories/US-42.31-qc-release-extension-v1-3-91.md)
+> AC-12.
 >
 > **ChainList #711 (X Layer, 2026-09-25) is the train's third shape**: the issue is not on this
 > repo at all. The Extension carries only the version pin, which is
