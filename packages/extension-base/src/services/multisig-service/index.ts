@@ -5,7 +5,7 @@ import { ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
-import { _SubstrateAdapterSubscriptionArgs } from '@subwallet/extension-base/services/chain-service/types';
+import { _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import { InappNotificationService } from '@subwallet/extension-base/services/inapp-notification-service';
 import { NotificationDescriptionMap, NotificationTitleMap } from '@subwallet/extension-base/services/inapp-notification-service/consts';
@@ -17,7 +17,8 @@ import { _reformatAddressWithChain, addLazy, createPromiseHandler, isSameAddress
 import { createLogger } from '@subwallet/extension-base/utils/logger';
 import { BehaviorSubject } from 'rxjs';
 
-import { BlockHash, SignedBlock } from '@polkadot/types/interfaces';
+import { Compact } from '@polkadot/types';
+import { BlockHash, Moment, SignedBlock } from '@polkadot/types/interfaces';
 
 import { EventItem, EventType } from '../event-service/types';
 
@@ -25,6 +26,33 @@ import { EventItem, EventType } from '../event-service/types';
  * Query key for multisig multisigs subscription
  */
 const MULTISIG_QUERY_KEY = 'query_multisig_multisigs';
+
+/**
+ * Delays used to retry a multisig subscription that cannot be set up or was broken by an RPC error
+ */
+const MULTISIG_RETRY_DELAY_MIN = 2000;
+const MULTISIG_RETRY_DELAY_MAX = 60000;
+
+/**
+ * Block data needed to resolve the extrinsic of a pending multisig tx
+ */
+interface MultisigBlockInfo {
+  blockHash: BlockHash;
+  signedBlock: SignedBlock;
+  timestamp: number;
+}
+
+/**
+ * On-chain state of a pending multisig tx whose block could not be read (e.g. pruned by the RPC node)
+ */
+type UnresolvedPendingMultisigTx = Pick<RawPendingMultisigTx, 'callHash' | 'blockHeight' | 'extrinsicIndex' | 'approvals' | 'depositAmount'>;
+
+/**
+ * Identifies a pending multisig tx on chain, the same call can be proposed again in another block after it is executed
+ */
+function genOnChainTxKey (callHash: string, blockHeight: number, extrinsicIndex: number) {
+  return `${callHash}___${blockHeight}___${extrinsicIndex}`;
+}
 
 /**
  * Interface representing multisig extrinsic data from the Substrate pallet
@@ -188,6 +216,8 @@ export class MultisigService implements StoppableServiceInterface {
   private subscribePromise: Promise<void> | undefined;
   /** Set to track notified transaction keys to avoid duplicate notifications */
   private readonly notifiedTxKeys: Set<string> = new Set();
+  /** Last queued notification write of each multisig address on each chain, so writes are applied in order */
+  private readonly notificationTaskQueue: Record<string, Promise<void>> = {};
 
   /**
    * Creates an instance of MultisigService
@@ -394,10 +424,10 @@ export class MultisigService implements StoppableServiceInterface {
           const reformatSigners = signers.map((s) => _reformatAddressWithChain(s, chainInfo));
           const threshold = account.accounts[0].threshold as number;
 
-          const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs) => {
+          const unsub = this.subscribePendingMultisigTxs(chain, reformatMultisigAddress, reformatSigners, threshold, (rs, unresolvedTxs) => {
             multisigServiceLogger.debug(`pending multisig txs of address ${reformatMultisigAddress}`, rs);
 
-            !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs);
+            !cancel && this.updatePendingMultisigTxSubjectByChain(reformatMultisigAddress, chain, rs, unresolvedTxs);
           });
 
           unsubList.push(unsub);
@@ -420,16 +450,41 @@ export class MultisigService implements StoppableServiceInterface {
   }
 
   /**
+   * Reads the block data needed to resolve the extrinsic of a pending multisig tx
+   * The timestamp is read from the block's timestamp inherent, so it does not need the state of old blocks, which RPC nodes prune by default
+   * @param substrateApi - Substrate API of the chain
+   * @param blockHeight - Height of the block that contains the multisig extrinsic
+   * @returns Block hash, signed block and timestamp of the block
+   */
+  private async getMultisigBlockInfo (substrateApi: _SubstrateApi, blockHeight: number): Promise<MultisigBlockInfo> {
+    const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
+    const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
+    const timestampExtrinsic = signedBlock.block.extrinsics.find(({ method }) => method.section === 'timestamp' && method.method === 'set');
+
+    if (timestampExtrinsic) {
+      const timestamp = (timestampExtrinsic.method.args[0] as Compact<Moment>).toNumber();
+
+      return { blockHash, signedBlock, timestamp };
+    }
+
+    const apiAt = await substrateApi.api.at(blockHash);
+    const timestamp = (await apiAt.query.timestamp.now()).toNumber();
+
+    return { blockHash, signedBlock, timestamp };
+  }
+
+  /**
    * Subscribes to pending multisig extrinsics for a specific multisig address on a chain
    * Fetches initial data and sets up a subscription for updates
    * @param chain - Chain identifier
    * @param multisigAddress - Multisig address to monitor
    * @param signers - List of signer addresses for the multisig
    * @param threshold - Number of approval required
-   * @param callback - Callback function called with updated pending extrinsics
+   * @param callback - Callback function called with updated pending extrinsics and the txs whose block could not be read
+   * @param onError - Called when the subscription is broken and needs to be set up again
    * @returns Function to unsubscribe from the subscription
    */
-  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[]) => void) {
+  private async subscribePendingMultisigTxsPromise (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[], unresolvedTxs: UnresolvedPendingMultisigTx[]) => void, onError: (error: unknown) => void) {
     const substrateApi = await this.chainService.getSubstrateApi(chain).isReady;
 
     if (!substrateApi.api.query.multisig.multisigs) {
@@ -449,9 +504,17 @@ export class MultisigService implements StoppableServiceInterface {
       args: rawKeysArgs
     }];
 
+    let closed = false;
+    // Updates are processed asynchronously, so an older update can finish after a newer one has been applied
+    let latestUpdateId = 0;
+    let appliedUpdateId = 0;
+
     const subscription = substrateApi.subscribeDataWithMulti(params, async (rs) => {
+      const updateId = ++latestUpdateId;
+
       try {
         const items: RawPendingMultisigTx[] = [];
+        const unresolvedTxs: UnresolvedPendingMultisigTx[] = [];
         const pendingMultisigEntries = rs[keyQuery];
 
         // subscribeDataWithMulti turns an RPC error into an empty result and completes the stream,
@@ -460,11 +523,8 @@ export class MultisigService implements StoppableServiceInterface {
           throw new Error(`Incomplete multisig storage result: expected ${rawKeysArgs.length} entries, got ${pendingMultisigEntries?.length ?? 0}`);
         }
 
-        const blockCache: Record<number, {
-          blockHash: BlockHash,
-          signedBlock: SignedBlock,
-          timestamp: number
-        }> = {};
+        // Cache block-level data to avoid many RPC calls, txs of the same block share the same request
+        const blockCache: Record<number, Promise<MultisigBlockInfo>> = {};
 
         await Promise.all(pendingMultisigEntries.map(async (_pendingMultisigInfo, index) => {
           const pendingMultisigInfo = _pendingMultisigInfo as unknown as PalletMultisigMultisig;
@@ -477,87 +537,144 @@ export class MultisigService implements StoppableServiceInterface {
           const extrinsicIndex = pendingMultisigInfo.when.index;
           const callHash = rawKeysArgs[index][1].toHex();
 
-          // Cache block-level data to avoid many RPC calls
-          let blockInfo = blockCache[blockHeight];
+          try {
+            blockCache[blockHeight] = blockCache[blockHeight] ?? this.getMultisigBlockInfo(substrateApi, blockHeight);
 
-          if (!blockInfo) {
-            const blockHash = await substrateApi.api.rpc.chain.getBlockHash(blockHeight);
-            const signedBlock = await substrateApi.api.rpc.chain.getBlock(blockHash);
-            const apiAt = await substrateApi.api.at(blockHash);
-            const timestamp = (await apiAt.query.timestamp.now()).toNumber();
+            const blockInfo = await blockCache[blockHeight];
+            const extrinsic = blockInfo.signedBlock.block.extrinsics[extrinsicIndex];
 
-            blockInfo = { blockHash, signedBlock, timestamp };
-            blockCache[blockHeight] = blockInfo;
+            if (!extrinsic) {
+              throw new Error(`Extrinsic ${extrinsicIndex} not found in block ${blockHeight}`);
+            }
+
+            const extrinsicHash = extrinsic.hash.toHex();
+
+            const callData = blockInfo.blockHash.toHex() === DEFAULT_BLOCK_HASH
+              ? undefined
+              : getCallData({ callHash, extrinsicIndex, block: blockInfo.signedBlock.block });
+
+            const decodedCallData = decodeCallData({
+              api: substrateApi.api,
+              callData
+            });
+
+            items.push({
+              chain,
+              multisigAddress,
+              callHash,
+              callData,
+              decodedCallData,
+              blockHeight,
+              extrinsicIndex,
+              extrinsicHash,
+              threshold,
+              signerAddresses: signers,
+              depositAmount: pendingMultisigInfo.deposit,
+              depositor: pendingMultisigInfo.depositor,
+              approvals: pendingMultisigInfo.approvals,
+              timestamp: blockInfo.timestamp,
+              multisigTxType: getMultisigTxType(decodedCallData)
+            });
+          } catch (error) {
+            // The tx is still on chain, pass its storage state down so it is not treated as executed or cancelled
+            multisigServiceLogger.warn(`Unable to read block ${blockHeight} of multisig call ${callHash} on ${chain}`, error);
+
+            unresolvedTxs.push({
+              callHash,
+              blockHeight,
+              extrinsicIndex,
+              depositAmount: pendingMultisigInfo.deposit,
+              approvals: pendingMultisigInfo.approvals
+            });
           }
-
-          const extrinsicHash = blockInfo.signedBlock.block.extrinsics[extrinsicIndex].hash.toHex();
-
-          const callData = blockInfo.blockHash.toHex() === DEFAULT_BLOCK_HASH
-            ? undefined
-            : getCallData({ callHash, extrinsicIndex, block: blockInfo.signedBlock.block });
-
-          const decodedCallData = decodeCallData({
-            api: substrateApi.api,
-            callData
-          });
-
-          items.push({
-            chain,
-            multisigAddress,
-            callHash,
-            callData,
-            decodedCallData,
-            blockHeight,
-            extrinsicIndex,
-            extrinsicHash,
-            threshold,
-            signerAddresses: signers,
-            depositAmount: pendingMultisigInfo.deposit,
-            depositor: pendingMultisigInfo.depositor,
-            approvals: pendingMultisigInfo.approvals,
-            timestamp: blockInfo.timestamp,
-            multisigTxType: getMultisigTxType(decodedCallData)
-          });
         }));
 
-        callback(items);
+        if (closed || updateId < appliedUpdateId) {
+          return;
+        }
+
+        appliedUpdateId = updateId;
+        callback(items, unresolvedTxs);
       } catch (error) {
         multisigServiceLogger.error(`Multisig Service subscription error ${chain}/${multisigAddress}`, error);
 
-        addLazy(
-          `resubscribeMultisig_${chain}_${multisigAddress}`,
-          () => {
-            if (this.status === ServiceStatus.STARTED) {
-              this.runSubscribePendingMultisigTxs().catch((e) => multisigServiceLogger.error('Error during resubscribeMultisig', e));
-            }
-          },
-          1000,
-          4000,
-          true
-        );
+        !closed && onError(error);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      closed = true;
+      subscription.unsubscribe();
+    };
   }
 
   /**
    * Wrapper function to subscribe to pending multisig extrinsics
-   * Returns an unsubscribe function that handles promise resolution
+   * Sets the subscription up again with an increasing delay when it cannot be set up or is broken by an RPC error
    * @param chain - Chain identifier
    * @param multisigAddress - Multisig address to monitor
    * @param signers - List of signer addresses for the multisig
    * @param threshold - Number of approval required
-   * @param callback - Callback function called with updated pending extrinsics
+   * @param callback - Callback function called with updated pending extrinsics and the txs whose block could not be read
    * @returns Function to unsubscribe from the subscription
    */
-  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[]) => void) {
-    const unsubPromise = this.subscribePendingMultisigTxsPromise(chain, multisigAddress, signers, threshold, callback);
+  private subscribePendingMultisigTxs (chain: string, multisigAddress: string, signers: string[], threshold: number, callback: (rs: RawPendingMultisigTx[], unresolvedTxs: UnresolvedPendingMultisigTx[]) => void) {
+    let stopped = false;
+    // Increased on every retry, so a replaced subscription can no longer update data or schedule a retry
+    let attempt = 0;
+    let retryCount = 0;
+    let retryTimeout: ReturnType<typeof setTimeout> | undefined;
+    let unsubscribe: VoidFunction | undefined;
+
+    const retry = (error: unknown) => {
+      if (stopped) {
+        return;
+      }
+
+      attempt++;
+      unsubscribe?.();
+      unsubscribe = undefined;
+
+      const delay = Math.min(MULTISIG_RETRY_DELAY_MIN * 2 ** retryCount, MULTISIG_RETRY_DELAY_MAX);
+
+      retryCount++;
+      multisigServiceLogger.warn(`Retry multisig subscription ${chain}/${multisigAddress} in ${delay}ms`, error);
+
+      clearTimeout(retryTimeout);
+      retryTimeout = setTimeout(subscribe, delay);
+    };
+
+    const subscribe = () => {
+      const currentAttempt = attempt;
+      const isCurrent = () => !stopped && currentAttempt === attempt;
+
+      this.subscribePendingMultisigTxsPromise(chain, multisigAddress, signers, threshold, (rs, unresolvedTxs) => {
+        if (isCurrent()) {
+          retryCount = 0;
+          callback(rs, unresolvedTxs);
+        }
+      }, (error) => {
+        isCurrent() && retry(error);
+      })
+        .then((unsub) => {
+          if (isCurrent()) {
+            unsubscribe = unsub;
+          } else {
+            unsub();
+          }
+        })
+        .catch((error) => {
+          isCurrent() && retry(error);
+        });
+    };
+
+    subscribe();
 
     return () => {
-      unsubPromise.then((unsub) => {
-        unsub?.();
-      }).catch((e) => multisigServiceLogger.error('Error during unsubscribe in subscribePendingMultisigTxs', e));
+      stopped = true;
+      clearTimeout(retryTimeout);
+      unsubscribe?.();
+      unsubscribe = undefined;
     };
   }
 
@@ -576,8 +693,9 @@ export class MultisigService implements StoppableServiceInterface {
    * @param multisigAddress - Multisig address
    * @param chain - Chain identifier
    * @param rawPendingTxs - Array of raw pending multisig extrinsics to update
+   * @param unresolvedTxs - Txs still on chain whose block could not be read
    */
-  private updatePendingMultisigTxSubjectByChain (multisigAddress: string, chain: string, rawPendingTxs: RawPendingMultisigTx[]): void {
+  private updatePendingMultisigTxSubjectByChain (multisigAddress: string, chain: string, rawPendingTxs: RawPendingMultisigTx[], unresolvedTxs: UnresolvedPendingMultisigTx[]): void {
     const allAddresses = this.keyringService.context.getAllAddresses();
     const currentMap = this.getPendingMultisigTxMap();
     const excludedPrefix = `${chain}___${multisigAddress}___`;
@@ -585,11 +703,8 @@ export class MultisigService implements StoppableServiceInterface {
     const newTxMap: PendingMultisigTxMap = {};
     const newNotifiedTxs: PendingMultisigTx[] = [];
 
-    // Txs still on chain whose extrinsic could not be resolved this time, keyed by call hash
-    const unresolvedTxMap = rawPendingTxs.reduce<Record<string, RawPendingMultisigTx>>((map, rawTx) => {
-      if (!rawTx.extrinsicHash) {
-        map[rawTx.callHash] = rawTx;
-      }
+    const unresolvedTxMap = unresolvedTxs.reduce<Record<string, UnresolvedPendingMultisigTx>>((map, tx) => {
+      map[genOnChainTxKey(tx.callHash, tx.blockHeight, tx.extrinsicIndex)] = tx;
 
       return map;
     }, {});
@@ -601,7 +716,7 @@ export class MultisigService implements StoppableServiceInterface {
         continue;
       }
 
-      const unresolvedTx = unresolvedTxMap[value.callHash];
+      const unresolvedTx = unresolvedTxMap[genOnChainTxKey(value.callHash, value.blockHeight, value.extrinsicIndex)];
 
       if (unresolvedTx) {
         // Keep the last known data of a tx that is still pending, only refresh its on-chain state
@@ -616,13 +731,8 @@ export class MultisigService implements StoppableServiceInterface {
       const extrinsicHash = rawTx.extrinsicHash;
       const signerAddresses = rawTx.signerAddresses;
 
-      if (!extrinsicHash) {
-        multisigServiceLogger.warn(`Unable to resolve extrinsic of multisig call ${rawTx.callHash} on ${chain}, keeping its last known data`);
-        continue;
-      }
-
-      if (!signerAddresses || signerAddresses.length === 0) {
-        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: signerAddresses');
+      if (!extrinsicHash || !signerAddresses || signerAddresses.length === 0) {
+        multisigServiceLogger.warn('Skipping multisig extrinsic due to missing required fields: extrinsicHash or signerAddresses');
         continue;
       }
 
@@ -653,10 +763,15 @@ export class MultisigService implements StoppableServiceInterface {
       }
     }
 
+    const notificationQueueKey = `${chain}___${multisigAddress}`;
+
     // 3. Replace the extrinsics of multisigAddress and chain
     // Mark notifications of approved or no longer pending transactions
-    this.updateMultisigApprovalNotifications(newTxMap, new Set(Object.keys(unresolvedTxMap)), multisigAddress, chain)
-      .catch((e) => multisigServiceLogger.error('Failed to update multisig approval notifications:', e));
+    this.enqueueNotificationTask(
+      notificationQueueKey,
+      () => this.updateMultisigApprovalNotifications(newTxMap, new Set(Object.keys(unresolvedTxMap)), multisigAddress, chain),
+      'Failed to update multisig approval notifications:'
+    );
 
     this.pendingMultisigTxSubject.next({
       ...filteredMap,
@@ -665,10 +780,27 @@ export class MultisigService implements StoppableServiceInterface {
 
     // 4. Create notifications for new pending transactions
     if (newNotifiedTxs.length > 0) {
-      this.createMultisigApprovalNotifications(newNotifiedTxs).catch((error) => {
-        multisigServiceLogger.error('Failed to create multisig approval notifications:', error);
-      });
+      this.enqueueNotificationTask(
+        notificationQueueKey,
+        () => this.createMultisigApprovalNotifications(newNotifiedTxs),
+        'Failed to create multisig approval notifications:'
+      );
     }
+  }
+
+  /**
+   * Runs notification writes of the same multisig address one after another,
+   * so a write computed from an older update cannot land after a newer one
+   * @param key - Key of the multisig address and chain
+   * @param task - Notification write to run
+   * @param errorMessage - Message logged when the write fails
+   */
+  private enqueueNotificationTask (key: string, task: () => Promise<void>, errorMessage: string): void {
+    const previousTask = this.notificationTaskQueue[key] ?? Promise.resolve();
+
+    this.notificationTaskQueue[key] = previousTask
+      .then(task)
+      .catch((e) => multisigServiceLogger.error(errorMessage, e));
   }
 
   /**
@@ -676,11 +808,11 @@ export class MultisigService implements StoppableServiceInterface {
    * so the user still sees why a notification needs no more action when clicking it
    * @private
    * @param newTxMap - Map of current pending multisig transactions
-   * @param unresolvedCallHashes - Call hashes of txs still on chain whose extrinsic could not be resolved
+   * @param unresolvedTxKeys - On-chain keys (genOnChainTxKey) of txs still on chain whose block could not be read
    * @param multisigAddress - Multisig address
    * @param chain - ChainSlug of the multisig transactions
    */
-  private async updateMultisigApprovalNotifications (newTxMap: PendingMultisigTxMap, unresolvedCallHashes: Set<string>, multisigAddress: string, chain: string): Promise<void> {
+  private async updateMultisigApprovalNotifications (newTxMap: PendingMultisigTxMap, unresolvedTxKeys: Set<string>, multisigAddress: string, chain: string): Promise<void> {
     const currentNotifications = await this.inappNotificationService.fetchNotificationsByParams({
       notificationTab: NotificationTab.MULTISIG,
       proxyId: ALL_ACCOUNT_KEY,
@@ -699,7 +831,7 @@ export class MultisigService implements StoppableServiceInterface {
         const isApproved = pendingTx.approvals.some((address) => isSameAddress(pendingTx.currentSigner, address));
 
         status = isApproved ? MultisigApprovalNotificationStatus.APPROVED : undefined;
-      } else if (unresolvedCallHashes.has(metadata.callHash)) {
+      } else if (unresolvedTxKeys.has(genOnChainTxKey(metadata.callHash, metadata.blockHeight, metadata.extrinsicIndex))) {
         // The tx is still on chain but has no known data yet, so its approval state cannot be verified
         return rs;
       } else {
