@@ -82,6 +82,10 @@ export class InappNotificationService implements CronServiceInterface {
     return this.dbService.cleanUpNotificationByIds(ids);
   }
 
+  updateNotifications (notifications: _NotificationInfo[]) {
+    return this.dbService.upsertNotifications(notifications);
+  }
+
   passValidateNotification (candidateNotification: _BaseNotificationInfo, comparedNotifications: _NotificationInfo[], remindTimeConfigInHrs: Record<NotificationActionType, number>) { // todo: simplify condition !!
     if ([NotificationActionType.WITHDRAW, NotificationActionType.CLAIM].includes(candidateNotification.actionType)) {
       const { actionType, address, metadata, time } = candidateNotification;
