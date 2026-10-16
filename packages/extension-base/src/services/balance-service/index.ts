@@ -9,11 +9,13 @@ import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substr
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { getAcrossbridgeTransferProcessFromEvm, getDefaultTransferProcess, getSnowbridgeTransferProcessFromEvm, RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
-import { _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetNetuid, _getChainNativeTokenSlug, _isChainSubstrateCompatible, _isCustomAsset, _isCustomChain, _isNativeToken, _isPureEvmChain } from '@subwallet/extension-base/services/chain-service/utils';
+import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
+import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
-import { addLazy, createPromiseHandler, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
+import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { AllSubstrateKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
@@ -164,12 +166,27 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
+    const stakedAddresses: string[] = [];
+
     events.forEach((event) => {
       if (event.type === 'account.remove' || event.type === 'accountProxy.remove') {
         removedAddresses.push(event.data[0] as string);
         lazyTime = 1000;
       }
+
+      if (event.type === 'transaction.done') {
+        const transaction = event.data[0] as SWTransactionBase;
+
+        // A subnet stake turns its alpha token on, as a swap does (EXT-39)
+        if (_BALANCE_CHAIN_GROUP.bittensor.includes(transaction.chain) && [ExtrinsicType.STAKING_BOND, ExtrinsicType.JOIN_YIELD_POOL].includes(transaction.extrinsicType)) {
+          stakedAddresses.push(transaction.address);
+        }
+      }
     });
+
+    if (stakedAddresses.length) {
+      this.autoEnableBittensorAlphaTokens(stakedAddresses).catch(console.error);
+    }
 
     if (removedAddresses.length > 0) {
       this.balanceMap.removeBalanceItems([...removedAddresses, ALL_ACCOUNT_KEY]); // Add all account key to recalculate all account balances
@@ -647,6 +664,55 @@ export class BalanceService implements StoppableServiceInterface {
 
     if (needActiveTokens.length) {
       await this.state.chainService.enableChains(needEnableChains);
+      this.state.chainService.setAssetSettings({ ...currentAssetSettings });
+    }
+
+    // After the write above, so the two do not overwrite each other's settings
+    await this.autoEnableBittensorAlphaTokens(addresses);
+  }
+
+  /**
+   * Turns on the alpha token of every subnet the accounts hold stake on (EXT-39). Only visible tokens
+   * are read, and a stake through Earning — unlike a swap — turns nothing on, so it would drop out of
+   * the Assets total. Subscan, behind `autoEnableChains`, does not cover Bittensor, so this reads the
+   * chain; like `autoEnableChains` it leaves a chain the user turned off alone.
+   */
+  public async autoEnableBittensorAlphaTokens (addresses: string[]) {
+    const assetMap = this.state.chainService.getAssetRegistry();
+    const currentAssetSettings = await this.state.chainService.getAssetSettings();
+    const coldkeys = addresses.filter((address) => AllSubstrateKeypairTypes.includes(getKeypairTypeByAddress(address)));
+    let changed = false;
+
+    if (!coldkeys.length) {
+      return;
+    }
+
+    for (const chain of _BALANCE_CHAIN_GROUP.bittensor) {
+      const chainState = this.state.chainService.getChainStateByKey(chain);
+      const hidden = Object.values(filterAlphaAssetsByChain(assetMap, chain)).filter((asset) => !currentAssetSettings[asset.slug]?.visible);
+
+      // The stake read needs the chain connected
+      if (!chainState?.active || chainState.manualTurnOff || !hidden.length) {
+        continue;
+      }
+
+      try {
+        const substrateApi = await this.state.chainService.getSubstrateApi(chain).isReady;
+        const rows = (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(coldkeys)).toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+        const stakedNetuids = new Set(rows.flatMap(([, stakes]) => stakes).filter((row) => new BigN(row.stake).gt(0)).map((row) => row.netuid));
+
+        hidden.forEach((asset) => {
+          if (stakedNetuids.has(_getAssetNetuid(asset))) {
+            currentAssetSettings[asset.slug] = { visible: true };
+            changed = true;
+          }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    if (changed) {
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
     }
   }
