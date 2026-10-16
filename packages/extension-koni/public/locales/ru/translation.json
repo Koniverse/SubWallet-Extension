@@ -1591,6 +1591,8 @@
   "ui.TRANSACTION.screen.Transaction.Swap.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.CancelUnstake.selectUnstakeRequest": "Выберите запрос на отмену стейка",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming": "Получение награды",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorTitle": "Награды получаются по одному валидатору",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorDescription": "Ваши награды распределены между валидаторами ({{validators}}) — больше, чем может обработать одно получение, — поэтому они получаются по одному валидатору. Это получение заберёт {{amount}} {{symbol}} у валидатора с наибольшей выплатой; оставшиеся {{remaining}} {{symbol}} можно получить следующими запросами, каждый со своей сетевой комиссией",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim": "Stake reward after claim",
   "ui.TRANSACTION.screen.Transaction.Earn.dualStakingFreezeWarning": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
   "ui.TRANSACTION.screen.Transaction.Earn.continueStaking": "Continue staking?",
@@ -2177,6 +2179,7 @@
   "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
   "bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold": "No rewards to claim. You need at least {{threshold}} {{symbol}} pending on a validator before you can claim",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.rootClaimTooHeavy": "Сейчас эти награды нельзя получить: фонд валидатора больше, чем может обработать одно получение",
   "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee": "Validator change fee",
@@ -2811,5 +2814,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "Обмен в этой подсети сейчас недоступен",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "У вас нет застейканных {{symbol}} для обмена. Для обмена используются застейканные {{symbol}}, а не доступный баланс",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "Застейканные {{symbol}} у каждого из ваших валидаторов меньше минимальной суммы обмена {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "Ваши застейканные {{symbol}} недавно изменились и пока не могут быть обменены. Повторите попытку позже",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "Сумма должна быть не меньше {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "Вы можете обменять не более {{number}} {{symbol}} из застейканного баланса",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "Эту сумму нельзя разделить между вашими валидаторами. Попробуйте немного другую сумму",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "Ваши застейканные {{symbol}} заблокированы и пока не могут быть обменены"
 }

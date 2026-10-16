@@ -1591,6 +1591,8 @@
   "ui.TRANSACTION.screen.Transaction.Swap.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.CancelUnstake.selectUnstakeRequest": "选择解除质押请求",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming": "领取奖励",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorTitle": "按验证者逐个领取",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorDescription": "您的奖励分布在 {{validators}} 个验证者上，超出单次领取可处理的范围，因此将按验证者逐个领取。本次领取将从支付最多的验证者处获得 {{amount}} {{symbol}}；剩余的 {{remaining}} {{symbol}} 可在后续领取中获得，每次领取单独收取网络费用",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim": "Stake reward after claim",
   "ui.TRANSACTION.screen.Transaction.Earn.dualStakingFreezeWarning": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
   "ui.TRANSACTION.screen.Transaction.Earn.continueStaking": "Continue staking?",
@@ -2177,6 +2179,7 @@
   "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
   "bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold": "No rewards to claim. You need at least {{threshold}} {{symbol}} pending on a validator before you can claim",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.rootClaimTooHeavy": "暂时无法领取这些奖励：验证者的资金池超出单次领取可处理的范围",
   "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee": "Validator change fee",
@@ -2809,5 +2812,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "该子网当前无法兑换",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "您没有可兑换的已质押 {{symbol}}。兑换使用已质押的 {{symbol}}，而非可转账余额",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "您在每个验证者上质押的 {{symbol}} 均低于最低兑换数量 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "您已质押的 {{symbol}} 近期有变动，暂时无法兑换。请稍后再试",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "数量至少为 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "您最多可从已质押余额中兑换 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "该数量无法在您的验证人之间拆分。请尝试略有不同的数量",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "您已质押的 {{symbol}} 已被锁定，暂时无法兑换"
 }

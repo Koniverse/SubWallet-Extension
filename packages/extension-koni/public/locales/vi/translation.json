@@ -1595,6 +1595,8 @@
   "ui.TRANSACTION.screen.Transaction.Swap.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.CancelUnstake.selectUnstakeRequest": "Chọn một yêu cầu unstake",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming": "Phần thưởng",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorTitle": "Claim lần lượt từng validator",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorDescription": "Phần thưởng của bạn nằm ở {{validators}} validator, nhiều hơn mức một lần claim xử lý được, nên sẽ được claim lần lượt từng validator. Lần claim này nhận {{amount}} {{symbol}} từ validator trả nhiều nhất; {{remaining}} {{symbol}} còn lại dành cho các lần claim tiếp theo, mỗi lần tính phí mạng riêng",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim": "Stake reward after claim",
   "ui.TRANSACTION.screen.Transaction.Earn.dualStakingFreezeWarning": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
   "ui.TRANSACTION.screen.Transaction.Earn.continueStaking": "Continue staking?",
@@ -2181,6 +2183,7 @@
   "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
   "bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold": "No rewards to claim. You need at least {{threshold}} {{symbol}} pending on a validator before you can claim",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.rootClaimTooHeavy": "Hiện chưa thể claim phần thưởng này: quỹ của validator lớn hơn mức một lần claim xử lý được",
   "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee": "Validator change fee",
@@ -2809,5 +2812,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "Dùng Touch ID, Windows Hello, vân tay hoặc khóa màn hình của thiết bị để mở khóa SubWallet mà không cần nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào trong Cài đặt > Cài đặt bảo mật",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "Để sau",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "Bật ngay",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Không thể thiết lập mở khóa bằng sinh trắc học. Bạn có thể thử lại trong Cài đặt > Cài đặt bảo mật"
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Không thể thiết lập mở khóa bằng sinh trắc học. Bạn có thể thử lại trong Cài đặt > Cài đặt bảo mật",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "Hiện không thể swap trên subnet này",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "Bạn không có {{symbol}} đang stake để swap. Swap dùng {{symbol}} đang stake, không dùng số dư khả dụng",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "{{symbol}} đang stake ở mỗi validator của bạn đều dưới mức swap tối thiểu {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "{{symbol}} đang stake của bạn vừa thay đổi nên chưa thể swap. Vui lòng thử lại sau",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "Số lượng tối thiểu là {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "Bạn có thể swap tối đa {{number}} {{symbol}} từ số dư đang stake",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "Không thể chia số lượng này cho các validator của bạn. Vui lòng thử một số lượng khác",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "{{symbol}} đang stake của bạn đang bị khoá nên chưa thể swap"
 }

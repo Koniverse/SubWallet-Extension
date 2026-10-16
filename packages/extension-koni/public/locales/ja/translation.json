@@ -1591,6 +1591,8 @@
   "ui.TRANSACTION.screen.Transaction.Swap.availableBalance": "Available balance",
   "ui.TRANSACTION.screen.Transaction.CancelUnstake.selectUnstakeRequest": "アンステークリクエストを選択",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.rewardClaiming": "報酬額",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorTitle": "バリデーターごとに順番に請求されます",
+  "ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorDescription": "報酬は{{validators}}つのバリデーターにあり、1回の請求で処理できる量を超えているため、バリデーターごとに順番に請求されます。今回の請求では最も多く支払うバリデーターから{{amount}} {{symbol}}を受け取ります。残りの{{remaining}} {{symbol}}は次回以降の請求で受け取れます（請求ごとにネットワーク手数料がかかります）",
   "ui.TRANSACTION.screen.Transaction.ClaimReward.stakeRewardAfterClaim": "Stake reward after claim",
   "ui.TRANSACTION.screen.Transaction.Earn.dualStakingFreezeWarning": "You're currently staking {{symbol}} via direct nomination. Due to {{originChain}}'s upcoming changes, continuing to stake via nomination pool will lead to pool-staked funds being frozen (e.g., can't unstake, claim rewards)",
   "ui.TRANSACTION.screen.Transaction.Earn.continueStaking": "Continue staking?",
@@ -2177,6 +2179,7 @@
   "bg.EARNING.services.service.earning.nativeStaking.tao.fromValidatorSameAsTo": "From validator is the same with to validator",
   "bg.EARNING.services.service.earning.nativeStaking.tao.remainingStakeBelowMinimumWarning": "Your remaining stake on the initial validator will fall below minimum active stake and cannot be unstaked if you proceed with the chosen amount. Hit \"Move all\" to move all {{maxAmount}} {{subnetSymbol}} to the new validator, or \"Cancel\" and lower the amount, then try again",
   "bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold": "No rewards to claim. You need at least {{threshold}} {{symbol}} pending on a validator before you can claim",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.rootClaimTooHeavy": "現在この報酬は請求できません：バリデーターのファンドが1回の請求で処理できる量を超えています",
   "bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow": "Amount too low. You need to move at least {{bnMinMoveStake}} {{symbol}}",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo": "A fee equivalent of {{number}} TAO will be deducted from your stake amount on the new validator once the transaction is complete",
   "ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee": "Validator change fee",
@@ -2809,5 +2812,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "現在このサブネットではスワップできません",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "スワップできるステーク中の{{symbol}}がありません。スワップには送金可能残高ではなくステーク中の{{symbol}}が使われます",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "各バリデーターにステーク中の{{symbol}}が、スワップの最低数量{{number}} {{symbol}}未満です",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "ステーク中の{{symbol}}は最近変更されたため、まだスワップできません。しばらくしてから再度お試しください",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "数量は{{number}} {{symbol}}以上である必要があります",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "ステーク残高からスワップできるのは最大{{number}} {{symbol}}です",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "この数量はバリデーター間で分割できません。少し異なる数量でお試しください",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "ステーク中の{{symbol}}はロックされているため、まだスワップできません"
 }

@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _MultiChainAsset } from '@subwallet/chain-list/types';
 import { APIItemState, CurrencyJson } from '@subwallet/extension-base/background/KoniTypes';
-import { _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSymbol, _getChainName, _getMultiChainAssetPriceId, _getMultiChainAssetSymbol, _isAssetValuable } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAlphaPriceId, _getAssetDecimals, _getAssetOriginChain, _getAssetPriceId, _getAssetSymbol, _getChainName, _getMultiChainAssetPriceId, _getMultiChainAssetSymbol, _isAssetValuable } from '@subwallet/extension-base/services/chain-service/utils';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AssetRegistryStore, BalanceStore, ChainStore, PriceStore } from '@subwallet/extension-koni-ui/stores/types';
 import { TokenBalanceItemType } from '@subwallet/extension-koni-ui/types/balance';
@@ -253,7 +253,10 @@ function getAccountBalance (
       return;
     }
 
-    const tokenGroupPriceId = multiChainAsset ? _getMultiChainAssetPriceId(multiChainAsset) : _getAssetPriceId(assetRegistryMap[tokenGroupKey]);
+    // A group of alpha copies (xSN on Subtensor-EVM and Base) has no price id of its own: it takes its subnet's (EXT-2)
+    const tokenGroupPriceId = multiChainAsset
+      ? _getMultiChainAssetPriceId(multiChainAsset) || _getAlphaPriceId(assetRegistryMap[tokenGroupMap[tokenGroupKey][0]])
+      : _getAssetPriceId(assetRegistryMap[tokenGroupKey]);
 
     // make sure priceId exists and token group has monetary value
     // todo: check if multiChainAsset has monetary value too (after Nampc updates the background)

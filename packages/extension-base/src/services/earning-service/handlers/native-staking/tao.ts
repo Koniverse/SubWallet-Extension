@@ -18,10 +18,11 @@ import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
-import { Codec } from '@polkadot/types/types';
+import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { fetchPoolsData } from '../../service';
+import { isRootClaimWorthNotifying, planRootClaim, RootClaimPlan, RootClaimPreview } from './bittensor-root-claim-plan';
 
 type Nominators = [Array<[number, number]>]
 
@@ -103,12 +104,6 @@ interface SubnetRateFeeResponse {
 interface SubnetFeeRate {
   netuid: number;
   fee_rate: string;
-}
-
-interface BasketPosition {
-  hotkey: string;
-  /** Realizable (mark-to-market) TAO payout of this position, in rao */
-  payout: string;
 }
 
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
@@ -564,51 +559,67 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Get pool reward */
 
   /**
-   * TAO the coldkey can actually redeem right now, in rao. The chain skips any validator owing
-   * less than the threshold, so only the positions above it are counted: `getRootBasketOwed`
-   * would also include dust that no claim can move, which would leave the figure promising more
-   * than a claim delivers and would raise claim notifications nothing can satisfy.
+   * The claim to send now and what it pays (EXT-9). The figure comes from the chain's claim preview,
+   * not the entitlement: a claim skips a fund's dust rows yet burns the whole entitlement, so
+   * `get_root_basket_positions` overstates small claims. Empty on runtimes without the preview API.
    */
-  protected async getClaimableReward (address: string, threshold: BigN): Promise<string> {
-    const positions = await this.getRootBasketPositions(address);
-
-    return this.filterClaimablePositions(positions, threshold)
-      .reduce((total, position) => total.plus(position.payout), new BigN(0))
-      .toFixed();
-  }
-
-  /**
-   * The positions a claim will actually settle. `root_claim_for_hotkey` skips a validator whose
-   * payout is under the threshold, so anything below it would only add weight to the transaction
-   * without paying out. Worthless positions go too, since the threshold can legitimately be zero.
-   */
-  protected filterClaimablePositions (positions: BasketPosition[], threshold: BigN): BasketPosition[] {
-    return positions.filter((position) => {
-      const payout = new BigN(position.payout);
-
-      return payout.gt(0) && payout.gte(threshold);
-    });
-  }
-
-  /**
-   * Per-validator entitlements of a coldkey, mark-to-market in rao. Empty on runtimes older than
-   * Root Reborn (v4.4.1), which have no beta basket API.
-   */
-  protected async getRootBasketPositions (address: string): Promise<BasketPosition[]> {
+  protected async getRootClaimPlan (address: string, threshold: BigN): Promise<RootClaimPlan> {
     const substrateApi = await this.substrateApi.isReady;
 
-    if (!substrateApi.api.call?.betaBasketRuntimeApi?.getRootBasketPositions) {
-      return [];
+    if (!substrateApi.api.call?.betaBasketRuntimeApi?.getRootBasketClaimPreviews) {
+      return planRootClaim({ previews: [], rootHotkeys: [], threshold });
     }
 
-    // Vec<(hotkey, owedShares, payoutTao)>
-    const rawPositions = await substrateApi.api.call.betaBasketRuntimeApi.getRootBasketPositions(address);
-    const positions = rawPositions as unknown as Array<[Codec, Codec, Codec]>;
+    const previews = (await substrateApi.api.call.betaBasketRuntimeApi.getRootBasketClaimPreviews(address)).toPrimitive() as unknown as RootClaimPreview[];
+    // `claim_root` also counts root hotkeys with nothing owed yet; only needed when it could settle several
+    const rootHotkeys = previews.filter((preview) => new BigN(preview.redeemableTao).gte(BigN.max(threshold, 1))).length > 1
+      ? await this.getRootHotkeys(address)
+      : [];
 
-    return Array.from(positions).map(([hotkey, , payout]) => ({
-      hotkey: hotkey.toString(),
-      payout: payout.toString()
-    }));
+    return planRootClaim({ previews, rootHotkeys, threshold });
+  }
+
+  /** Hotkeys the coldkey has root stake on. */
+  protected async getRootHotkeys (address: string): Promise<string[]> {
+    const substrateApi = await this.substrateApi.isReady;
+    const stakes = (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toPrimitive() as unknown as TaoStakeInfo[];
+
+    return stakes.filter((row) => row.netuid === 0 && new BigN(row.stake).gt(0)).map((row) => row.hotkey);
+  }
+
+  /** The claim extrinsic a plan calls for; undefined when nothing can be claimed. */
+  protected async buildRootClaim (plan: RootClaimPlan): Promise<SubmittableExtrinsic<'promise'> | undefined> {
+    const substrateApi = await this.substrateApi.isReady;
+
+    if (plan.call === 'claimRoot') {
+      // `subnets` is ignored since v4.4.1, it is kept only so old call data still decodes
+      return substrateApi.api.tx.subtensorModule.claimRoot([]);
+    }
+
+    if (plan.call === 'claimRootWithHotkey' && plan.hotkey) {
+      return substrateApi.api.tx.subtensorModule.claimRootWithHotkey(plan.hotkey);
+    }
+
+    return undefined;
+  }
+
+  /** What the planned claim costs, in rao — flat whatever it pays (10-13); undefined when it cannot be estimated. */
+  protected async getRootClaimFee (address: string, plan: RootClaimPlan): Promise<BigN | undefined> {
+    try {
+      const extrinsic = await this.buildRootClaim(plan);
+
+      if (!extrinsic) {
+        return undefined;
+      }
+
+      const info = await extrinsic.paymentInfo(address);
+
+      return new BigN(info.partialFee.toString());
+    } catch (e) {
+      console.error(e);
+
+      return undefined;
+    }
   }
 
   /** Minimum payout, in rao, a single validator must owe before the chain settles a claim on it */
@@ -650,6 +661,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     // Same for every address, so read it once per cycle rather than per address
     const threshold = await this.getRootClaimThreshold();
+    let feePromise: Promise<BigN | undefined> | undefined;
 
     await Promise.all(useAddresses.map(async (address) => {
       if (cancel) {
@@ -657,19 +669,28 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       }
 
       try {
-        // Resolves to '0' on runtimes without the beta basket API, so the UI still settles
-        const unclaimedReward = await this.getClaimableReward(address, threshold);
+        // Pays 0 on runtimes without the preview API, so the UI still settles
+        const plan = await this.getRootClaimPlan(address, threshold);
 
+        // What the next claim pays: every validator, or the one paying most when they must be claimed one at a time
         const earningRewardItem: EarningRewardItem = {
           ...this.baseInfo,
           address: address,
           type: this.type,
-          unclaimedReward: unclaimedReward,
+          unclaimedReward: plan.pays.toFixed(),
+          partialClaim: plan.remainingValidators > 0
+            ? { remainingValidators: plan.remainingValidators, remainingReward: plan.remainingReward.toFixed() }
+            : undefined,
           state: APIItemState.READY
         };
 
-        if (unclaimedReward !== '0') {
-          await this.createClaimNotification(earningRewardItem, this.nativeToken);
+        if (plan.pays.gt(0)) {
+          // The fee is flat whatever a claim pays, so one estimate serves every address in the cycle
+          feePromise = feePromise ?? this.getRootClaimFee(address, plan);
+
+          if (isRootClaimWorthNotifying(plan.pays, await feePromise)) {
+            await this.createClaimNotification(earningRewardItem, this.nativeToken);
+          }
         }
 
         callback(earningRewardItem);
@@ -690,30 +711,28 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   override async handleYieldClaimReward (address: string, bondReward?: boolean): Promise<TransactionData> {
     const substrateApi = await this.substrateApi.isReady;
 
-    if (!substrateApi.api.tx.subtensorModule.claimRoot) {
+    if (!substrateApi.api.tx.subtensorModule.claimRoot || !substrateApi.api.tx.subtensorModule.claimRootWithHotkey) {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
     }
 
-    const [positions, threshold] = await Promise.all([
-      this.getRootBasketPositions(address),
-      this.getRootClaimThreshold()
-    ]);
-
-    // A claim built purely from skipped positions would succeed as a no-op that still charges a fee
-    const claimablePositions = this.filterClaimablePositions(positions, threshold);
-
-    if (positions.length > 0 && claimablePositions.length === 0) {
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold', { replace: { threshold: formatNumber(threshold, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } })));
-    }
-
+    // Fresh previews, so the claim matches the chain now rather than the last reward cycle
+    const threshold = await this.getRootClaimThreshold();
+    const plan = await this.getRootClaimPlan(address, threshold);
     // Redemption is fund-level: the payout is sold to TAO and re-staked on root, so
     // `bondReward` has no meaning here
-    if (claimablePositions.length === 1 && substrateApi.api.tx.subtensorModule.claimRootWithHotkey) {
-      return substrateApi.api.tx.subtensorModule.claimRootWithHotkey(claimablePositions[0].hotkey);
+    const extrinsic = await this.buildRootClaim(plan);
+
+    if (extrinsic) {
+      return extrinsic;
     }
 
-    // `subnets` is ignored since v4.4.1, it is kept only so old call data still decodes
-    return substrateApi.api.tx.subtensorModule.claimRoot([]);
+    // A claim that pays nothing succeeds as a no-op that still charges a fee; one over budget is refused and charged
+    const symbol = _getAssetSymbol(this.nativeToken);
+    const message = plan.error === 'tooHeavy'
+      ? t('bg.EARNING.services.service.earning.nativeStaking.tao.rootClaimTooHeavy')
+      : t('bg.EARNING.services.service.earning.nativeStaking.tao.rewardBelowClaimThreshold', { replace: { threshold: formatNumber(threshold, _getAssetDecimals(this.nativeToken)), symbol } });
+
+    return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, message));
   }
 
   /* Claim reward action */
