@@ -2809,5 +2809,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "该子网当前无法兑换",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "您没有可兑换的已质押 {{symbol}}。兑换使用已质押的 {{symbol}}，而非可转账余额",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "您在每个验证者上质押的 {{symbol}} 均低于最低兑换数量 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "您已质押的 {{symbol}} 近期有变动，暂时无法兑换。请稍后再试",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "数量至少为 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "您最多可从已质押余额中兑换 {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "该数量无法在您的验证人之间拆分。请尝试略有不同的数量",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "您已质押的 {{symbol}} 已被锁定，暂时无法兑换"
 }

@@ -1,22 +1,25 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, toBNString } from '@subwallet/extension-base/utils';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain, balanceFormatter, formatNumber, toBNString } from '@subwallet/extension-base/utils';
 import { ApiPromise } from 'avail-js-sdk';
 import BigNumber from 'bignumber.js';
+import { t } from 'i18next';
 
 import { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
-import { _getAssetDecimals, _isNativeTokenBySlug } from '../../chain-service/utils';
+import { _getAssetDecimals, _getAssetSymbol, _isNativeTokenBySlug } from '../../chain-service/utils';
 import { TaoStakeInfo } from '../../earning-service/handlers/native-staking/tao';
 import FeeService from '../../fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
+import { findMinLeg, getRootHeldHotkeys, getSwapSource, planSwapLegs, SwapSourceParams, SwapSourcePlan } from './bittensor-swap-plan';
 
 export class BittensorSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
@@ -99,7 +102,24 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     }
 
     if (swap) {
-      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex); // todo: create interface for input request
+      const fromAsset = this.chainService.getAssetBySlug(selectedQuote.pair.from);
+      const toAsset = this.chainService.getAssetBySlug(selectedQuote.pair.to);
+      const fromNetuid = this.getNetuid(fromAsset);
+      const toNetuid = this.getNetuid(toAsset);
+
+      if (fromNetuid == null || toNetuid == null || fromNetuid === toNetuid) {
+        return [new TransactionError(BasicTxErrorType.UNSUPPORTED)];
+      }
+
+      const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
+      const plan = await this.getSwapSourcePlan(substrateApi.api, params.address, fromNetuid, new BigNumber(selectedQuote.fromAmount), fromAsset);
+
+      if (plan.txError) {
+        return [plan.txError];
+      }
+
+      // The amount is checked against the stake the legs spend; the fee is checked against transferable balance on its own
+      return this.swapBaseHandler.validateSwapOnlyProcess(params, swapIndex, plan.usable);
     }
 
     if (swapXcm) {
@@ -139,8 +159,8 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     const fromAsset = this.chainService.getAssetBySlug(pair.from);
     const toAsset = this.chainService.getAssetBySlug(pair.to);
     const chainInfo = this.chainService.getChainInfoByKey(fromAsset.originChain);
-    const fromNetuid = _isNativeTokenBySlug(fromAsset.slug) ? 0 : fromAsset.metadata?.netuid;
-    const toNetuid = _isNativeTokenBySlug(toAsset.slug) ? 0 : toAsset.metadata?.netuid;
+    const fromNetuid = this.getNetuid(fromAsset);
+    const toNetuid = this.getNetuid(toAsset);
 
     if (fromNetuid == null || toNetuid == null || fromNetuid === toNetuid) {
       return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
@@ -156,8 +176,13 @@ export class BittensorSwapHandler implements SwapBaseInterface {
 
     const chainApi = this.chainService.getSubstrateApi(chainInfo.slug);
     const substrateApi = await chainApi.isReady;
-    const _stakeInfo = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address);
-    const stakeInfo = _stakeInfo.toPrimitive() as unknown as TaoStakeInfo[];
+
+    // Same plan as validation, so the check, the quote and the submit spend the same stake
+    const plan = await this.getSwapSourcePlan(substrateApi.api, address, fromNetuid, new BigNumber(quote.fromAmount), fromAsset);
+
+    if (plan.txError) {
+      return Promise.reject(plan.txError);
+    }
 
     // TAO/ALPHA ratio
     const priceRatio = new BigNumber(toBNString(quote.rate, _getAssetDecimals(fromAsset)));
@@ -167,13 +192,19 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       .integerValue(BigNumber.ROUND_DOWN)
       .toFixed();
 
-    const calls = this.buildSwapCalls({
-      stakeInfo,
+    const calls = plan.legs.map((leg) => substrateApi.api.tx.subtensorModule.swapStakeLimit(
+      leg.hotkey,
       fromNetuid,
       toNetuid,
-      amount: new BigNumber(quote.fromAmount),
-      limitPrice
-    }, substrateApi.api);
+      leg.amount.toFixed(),
+      limitPrice,
+      false
+    ));
+
+    if (!calls.length) {
+      // Never send an empty batch: the chain accepts it and nothing is swapped
+      return Promise.reject(new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE));
+    }
 
     let extrinsic: SubmittableExtrinsic<'promise', ISubmittableResult>;
 
@@ -193,47 +224,101 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     } as SwapSubmitStepData;
   }
 
-  // Sort hotkeys by stake descending
-  private getHotkeysByNetuidDesc (stakeInfo: TaoStakeInfo[], fromNetuid: number): TaoStakeInfo[] {
-    return stakeInfo.filter((i) => i.netuid === fromNetuid && new BigNumber(i.stake).gt(0))
-      .sort((a, b) => new BigNumber(b.stake).minus(a.stake).toNumber());
-  }
+  /** Root hotkeys still under the root hold; none while `RootStakeUnlockInterval` is 0. */
+  private async readRootHeldHotkeys (api: ApiPromise, coldkey: string, hotkeys: string[]): Promise<Set<string>> {
+    const intervalCodec = await api.query.subtensorModule.rootStakeUnlockInterval?.();
+    const interval = Number(intervalCodec?.toPrimitive() ?? 0);
 
-  private buildSwapCalls (params: { stakeInfo: TaoStakeInfo[]; fromNetuid: number; toNetuid: number; amount: BigNumber; limitPrice: string;}, api: ApiPromise) {
-    const { amount, fromNetuid, limitPrice, stakeInfo, toNetuid } = params;
-
-    const hotkeys = this.getHotkeysByNetuidDesc(stakeInfo, fromNetuid);
-
-    let remaining = amount;
-    const calls = [];
-
-    for (const item of hotkeys) {
-      if (remaining.lte(0)) {
-        break;
-      }
-
-      const stake = new BigNumber(item.stake);
-
-      if (stake.lte(0)) {
-        continue;
-      }
-
-      const swapAmount = BigNumber.minimum(stake, remaining);
-
-      calls.push(
-        api.tx.subtensorModule.swapStakeLimit(
-          item.hotkey,
-          fromNetuid,
-          toNetuid,
-          swapAmount.toFixed(),
-          limitPrice,
-          false
-        )
-      );
-
-      remaining = remaining.minus(swapAmount);
+    if (!interval || !hotkeys.length || !api.query.subtensorModule.lastColdkeyHotkeyStakeBlock) {
+      return new Set();
     }
 
-    return calls;
+    const [header, lastBlocks] = await Promise.all([
+      api.rpc.chain.getHeader(),
+      api.query.subtensorModule.lastColdkeyHotkeyStakeBlock.multi(hotkeys.map((hotkey) => [coldkey, hotkey]))
+    ]);
+    const lastStakeBlocks: Record<string, number | null> = {};
+
+    hotkeys.forEach((hotkey, index) => {
+      const last = lastBlocks[index].toPrimitive();
+
+      lastStakeBlocks[hotkey] = last == null ? null : Number(last);
+    });
+
+    return getRootHeldHotkeys(interval, header.number.toNumber(), lastStakeBlocks);
+  }
+
+  /** Reads what `getSwapSource` / `planSwapLegs` need for a swap from `fromNetuid`. */
+  private async readSwapSourceParams (api: ApiPromise, address: string, fromNetuid: number): Promise<SwapSourceParams> {
+    const [_stakeInfo, priceCodec, availabilityCodec] = await Promise.all([
+      api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
+      fromNetuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(fromNetuid),
+      // Older runtimes have no availability API: no lock cap then
+      api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys?.([address], [fromNetuid]).catch(() => undefined)
+    ]);
+
+    const stakes = _stakeInfo.toPrimitive() as unknown as TaoStakeInfo[];
+    // DefaultMinStake = InitialMinStake (v478 `lib.rs`)
+    const minStake = new BigNumber(api.consts.subtensorModule.initialMinStake.toString());
+    const rootHotkeys = fromNetuid === 0 ? stakes.filter((row) => row.netuid === 0 && new BigNumber(row.stake).gt(0)).map((row) => row.hotkey) : [];
+    const held = fromNetuid === 0 ? await this.readRootHeldHotkeys(api, address, rootHotkeys) : new Set<string>();
+    // A leg must sell for more than the minimum: root sells 1:1 with no fee, a subnet through its pool
+    const minLeg = fromNetuid === 0
+      ? minStake.plus(1)
+      : await findMinLeg(minStake, new BigNumber(priceCodec?.toString() || '0').dividedBy(1e9), (alpha) => this.simulateAlphaSale(api, fromNetuid, alpha));
+
+    // { coldkey: { netuid: { total, locked, available } } } for the one coldkey asked
+    const availability = Object.values((availabilityCodec?.toPrimitive() ?? {}) as Record<string, Record<string, { available: number | string }>>)[0]?.[fromNetuid];
+    const available = availability ? new BigNumber(availability.available) : undefined;
+
+    return { stakes, fromNetuid, minLeg, held, available };
+  }
+
+  /** The TAO a sale of `alpha` on `netuid` pays out now, as the chain checks a leg against the minimum. */
+  private async simulateAlphaSale (api: ApiPromise, netuid: number, alpha: BigNumber): Promise<BigNumber> {
+    const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
+
+    return new BigNumber(result.taoAmount ?? 0);
+  }
+
+  private getNetuid (asset: _ChainAsset): number | undefined {
+    return _isNativeTokenBySlug(asset.slug) ? 0 : asset.metadata?.netuid;
+  }
+
+  /**
+   * Splits `amount` into legs over the stake a swap can spend (`planSwapLegs`). Validation and submit
+   * both call this, so the check and the submit spend the same stake.
+   */
+  private async getSwapSourcePlan (api: ApiPromise, address: string, fromNetuid: number, amount: BigNumber, fromAsset: _ChainAsset): Promise<SwapSourcePlan & { txError?: TransactionError }> {
+    const plan = planSwapLegs({ ...(await this.readSwapSourceParams(api, address, fromNetuid)), amount });
+
+    if (!plan.error) {
+      return plan;
+    }
+
+    const decimals = _getAssetDecimals(fromAsset);
+    const symbol = _getAssetSymbol(fromAsset);
+    const format = (value: BigNumber) => formatNumber(value.toFixed(), decimals, balanceFormatter, { maxNumberFormat: decimals || 6 });
+    const number = ['amountBelowMinimum', 'stakeBelowMinimum'].includes(plan.error) ? plan.minLeg : plan.usable;
+    const message = t(`bg.SWAP.services.service.swap.bittensorHandler.${plan.error}`, { replace: { symbol, number: format(number) } });
+    const errorType = plan.error === 'swapUnavailable'
+      ? BasicTxErrorType.UNSUPPORTED
+      : ['amountBelowMinimum', 'cannotSplitAmount'].includes(plan.error) ? BasicTxErrorType.INVALID_PARAMS : BasicTxErrorType.NOT_ENOUGH_BALANCE;
+
+    return { ...plan, txError: new TransactionError(errorType, message) };
+  }
+
+  /** What a swap from `fromAsset` can spend now — what the Swap screen's Max fills in. */
+  public async getSwapMax (address: string, fromAsset: _ChainAsset): Promise<BittensorSwapMax> {
+    const fromNetuid = this.getNetuid(fromAsset);
+
+    if (fromNetuid == null) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
+    const source = getSwapSource(await this.readSwapSourceParams(substrateApi.api, address, fromNetuid));
+
+    return { usable: source.usable.toFixed(0) };
   }
 }

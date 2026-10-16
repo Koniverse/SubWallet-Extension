@@ -2810,5 +2810,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "Use Touch ID, Windows Hello, fingerprint or your device screen lock to unlock SubWallet without typing your password. You can change this anytime in Settings > Security",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "Not now",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "Enable",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Unable to set up biometric unlock. You can try again in Settings > Security"
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Unable to set up biometric unlock. You can try again in Settings > Security",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "Swap is not available for this subnet right now",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "You have no staked {{symbol}} to swap. Swaps use your staked {{symbol}}, not your transferable balance",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "Your staked {{symbol}} with each validator is below the minimum swap of {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "Your staked {{symbol}} changed recently and can't be swapped yet. Try again later",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "Amount must be at least {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "You can swap up to {{number}} {{symbol}} of your staked balance",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "This amount can't be split across your validators. Try a slightly different amount",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "Your staked {{symbol}} is locked and can't be swapped yet"
 }

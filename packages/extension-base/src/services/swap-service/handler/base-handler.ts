@@ -470,11 +470,22 @@ export class SwapBaseHandler {
     return [];
   }
 
-  private validateSwapStepV2 (swapToChain: _ChainInfo, swapToken: _ChainAsset, receivingToken: _ChainAsset, swapFeeToken: _ChainAsset, bnSwapValue: BigN, bnExpectedReceivingAmount: BigN, bnSwapFromTokenBalance: BigN, bnSwapFeeAmount: BigN, bnSwapFeeTokenBalance: BigN, recipient?: string): TransactionError[] {
-    const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance);
+  private validateSwapStepV2 (swapToChain: _ChainInfo, swapToken: _ChainAsset, receivingToken: _ChainAsset, swapFeeToken: _ChainAsset, bnSwapValue: BigN, bnExpectedReceivingAmount: BigN, bnSwapFromTokenBalance: BigN, bnSwapFeeAmount: BigN, bnSwapFeeTokenBalance: BigN, recipient?: string, spendsSeparateSource = false): TransactionError[] {
+    if (spendsSeparateSource) {
+      // The amount comes from a source the fee does not touch (e.g. Bittensor stake), so check them apart
+      if (bnSwapFromTokenBalance.lt(bnSwapValue)) {
+        return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientSpendingTokenBalance', { replace: { spendingTokenSymbol: swapToken.symbol } }))];
+      }
 
-    if (spendingAndFeePaymentValidation.length > 0) {
-      return spendingAndFeePaymentValidation;
+      if (bnSwapFeeTokenBalance.lte(bnSwapFeeAmount)) {
+        return [new TransactionError(BasicTxErrorType.NOT_ENOUGH_BALANCE, t('bg.core.validation.insufficientFeeTokenBalance', { replace: { feeTokenSymbol: swapFeeToken.symbol } }))];
+      }
+    } else {
+      const spendingAndFeePaymentValidation = validateSpendingAndFeePayment(swapToken, swapFeeToken, bnSwapValue, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance);
+
+      if (spendingAndFeePaymentValidation.length > 0) {
+        return spendingAndFeePaymentValidation;
+      }
     }
 
     if (bnExpectedReceivingAmount.lte(_getTokenMinAmount(receivingToken))) {
@@ -498,7 +509,11 @@ export class SwapBaseHandler {
     return [];
   }
 
-  public async validateSwapOnlyProcess (params: ValidateSwapProcessParams, swapIndex: number): Promise<TransactionError[]> {
+  /**
+   * @param spendingSourceBalance When the swapped amount does not come from the token's transferable balance
+   * (Bittensor swaps spend stake), the balance it does come from. The fee is then checked on its own.
+   */
+  public async validateSwapOnlyProcess (params: ValidateSwapProcessParams, swapIndex: number, spendingSourceBalance?: BigN): Promise<TransactionError[]> {
     const swapStepInfo = params.process.steps[swapIndex];
     const swapMetadata = swapStepInfo.metadata as unknown as BaseSwapStepMetadata; // todo
     const swapFee = params.process.totalFee[swapIndex];
@@ -541,10 +556,10 @@ export class SwapBaseHandler {
       this.balanceService.getTransferableBalance(swapMetadata.sender, swapToken.originChain, swapToken.slug, ExtrinsicType.SWAP)
     ]);
 
-    const bnSwapFromTokenBalance = BigN(swapFromTokenBalance.value);
+    const bnSwapFromTokenBalance = spendingSourceBalance ?? BigN(swapFromTokenBalance.value);
     const bnSwapFeeTokenBalance = BigN(swapFeeTokenBalance.value);
 
-    return this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver);
+    return this.validateSwapStepV2(swapToChain, swapToken, swapReceivingToken, swapFeeToken, bnSwapValue, bnSwapReceivingAmount, bnSwapFromTokenBalance, bnSwapFeeAmount, bnSwapFeeTokenBalance, swapMetadata.receiver, !!spendingSourceBalance);
   }
 
   public async validateXcmSwapProcess (params: ValidateSwapProcessParams, swapIndex: number, xcmIndex: number): Promise<TransactionError[]> {

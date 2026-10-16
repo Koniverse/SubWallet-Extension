@@ -2809,5 +2809,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "Dùng Touch ID, Windows Hello, vân tay hoặc khóa màn hình của thiết bị để mở khóa SubWallet mà không cần nhập mật khẩu. Bạn có thể thay đổi bất cứ lúc nào trong Cài đặt > Cài đặt bảo mật",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "Để sau",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "Bật ngay",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Không thể thiết lập mở khóa bằng sinh trắc học. Bạn có thể thử lại trong Cài đặt > Cài đặt bảo mật"
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "Không thể thiết lập mở khóa bằng sinh trắc học. Bạn có thể thử lại trong Cài đặt > Cài đặt bảo mật",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "Hiện không thể swap trên subnet này",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "Bạn không có {{symbol}} đang stake để swap. Swap dùng {{symbol}} đang stake, không dùng số dư khả dụng",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "{{symbol}} đang stake ở mỗi validator của bạn đều dưới mức swap tối thiểu {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "{{symbol}} đang stake của bạn vừa thay đổi nên chưa thể swap. Vui lòng thử lại sau",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "Số lượng tối thiểu là {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "Bạn có thể swap tối đa {{number}} {{symbol}} từ số dư đang stake",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "Không thể chia số lượng này cho các validator của bạn. Vui lòng thử một số lượng khác",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "{{symbol}} đang stake của bạn đang bị khoá nên chưa thể swap"
 }

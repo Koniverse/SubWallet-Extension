@@ -2811,5 +2811,13 @@
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.description": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.notNow": "",
   "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.enable": "",
-  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": ""
+  "ui.ACCOUNT.components.Modal.PasskeyUnlockSetup.setupFailed": "",
+  "bg.SWAP.services.service.swap.bittensorHandler.swapUnavailable": "Обмен в этой подсети сейчас недоступен",
+  "bg.SWAP.services.service.swap.bittensorHandler.noStakeToSwap": "У вас нет застейканных {{symbol}} для обмена. Для обмена используются застейканные {{symbol}}, а не доступный баланс",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeBelowMinimum": "Застейканные {{symbol}} у каждого из ваших валидаторов меньше минимальной суммы обмена {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeOnHold": "Ваши застейканные {{symbol}} недавно изменились и пока не могут быть обменены. Повторите попытку позже",
+  "bg.SWAP.services.service.swap.bittensorHandler.amountBelowMinimum": "Сумма должна быть не меньше {{number}} {{symbol}}",
+  "bg.SWAP.services.service.swap.bittensorHandler.notEnoughStakeToSwap": "Вы можете обменять не более {{number}} {{symbol}} из застейканного баланса",
+  "bg.SWAP.services.service.swap.bittensorHandler.cannotSplitAmount": "Эту сумму нельзя разделить между вашими валидаторами. Попробуйте немного другую сумму",
+  "bg.SWAP.services.service.swap.bittensorHandler.stakeLocked": "Ваши застейканные {{symbol}} заблокированы и пока не могут быть обменены"
 }
