@@ -23,7 +23,7 @@ arch_ref:
   - AD-18
   - AD-15
 created: 2026-06-12
-updated: 2026-07-14
+updated: 2026-10-16
 ---
 
 > **⚠️ Corrected 2026-07-13 — AD-07's mechanism does not exist.** Wherever this file says
@@ -90,7 +90,7 @@ power, not yield — owned by EPIC-15).
 | 3 | **Bittensor / dTAO** | [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md), [US-12.10](../stories/US-12.10-bittensor-alpha-token-liquid-staking.md), [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | dTAO subnet staking plus the forward alpha-token product line |
 | 4 | **Earning flow plumbing** | [US-12.8](../stories/US-12.8-earning-path-simulation-and-step-tracking.md), [US-12.9](../stories/US-12.9-xcm-deposit-routing-into-earning.md) | Multi-step path simulation/tracking and XCM deposit routing into a position |
 | 5 | **Network expansion** | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | Additional-network staking — planned (Enjin, Phala, xx, …); Mythos/Tanssi/Amplitude/Energy ship under FR-114 / US-12.1 |
-| 6 | **Accuracy & load hardening** | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md), [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Reward/APY-figure correctness (US-12.13) and earning-surface performance + cache freshness across many pools (US-12.14) |
+| 6 | **Accuracy & load hardening** | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md), [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md), [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Reward/APY-figure correctness (US-12.13) and earning-surface performance + cache freshness across many pools (US-12.14) |
 
 ### Out of scope
 
@@ -118,7 +118,7 @@ power, not yield — owned by EPIC-15).
 | FR-124 | [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | 👀 review |
 | FR-125 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | 📋 backlog |
 | FR-160 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | ✅ done |
-| NFR-22 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) — financial-figure accuracy (rewards / APY) | 📋 backlog |
+| NFR-22 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) — financial-figure accuracy (rewards / APY); [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) — the Bittensor slice (#5112) | 📋 backlog |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
 > The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-114..122
@@ -185,6 +185,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
 | [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | Nominator fast-unbond duration | Quote the unstaking window the runtime enforces, not `bondingDuration` (28d → 2d on DOT) | ✅ done | 1.3.87 |
 | [US-12.23](../stories/US-12.23-bittensor-manual-claim-native-staking.md) | Manual claim for Bittensor native staking | Root (netuid 0) basket rewards need a user-triggered claim; subnet/alpha have nothing to claim. PR #5065 merged and **shipped 2026-09-17** after four windows, fresh approval on the final head, still **no test**; AC-4 corrected at ship time — the fallback is 0, not 500000 rao. Issue body still empty — ACs derived from the code (#5064) | ✅ done | 1.3.90 |
+| [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy | On-chain yield, prices, staking and swap for TAO and subnets — one maintenance PR for the extension, BE rows outside the repo (#5112; tracker [2026-10-12 §G](../../notes/2026-10-12.md#g-research--push-tao--subnets-bittensor)) | 📋 backlog | — |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**
@@ -241,6 +242,7 @@ the work its children already carry.
 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | New per-network staking handler subclasses (Enjin / Phala / xx) on the existing native tree; targets from static cache (AD-23) | FR-125 |
 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) | Reward/APY-figure accuracy verified at the `BasePoolHandler` seam (AD-22) across every pool type | NFR-22 |
 | [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md) | Earning read-path performance + cache freshness: static cache (AD-23), Services SDK aggregation (AD-24), removed-account invalidation | NFR-12, NFR-21 |
+| [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor figures from the chain at the native Subtensor handlers (`tao.ts`, `dtao.ts`, AD-22): yield, alpha price, minimums, limits, root claim; plus the swap and balance paths the same PR touches | NFR-22, NFR-20 |
 | [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | `getNominatorUnstakingEras()` at the relay unstaking-period seam — `NominationPoolHandler` + `RelayNativeStakingPoolHandler` (AD-22) and both legacy `relayChain.ts` metadata entry points | FR-114 (defends), FR-115 (defends) |
 
 > Cell notation — `FR-N` / `FR-N (defends)` / `NFR-N` / `— (AD-N)` / `—`: [AGENTS.md §7 rule 8](../../../AGENTS.md).

@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-10-12 08:25:41 UTC
-> Total stories: 336
+> Last generated: 2026-10-16 02:27:17 UTC
+> Total stories: 337
 
-## 📋 Backlog (71)
+## 📋 Backlog (72)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -26,6 +26,7 @@
 | US-12.13 | Earning reward & APY-accuracy hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.14 | Earning performance & cache hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
+| US-12.24 | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | EPIC-12 | P1 | 13 | — | — |
 | US-13.8 | Bittensor alpha-token bridges (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | EPIC-13 | P2 | 8 | — | — |
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
@@ -378,7 +379,7 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 71
+- 📋 **Backlog**: 72
 - 🟢 **Ready**: 5
 - 🟡 **In Progress**: 10
 - 👀 **Review**: 7
