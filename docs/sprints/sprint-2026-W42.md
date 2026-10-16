@@ -12,11 +12,16 @@ goal: "Ship v1.3.91. Its release note (10-09) names two items — #5093's multis
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095 approved 09-28, not merged | ← W40 via W41 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🟡 ready — waits on the merges | new | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — #5112 assigned 10-16, no branch or PR yet | new 10-16 (mid-sprint) | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block | ← W40 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W39 | — |
 
 **13 points, two stories.** Every story's `sprint:` field was read on day one: US-42.31 names this
 window (set by the tester), and US-18.5 was moved here at W40's closeout.
+
+**10-16: 26 points, three stories.** [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md)
+(#5112, 13 points) joined mid-sprint: the issue was assigned to `tunghp2002` and moved to In Progress on
+the board. Not part of v1.3.91 — the goal above is unchanged.
 
 ## v1.3.91 — what stands between the release note and a release
 

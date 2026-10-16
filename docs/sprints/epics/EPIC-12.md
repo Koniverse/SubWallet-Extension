@@ -118,7 +118,7 @@ power, not yield — owned by EPIC-15).
 | FR-124 | [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | 👀 review |
 | FR-125 | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | 📋 backlog |
 | FR-160 | [US-12.15](../stories/US-12.15-earning-term-and-condition-display.md) | ✅ done |
-| NFR-22 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) — financial-figure accuracy (rewards / APY); [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) — the Bittensor slice (#5112) | 📋 backlog |
+| NFR-22 | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md) — financial-figure accuracy (rewards / APY); [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) — the Bittensor slice (#5112) | 📋 backlog (US-12.13) · 🚧 in-progress (US-12.24) |
 
 > FR statuses above are **story-planning** statuses (Stream B; all `📋 backlog`).
 > The shipped state of each capability lives in [PRD](../../PRD.md#functional-requirements): FR-114..122
@@ -185,7 +185,7 @@ power, not yield — owned by EPIC-15).
 | [US-12.21](../stories/US-12.21-earning-fixes-recovered-from-uncategorized.md) | Earning fixes recovered from Uncategorized | Withdraw/era/pool-status from the triage bucket | ✅ done | 1.3.77 |
 | [US-12.22](../stories/US-12.22-nominator-fast-unbond-duration.md) | Nominator fast-unbond duration | Quote the unstaking window the runtime enforces, not `bondingDuration` (28d → 2d on DOT) | ✅ done | 1.3.87 |
 | [US-12.23](../stories/US-12.23-bittensor-manual-claim-native-staking.md) | Manual claim for Bittensor native staking | Root (netuid 0) basket rewards need a user-triggered claim; subnet/alpha have nothing to claim. PR #5065 merged and **shipped 2026-09-17** after four windows, fresh approval on the final head, still **no test**; AC-4 corrected at ship time — the fallback is 0, not 500000 rao. Issue body still empty — ACs derived from the code (#5064) | ✅ done | 1.3.90 |
-| [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy | On-chain yield, prices, staking and swap for TAO and subnets — one maintenance PR for the extension, BE rows outside the repo (#5112; tracker [2026-10-12 §G](../../notes/2026-10-12.md#g-research--push-tao--subnets-bittensor)) | 📋 backlog | — |
+| [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy | On-chain yield, prices, staking and swap for TAO and subnets — one maintenance PR for the extension, BE rows outside the repo (#5112; tracker [2026-10-12 §G](../../notes/2026-10-12.md#g-research--push-tao--subnets-bittensor)) | 🚧 in-progress | — |
 
 > **US-12.16 … US-12.20 carry no FR** (nor do the hardening clusters US-12.13/US-12.14). They hold the
 > incremental work, fixes and chores that landed on this epic's capabilities — **361 tracker issues**

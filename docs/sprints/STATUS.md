@@ -1,10 +1,10 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-10-16 02:27:17 UTC
+> Last generated: 2026-10-16 05:16:55 UTC
 > Total stories: 337
 
-## 📋 Backlog (72)
+## 📋 Backlog (71)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
@@ -26,7 +26,6 @@
 | US-12.13 | Earning reward & APY-accuracy hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.14 | Earning performance & cache hardening | EPIC-12 | P2 | 5 | — | — |
 | US-12.17 | Open earning improvements | EPIC-12 | P3 | 5 | — | — |
-| US-12.24 | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | EPIC-12 | P1 | 13 | — | — |
 | US-13.8 | Bittensor alpha-token bridges (alpha ↔ Subtensor-EVM; xTAO/xAlpha → Base) | EPIC-13 | P2 | 8 | — | — |
 | US-13.9 | Hyperbridge integration | EPIC-13 | P3 | 5 | — | — |
 | US-13.10 | Axelar cross-chain integration | EPIC-13 | P3 | 5 | — | — |
@@ -91,11 +90,12 @@
 | US-42.31 | QC — Release SubWallet Extension v1.3.91 | EPIC-42 | P2 | 8 | sprint-2026-W42 | MaiThuongNinni |
 | US-8.12 | Fee/BigInt & gas-estimation hardening | EPIC-8 | P1 | 5 | sprint-2026-W31 | bluezdot |
 
-## 🟡 In Progress (10)
+## 🟡 In Progress (11)
 
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
+| US-12.24 | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | EPIC-12 | P1 | 13 | sprint-2026-W42 | tunghp2002 |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
@@ -379,12 +379,12 @@ _No stories_
 
 ## Summary
 
-- 📋 **Backlog**: 72
+- 📋 **Backlog**: 71
 - 🟢 **Ready**: 5
-- 🟡 **In Progress**: 10
+- 🟡 **In Progress**: 11
 - 👀 **Review**: 7
 - ✅ **Done**: 242
 - 🚫 **Blocked**: 0
 - 🗑️ **Deprecated**: 1
 
-⚠️  **WIP limit exceeded**: 10 stories in-progress (limit: 3).
+⚠️  **WIP limit exceeded**: 11 stories in-progress (limit: 3).
