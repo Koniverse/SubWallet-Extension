@@ -3,7 +3,7 @@
 
 import { _ChainAsset, _ChainInfo } from '@subwallet/chain-list/types';
 import { BalanceError } from '@subwallet/extension-base/background/errors/BalanceError';
-import { AmountData, APIItemState, BalanceErrorType, DetectBalanceCache, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
+import { AmountData, APIItemState, AssetSetting, BalanceErrorType, DetectBalanceCache, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
 import { _isXcmWithinSameConsensus } from '@subwallet/extension-base/core/substrate/xcm-parser';
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
@@ -15,7 +15,7 @@ import { EventItem, EventType } from '@subwallet/extension-base/services/event-s
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
-import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
+import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, getShownAlphaStakes, getTaoPerAlphaMap, isAccountAll, PromiseHandler, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { AllSubstrateKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
@@ -105,6 +105,10 @@ export class BalanceService implements StoppableServiceInterface {
 
     await this.startScanBalance();
 
+    // One chain read covers every account, so this runs on every start rather than on the 15-minute scan cache;
+    // only tokens never set, so a token the user turned off stays off
+    this.autoEnableBittensorAlphaTokens(keyring.getPairs().map((account) => account.address), true).catch(console.error);
+
     // Run subscribe balance
     await this.runSubscribeBalances();
 
@@ -182,10 +186,15 @@ export class BalanceService implements StoppableServiceInterface {
           stakedAddresses.push(transaction.address);
         }
       }
+
+      // Turning Bittensor on brings back only its native and priority tokens: add the subnets staked into
+      if (event.type === 'chain.updateState' && _BALANCE_CHAIN_GROUP.bittensor.includes(event.data[0] as string) && this.state.chainService.getChainStateByKey(event.data[0] as string)?.active) {
+        stakedAddresses.push(...keyring.getPairs().map((account) => account.address));
+      }
     });
 
     if (stakedAddresses.length) {
-      this.autoEnableBittensorAlphaTokens(stakedAddresses).catch(console.error);
+      this.autoEnableBittensorAlphaTokens([...new Set(stakedAddresses)]).catch(console.error);
     }
 
     if (removedAddresses.length > 0) {
@@ -666,22 +675,22 @@ export class BalanceService implements StoppableServiceInterface {
       await this.state.chainService.enableChains(needEnableChains);
       this.state.chainService.setAssetSettings({ ...currentAssetSettings });
     }
-
-    // After the write above, so the two do not overwrite each other's settings
-    await this.autoEnableBittensorAlphaTokens(addresses);
   }
 
   /**
-   * Turns on the alpha token of every subnet the accounts hold stake on (EXT-39). Only visible tokens
-   * are read, and a stake through Earning — unlike a swap — turns nothing on, so it would drop out of
-   * the Assets total. Subscan, behind `autoEnableChains`, does not cover Bittensor, so this reads the
-   * chain; like `autoEnableChains` it leaves a chain the user turned off alone.
+   * Turns on the alpha token of every subnet an account holds a position on that Earning shows (EXT-39).
+   * Only visible tokens are read, and a stake through Earning — unlike a swap — turns nothing on, so it
+   * would drop out of the Assets total. Subscan, behind `autoEnableChains`, does not cover Bittensor, so
+   * this reads the chain. Runs on start for tokens never set (`onlyUnset`), and for any hidden token when
+   * Bittensor is turned on — which hides all of its tokens when turned off — or after a subnet stake.
    */
-  public async autoEnableBittensorAlphaTokens (addresses: string[]) {
+  public async autoEnableBittensorAlphaTokens (addresses: string[], onlyUnset = false) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const coldkeys = addresses.filter((address) => AllSubstrateKeypairTypes.includes(getKeypairTypeByAddress(address)));
-    let changed = false;
+    const enable: string[] = [];
+    // A stored `visible: false` may be the user's own choice, which `onlyUnset` leaves alone
+    const canEnable = (settings: Record<string, AssetSetting>, slug: string) => onlyUnset ? !settings[slug] : !settings[slug]?.visible;
 
     if (!coldkeys.length) {
       return;
@@ -689,22 +698,26 @@ export class BalanceService implements StoppableServiceInterface {
 
     for (const chain of _BALANCE_CHAIN_GROUP.bittensor) {
       const chainState = this.state.chainService.getChainStateByKey(chain);
-      const hidden = Object.values(filterAlphaAssetsByChain(assetMap, chain)).filter((asset) => !currentAssetSettings[asset.slug]?.visible);
+      const hidden = Object.values(filterAlphaAssetsByChain(assetMap, chain)).filter((asset) => canEnable(currentAssetSettings, asset.slug));
 
-      // The stake read needs the chain connected
-      if (!chainState?.active || chainState.manualTurnOff || !hidden.length) {
+      // The stake read needs the chain on; `manualTurnOff` stays set after the user turns it back on, so it is not checked
+      if (!chainState?.active || !hidden.length) {
         continue;
       }
 
       try {
         const substrateApi = await this.state.chainService.getSubstrateApi(chain).isReady;
-        const rows = (await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(coldkeys)).toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-        const stakedNetuids = new Set(rows.flatMap(([, stakes]) => stakes).filter((row) => new BigN(row.stake).gt(0)).map((row) => row.netuid));
+        const [stakeCodec, priceCodec] = await Promise.all([
+          substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(coldkeys),
+          substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()
+        ]);
+        // The subnets Earning shows a position on: a 1-rao leftover from an unstake does not count
+        const shown = getShownAlphaStakes(stakeCodec.toPrimitive() as Array<[string, TaoStakeInfo[]]>, getTaoPerAlphaMap(priceCodec.toPrimitive() as Array<{ netuid: number, price: number | string }>));
+        const stakedNetuids = new Set(shown.flatMap((byNetuid) => Object.keys(byNetuid).map(Number)));
 
         hidden.forEach((asset) => {
           if (stakedNetuids.has(_getAssetNetuid(asset))) {
-            currentAssetSettings[asset.slug] = { visible: true };
-            changed = true;
+            enable.push(asset.slug);
           }
         });
       } catch (e) {
@@ -712,8 +725,15 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
-    if (changed) {
-      this.state.chainService.setAssetSettings({ ...currentAssetSettings });
+    if (enable.length) {
+      // Re-read: `autoEnableChains` may have written while the chain was read, and its changes must stay
+      const latestAssetSettings = await this.state.chainService.getAssetSettings();
+
+      enable.filter((slug) => canEnable(latestAssetSettings, slug)).forEach((slug) => {
+        latestAssetSettings[slug] = { visible: true };
+      });
+
+      this.state.chainService.setAssetSettings({ ...latestAssetSettings });
     }
   }
 

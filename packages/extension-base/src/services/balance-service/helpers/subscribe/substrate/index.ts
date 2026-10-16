@@ -19,7 +19,7 @@ import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subw
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
-import { filterAlphaAssetsByChain, filterAssetsByChainAndType } from '@subwallet/extension-base/utils';
+import { filterAlphaAssetsByChain, filterAssetsByChainAndType, getShownAlphaStakes, getTaoPerAlphaMap } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { timer } from 'rxjs';
 
@@ -616,23 +616,18 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
       return;
     }
 
-    const rawData = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses);
+    const [rawData, rawPrices] = await Promise.all([
+      substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses),
+      substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()
+    ]);
     const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
+    const taoPerAlpha = getTaoPerAlphaMap(rawPrices.toPrimitive() as Array<{ netuid: number, price: number | string }>);
+    // Only the stake Earning shows, so a 1-rao leftover is a zero balance here too
+    const shown = getShownAlphaStakes(values, taoPerAlpha);
     const converted: Record<string, Record<number, BigN>> = {};
 
     for (let i = 0; i < values.length; i++) {
-      const [, stakes] = values[i];
-      const address = addresses[i];
-
-      converted[address] = {};
-
-      stakes.forEach((stakeInfo) => {
-        const { netuid, stake } = stakeInfo;
-
-        const currentValue = converted[address][netuid] || BigN(0);
-
-        converted[address][netuid] = currentValue.plus(stake);
-      });
+      converted[addresses[i]] = shown[i];
     }
 
     for (const chainAsset of Object.values(tokenMap)) {
