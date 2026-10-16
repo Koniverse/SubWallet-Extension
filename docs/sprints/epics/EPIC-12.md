@@ -90,7 +90,7 @@ power, not yield — owned by EPIC-15).
 | 3 | **Bittensor / dTAO** | [US-12.6](../stories/US-12.6-bittensor-dtao-subnet-staking.md), [US-12.10](../stories/US-12.10-bittensor-alpha-token-liquid-staking.md), [US-12.11](../stories/US-12.11-trusted-stake-alpha-index.md) | dTAO subnet staking plus the forward alpha-token product line |
 | 4 | **Earning flow plumbing** | [US-12.8](../stories/US-12.8-earning-path-simulation-and-step-tracking.md), [US-12.9](../stories/US-12.9-xcm-deposit-routing-into-earning.md) | Multi-step path simulation/tracking and XCM deposit routing into a position |
 | 5 | **Network expansion** | [US-12.12](../stories/US-12.12-staking-for-additional-networks-enjin-phala-xx.md) | Additional-network staking — planned (Enjin, Phala, xx, …); Mythos/Tanssi/Amplitude/Energy ship under FR-114 / US-12.1 |
-| 6 | **Accuracy & load hardening** | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md), [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md), [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Reward/APY-figure correctness (US-12.13) and earning-surface performance + cache freshness across many pools (US-12.14) |
+| 6 | **Accuracy & load hardening** | [US-12.13](../stories/US-12.13-earning-reward-and-apy-accuracy-hardening.md), [US-12.14](../stories/US-12.14-earning-performance-and-cache-hardening.md), [US-12.24](../stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Reward/APY-figure correctness (US-12.13) and earning-surface performance + cache freshness across many pools (US-12.14); the Bittensor slice — on-chain yield, prices, staking and swap (US-12.24, #5112) |
 
 ### Out of scope
 
