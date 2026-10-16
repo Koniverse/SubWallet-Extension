@@ -3,7 +3,7 @@
 
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
-import { _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetPriceId, _isChainInfoCompatibleWithAccountInfo } from '@subwallet/extension-base/services/chain-service/utils';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { EarningRewardHistoryItem, SpecialYieldPoolInfo, SpecialYieldPositionInfo, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { AlertModal, Layout, PageWrapper } from '@subwallet/extension-koni-ui/components';
@@ -77,7 +77,7 @@ function Component ({ compound,
     return assetRegistry[inputSlug];
   }, [assetRegistry, poolInfo.metadata.inputAsset]);
 
-  const price = useMemo(() => priceMap[inputAsset?.priceId || ''] || 0, [inputAsset?.priceId, priceMap]);
+  const price = useMemo(() => priceMap[_getAssetPriceId(inputAsset)] || 0, [inputAsset, priceMap]);
   const exchangeRate = useMemo(() => {
     let rate = 1;
 
