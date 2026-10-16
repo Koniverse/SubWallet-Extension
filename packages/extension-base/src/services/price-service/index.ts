@@ -77,7 +77,8 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     const getPriceData = async () => {
       await Promise.all([
         getExchangeRateMap(),
-        getPriceMap(priceIds, currency),
+        // The last answer stands in for any page no source answers this time
+        getPriceMap(priceIds, currency, undefined, this.rawPriceSubject.value),
         this.getTaoPerAlpha()
       ]).then(([exchangeRateMap, priceMap, taoPerAlpha]) => {
         if (checkFetchSuccess(priceMap, exchangeRateMap)) {
