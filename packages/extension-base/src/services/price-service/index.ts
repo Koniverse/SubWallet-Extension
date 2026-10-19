@@ -12,7 +12,7 @@ import { getExchangeRateMap, getHistoryPrice, getPriceMap } from '@subwallet/ext
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
-import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
+import { getTokenPriceHistoryId, readAlphaPrices, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
@@ -108,7 +108,8 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
         return result;
       }
 
-      const prices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toPrimitive() as Array<{ netuid: number, price: number | string }>;
+      // Shared with the alpha balances and Earning, which read it on their own timers
+      const prices = await readAlphaPrices(substrateApi.api);
 
       // rao per alpha
       prices.forEach(({ netuid, price }) => {

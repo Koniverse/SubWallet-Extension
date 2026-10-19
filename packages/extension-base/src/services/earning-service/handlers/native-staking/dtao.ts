@@ -7,7 +7,7 @@ import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subw
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { getPriceImpact, reformatAddress } from '@subwallet/extension-base/utils';
+import { getPriceImpact, readAlphaPrices, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN_ZERO } from '@polkadot/util';
@@ -63,7 +63,8 @@ const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecim
   const result = Object.create(null) as Record<number, string>;
   const PRICE_SCALE = new BigN(10).pow(priceScaleDecimals);
 
-  const allSubnetPrices = (await substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()).toJSON() as SubnetPriceData[] | undefined;
+  // Shared with the price list and the alpha balances, which read it on their own timers
+  const allSubnetPrices: SubnetPriceData[] | undefined = await readAlphaPrices(substrateApi.api);
 
   if (allSubnetPrices && allSubnetPrices.length > 0) {
     for (const subnetPrice of allSubnetPrices) {

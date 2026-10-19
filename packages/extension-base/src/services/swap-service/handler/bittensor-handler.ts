@@ -5,11 +5,12 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapEstimate, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapQuote, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, balanceFormatter, DEFAULT_MIN_STAKE, formatNumber, getSwapLimitPrice, readOptional, toBNString } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, balanceFormatter, DEFAULT_MIN_STAKE, formatNumber, getSwapLimitPrice, readOptional, SharedRead, toBNString } from '@subwallet/extension-base/utils';
 import { ApiPromise } from 'avail-js-sdk';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
 
+import { ApiDecoration } from '@polkadot/api/types';
 import { SubmittableExtrinsic } from '@polkadot/api-base/types';
 import { ISubmittableResult } from '@polkadot/types/types';
 
@@ -22,8 +23,27 @@ import FeeService from '../../fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
 import { findMinLeg, getRootHeldHotkeys, getSwapSource, planSwapLegs, SwapSourceParams, SwapSourcePlan } from './bittensor-swap-plan';
 
+/** The best block when a swap step started, and the API reading at it */
+interface PinnedBlock {
+  hash: string;
+  at: ApiDecoration<'promise'>;
+}
+
+interface SimulatedSwap {
+  origin?: SimulatedSubnetTrade;
+  destination?: SimulatedSubnetTrade;
+  received: BigNumber;
+}
+
 export class BittensorSwapHandler implements SwapBaseInterface {
   private swapBaseHandler: SwapBaseHandler;
+  /**
+   * The swap estimate, validation and submit follow each other within seconds and read the same state.
+   * A block's state never changes, so reads keyed by its hash are shared exactly: each step asks only
+   * for the best block's hash, and a new block reads again. Kept a minute, only to drop old blocks.
+   */
+  private readonly swapSims = new SharedRead<SimulatedSwap>(60000);
+  private readonly swapSources = new SharedRead<SwapSourceParams>(60000);
   providerSlug: SwapProviderId;
   isReady = false;
 
@@ -113,7 +133,8 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       }
 
       const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
-      const plan = await this.getSwapSourcePlan(substrateApi.api, params.address, fromNetuid, new BigNumber(selectedQuote.fromAmount), fromAsset);
+      const block = await this.pinBestBlock(substrateApi.api);
+      const plan = await this.getSwapSourcePlan(substrateApi.api, block, params.address, fromNetuid, new BigNumber(selectedQuote.fromAmount), fromAsset);
 
       if (plan.txError) {
         return [plan.txError];
@@ -179,13 +200,14 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     const substrateApi = await chainApi.isReady;
 
     // Same plan as validation, so the check, the quote and the submit spend the same stake
-    const plan = await this.getSwapSourcePlan(substrateApi.api, address, fromNetuid, new BigNumber(quote.fromAmount), fromAsset);
+    const block = await this.pinBestBlock(substrateApi.api);
+    const plan = await this.getSwapSourcePlan(substrateApi.api, block, address, fromNetuid, new BigNumber(quote.fromAmount), fromAsset);
 
     if (plan.txError) {
       return Promise.reject(plan.txError);
     }
 
-    const limitPrice = (await this.getSwapLimitPrice(substrateApi.api, fromNetuid, toNetuid, quote, params.slippage, fromAsset)).toFixed();
+    const limitPrice = (await this.getSwapLimitPrice(substrateApi.api, block, fromNetuid, toNetuid, quote, params.slippage, fromAsset)).toFixed();
 
     const calls = plan.legs.map((leg) => substrateApi.api.tx.subtensorModule.swapStakeLimit(
       leg.hotkey,
@@ -219,18 +241,26 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     } as SwapSubmitStepData;
   }
 
+  /** The best block now: reads at it return what reads without a block do. One `chain_getBlockHash`. */
+  private async pinBestBlock (api: ApiPromise): Promise<PinnedBlock> {
+    const hash = (await api.rpc.chain.getBlockHash()).toHex();
+
+    // Given the current runtime, the API finds the block's types without a request
+    return { hash, at: await api.at(hash, api.runtimeVersion) };
+  }
+
   /** Root hotkeys still under the root hold; none while `RootStakeUnlockInterval` is 0. */
-  private async readRootHeldHotkeys (api: ApiPromise, coldkey: string, hotkeys: string[]): Promise<Set<string>> {
-    const intervalCodec = await api.query.subtensorModule.rootStakeUnlockInterval?.();
+  private async readRootHeldHotkeys (api: ApiPromise, { at, hash }: PinnedBlock, coldkey: string, hotkeys: string[]): Promise<Set<string>> {
+    const intervalCodec = await at.query.subtensorModule.rootStakeUnlockInterval?.();
     const interval = Number(intervalCodec?.toPrimitive() ?? 0);
 
-    if (!interval || !hotkeys.length || !api.query.subtensorModule.lastColdkeyHotkeyStakeBlock) {
+    if (!interval || !hotkeys.length || !at.query.subtensorModule.lastColdkeyHotkeyStakeBlock) {
       return new Set();
     }
 
     const [header, lastBlocks] = await Promise.all([
-      api.rpc.chain.getHeader(),
-      api.query.subtensorModule.lastColdkeyHotkeyStakeBlock.multi(hotkeys.map((hotkey) => [coldkey, hotkey]))
+      api.rpc.chain.getHeader(hash),
+      at.query.subtensorModule.lastColdkeyHotkeyStakeBlock.multi(hotkeys.map((hotkey) => [coldkey, hotkey]))
     ]);
     const lastStakeBlocks: Record<string, number | null> = {};
 
@@ -243,20 +273,25 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     return getRootHeldHotkeys(interval, header.number.toNumber(), lastStakeBlocks);
   }
 
-  /** Reads what `getSwapSource` / `planSwapLegs` need for a swap from `fromNetuid`. */
-  private async readSwapSourceParams (api: ApiPromise, address: string, fromNetuid: number): Promise<SwapSourceParams> {
+  /** Reads what `getSwapSource` / `planSwapLegs` need for a swap from `fromNetuid`, at `block`. */
+  private readSwapSourceParams (api: ApiPromise, block: PinnedBlock, address: string, fromNetuid: number): Promise<SwapSourceParams> {
+    return this.swapSources.get([block.hash, address, fromNetuid].join('-'), () => this.fetchSwapSourceParams(api, block, address, fromNetuid));
+  }
+
+  private async fetchSwapSourceParams (api: ApiPromise, block: PinnedBlock, address: string, fromNetuid: number): Promise<SwapSourceParams> {
+    const { at } = block;
     const [_stakeInfo, priceCodec, availabilityCodec] = await Promise.all([
-      api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
-      fromNetuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(fromNetuid),
+      at.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
+      fromNetuid === 0 ? Promise.resolve(undefined) : at.call.swapRuntimeApi.currentAlphaPrice(fromNetuid),
       // A runtime without the availability API: no lock cap then
-      readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([address], [fromNetuid]))
+      readOptional(() => at.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([address], [fromNetuid]))
     ]);
 
     const stakes = _stakeInfo.toPrimitive() as unknown as TaoStakeInfo[];
     // DefaultMinStake = InitialMinStake (v478 `lib.rs`)
-    const minStake = new BigNumber(api.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
+    const minStake = new BigNumber(at.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
     const rootHotkeys = fromNetuid === 0 ? stakes.filter((row) => row.netuid === 0 && new BigNumber(row.stake).gt(0)).map((row) => row.hotkey) : [];
-    const held = fromNetuid === 0 ? await readOptional(() => this.readRootHeldHotkeys(api, address, rootHotkeys)) ?? new Set<string>() : new Set<string>();
+    const held = fromNetuid === 0 ? await readOptional(() => this.readRootHeldHotkeys(api, block, address, rootHotkeys)) ?? new Set<string>() : new Set<string>();
     const taoPerAlpha = new BigNumber(priceCodec?.toString() || '0').dividedBy(1e9);
     let minLeg: BigNumber | undefined;
 
@@ -265,7 +300,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       minLeg = minStake.plus(1);
     } else {
       try {
-        minLeg = await findMinLeg(minStake, taoPerAlpha, (alpha) => this.simulateAlphaSale(api, fromNetuid, alpha));
+        minLeg = await findMinLeg(minStake, taoPerAlpha, (alpha) => this.simulateAlphaSale(at, fromNetuid, alpha));
       } catch (e) {
         // A runtime without the simulation: the minimum at spot
         minLeg = taoPerAlpha.gt(0) ? minStake.plus(1).dividedBy(taoPerAlpha).integerValue(BigNumber.ROUND_CEIL) : undefined;
@@ -280,8 +315,8 @@ export class BittensorSwapHandler implements SwapBaseInterface {
   }
 
   /** The TAO a sale of `alpha` on `netuid` pays out now, as the chain checks a leg against the minimum. */
-  private async simulateAlphaSale (api: ApiPromise, netuid: number, alpha: BigNumber): Promise<BigNumber> {
-    const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
+  private async simulateAlphaSale (at: ApiDecoration<'promise'>, netuid: number, alpha: BigNumber): Promise<BigNumber> {
+    const result = (await at.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
 
     return new BigNumber(result.taoAmount ?? 0);
   }
@@ -290,12 +325,14 @@ export class BittensorSwapHandler implements SwapBaseInterface {
    * The whole swap through the chain's own simulation: sell on the origin pool, buy on the destination
    * pool, root priced 1:1 and without a pool. `received` is what it returns, in the destination's unit.
    */
-  private async simulateSwap (api: ApiPromise, fromNetuid: number, toNetuid: number, amount: BigNumber): Promise<{ origin?: SimulatedSubnetTrade, destination?: SimulatedSubnetTrade, received: BigNumber }> {
-    const origin = fromNetuid === 0 ? undefined : await simulateSubnetTrade(api, fromNetuid, amount, false);
-    const taoBetween = origin ? origin.out : amount;
-    const destination = toNetuid === 0 ? undefined : await simulateSubnetTrade(api, toNetuid, taoBetween, true);
+  private simulateSwap (api: ApiPromise, block: PinnedBlock, fromNetuid: number, toNetuid: number, amount: BigNumber): Promise<SimulatedSwap> {
+    return this.swapSims.get([block.hash, fromNetuid, toNetuid, amount.toFixed(0)].join('-'), async () => {
+      const origin = fromNetuid === 0 ? undefined : await simulateSubnetTrade(api, fromNetuid, amount, false, block.at);
+      const taoBetween = origin ? origin.out : amount;
+      const destination = toNetuid === 0 ? undefined : await simulateSubnetTrade(api, toNetuid, taoBetween, true, block.at);
 
-    return { origin, destination, received: destination ? destination.out : taoBetween };
+      return { origin, destination, received: destination ? destination.out : taoBetween };
+    });
   }
 
   /**
@@ -304,9 +341,9 @@ export class BittensorSwapHandler implements SwapBaseInterface {
    * checked at about that ratio. Taking the quote's average rate instead left only the setting less the
    * swap's own impact for other trades. Falls back to the quote's rate without the chain's simulation.
    */
-  private async getSwapLimitPrice (api: ApiPromise, fromNetuid: number, toNetuid: number, quote: SwapQuote, slippage: number, fromAsset: _ChainAsset): Promise<BigNumber> {
+  private async getSwapLimitPrice (api: ApiPromise, block: PinnedBlock, fromNetuid: number, toNetuid: number, quote: SwapQuote, slippage: number, fromAsset: _ChainAsset): Promise<BigNumber> {
     try {
-      const { destination, origin } = await this.simulateSwap(api, fromNetuid, toNetuid, new BigNumber(quote.fromAmount));
+      const { destination, origin } = await this.simulateSwap(api, block, fromNetuid, toNetuid, new BigNumber(quote.fromAmount));
 
       return getSwapLimitPrice(origin?.priceAfter ?? new BigNumber(1), destination?.priceAfter ?? new BigNumber(1), slippage);
     } catch (e) {
@@ -331,7 +368,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     }
 
     const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
-    const { received } = await this.simulateSwap(substrateApi.api, fromNetuid, toNetuid, new BigNumber(amount));
+    const { received } = await this.simulateSwap(substrateApi.api, await this.pinBestBlock(substrateApi.api), fromNetuid, toNetuid, new BigNumber(amount));
 
     return { toAmount: received.toFixed(0) };
   }
@@ -344,8 +381,8 @@ export class BittensorSwapHandler implements SwapBaseInterface {
    * Splits `amount` into legs over the stake a swap can spend (`planSwapLegs`). Validation and submit
    * both call this, so the check and the submit spend the same stake.
    */
-  private async getSwapSourcePlan (api: ApiPromise, address: string, fromNetuid: number, amount: BigNumber, fromAsset: _ChainAsset): Promise<SwapSourcePlan & { txError?: TransactionError }> {
-    const plan = planSwapLegs({ ...(await this.readSwapSourceParams(api, address, fromNetuid)), amount });
+  private async getSwapSourcePlan (api: ApiPromise, block: PinnedBlock, address: string, fromNetuid: number, amount: BigNumber, fromAsset: _ChainAsset): Promise<SwapSourcePlan & { txError?: TransactionError }> {
+    const plan = planSwapLegs({ ...(await this.readSwapSourceParams(api, block, address, fromNetuid)), amount });
 
     if (!plan.error) {
       return plan;
@@ -372,7 +409,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     }
 
     const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
-    const source = getSwapSource(await this.readSwapSourceParams(substrateApi.api, address, fromNetuid));
+    const source = getSwapSource(await this.readSwapSourceParams(substrateApi.api, await this.pinBestBlock(substrateApi.api), address, fromNetuid));
 
     return { usable: source.usable.toFixed(0) };
   }

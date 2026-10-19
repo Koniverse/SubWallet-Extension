@@ -1,7 +1,11 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ApiPromise } from '@polkadot/api';
+
 import BigN from 'bignumber.js';
+
+import { SharedRead } from './shared-read';
 
 /**
  * Each account's alpha by netuid, counting only the stake Earning shows: a hotkey whose stake is worth
@@ -26,8 +30,23 @@ export const getShownAlphaStakes = (rows: Array<[string, Array<{ netuid: number,
   });
 };
 
+/** Every subnet's price as `current_alpha_price_all` returns it: rao of TAO per alpha */
+export type AlphaPriceList = Array<{ netuid: number, price: string | number }>;
+
+// `CRON_REFRESH_PRICE_INTERVAL`: the price list refreshes this often anyway
+const alphaPriceReads = new SharedRead<AlphaPriceList>(30000);
+
+/**
+ * `current_alpha_price_all`, read once for every reader within 30 s: the price list, alpha balances
+ * (Substrate and Subtensor-EVM, one per token), Earning positions and token auto-enable all want it on
+ * their own timers. None needs it fresher: it prices display and the 1-rao dust rule, never a limit.
+ */
+export const readAlphaPrices = (api: ApiPromise): Promise<AlphaPriceList> => {
+  return alphaPriceReads.get(api.genesisHash.toHex(), async () => (await api.call.swapRuntimeApi.currentAlphaPriceAll()).toPrimitive() as AlphaPriceList);
+};
+
 /** TAO per alpha by netuid from `current_alpha_price_all`, whose prices are rao per alpha. */
-export const getTaoPerAlphaMap = (prices: Array<{ netuid: number, price: string | number }>): Record<number, BigN> => {
+export const getTaoPerAlphaMap = (prices: AlphaPriceList): Record<number, BigN> => {
   const result: Record<number, BigN> = {};
 
   prices.forEach(({ netuid, price }) => {

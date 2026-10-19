@@ -11,7 +11,7 @@ import { _EvmApi } from '@subwallet/extension-base/services/chain-service/types'
 import { _getAssetNetuid, _getContractAddressOfToken } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeEvmPalletBalance } from '@subwallet/extension-base/types';
-import { filterAssetsByChainAndType, getShownAlphaStakes, getTaoPerAlphaMap, readOptional } from '@subwallet/extension-base/utils';
+import { filterAssetsByChainAndType, getShownAlphaStakes, getTaoPerAlphaMap, readAlphaPrices, readOptional } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { Contract } from 'web3-eth-contract';
 
@@ -101,12 +101,12 @@ export function subscribeERC20IntervalForSubtensorEvm ({ addresses, assetMap, ca
           const substrateApi = await substrateApiMap.bittensor.isReady;
           const [rawData, rawPrices] = await Promise.all([
             substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(subtensorEvmSs58Address),
-            // Without prices every stake counts, as before
-            readOptional(() => substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll())
+            // One price read for every alpha token; without prices every stake counts, as before
+            readOptional(() => readAlphaPrices(substrateApi.api))
           ]);
           const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
           // Only the stake Earning shows, so a 1-rao leftover is a zero balance here too
-          const shown = getShownAlphaStakes(values, rawPrices ? getTaoPerAlphaMap(rawPrices.toPrimitive() as Array<{ netuid: number, price: number | string }>) : undefined);
+          const shown = getShownAlphaStakes(values, rawPrices ? getTaoPerAlphaMap(rawPrices) : undefined);
           const converted: Record<string, Record<number, BigN>> = {};
 
           for (let i = 0; i < values.length; i++) {

@@ -5,6 +5,7 @@ import { getPriceAfterStake, getPriceAfterUnstake } from '@subwallet/extension-b
 import BigN from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
+import { ApiDecoration } from '@polkadot/api/types';
 
 export interface SimulatedSubnetTrade {
   /** TAO per alpha before the trade */
@@ -20,16 +21,19 @@ export interface SimulatedSubnetTrade {
 /**
  * Stakes `amount` TAO into, or unstakes `amount` alpha from, subnet `netuid` with the chain's own
  * simulation (`sim_swap_tao_for_alpha` / `sim_swap_alpha_for_tao`), and the pool price it leaves
- * (EXT-5, EXT-6). One round of parallel reads.
+ * (EXT-5, EXT-6). One round of three parallel requests, on the best block or, with `at`, on that block.
  */
-export async function simulateSubnetTrade (api: ApiPromise, netuid: number, amount: BigN, isStake: boolean): Promise<SimulatedSubnetTrade> {
-  const [priceCodec, taoInCodec, alphaInCodec, simCodec] = await Promise.all([
-    api.call.swapRuntimeApi.currentAlphaPrice(netuid),
-    api.query.subtensorModule.subnetTAO(netuid),
-    api.query.subtensorModule.subnetAlphaIn(netuid),
+export async function simulateSubnetTrade (api: ApiPromise, netuid: number, amount: BigN, isStake: boolean, at?: ApiDecoration<'promise'>): Promise<SimulatedSubnetTrade> {
+  const source = at ?? api;
+  const [priceCodec, [taoInCodec, alphaInCodec], simCodec] = await Promise.all([
+    source.call.swapRuntimeApi.currentAlphaPrice(netuid),
+    // One request either way: the API batches plain reads of the best block itself, but not reads at a block
+    at
+      ? at.queryMulti([[at.query.subtensorModule.subnetTAO, netuid], [at.query.subtensorModule.subnetAlphaIn, netuid]])
+      : Promise.all([api.query.subtensorModule.subnetTAO(netuid), api.query.subtensorModule.subnetAlphaIn(netuid)]),
     isStake
-      ? api.call.swapRuntimeApi.simSwapTaoForAlpha(netuid, amount.toFixed(0))
-      : api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, amount.toFixed(0))
+      ? source.call.swapRuntimeApi.simSwapTaoForAlpha(netuid, amount.toFixed(0))
+      : source.call.swapRuntimeApi.simSwapAlphaForTao(netuid, amount.toFixed(0))
   ]);
   // rao per alpha
   const spot = new BigN(priceCodec.toString()).dividedBy(1e9);

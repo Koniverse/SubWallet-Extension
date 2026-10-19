@@ -15,7 +15,7 @@ import { EventItem, EventType } from '@subwallet/extension-base/services/event-s
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
 import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
-import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, getShownAlphaStakes, getTaoPerAlphaMap, isAccountAll, PromiseHandler, readOptional, waitTimeout } from '@subwallet/extension-base/utils';
+import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, getShownAlphaStakes, getTaoPerAlphaMap, isAccountAll, PromiseHandler, readAlphaPrices, readOptional, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { AllSubstrateKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
 import keyring from '@subwallet/ui-keyring';
@@ -707,12 +707,12 @@ export class BalanceService implements StoppableServiceInterface {
 
       try {
         const substrateApi = await this.state.chainService.getSubstrateApi(chain).isReady;
-        const [stakeCodec, priceCodec] = await Promise.all([
+        const [stakeCodec, prices] = await Promise.all([
           substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(coldkeys),
-          readOptional(() => substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll())
+          readOptional(() => readAlphaPrices(substrateApi.api))
         ]);
         // The subnets Earning shows a position on: a 1-rao leftover from an unstake does not count; without prices, any stake
-        const shown = getShownAlphaStakes(stakeCodec.toPrimitive() as Array<[string, TaoStakeInfo[]]>, priceCodec ? getTaoPerAlphaMap(priceCodec.toPrimitive() as Array<{ netuid: number, price: number | string }>) : undefined);
+        const shown = getShownAlphaStakes(stakeCodec.toPrimitive() as Array<[string, TaoStakeInfo[]]>, prices ? getTaoPerAlphaMap(prices) : undefined);
         const stakedNetuids = new Set(shown.flatMap((byNetuid) => Object.keys(byNetuid).map(Number)));
 
         hidden.forEach((asset) => {

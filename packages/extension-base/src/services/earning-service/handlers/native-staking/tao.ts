@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { DEFAULT_MIN_STAKE, fetchFromProxyService, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress } from '@subwallet/extension-base/utils';
+import { DEFAULT_MIN_STAKE, fetchFromProxyService, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress, SharedRead } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -270,6 +270,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   };
 
   protected bittensorCache: BittensorCache;
+  /** A claim's fee by call: flat whatever it pays (10-13), so one estimate serves 10 minutes of reward cycles */
+  private readonly rootClaimFees = new SharedRead<BigN>(10 * 60 * 1000);
 
   protected getAlphaPriceScaleDecimals (): number {
     return _getAssetDecimals(this.nativeToken);
@@ -611,13 +613,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     try {
       const extrinsic = await this.buildRootClaim(plan);
 
-      if (!extrinsic) {
+      if (!plan.call || !extrinsic) {
         return undefined;
       }
 
-      const info = await extrinsic.paymentInfo(address);
-
-      return new BigN(info.partialFee.toString());
+      return await this.rootClaimFees.get(plan.call, async () => new BigN((await extrinsic.paymentInfo(address)).partialFee.toString()));
     } catch (e) {
       console.error(e);
 
@@ -908,8 +908,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   public async getUnstakeDetail (address: string, hotkey: string, netuid: number, amount: string, withMinimum = false, unstakeAll = false): Promise<UnstakePlan & { minPartial?: BigN, nominatorMinStake: BigN, available?: BigN }> {
     const { api } = await this.substrateApi.isReady;
     // Only the stake and the price are needed; a runtime without one of the others skips that check
-    const [stakeCodec, priceCodec, nominatorMinCodec, ownerCodec, availabilityCodec] = await Promise.all([
-      api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
+    const [stake, priceCodec, nominatorMinCodec, ownerCodec, availabilityCodec] = await Promise.all([
+      this.getHotkeyStake(address, hotkey, netuid),
       netuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(netuid),
       readOptional(() => api.query.subtensorModule.nominatorMinRequiredStake()),
       readOptional(() => api.query.subtensorModule.owner(hotkey)),
@@ -918,9 +918,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     // What the coldkey may take off the subnet: conviction-locked alpha cannot be unstaked (EXT-19)
     const availability = Object.values((availabilityCodec?.toPrimitive() ?? {}) as Record<string, Record<string, { available: number | string }>>)[0]?.[netuid];
     const available = availability ? new BigN(availability.available) : undefined;
-    const stake = (stakeCodec.toPrimitive() as unknown as TaoStakeInfo[])
-      .filter((row) => row.netuid === netuid && isSameAddress(row.hotkey, hotkey))
-      .reduce((sum, row) => sum.plus(row.stake), new BigN(0));
     // Root is 1:1; a subnet's price is rao per alpha
     const taoPerUnit = netuid === 0 ? new BigN(1) : new BigN(priceCodec?.toString() || '0').dividedBy(1e9);
     // DefaultMinStake = InitialMinStake
@@ -959,6 +956,16 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     return { ...plan, minPartial, nominatorMinStake, available };
   }
 
+  /** The coldkey's stake on `hotkey` on subnet `netuid`, in rao of the subnet's unit */
+  private async getHotkeyStake (address: string, hotkey: string, netuid: number): Promise<BigN> {
+    const { api } = await this.substrateApi.isReady;
+    const rows = (await api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address)).toPrimitive() as unknown as TaoStakeInfo[];
+
+    return rows
+      .filter((row) => row.netuid === netuid && isSameAddress(row.hotkey, hotkey))
+      .reduce((sum, row) => sum.plus(row.stake), new BigN(0));
+  }
+
   override async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid = 0, slippage: number = DEFAULT_BITTENSOR_SLIPPAGE, unstakeAll = false): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
 
@@ -968,11 +975,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const binaryAmount = new BigN(amount);
 
-    // Validation already checked the minimum: only whether this is a full exit is needed here. The limit
-    // prices `amount`: what accrues between the read and the block is too little to move it
-    const [BNlimitPrice, { fullExit }] = await Promise.all([
+    // Validation already checked the minimum: only whether this is a full exit is needed here, which Max
+    // always is (`planUnstake`). The limit prices `amount`: what accrues between the read and the block is too little to move it
+    const [BNlimitPrice, fullExit] = await Promise.all([
       this.getLimitPrice(netuid, binaryAmount, slippage, false),
-      this.getUnstakeDetail(address, selectedTarget, netuid, amount, false, unstakeAll)
+      unstakeAll ? true : this.getHotkeyStake(address, selectedTarget, netuid).then((stake) => binaryAmount.gte(stake))
     ]);
 
     // A full exit unstakes what is there when the block runs: rewards keep accruing after the amount was read

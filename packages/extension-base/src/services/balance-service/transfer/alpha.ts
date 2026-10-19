@@ -40,13 +40,12 @@ export interface AlphaTransferParams {
 export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, netuid, substrateApi, symbol, to }: AlphaTransferParams): Promise<TransactionError[]> {
   const { api } = await substrateApi.isReady;
   const isOtherColdkey = !isSameAddress(from, to);
-  const [toggleCodec, priceCodec, availabilityCodec, flagsCodec, recipientLockKeys, recipientHotkeysCodec] = await Promise.all([
+  // The sender's lock and the recipient's hotkeys matter only when the stake changes coldkey
+  const [toggleCodec, priceCodec, availabilityCodec, recipientHotkeysCodec] = await Promise.all([
     readOptional(() => api.query.subtensorModule.transferToggle(netuid)),
     readOptional(() => api.call.swapRuntimeApi.currentAlphaPrice(netuid)),
-    readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([from], [netuid])),
-    readOptional(() => api.query.subtensorModule.accountFlags(to)),
-    readOptional(() => api.query.subtensorModule.lock.keys(to, netuid)),
-    readOptional(() => api.query.subtensorModule.stakingHotkeys(to))
+    isOtherColdkey ? readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([from], [netuid])) : undefined,
+    isOtherColdkey ? readOptional(() => api.query.subtensorModule.stakingHotkeys(to)) : undefined
   ]);
   const value = new BigN(amount);
   const format = (alpha: BigN) => formatNumber(alpha.toFixed(0), decimals);
@@ -78,6 +77,11 @@ export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, n
   const available = availability ? new BigN(availability.available) : undefined;
 
   if (available && value.gt(available)) {
+    // Only a transfer that carries locked alpha needs the recipient's lock settings
+    const [flagsCodec, recipientLockKeys] = await Promise.all([
+      readOptional(() => api.query.subtensorModule.accountFlags(to)),
+      readOptional(() => api.query.subtensorModule.lock.keys(to, netuid))
+    ]);
     const acceptsLocked = (Number(flagsCodec?.toPrimitive() ?? 0) & ACCOUNT_FLAGS_ACCEPT_LOCKED_ALPHA) === ACCOUNT_FLAGS_ACCEPT_LOCKED_ALPHA;
 
     if (flagsCodec && !acceptsLocked) {
