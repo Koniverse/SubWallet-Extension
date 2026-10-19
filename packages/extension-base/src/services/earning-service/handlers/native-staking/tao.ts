@@ -905,14 +905,19 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
    * `DefaultMinStake`. One round of parallel reads; the pool is simulated only for an amount near that minimum.
    * `unstakeAll` (Max) makes it a full exit whatever accrued after the amount was read.
    */
-  public async getUnstakeDetail (address: string, hotkey: string, netuid: number, amount: string, withMinimum = false, unstakeAll = false): Promise<UnstakePlan & { minPartial?: BigN, nominatorMinStake: BigN }> {
+  public async getUnstakeDetail (address: string, hotkey: string, netuid: number, amount: string, withMinimum = false, unstakeAll = false): Promise<UnstakePlan & { minPartial?: BigN, nominatorMinStake: BigN, available?: BigN }> {
     const { api } = await this.substrateApi.isReady;
-    const [stakeCodec, priceCodec, nominatorMinCodec, ownerCodec] = await Promise.all([
+    const [stakeCodec, priceCodec, nominatorMinCodec, ownerCodec, availabilityCodec] = await Promise.all([
       api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
       netuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(netuid),
       api.query.subtensorModule.nominatorMinRequiredStake(),
-      api.query.subtensorModule.owner(hotkey)
+      api.query.subtensorModule.owner(hotkey),
+      // Older runtimes have no availability API: no lock cap then
+      api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys?.([address], [netuid]).catch(() => undefined)
     ]);
+    // What the coldkey may take off the subnet: conviction-locked alpha cannot be unstaked (EXT-19)
+    const availability = Object.values((availabilityCodec?.toPrimitive() ?? {}) as Record<string, Record<string, { available: number | string }>>)[0]?.[netuid];
+    const available = availability ? new BigN(availability.available) : undefined;
     const stake = (stakeCodec.toPrimitive() as unknown as TaoStakeInfo[])
       .filter((row) => row.netuid === netuid && isSameAddress(row.hotkey, hotkey))
       .reduce((sum, row) => sum.plus(row.stake), new BigN(0));
@@ -926,7 +931,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     // A remainder under the nominator minimum refuses the amount already
     if (plan.fullExit || plan.remainderTooSmall || !withMinimum) {
-      return { ...plan, nominatorMinStake };
+      return { ...plan, nominatorMinStake, available };
     }
 
     // `validate_remove_stake` wants a partial sale to pay at least DefaultMinStake (>=); root sells 1:1
@@ -934,7 +939,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     // Twice the minimum at spot: the pool fee (0.05%) and the slippage of a sale this small cannot take it under
     if (netuid === 0 || new BigN(amount).gte(spotMinimum.multipliedBy(2))) {
-      return { ...plan, minPartial: spotMinimum, nominatorMinStake };
+      return { ...plan, minPartial: spotMinimum, nominatorMinStake, available };
     }
 
     const minPartial = await findMinLeg(minStake.minus(1), taoPerUnit, async (alpha) => {
@@ -943,7 +948,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return new BigN(result.taoAmount ?? 0);
     });
 
-    return { ...plan, minPartial, nominatorMinStake };
+    return { ...plan, minPartial, nominatorMinStake, available };
   }
 
   override async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid = 0, slippage: number = DEFAULT_BITTENSOR_SLIPPAGE, unstakeAll = false): Promise<[ExtrinsicType, TransactionData]> {
@@ -995,9 +1000,14 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     // A full exit has no minimum; a partial unstake must sell for at least the chain's minimum and leave
     // at least the nominator minimum, which the chain would otherwise unstake too (EXT-26)
-    const { fullExit, minPartial, nominatorMinStake, remainderTooSmall, remaining } = await this.getUnstakeDetail(address, selectedTarget, poolInfo.metadata.subnetData?.netuid || 0, amount, true, unstakeAll);
+    const { available, fullExit, minPartial, nominatorMinStake, remainderTooSmall, remaining, unstaked } = await this.getUnstakeDetail(address, selectedTarget, poolInfo.metadata.subnetData?.netuid || 0, amount, true, unstakeAll);
     const decimals = _getAssetDecimals(this.nativeToken);
     const symbol = poolInfo.metadata.subnetData?.subnetSymbol || _getAssetSymbol(this.nativeToken);
+
+    // Conviction-locked alpha cannot leave: the chain refuses `StakeUnavailable` (EXT-19)
+    if (available && unstaked.gt(available)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked', { replace: { available: formatNumber(available, decimals), symbol } }))];
+    }
 
     if (remainderTooSmall) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum', { replace: { remaining: formatNumber(remaining, decimals), minimum: formatNumber(nominatorMinStake, decimals), symbol } }))];
