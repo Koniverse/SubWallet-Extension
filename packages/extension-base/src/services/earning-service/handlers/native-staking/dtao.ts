@@ -13,7 +13,7 @@ import BigN from 'bignumber.js';
 import { BN_ZERO } from '@polkadot/util';
 
 import { simulateSubnetTrade } from './bittensor-pool';
-import TaoNativeStakingPoolHandler, { DEFAULT_DTAO_MINBOND, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
+import TaoNativeStakingPoolHandler, { RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
   netuid: number;
@@ -270,6 +270,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
 
       try {
         for (const subnet of this.subnetData) {
+          const minStake = (await this.getMinBond(subnet.netuid)).toString();
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `${this.slug}__subnet_${netuid}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
@@ -289,14 +290,14 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
                 netuid: subnet.netuid,
                 subnetSymbol: subnet.symbol || 'dTAO'
               },
-              minValidate: DEFAULT_DTAO_MINBOND
+              minValidate: minStake
             },
             statistic: {
               assetEarning: [{ slug: this.nativeToken.slug }],
               maxCandidatePerFarmer: subnet.maxAllowedValidators,
               maxWithdrawalRequestPerFarmer: 1,
               earningThreshold: {
-                join: DEFAULT_DTAO_MINBOND,
+                join: minStake,
                 defaultUnstake: '0',
                 fastUnstake: '0'
               },

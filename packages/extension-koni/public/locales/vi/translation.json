@@ -2031,7 +2031,7 @@
   "bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingValidator": "You cannot stake more for a validator you are unstaking from",
   "bg.EARNING.services.service.earning.lending.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.liquidStaking.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
-  "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "Insufficient stake. You need to stake at least {{bnMinStake}} {{symbol}} to earn rewards",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "Số lượng quá nhỏ. Hãy stake ít nhất {{bnMinStake}} {{symbol}}",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Amount too low. Unstake at least {{bnMinUnstake}} {{symbol}}, or the whole position",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum": "Lệnh này sẽ để lại {{remaining}} {{symbol}} đang stake, dưới mức {{minimum}} TAO mà nominator được giữ. Hãy rút ít hơn, hoặc rút toàn bộ",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked": "Một phần stake của bạn trên subnet này đang bị khoá. Bạn chỉ có thể rút tối đa {{available}} {{symbol}}",

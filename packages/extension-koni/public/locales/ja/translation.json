@@ -2027,7 +2027,7 @@
   "bg.EARNING.koni.api.staking.bonding.utils.cannotStakeMoreOnUnstakingValidator": "You cannot stake more for a validator you are unstaking from",
   "bg.EARNING.services.service.earning.lending.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.liquidStaking.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
-  "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "Insufficient stake. You need to stake at least {{bnMinStake}} {{symbol}} to earn rewards",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "数量が少なすぎます。{{bnMinStake}} {{symbol}}以上をステークしてください",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Amount too low. Unstake at least {{bnMinUnstake}} {{symbol}}, or the whole position",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum": "このままでは{{remaining}} {{symbol}}がステークに残り、ノミネーターが保持できる最低額{{minimum}} TAOを下回ります。アンステーク額を減らすか、全額をアンステークしてください",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked": "このサブネットのステークの一部はロックされています。アンステークできるのは最大{{available}} {{symbol}}です",

@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, fetchFromProxyService, formatMinimum, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress, SharedRead } from '@subwallet/extension-base/utils';
+import { DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -22,7 +22,6 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
-import { fetchPoolsData } from '../../service';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, planRootClaim, RootClaimPlan, RootClaimPreview } from './bittensor-root-claim-plan';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
@@ -110,8 +109,6 @@ interface SubnetFeeRate {
 }
 
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
-
-export const DEFAULT_DTAO_MINBOND = '21000000';
 
 /**
  * `RootClaimableThreshold` is stored as a substrate-fixed `I96F32`: a 128 bit integer whose low
@@ -274,39 +271,36 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     return _getAssetDecimals(this.nativeToken);
   }
 
-  protected async getMinBond (netuid?: number): Promise<BigN> {
-    // @ts-ignore
-    if (this.type === YieldPoolType.SUBNET_STAKING) {
-      if (!netuid) {
-        return new BigN(DEFAULT_DTAO_MINBOND);
-      }
+  /**
+   * The smallest stake the chain takes on `netuid` (`validate_add_stake`), in rao: `DefaultMinStake` (0.002 TAO),
+   * plus on a subnet the pool fee on a buy that size — none on root — here at the default fee rate. Rounded up to
+   * the 2 digits the screens print, so the figure shown is always enough. The nominator minimum (0.02 TAO) is not
+   * a staking rule: it bounds what a partial unstake may leave (EXT-26). EXT-20: was the raw
+   * `NominatorMinRequiredStake` read as rao (0.01 TAO) on root, and a hardcoded 0.021 TAO on subnets.
+   */
+  protected async getMinBond (netuid = 0): Promise<BigN> {
+    const { api } = await this.substrateApi.isReady;
+    const minStake = new BigN(api.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
+    const fee = netuid ? minStake.multipliedBy(DEFAULT_SWAP_FEE_RATE).integerValue(BigN.ROUND_CEIL) : new BigN(0);
 
-      const subnetSlug = `${this.slug}__subnet_${netuid.toString().padStart(2, '0')}`;
+    return roundUpMinimum(minStake.plus(fee), _getAssetDecimals(this.nativeToken), 2);
+  }
 
-      const cachedPool = await this.getPoolInfo(subnetSlug);
+  /** `getMinBond` exactly as the chain computes it: the fee from its own simulation of a buy of `DefaultMinStake` */
+  private async getExactMinStake (netuid: number): Promise<BigN> {
+    const { api } = await this.substrateApi.isReady;
+    const minStake = new BigN(api.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
 
-      if (cachedPool?.metadata?.minValidate) {
-        return new BigN(cachedPool.metadata.minValidate);
-      }
-
-      // If can't get from cached -> get data online
-      const onlineData = await fetchPoolsData();
-      const onlinePool = onlineData[subnetSlug];
-
-      return new BigN(onlinePool?.metadata?.minValidate || DEFAULT_DTAO_MINBOND);
+    if (!netuid) {
+      return minStake;
     }
 
-    const cachedPool = await this.getPoolInfo(this.slug);
+    const sim = await readOptional(() => api.call.swapRuntimeApi.simSwapTaoForAlpha(netuid, minStake.toFixed(0)));
+    const fee = sim
+      ? new BigN((sim.toPrimitive() as { taoFee?: number | string }).taoFee ?? 0)
+      : minStake.multipliedBy(DEFAULT_SWAP_FEE_RATE).integerValue(BigN.ROUND_CEIL);
 
-    if (cachedPool?.metadata?.minValidate || cachedPool?.statistic?.earningThreshold?.join) {
-      return new BigN(cachedPool.metadata?.minValidate || cachedPool.statistic?.earningThreshold?.join || 0);
-    }
-
-    // If can get from cached -> get data online
-    const onlineData = await fetchPoolsData();
-    const onlinePool = onlineData[this.slug];
-
-    return new BigN(onlinePool?.metadata?.minValidate || onlinePool?.statistic?.earningThreshold?.join || 0);
+    return minStake.plus(fee);
   }
 
   constructor (state: KoniState, chain: string) {
@@ -350,18 +344,18 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }, BITTENSOR_REFRESH_STAKE_APY);
 
     const rxSubnetTAO = substrateApi.api.rx.query.subtensorModule.subnetTAO(0);
-    const rxMinDelegatorStake = substrateApi.api.rx.query.subtensorModule.nominatorMinRequiredStake();
     const rxMaxValidators = substrateApi.api.rx.query.subtensorModule.maxAllowedValidators(0);
+    // A runtime constant: no subscription
+    const bnMinStake = await this.getMinBond();
 
-    const subscription = combineLatest([rxMinDelegatorStake, rxMaxValidators, rxSubnetTAO, aprSubject]).subscribe({
-      next: ([minDelegatorStake, maxValidators, taoIn, apr]) => {
+    const subscription = combineLatest([rxMaxValidators, rxSubnetTAO, aprSubject]).subscribe({
+      next: ([maxValidators, taoIn, apr]) => {
         if (cancel) {
           return;
         }
 
         try {
           const bnTaoIn = new BigN(taoIn.toString());
-          const bnMinStake = new BigN(minDelegatorStake.toString());
           const minStake = bnMinStake.toString();
           const data: NativeYieldPoolInfo = {
             ...this.baseInfo,
@@ -882,11 +876,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }
 
     const { amount, subnetData } = data;
+    const netuid = subnetData?.netuid || 0;
+    // Refused below what the chain takes; the message names the minimum the screens show, which is enough
+    const [shownMinStake, minStake] = await Promise.all([this.getMinBond(netuid), this.getExactMinStake(netuid)]);
 
-    const bnMinStake = await this.getMinBond(subnetData?.netuid);
-
-    if (new BigN(amount).lt(bnMinStake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn', { replace: { bnMinStake: formatNumber(bnMinStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } }))];
+    if (new BigN(amount).lt(minStake)) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn', { replace: { bnMinStake: formatNumber(shownMinStake, _getAssetDecimals(this.nativeToken)), symbol: _getAssetSymbol(this.nativeToken) } }))];
     }
 
     return baseErrors;

@@ -20,6 +20,17 @@ describe('A minimum as a message shows it', () => {
     expect(formatMinimum(20000000, 9)).toBe('0.02');
   });
 
+  it('rounds a staking minimum to the 2 digits the screens print, so 0.002001 shows as 0.0021, not 0.002', () => {
+    // 0.002 TAO + the pool fee on a buy that size (1,007 rao on testnet SN3, 10-19)
+    const minimum = roundUpMinimum(2001007, 9, 2);
+
+    expect(minimum.toFixed()).toBe('2100000');
+    expect(formatNumber(minimum, 9)).toBe('0.0021');
+    expect(formatNumber(2001007, 9)).toBe('0.002');
+    // Root has no pool fee: 0.002 exactly
+    expect(roundUpMinimum(2000000, 9, 2).toFixed()).toBe('2000000');
+  });
+
   it('rounds up above 1 too', () => {
     expect(formatMinimum(new BigNumber('2552955089'), 9)).toBe('2.56');
     expect(formatMinimum(new BigNumber('1234500000000'), 9)).toBe('1240');

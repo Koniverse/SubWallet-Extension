@@ -113,6 +113,9 @@ export const DEFAULT_MIN_STAKE = '2000000';
 /** `InitialMinTransfer` on v478, in rao: what a move within a subnet or a transfer must be worth at spot */
 export const DEFAULT_MIN_TRANSFER = '100000';
 
+/** The swap pallet's default `FeeRate`, 33 / 65535 ≈ 0.0504% of a trade's input: every mainnet subnet's on 10-12 */
+export const DEFAULT_SWAP_FEE_RATE = 33 / 65535;
+
 /**
  * A chain read that only refines a check: `undefined` when the runtime no longer has the storage or
  * runtime API, or the call fails, so the check is skipped and the action goes on as before it existed.
