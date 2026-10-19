@@ -369,17 +369,17 @@ export default abstract class BasePoolHandler {
   /* Leave action */
 
   /** Validate param to leave the pool */
-  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]>
+  public abstract validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo, unstakeAll?: boolean): Promise<TransactionError[]>
   /** Create `transaction` to leave the pool normal (default unstake) */
-  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]>;
+  protected abstract handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number, unstakeAll?: boolean): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool fast (swap token) */
   protected abstract handleYieldRedeem (amount: string, address: string, selectedTarget?: string): Promise<[ExtrinsicType, TransactionData]>;
   /** Create `transaction` to leave the pool */
-  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number): Promise<[ExtrinsicType, TransactionData]> {
+  public async handleYieldLeave (fastLeave: boolean, amount: string, address: string, selectedTarget?: string, netuid?: number, slippage?: number, unstakeAll?: boolean): Promise<[ExtrinsicType, TransactionData]> {
     if (fastLeave) {
       return this.handleYieldRedeem(amount, address, selectedTarget);
     } else {
-      return this.handleYieldUnstake(amount, address, selectedTarget, netuid, slippage);
+      return this.handleYieldUnstake(amount, address, selectedTarget, netuid, slippage, unstakeAll);
     }
   }
 

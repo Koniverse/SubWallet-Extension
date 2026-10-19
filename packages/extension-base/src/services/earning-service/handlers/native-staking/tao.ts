@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { fetchFromProxyService, formatNumber, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchFromProxyService, formatNumber, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -21,8 +21,10 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { BN, BN_ZERO, noop } from '@polkadot/util';
 
+import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { fetchPoolsData } from '../../service';
 import { isRootClaimWorthNotifying, planRootClaim, RootClaimPlan, RootClaimPreview } from './bittensor-root-claim-plan';
+import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
 
@@ -880,7 +882,54 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   /* Leave pool action */
 
-  override async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid = 0, slippage: number = DEFAULT_BITTENSOR_SLIPPAGE): Promise<[ExtrinsicType, TransactionData]> {
+  /**
+   * How unstaking `amount` from `hotkey` leaves the position, read from the chain (EXT-26), and with
+   * `withMinimum`, for a partial unstake, the smallest amount the chain takes: one that sells for at least
+   * `DefaultMinStake`. One round of parallel reads; the pool is simulated only for an amount near that minimum.
+   * `unstakeAll` (Max) makes it a full exit whatever accrued after the amount was read.
+   */
+  public async getUnstakeDetail (address: string, hotkey: string, netuid: number, amount: string, withMinimum = false, unstakeAll = false): Promise<UnstakePlan & { minPartial?: BigN, nominatorMinStake: BigN }> {
+    const { api } = await this.substrateApi.isReady;
+    const [stakeCodec, priceCodec, nominatorMinCodec, ownerCodec] = await Promise.all([
+      api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
+      netuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(netuid),
+      api.query.subtensorModule.nominatorMinRequiredStake(),
+      api.query.subtensorModule.owner(hotkey)
+    ]);
+    const stake = (stakeCodec.toPrimitive() as unknown as TaoStakeInfo[])
+      .filter((row) => row.netuid === netuid && isSameAddress(row.hotkey, hotkey))
+      .reduce((sum, row) => sum.plus(row.stake), new BigN(0));
+    // Root is 1:1; a subnet's price is rao per alpha
+    const taoPerUnit = netuid === 0 ? new BigN(1) : new BigN(priceCodec?.toString() || '0').dividedBy(1e9);
+    // DefaultMinStake = InitialMinStake
+    const minStake = new BigN(api.consts.subtensorModule.initialMinStake.toString());
+    // `NominatorMinRequiredStake` is a per-million factor on DefaultMinStake (`get_nominator_min_required_stake`): 0.02 TAO on 10-19
+    const nominatorMinStake = minStake.multipliedBy(nominatorMinCodec.toString()).dividedToIntegerBy(1e6);
+    const plan = planUnstake({ amount: new BigN(amount), stake, taoPerUnit, nominatorMinStake, ownsHotkey: isSameAddress(ownerCodec.toString(), address), unstakeAll });
+
+    // A remainder under the nominator minimum refuses the amount already
+    if (plan.fullExit || plan.remainderTooSmall || !withMinimum) {
+      return { ...plan, nominatorMinStake };
+    }
+
+    // `validate_remove_stake` wants a partial sale to pay at least DefaultMinStake (>=); root sells 1:1
+    const spotMinimum = minStake.dividedBy(taoPerUnit).integerValue(BigN.ROUND_CEIL);
+
+    // Twice the minimum at spot: the pool fee (0.05%) and the slippage of a sale this small cannot take it under
+    if (netuid === 0 || new BigN(amount).gte(spotMinimum.multipliedBy(2))) {
+      return { ...plan, minPartial: spotMinimum, nominatorMinStake };
+    }
+
+    const minPartial = await findMinLeg(minStake.minus(1), taoPerUnit, async (alpha) => {
+      const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
+
+      return new BigN(result.taoAmount ?? 0);
+    });
+
+    return { ...plan, minPartial, nominatorMinStake };
+  }
+
+  override async handleYieldUnstake (amount: string, address: string, selectedTarget?: string, netuid = 0, slippage: number = DEFAULT_BITTENSOR_SLIPPAGE, unstakeAll = false): Promise<[ExtrinsicType, TransactionData]> {
     const apiPromise = await this.substrateApi.isReady;
 
     if (!selectedTarget) {
@@ -889,12 +938,22 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const binaryAmount = new BigN(amount);
 
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
+    // Validation already checked the minimum: only whether this is a full exit is needed here
+    const [rate, { fullExit }] = await Promise.all([
+      getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()),
+      this.getUnstakeDetail(address, selectedTarget, netuid, amount, false, unstakeAll)
+    ]);
+    const alphaToTaoPrice = new BigN(rate);
     const limitPrice = alphaToTaoPrice
       .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
       .multipliedBy(1 - slippage);
 
     const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
+
+    // A full exit unstakes what is there when the block runs: rewards keep accruing after the amount was read
+    if (fullExit && apiPromise.api.tx.subtensorModule.removeStakeFullLimit) {
+      return [ExtrinsicType.STAKING_UNBOND, apiPromise.api.tx.subtensorModule.removeStakeFullLimit(selectedTarget, netuid, BNlimitPrice.toFixed())];
+    }
 
     const extrinsic = apiPromise.api.tx.subtensorModule.removeStakeLimit(
       selectedTarget,
@@ -907,7 +966,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     return [ExtrinsicType.STAKING_UNBOND, extrinsic];
   }
 
-  public override async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo): Promise<TransactionError[]> {
+  public override async validateYieldLeave (amount: string, address: string, fastLeave: boolean, selectedTarget?: string, slug?: string, poolInfo?: YieldPoolInfo, unstakeAll?: boolean): Promise<TransactionError[]> {
     const baseErrors = await super.validateYieldLeave(amount, address, fastLeave, selectedTarget, slug);
 
     if (baseErrors.length > 0) {
@@ -918,15 +977,24 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
     }
 
-    const netuid = poolInfo.metadata.subnetData?.netuid;
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid || 0, this.getAlphaPriceScaleDecimals()));
+    if (!selectedTarget) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS)];
+    }
 
-    const minDelegatorStake = await this.getMinBond(netuid);
+    // A full exit has no minimum; a partial unstake must sell for at least the chain's minimum and leave
+    // at least the nominator minimum, which the chain would otherwise unstake too (EXT-26)
+    const { fullExit, minPartial, nominatorMinStake, remainderTooSmall, remaining } = await this.getUnstakeDetail(address, selectedTarget, poolInfo.metadata.subnetData?.netuid || 0, amount, true, unstakeAll);
+    const decimals = _getAssetDecimals(this.nativeToken);
+    const symbol = poolInfo.metadata.subnetData?.subnetSymbol || _getAssetSymbol(this.nativeToken);
 
-    const minUnstake = minDelegatorStake.dividedBy(alphaToTaoPrice);
+    if (remainderTooSmall) {
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum', { replace: { remaining: formatNumber(remaining, decimals), minimum: formatNumber(nominatorMinStake, decimals), symbol } }))];
+    }
 
-    if (new BigN(amount).lt(minUnstake)) {
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow', { replace: { bnMinUnstake: formatNumber(minUnstake, _getAssetDecimals(this.nativeToken)), symbol: poolInfo.metadata.subnetData?.subnetSymbol || _getAssetSymbol(this.nativeToken) } }))];
+    if (!fullExit && (!minPartial || new BigN(amount).lt(minPartial))) {
+      const bnMinUnstake = minPartial ? formatNumber(minPartial, decimals) : '-';
+
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow', { replace: { bnMinUnstake, symbol } }))];
     }
 
     return baseErrors;

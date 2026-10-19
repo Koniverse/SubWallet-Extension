@@ -1153,7 +1153,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo, params.unstakeAll);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -1168,7 +1168,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const slippage = params.slippage;
 
     if (handler) {
-      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid, slippage);
+      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid, slippage, params.unstakeAll);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }

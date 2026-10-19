@@ -35,6 +35,10 @@ export interface SubnetYieldLeaveParams {
   slippage?: number;
   /** stakingFee (subnet staking) */
   stakingFee?: string;
+  /** TAO the unstake is expected to return, in rao: the confirmation warns when the network fee is not less */
+  expectedTao?: string;
+  /** All of the position (Max): what accrues before the block goes too (Bittensor) */
+  unstakeAll?: boolean;
 }
 
 export type YieldLeaveParams = BaseYieldLeaveParams & Partial<SubnetYieldLeaveParams>;
