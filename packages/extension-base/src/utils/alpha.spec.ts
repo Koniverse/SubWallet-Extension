@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap } from './alpha';
+import { getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap, readOptional } from './alpha';
 
 describe('Alpha balance as Earning shows it (EXT-39)', () => {
   // rao per alpha, as `current_alpha_price_all` returns it
@@ -39,6 +39,24 @@ describe('Alpha balance as Earning shows it (EXT-39)', () => {
 
     expect(shown.length).toBe(2);
     expect(Object.keys(shown[1])).toEqual([]);
+  });
+});
+
+describe('Reads a runtime upgrade may drop', () => {
+  it('counts every stake when the runtime gives no prices, as before the dust rule', () => {
+    const [shown] = getShownAlphaStakes([['a', [{ netuid: 17, stake: 1 }, { netuid: 64, stake: 0 }]]]);
+
+    expect(shown).toEqual({ 17: new BigN(1) });
+  });
+
+  it('gives undefined for a storage the runtime no longer has, or a call that fails', async () => {
+    const query: { transferToggle?: () => Promise<boolean> } = {};
+
+    await expect(readOptional(() => query.transferToggle?.())).resolves.toBeUndefined();
+    // A missing entry called without `?.` throws before any promise exists
+    await expect(readOptional(() => (query.transferToggle as () => Promise<boolean>)())).resolves.toBeUndefined();
+    await expect(readOptional(() => Promise.reject(new Error('Unknown runtime API')))).resolves.toBeUndefined();
+    await expect(readOptional(() => Promise.resolve(true))).resolves.toBe(true);
   });
 });
 

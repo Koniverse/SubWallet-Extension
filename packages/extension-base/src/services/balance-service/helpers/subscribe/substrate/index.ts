@@ -19,7 +19,7 @@ import { _EvmApi, _SubstrateAdapterSubscriptionArgs, _SubstrateApi } from '@subw
 import { _checkSmartContractSupportByChain, _getAssetExistentialDeposit, _getAssetNetuid, _getChainExistentialDeposit, _getChainNativeTokenSlug, _getContractAddressOfToken, _getTokenOnChainAssetId, _getTokenOnChainInfo, _getTokenTypesSupportedByChain, _getXcmAssetMultilocation, _isBridgedToken, _isChainEvmCompatible } from '@subwallet/extension-base/services/chain-service/utils';
 import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/tao';
 import { BalanceItem, SubscribeBasePalletBalance, SubscribeSubstratePalletBalance } from '@subwallet/extension-base/types';
-import { filterAlphaAssetsByChain, filterAssetsByChainAndType, getShownAlphaStakes, getTaoPerAlphaMap } from '@subwallet/extension-base/utils';
+import { filterAlphaAssetsByChain, filterAssetsByChainAndType, getShownAlphaStakes, getTaoPerAlphaMap, readOptional } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { timer } from 'rxjs';
 
@@ -618,10 +618,11 @@ const subscribeSubnetAlphaPallet = async ({ addresses, assetMap, callback, chain
 
     const [rawData, rawPrices] = await Promise.all([
       substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(addresses),
-      substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll()
+      // Without prices every stake counts, as before
+      readOptional(() => substrateApi.api.call.swapRuntimeApi.currentAlphaPriceAll())
     ]);
     const values: Array<[string, TaoStakeInfo[]]> = rawData.toPrimitive() as Array<[string, TaoStakeInfo[]]>;
-    const taoPerAlpha = getTaoPerAlphaMap(rawPrices.toPrimitive() as Array<{ netuid: number, price: number | string }>);
+    const taoPerAlpha = rawPrices ? getTaoPerAlphaMap(rawPrices.toPrimitive() as Array<{ netuid: number, price: number | string }>) : undefined;
     // Only the stake Earning shows, so a 1-rao leftover is a zero balance here too
     const shown = getShownAlphaStakes(values, taoPerAlpha);
     const converted: Record<string, Record<number, BigN>> = {};

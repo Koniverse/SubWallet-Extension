@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapEstimate, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapQuote, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, balanceFormatter, formatNumber, getSwapLimitPrice, toBNString } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, balanceFormatter, DEFAULT_MIN_STAKE, formatNumber, getSwapLimitPrice, readOptional, toBNString } from '@subwallet/extension-base/utils';
 import { ApiPromise } from 'avail-js-sdk';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
@@ -248,19 +248,29 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     const [_stakeInfo, priceCodec, availabilityCodec] = await Promise.all([
       api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
       fromNetuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(fromNetuid),
-      // Older runtimes have no availability API: no lock cap then
-      api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys?.([address], [fromNetuid]).catch(() => undefined)
+      // A runtime without the availability API: no lock cap then
+      readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([address], [fromNetuid]))
     ]);
 
     const stakes = _stakeInfo.toPrimitive() as unknown as TaoStakeInfo[];
     // DefaultMinStake = InitialMinStake (v478 `lib.rs`)
-    const minStake = new BigNumber(api.consts.subtensorModule.initialMinStake.toString());
+    const minStake = new BigNumber(api.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
     const rootHotkeys = fromNetuid === 0 ? stakes.filter((row) => row.netuid === 0 && new BigNumber(row.stake).gt(0)).map((row) => row.hotkey) : [];
-    const held = fromNetuid === 0 ? await this.readRootHeldHotkeys(api, address, rootHotkeys) : new Set<string>();
+    const held = fromNetuid === 0 ? await readOptional(() => this.readRootHeldHotkeys(api, address, rootHotkeys)) ?? new Set<string>() : new Set<string>();
+    const taoPerAlpha = new BigNumber(priceCodec?.toString() || '0').dividedBy(1e9);
+    let minLeg: BigNumber | undefined;
+
     // A leg must sell for more than the minimum: root sells 1:1 with no fee, a subnet through its pool
-    const minLeg = fromNetuid === 0
-      ? minStake.plus(1)
-      : await findMinLeg(minStake, new BigNumber(priceCodec?.toString() || '0').dividedBy(1e9), (alpha) => this.simulateAlphaSale(api, fromNetuid, alpha));
+    if (fromNetuid === 0) {
+      minLeg = minStake.plus(1);
+    } else {
+      try {
+        minLeg = await findMinLeg(minStake, taoPerAlpha, (alpha) => this.simulateAlphaSale(api, fromNetuid, alpha));
+      } catch (e) {
+        // A runtime without the simulation: the minimum at spot
+        minLeg = taoPerAlpha.gt(0) ? minStake.plus(1).dividedBy(taoPerAlpha).integerValue(BigNumber.ROUND_CEIL) : undefined;
+      }
+    }
 
     // { coldkey: { netuid: { total, locked, available } } } for the one coldkey asked
     const availability = Object.values((availabilityCodec?.toPrimitive() ?? {}) as Record<string, Record<string, { available: number | string }>>)[0]?.[fromNetuid];

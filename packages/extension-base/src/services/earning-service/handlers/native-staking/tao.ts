@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { fetchFromProxyService, formatNumber, getStakeLimitPrice, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
+import { DEFAULT_MIN_STAKE, fetchFromProxyService, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -907,13 +907,13 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
    */
   public async getUnstakeDetail (address: string, hotkey: string, netuid: number, amount: string, withMinimum = false, unstakeAll = false): Promise<UnstakePlan & { minPartial?: BigN, nominatorMinStake: BigN, available?: BigN }> {
     const { api } = await this.substrateApi.isReady;
+    // Only the stake and the price are needed; a runtime without one of the others skips that check
     const [stakeCodec, priceCodec, nominatorMinCodec, ownerCodec, availabilityCodec] = await Promise.all([
       api.call.stakeInfoRuntimeApi.getStakeInfoForColdkey(address),
       netuid === 0 ? Promise.resolve(undefined) : api.call.swapRuntimeApi.currentAlphaPrice(netuid),
-      api.query.subtensorModule.nominatorMinRequiredStake(),
-      api.query.subtensorModule.owner(hotkey),
-      // Older runtimes have no availability API: no lock cap then
-      api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys?.([address], [netuid]).catch(() => undefined)
+      readOptional(() => api.query.subtensorModule.nominatorMinRequiredStake()),
+      readOptional(() => api.query.subtensorModule.owner(hotkey)),
+      readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([address], [netuid]))
     ]);
     // What the coldkey may take off the subnet: conviction-locked alpha cannot be unstaked (EXT-19)
     const availability = Object.values((availabilityCodec?.toPrimitive() ?? {}) as Record<string, Record<string, { available: number | string }>>)[0]?.[netuid];
@@ -924,10 +924,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     // Root is 1:1; a subnet's price is rao per alpha
     const taoPerUnit = netuid === 0 ? new BigN(1) : new BigN(priceCodec?.toString() || '0').dividedBy(1e9);
     // DefaultMinStake = InitialMinStake
-    const minStake = new BigN(api.consts.subtensorModule.initialMinStake.toString());
-    // `NominatorMinRequiredStake` is a per-million factor on DefaultMinStake (`get_nominator_min_required_stake`): 0.02 TAO on 10-19
-    const nominatorMinStake = minStake.multipliedBy(nominatorMinCodec.toString()).dividedToIntegerBy(1e6);
-    const plan = planUnstake({ amount: new BigN(amount), stake, taoPerUnit, nominatorMinStake, ownsHotkey: isSameAddress(ownerCodec.toString(), address), unstakeAll });
+    const minStake = new BigN(api.consts.subtensorModule.initialMinStake?.toString() || DEFAULT_MIN_STAKE);
+    // `NominatorMinRequiredStake` is a per-million factor on DefaultMinStake (`get_nominator_min_required_stake`): 0.02 TAO on 10-19.
+    // Unread, the remainder check is skipped: a swept remainder still comes back as free TAO
+    const nominatorMinStake = nominatorMinCodec && ownerCodec ? minStake.multipliedBy(nominatorMinCodec.toString()).dividedToIntegerBy(1e6) : new BigN(0);
+    const plan = planUnstake({ amount: new BigN(amount), stake, taoPerUnit, nominatorMinStake, ownsHotkey: isSameAddress(ownerCodec?.toString() || '', address), unstakeAll });
 
     // A remainder under the nominator minimum refuses the amount already
     if (plan.fullExit || plan.remainderTooSmall || !withMinimum) {
@@ -942,11 +943,18 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       return { ...plan, minPartial: spotMinimum, nominatorMinStake, available };
     }
 
-    const minPartial = await findMinLeg(minStake.minus(1), taoPerUnit, async (alpha) => {
-      const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
+    let minPartial: BigN | undefined;
 
-      return new BigN(result.taoAmount ?? 0);
-    });
+    try {
+      minPartial = await findMinLeg(minStake.minus(1), taoPerUnit, async (alpha) => {
+        const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
+
+        return new BigN(result.taoAmount ?? 0);
+      });
+    } catch (e) {
+      // A runtime without the simulation: the minimum at spot
+      minPartial = spotMinimum;
+    }
 
     return { ...plan, minPartial, nominatorMinStake, available };
   }

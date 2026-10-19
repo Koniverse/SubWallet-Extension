@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
-import { formatNumber, isSameAddress } from '@subwallet/extension-base/utils';
+import { formatNumber, isSameAddress, readOptional } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
@@ -35,33 +35,38 @@ export interface AlphaTransferParams {
  *   fails `AccountRejectsLockedAlpha` unless the recipient opted in, and `LockHotkeyMismatch` when the
  *   recipient holds a lock on another hotkey on the subnet;
  * - a recipient others already staked into on 128 hotkeys → `TooManyStakingHotkeys`.
+ * A check whose read the runtime no longer has, or that fails, is skipped: the chain still decides.
  */
 export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, netuid, substrateApi, symbol, to }: AlphaTransferParams): Promise<TransactionError[]> {
   const { api } = await substrateApi.isReady;
   const isOtherColdkey = !isSameAddress(from, to);
   const [toggleCodec, priceCodec, availabilityCodec, flagsCodec, recipientLockKeys, recipientHotkeysCodec] = await Promise.all([
-    api.query.subtensorModule.transferToggle(netuid),
-    api.call.swapRuntimeApi.currentAlphaPrice(netuid),
-    api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys?.([from], [netuid]).catch(() => undefined),
-    api.query.subtensorModule.accountFlags?.(to),
-    api.query.subtensorModule.lock?.keys(to, netuid),
-    api.query.subtensorModule.stakingHotkeys(to)
+    readOptional(() => api.query.subtensorModule.transferToggle(netuid)),
+    readOptional(() => api.call.swapRuntimeApi.currentAlphaPrice(netuid)),
+    readOptional(() => api.call.stakeInfoRuntimeApi.getStakeAvailabilityForColdkeys([from], [netuid])),
+    readOptional(() => api.query.subtensorModule.accountFlags(to)),
+    readOptional(() => api.query.subtensorModule.lock.keys(to, netuid)),
+    readOptional(() => api.query.subtensorModule.stakingHotkeys(to))
   ]);
   const value = new BigN(amount);
   const format = (alpha: BigN) => formatNumber(alpha.toFixed(0), decimals);
 
-  if (!toggleCodec.toPrimitive()) {
+  if (toggleCodec && !toggleCodec.toPrimitive()) {
     return [new TransactionError(BasicTxErrorType.UNSUPPORTED, t('bg.BALANCE.services.service.balance.transfer.alpha.transferDisabled', { replace: { symbol } }))];
   }
 
-  // The chain values the stake at spot, with no slippage: price is rao of TAO per alpha
-  const taoPerAlpha = new BigN(priceCodec.toString()).dividedBy(1e9);
-  const minTransfer = new BigN(api.consts.subtensorModule.initialMinTransfer.toString());
+  const minTransferCodec = api.consts.subtensorModule.initialMinTransfer;
 
-  if (value.multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_FLOOR).lt(minTransfer)) {
-    const minimum = taoPerAlpha.gt(0) ? minTransfer.dividedBy(taoPerAlpha).integerValue(BigN.ROUND_CEIL) : undefined;
+  if (priceCodec && minTransferCodec) {
+    // The chain values the stake at spot, with no slippage: price is rao of TAO per alpha
+    const taoPerAlpha = new BigN(priceCodec.toString()).dividedBy(1e9);
+    const minTransfer = new BigN(minTransferCodec.toString());
 
-    return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.amountBelowMinimum', { replace: { minimum: minimum ? format(minimum) : '-', symbol } }))];
+    if (value.multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_FLOOR).lt(minTransfer)) {
+      const minimum = taoPerAlpha.gt(0) ? minTransfer.dividedBy(taoPerAlpha).integerValue(BigN.ROUND_CEIL) : undefined;
+
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.amountBelowMinimum', { replace: { minimum: minimum ? format(minimum) : '-', symbol } }))];
+    }
   }
 
   if (!isOtherColdkey) {
@@ -75,7 +80,7 @@ export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, n
   if (available && value.gt(available)) {
     const acceptsLocked = (Number(flagsCodec?.toPrimitive() ?? 0) & ACCOUNT_FLAGS_ACCEPT_LOCKED_ALPHA) === ACCOUNT_FLAGS_ACCEPT_LOCKED_ALPHA;
 
-    if (!acceptsLocked) {
+    if (flagsCodec && !acceptsLocked) {
       return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.recipientRejectsLocked', { replace: { available: format(available), symbol } }))];
     }
 
@@ -86,7 +91,7 @@ export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, n
     }
   }
 
-  const recipientHotkeys = (recipientHotkeysCodec.toPrimitive() as string[] | null) || [];
+  const recipientHotkeys = (recipientHotkeysCodec?.toPrimitive() as string[] | null) || [];
 
   if (!recipientHotkeys.some((item) => isSameAddress(item, hotkey)) && recipientHotkeys.length >= MAX_THIRD_PARTY_STAKING_HOTKEYS) {
     return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.recipientTooManyValidators'))];

@@ -6,16 +6,18 @@ import BigN from 'bignumber.js';
 /**
  * Each account's alpha by netuid, counting only the stake Earning shows: a hotkey whose stake is worth
  * at least 1 rao of TAO (`parseNominatorMetadataBase`). Unstaking leaves 1 rao behind on a subnet;
- * counted, it shows as a "0" balance that "Show zero balance" cannot hide (EXT-39).
+ * counted, it shows as a "0" balance that "Show zero balance" cannot hide (EXT-39). Without
+ * `taoPerAlpha`, when the runtime gives no prices, every stake counts, as before.
  */
-export const getShownAlphaStakes = (rows: Array<[string, Array<{ netuid: number, stake: string | number }>]>, taoPerAlpha: Record<number, BigN>): Array<Record<number, BigN>> => {
+export const getShownAlphaStakes = (rows: Array<[string, Array<{ netuid: number, stake: string | number }>]>, taoPerAlpha?: Record<number, BigN>): Array<Record<number, BigN>> => {
   return rows.map(([, stakes]) => {
     const byNetuid: Record<number, BigN> = {};
 
     stakes.forEach(({ netuid, stake }) => {
       const value = new BigN(stake);
+      const shown = taoPerAlpha ? new BigN(value.multipliedBy(taoPerAlpha[netuid] || 0).toFixed(0)).gt(0) : value.gt(0);
 
-      if (new BigN(value.multipliedBy(taoPerAlpha[netuid] || 0).toFixed(0)).gt(0)) {
+      if (shown) {
         byNetuid[netuid] = (byNetuid[netuid] || new BigN(0)).plus(value);
       }
     });
@@ -84,4 +86,19 @@ export const getSwapLimitPrice = (originPriceAfter: BigN, destinationPriceAfter:
  */
 export const getPriceImpact = (ideal: BigN, out: BigN): number => {
   return ideal.lte(0) ? 0 : BigN.maximum(ideal.minus(out).dividedBy(ideal), 0).toNumber();
+};
+
+/** `InitialMinStake` (= `DefaultMinStake`) on v478, in rao, for a runtime that no longer exposes the constant */
+export const DEFAULT_MIN_STAKE = '2000000';
+
+/**
+ * A chain read that only refines a check: `undefined` when the runtime no longer has the storage or
+ * runtime API, or the call fails, so the check is skipped and the action goes on as before it existed.
+ */
+export const readOptional = async <T>(read: () => Promise<T> | undefined): Promise<T | undefined> => {
+  try {
+    return await read();
+  } catch (e) {
+    return undefined;
+  }
 };
