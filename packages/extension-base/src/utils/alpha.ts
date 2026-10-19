@@ -110,6 +110,9 @@ export const getPriceImpact = (ideal: BigN, out: BigN): number => {
 /** `InitialMinStake` (= `DefaultMinStake`) on v478, in rao, for a runtime that no longer exposes the constant */
 export const DEFAULT_MIN_STAKE = '2000000';
 
+/** `InitialMinTransfer` on v478, in rao: what a move within a subnet or a transfer must be worth at spot */
+export const DEFAULT_MIN_TRANSFER = '100000';
+
 /**
  * A chain read that only refines a check: `undefined` when the runtime no longer has the storage or
  * runtime API, or the call fails, so the check is skipped and the action goes on as before it existed.

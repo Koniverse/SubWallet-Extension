@@ -5,7 +5,7 @@ import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
 import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapEstimate, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapQuote, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, balanceFormatter, DEFAULT_MIN_STAKE, formatNumber, getSwapLimitPrice, readOptional, SharedRead, toBNString } from '@subwallet/extension-base/utils';
+import { _reformatAddressWithChain, balanceFormatter, DEFAULT_MIN_STAKE, formatMinimum, formatNumber, getSwapLimitPrice, readOptional, SharedRead, toBNString } from '@subwallet/extension-base/utils';
 import { ApiPromise } from 'avail-js-sdk';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
@@ -391,8 +391,9 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     const decimals = _getAssetDecimals(fromAsset);
     const symbol = _getAssetSymbol(fromAsset);
     const format = (value: BigNumber) => formatNumber(value.toFixed(), decimals, balanceFormatter, { maxNumberFormat: decimals || 6 });
-    const number = ['amountBelowMinimum', 'stakeBelowMinimum'].includes(plan.error) ? plan.minLeg : plan.usable;
-    const message = t(`bg.SWAP.services.service.swap.bittensorHandler.${plan.error}`, { replace: { symbol, number: format(number) } });
+    // A minimum is rounded up as shown, a maximum (what is usable) cut down: either way the amount shown works
+    const number = ['amountBelowMinimum', 'stakeBelowMinimum'].includes(plan.error) ? formatMinimum(plan.minLeg, decimals) : format(plan.usable);
+    const message = t(`bg.SWAP.services.service.swap.bittensorHandler.${plan.error}`, { replace: { symbol, number } });
     const errorType = plan.error === 'swapUnavailable'
       ? BasicTxErrorType.UNSUPPORTED
       : ['amountBelowMinimum', 'cannotSplitAmount'].includes(plan.error) ? BasicTxErrorType.INVALID_PARAMS : BasicTxErrorType.NOT_ENOUGH_BALANCE;

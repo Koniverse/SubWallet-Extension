@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BasicTxErrorType } from '@subwallet/extension-base/types';
-import { formatNumber, isSameAddress, readOptional } from '@subwallet/extension-base/utils';
+import { formatMinimum, formatNumber, isSameAddress, readOptional } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 
@@ -64,7 +64,7 @@ export async function validateAlphaTransfer ({ amount, decimals, from, hotkey, n
     if (value.multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_FLOOR).lt(minTransfer)) {
       const minimum = taoPerAlpha.gt(0) ? minTransfer.dividedBy(taoPerAlpha).integerValue(BigN.ROUND_CEIL) : undefined;
 
-      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.amountBelowMinimum', { replace: { minimum: minimum ? format(minimum) : '-', symbol } }))];
+      return [new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.BALANCE.services.service.balance.transfer.alpha.amountBelowMinimum', { replace: { minimum: minimum ? formatMinimum(minimum, decimals) : '-', symbol } }))];
     }
   }
 
