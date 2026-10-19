@@ -117,6 +117,35 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     return slug.startsWith(`${this.slug}__`);
   }
 
+  /**
+   * The pool fee of staking `value` TAO or unstaking `value` alpha, in rao of TAO, as the chain's own
+   * simulation charges it: `FeeRate` on the amount paid in (33 / 65535 ≈ 0.0504% on every mainnet subnet,
+   * 10-19). An unstake pays it in alpha, valued at `rate`. Runtimes without the simulation fall back to the
+   * proxy's fee rate.
+   */
+  private async getPoolFeeInTao (netuid: number, value: BigN, type: ExtrinsicType, rate: BigN): Promise<BigN> {
+    const substrateApi = await this.substrateApi.isReady;
+    const isStake = type === ExtrinsicType.STAKING_BOND;
+
+    try {
+      if (isStake) {
+        const result = (await substrateApi.api.call.swapRuntimeApi.simSwapTaoForAlpha(netuid, value.toFixed(0))).toPrimitive() as { taoFee?: number | string };
+
+        return new BigN(result.taoFee ?? 0);
+      }
+
+      const result = (await substrateApi.api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, value.toFixed(0))).toPrimitive() as { alphaFee?: number | string };
+
+      return new BigN(result.alphaFee ?? 0).multipliedBy(rate).integerValue(BigN.ROUND_FLOOR);
+    } catch (e) {
+      console.error(e);
+
+      const feeRate = await this.bittensorCache.fetchSubnetFeeRate(netuid);
+
+      return (isStake ? value : value.multipliedBy(rate)).multipliedBy(feeRate).integerValue(BigN.ROUND_FLOOR);
+    }
+  }
+
   public override async getEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
@@ -128,8 +157,6 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const value = new BigN(params.value);
     const rate = taoIn.dividedBy(alphaIn);
 
-    const feeRate = await this.bittensorCache.fetchSubnetFeeRate(params.netuid);
-
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
       const newAlphaIn = k.dividedBy(newTaoIn);
@@ -137,12 +164,10 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
       const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
 
-      const bnStakingTaoFee = value.multipliedBy(feeRate);
-
       return {
         slippage: slippage.plus(0.0001).toNumber(),
         rate: rate.toNumber(),
-        stakingTaoFee: bnStakingTaoFee.toString()
+        stakingTaoFee: (await this.getPoolFeeInTao(params.netuid, value, ExtrinsicType.STAKING_BOND, rate)).toFixed(0)
       };
     } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
       const newAlphaIn = alphaIn.plus(value);
@@ -151,13 +176,10 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
       const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
 
-      const taoAmount = value.multipliedBy(rate);
-      const bnStakingTaoFee = taoAmount.multipliedBy(feeRate);
-
       return {
         slippage: slippage.plus(0.0001).toNumber(),
         rate: rate.toNumber(),
-        stakingTaoFee: bnStakingTaoFee.toString()
+        stakingTaoFee: (await this.getPoolFeeInTao(params.netuid, value, ExtrinsicType.STAKING_UNBOND, rate)).toFixed(0)
       };
     }
 
