@@ -1964,6 +1964,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact": "High price impact!",
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning": "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
   "ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning": "Low liquidity. Swap is available but not recommended as swap rate is unfavorable",
+  "ui.TRANSACTION.screen.Transaction.Swap.bittensorQuoteMovedWarning": "Цена изменилась после котировки: этот обмен сейчас вернёт около {{received}} {{symbol}} — меньше {{minimum}} {{symbol}}, которые допускает котировка с вашим проскальзыванием. Продолжить?",
   "ui.TRANSACTION.screen.Transaction.Swap.inputYourRecipientAccount": "Input your recipient account",
   "ui.TRANSACTION.components.Field.FeeEditor.ChooseFeeItem.availableBalanceColon": "Доступные средства:",
   "ui.TRANSACTION.components.Field.FeeEditor.Modal.recommended": "Recommended",

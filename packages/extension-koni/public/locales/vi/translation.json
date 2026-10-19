@@ -1968,6 +1968,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact": "High price impact!",
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning": "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
   "ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning": "Low liquidity. Swap is available but not recommended as swap rate is unfavorable",
+  "ui.TRANSACTION.screen.Transaction.Swap.bittensorQuoteMovedWarning": "Giá đã thay đổi so với báo giá: lệnh swap này giờ chỉ nhận về khoảng {{received}} {{symbol}}, thấp hơn mức {{minimum}} {{symbol}} mà báo giá cho phép theo slippage của bạn. Vẫn tiếp tục?",
   "ui.TRANSACTION.screen.Transaction.Swap.inputYourRecipientAccount": "Input your recipient account",
   "ui.TRANSACTION.components.Field.FeeEditor.ChooseFeeItem.availableBalanceColon": "Số dư khả dụng:",
   "ui.TRANSACTION.components.Field.FeeEditor.Modal.recommended": "Recommended",

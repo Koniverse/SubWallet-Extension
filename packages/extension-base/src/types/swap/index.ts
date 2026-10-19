@@ -232,6 +232,18 @@ export interface BittensorSwapMax {
   usable: string;
 }
 
+export interface RequestBittensorSwapEstimate {
+  fromTokenSlug: string;
+  toTokenSlug: string;
+  /** In the from token's smallest unit */
+  fromAmount: string;
+}
+
+/** What a Bittensor swap returns now by the chain's simulation, in the to token's smallest unit. */
+export interface BittensorSwapEstimate {
+  toAmount: string;
+}
+
 export interface ValidateSwapProcessParams {
   address: string;
   process: CommonOptimalSwapPath;

@@ -4,8 +4,8 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ChainType, ExtrinsicType } from '@subwallet/extension-base/background/KoniTypes';
-import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
-import { _reformatAddressWithChain, balanceFormatter, formatNumber, toBNString } from '@subwallet/extension-base/utils';
+import { BaseStepDetail, BaseSwapStepMetadata, BasicTxErrorType, BittensorSwapEstimate, BittensorSwapMax, CommonOptimalSwapPath, CommonStepFeeInfo, CommonStepType, DynamicSwapType, OptimalSwapPathParamsV2, SwapBaseTxData, SwapProviderId, SwapQuote, SwapStepType, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { _reformatAddressWithChain, balanceFormatter, formatNumber, getSwapLimitPrice, toBNString } from '@subwallet/extension-base/utils';
 import { ApiPromise } from 'avail-js-sdk';
 import BigNumber from 'bignumber.js';
 import { t } from 'i18next';
@@ -16,6 +16,7 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _isNativeTokenBySlug } from '../../chain-service/utils';
+import { SimulatedSubnetTrade, simulateSubnetTrade } from '../../earning-service/handlers/native-staking/bittensor-pool';
 import { TaoStakeInfo } from '../../earning-service/handlers/native-staking/tao';
 import FeeService from '../../fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
@@ -184,13 +185,7 @@ export class BittensorSwapHandler implements SwapBaseInterface {
       return Promise.reject(plan.txError);
     }
 
-    // TAO/ALPHA ratio
-    const priceRatio = new BigNumber(toBNString(quote.rate, _getAssetDecimals(fromAsset)));
-
-    const limitPrice = priceRatio
-      .multipliedBy(new BigNumber(1).minus(params.slippage))
-      .integerValue(BigNumber.ROUND_DOWN)
-      .toFixed();
+    const limitPrice = (await this.getSwapLimitPrice(substrateApi.api, fromNetuid, toNetuid, quote, params.slippage, fromAsset)).toFixed();
 
     const calls = plan.legs.map((leg) => substrateApi.api.tx.subtensorModule.swapStakeLimit(
       leg.hotkey,
@@ -279,6 +274,56 @@ export class BittensorSwapHandler implements SwapBaseInterface {
     const result = (await api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, alpha.toFixed(0))).toPrimitive() as { taoAmount?: number | string };
 
     return new BigNumber(result.taoAmount ?? 0);
+  }
+
+  /**
+   * The whole swap through the chain's own simulation: sell on the origin pool, buy on the destination
+   * pool, root priced 1:1 and without a pool. `received` is what it returns, in the destination's unit.
+   */
+  private async simulateSwap (api: ApiPromise, fromNetuid: number, toNetuid: number, amount: BigNumber): Promise<{ origin?: SimulatedSubnetTrade, destination?: SimulatedSubnetTrade, received: BigNumber }> {
+    const origin = fromNetuid === 0 ? undefined : await simulateSubnetTrade(api, fromNetuid, amount, false);
+    const taoBetween = origin ? origin.out : amount;
+    const destination = toNetuid === 0 ? undefined : await simulateSubnetTrade(api, toNetuid, taoBetween, true);
+
+    return { origin, destination, received: destination ? destination.out : taoBetween };
+  }
+
+  /**
+   * The `swap_stake_limit` limit (EXT-29): the origin-to-destination price ratio once the whole amount has
+   * gone through both pools, less the slippage setting. Every leg moves the same pools, so the last one is
+   * checked at about that ratio. Taking the quote's average rate instead left only the setting less the
+   * swap's own impact for other trades. Falls back to the quote's rate without the chain's simulation.
+   */
+  private async getSwapLimitPrice (api: ApiPromise, fromNetuid: number, toNetuid: number, quote: SwapQuote, slippage: number, fromAsset: _ChainAsset): Promise<BigNumber> {
+    try {
+      const { destination, origin } = await this.simulateSwap(api, fromNetuid, toNetuid, new BigNumber(quote.fromAmount));
+
+      return getSwapLimitPrice(origin?.priceAfter ?? new BigNumber(1), destination?.priceAfter ?? new BigNumber(1), slippage);
+    } catch (e) {
+      console.error(e);
+
+      // TAO/ALPHA ratio
+      return new BigNumber(toBNString(quote.rate, _getAssetDecimals(fromAsset))).multipliedBy(new BigNumber(1).minus(slippage)).integerValue(BigNumber.ROUND_DOWN);
+    }
+  }
+
+  /**
+   * What swapping `amount` of `fromAsset` into `toAsset` returns now, by the chain's simulation. The limit
+   * follows the chain, so a quote that overstates the return (alpha → alpha leaves out the buy leg, BE-16)
+   * would go through at the real price: the Swap screen compares the two and asks before submitting.
+   */
+  public async getSwapEstimate (fromAsset: _ChainAsset, toAsset: _ChainAsset, amount: string): Promise<BittensorSwapEstimate> {
+    const fromNetuid = this.getNetuid(fromAsset);
+    const toNetuid = this.getNetuid(toAsset);
+
+    if (fromNetuid == null || toNetuid == null || fromNetuid === toNetuid) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    const substrateApi = await this.chainService.getSubstrateApi(fromAsset.originChain).isReady;
+    const { received } = await this.simulateSwap(substrateApi.api, fromNetuid, toNetuid, new BigNumber(amount));
+
+    return { toAmount: received.toFixed(0) };
   }
 
   private getNetuid (asset: _ChainAsset): number | undefined {

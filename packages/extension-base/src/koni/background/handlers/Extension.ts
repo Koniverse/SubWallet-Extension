@@ -73,7 +73,7 @@ import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTran
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, PendingMultisigTxRequest, PrepareMultisigSignRequest, PrepareMultisigSignResponse, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, MarkAllReadParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
-import { BittensorSwapMax, RequestBittensorSwapMax, SwapPair, SwapQuoteResponse, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { BittensorSwapEstimate, BittensorSwapMax, RequestBittensorSwapEstimate, RequestBittensorSwapMax, SwapPair, SwapQuoteResponse, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountJsonByAddress, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -5613,6 +5613,10 @@ export default class KoniExtension {
     return this.#koniState.swapService.getBittensorSwapMax(request);
   }
 
+  private async getBittensorSwapEstimate (request: RequestBittensorSwapEstimate): Promise<BittensorSwapEstimate> {
+    return this.#koniState.swapService.getBittensorSwapEstimate(request);
+  }
+
   private async handleSwapStep (inputData: SwapSubmitParams): Promise<SWTransactionResponse> {
     const { address, errorOnTimeOut, isPassConfirmation, onSend, process, processId, quote, recipient } = inputData;
     let step: BriefProcessStep | undefined;
@@ -6935,6 +6939,8 @@ export default class KoniExtension {
         return this.validateSwapProcess(request as ValidateSwapProcessParams);
       case 'pri(swapService.getBittensorSwapMax)':
         return this.getBittensorSwapMax(request as RequestBittensorSwapMax);
+      case 'pri(swapService.getBittensorSwapEstimate)':
+        return this.getBittensorSwapEstimate(request as RequestBittensorSwapEstimate);
       case 'pri(swapService.handleSwapStep)':
         return this.handleSwapStep(request as SwapSubmitParams);
         /* Swap service */

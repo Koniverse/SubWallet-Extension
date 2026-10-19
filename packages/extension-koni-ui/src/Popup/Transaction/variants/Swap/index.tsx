@@ -24,14 +24,14 @@ import { DataContext } from '@subwallet/extension-koni-ui/contexts/DataContext';
 import { useChainConnection, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useGetAccountTokenBalance, useGetBalance, useHandleSubmitMultiTransaction, useNotification, useOneSignProcess, usePreCheckAction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import { ChainAndExcludedTokenInfo } from '@subwallet/extension-koni-ui/hooks/chain/useCreateGetChainAndExcludedTokenByAccountProxy';
 import { submitProcess } from '@subwallet/extension-koni-ui/messaging';
-import { getBittensorSwapMax, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
+import { getBittensorSwapEstimate, getBittensorSwapMax, handleSwapRequestV2, handleSwapStep, validateSwapProcess } from '@subwallet/extension-koni-ui/messaging/transaction/swap';
 import { FreeBalance, TransactionContent, TransactionFooter } from '@subwallet/extension-koni-ui/Popup/Transaction/parts';
 import EmptySwapPairs from '@subwallet/extension-koni-ui/Popup/Transaction/variants/Swap/EmptySwapPairs';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, FormCallbacks, FormFieldData, SwapParams, ThemeProps, TokenBalanceItemType } from '@subwallet/extension-koni-ui/types';
 import { TokenSelectorItemType } from '@subwallet/extension-koni-ui/types/field';
-import { convertFieldToObject, findAccountByAddress, getAssetDisplayName, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, findAccountByAddress, formatBalance, getAssetDisplayName, isAccountAll, SortableTokenItem, sortTokensByBalanceInSelector } from '@subwallet/extension-koni-ui/utils';
 import { Button, Form, Icon, ModalContext } from '@subwallet/react-ui';
 import subwalletApiSdk from '@subwallet-monorepos/subwallet-services-sdk';
 import BigN from 'bignumber.js';
@@ -740,34 +740,88 @@ const Component = ({ allowedChainAndExcludedTokenForTargetAccountProxy, defaultS
       }, 300);
     };
 
-    if (currentQuote.isLowLiquidity) {
-      const metadata = currentQuote.metadata as KyberSwapQuoteMetadata;
-      const isHighPriceImpact = metadata?.priceImpact;
+    const confirmLowLiquidity = () => {
+      if (currentQuote.isLowLiquidity) {
+        const metadata = currentQuote.metadata as KyberSwapQuoteMetadata;
+        const isHighPriceImpact = metadata?.priceImpact;
 
-      openAlert({
-        title: isHighPriceImpact ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact') : t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
-        type: NotificationType.WARNING,
-        content: isHighPriceImpact && metadata.priceImpact
-          ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning', { replace: { priceImpact: metadata.priceImpact } })
-          : t('ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning'),
-        okButton: {
-          text: t('ui.TRANSACTION.screen.Transaction.Swap.continue'),
-          onClick: () => {
-            closeAlert();
-            transactionBlockProcess();
+        openAlert({
+          title: isHighPriceImpact ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact') : t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
+          type: NotificationType.WARNING,
+          content: isHighPriceImpact && metadata.priceImpact
+            ? t('ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning', { replace: { priceImpact: metadata.priceImpact } })
+            : t('ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning'),
+          okButton: {
+            text: t('ui.TRANSACTION.screen.Transaction.Swap.continue'),
+            onClick: () => {
+              closeAlert();
+              transactionBlockProcess();
+            },
+            icon: CheckCircle
           },
-          icon: CheckCircle
-        },
-        cancelButton: {
-          text: t('ui.TRANSACTION.screen.Transaction.Swap.cancel'),
-          schema: 'secondary',
-          onClick: closeAlert
-        }
-      });
-    } else {
-      transactionBlockProcess();
+          cancelButton: {
+            text: t('ui.TRANSACTION.screen.Transaction.Swap.cancel'),
+            schema: 'secondary',
+            onClick: closeAlert
+          }
+        });
+      } else {
+        transactionBlockProcess();
+      }
+    };
+
+    // Bittensor: the limit follows the chain, so a quote that overstates the return would go through at the
+    // real price — ask first when the chain returns less than the quote allows with the slippage (EXT-29)
+    if (!isBittensorStakedSwap) {
+      confirmLowLiquidity();
+
+      return;
     }
-  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, targetAccountProxy.accountType]);
+
+    setSubmitLoading(true);
+
+    getBittensorSwapEstimate({ fromTokenSlug: currentQuote.pair.from, toTokenSlug: currentQuote.pair.to, fromAmount: currentQuote.fromAmount })
+      .then(({ toAmount }) => {
+        // Before the alert or the submit, which sets it again
+        setSubmitLoading(false);
+
+        const minimum = new BigN(currentQuote.toAmount).multipliedBy(1 - slippage).integerValue(BigN.ROUND_DOWN);
+
+        if (new BigN(toAmount).gte(minimum)) {
+          confirmLowLiquidity();
+
+          return;
+        }
+
+        const decimals = toAssetInfo?.decimals || 0;
+
+        openAlert({
+          title: t('ui.TRANSACTION.screen.Transaction.Swap.payAttentionExclamation'),
+          type: NotificationType.WARNING,
+          content: t('ui.TRANSACTION.screen.Transaction.Swap.bittensorQuoteMovedWarning', {
+            replace: { received: formatBalance(toAmount, decimals), minimum: formatBalance(minimum, decimals), symbol: toAssetInfo?.symbol || '' }
+          }),
+          okButton: {
+            text: t('ui.TRANSACTION.screen.Transaction.Swap.continue'),
+            onClick: () => {
+              closeAlert();
+              confirmLowLiquidity();
+            },
+            icon: CheckCircle
+          },
+          cancelButton: {
+            text: t('ui.TRANSACTION.screen.Transaction.Swap.cancel'),
+            schema: 'secondary',
+            onClick: closeAlert
+          }
+        });
+      })
+      // Without the chain's simulation, as before
+      .catch(() => {
+        setSubmitLoading(false);
+        confirmLowLiquidity();
+      });
+  }, [ErrorMessageMap.NoQuote, accounts, chainValue, checkChainConnected, closeAlert, currentOptimalSwapPath, currentQuote, customSwapErrorMessage, isBittensorStakedSwap, isChainConnected, notify, notifyErrorMessage, onError, onSuccess, oneSign, openAlert, processState.currentStep, processState.processId, processState.steps.length, slippage, swapError, t, targetAccountProxy.accountType, toAssetInfo?.decimals, toAssetInfo?.symbol]);
 
   const onAfterConfirmTermModal = useCallback(() => {
     return setConfirmedTerm('swap-term-confirmed');

@@ -1938,6 +1938,7 @@
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpact": "High price impact!",
   "ui.TRANSACTION.screen.Transaction.Swap.highPriceImpactWarning": "Swapping this amount will result in a -{{priceImpact}}% price impact, and you will receive less than expected. Lower amount and try again, or continue at your own risk",
   "ui.TRANSACTION.screen.Transaction.Swap.lowLiquidityWarning": "Low liquidity. Swap is available but not recommended as swap rate is unfavorable",
+  "ui.TRANSACTION.screen.Transaction.Swap.bittensorQuoteMovedWarning": "The price has moved since the quote: this swap would now return about {{received}} {{symbol}}, less than the {{minimum}} {{symbol}} the quote allows with your slippage. Continue anyway?",
   "ui.TRANSACTION.screen.Transaction.Swap.inputYourRecipientAccount": "Input your recipient account",
   "ui.TRANSACTION.components.Field.FeeEditor.ChooseFeeItem.availableBalanceColon": "Available balance:",
   "ui.TRANSACTION.components.Field.FeeEditor.Modal.recommended": "Recommended",

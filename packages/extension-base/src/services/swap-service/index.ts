@@ -17,7 +17,7 @@ import { ChainflipSwapHandler } from '@subwallet/extension-base/services/swap-se
 import { HydradxHandler } from '@subwallet/extension-base/services/swap-service/handler/hydradx-handler';
 import { OptimexHandler } from '@subwallet/extension-base/services/swap-service/handler/optimex-handler';
 import { getSwapAltToken, getTokenPairFromStep, processStepsToPathActions, SWAP_QUOTE_TIMEOUT_MAP } from '@subwallet/extension-base/services/swap-service/utils';
-import { BasicTxErrorType, BittensorSwapMax, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, RequestBittensorSwapMax, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, BittensorSwapEstimate, BittensorSwapMax, DynamicSwapAction, DynamicSwapType, OptimalSwapPathParamsV2, RequestBittensorSwapEstimate, RequestBittensorSwapMax, SwapRequestV2, ValidateSwapProcessParams } from '@subwallet/extension-base/types';
 import { CommonOptimalSwapPath, DEFAULT_FIRST_STEP, MOCK_STEP_FEE } from '@subwallet/extension-base/types/service-base';
 import { _SUPPORTED_SWAP_PROVIDERS, ProcessedQuoteAskResponse, SwapErrorType, SwapPair, SwapProviderId, SwapQuote, SwapQuoteResponse, SwapRequestResult, SwapStepType, SwapSubmitParams, SwapSubmitStepData } from '@subwallet/extension-base/types/swap';
 import { _reformatAddressWithChain, createPromiseHandler, PromiseHandler } from '@subwallet/extension-base/utils';
@@ -444,6 +444,20 @@ export class SwapService implements StoppableServiceInterface {
     }
 
     return handler.getSwapMax(address, asset);
+  }
+
+  /** What a Bittensor swap returns now by the chain's simulation, for the Swap screen to compare with the quote (EXT-29). */
+  public async getBittensorSwapEstimate ({ fromAmount, fromTokenSlug, toTokenSlug }: RequestBittensorSwapEstimate): Promise<BittensorSwapEstimate> {
+    const fromAsset = this.chainService.getAssetBySlug(fromTokenSlug);
+    const toAsset = this.chainService.getAssetBySlug(toTokenSlug);
+    const providerId = fromAsset?.originChain === 'bittensor_testnet' ? SwapProviderId.BITTENSOR_TESTNET : SwapProviderId.BITTENSOR;
+    const handler = this.handlers[providerId];
+
+    if (!fromAsset || !toAsset || !_BALANCE_CHAIN_GROUP.bittensor.includes(fromAsset.originChain) || !(handler instanceof BittensorSwapHandler)) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    return handler.getSwapEstimate(fromAsset, toAsset, fromAmount);
   }
 
   public async validateSwapProcessV2 (params: ValidateSwapProcessParams): Promise<TransactionError[]> {
