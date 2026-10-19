@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { fetchFromProxyService, formatNumber, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
+import { fetchFromProxyService, formatNumber, getStakeLimitPrice, isSameAddress, reformatAddress } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -23,6 +23,7 @@ import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { fetchPoolsData } from '../../service';
+import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, planRootClaim, RootClaimPlan, RootClaimPreview } from './bittensor-root-claim-plan';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
@@ -826,6 +827,28 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   /* Join pool action */
 
+  /**
+   * The limit price of a stake (`isStake`) or an unstake of `amount` on `netuid`, in rao per alpha: the pool
+   * price once the trade fills, with `slippage` left for other trades (EXT-6). Root sells 1:1. Without the
+   * chain's simulation it falls back to spot.
+   */
+  protected async getLimitPrice (netuid: number, amount: BigN, slippage: number, isStake: boolean): Promise<BigN> {
+    if (netuid !== 0) {
+      try {
+        const { api } = await this.substrateApi.isReady;
+        const { priceAfter } = await simulateSubnetTrade(api, netuid, amount, isStake);
+
+        return getStakeLimitPrice(priceAfter, slippage, isStake);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
+
+    return getStakeLimitPrice(alphaToTaoPrice, slippage, isStake);
+  }
+
   override async createJoinExtrinsic (
     data: SubmitJoinNativeStaking,
     positionInfo?: YieldPositionInfo,
@@ -840,13 +863,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const netuid = subnetData?.netuid ?? 0;
     const slippage = subnetData?.slippage ?? DEFAULT_BITTENSOR_SLIPPAGE;
-
-    const alphaToTaoPrice = new BigN(await getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()));
-    const limitPrice = alphaToTaoPrice
-      .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
-      .multipliedBy(1 + slippage);
-
-    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
+    const BNlimitPrice = await this.getLimitPrice(netuid, binaryAmount, slippage, true);
 
     const extrinsic = chainApi.api.tx.subtensorModule.addStakeLimit(
       hotkey,
@@ -938,17 +955,12 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const binaryAmount = new BigN(amount);
 
-    // Validation already checked the minimum: only whether this is a full exit is needed here
-    const [rate, { fullExit }] = await Promise.all([
-      getAlphaToTaoRate(this.substrateApi, netuid, this.getAlphaPriceScaleDecimals()),
+    // Validation already checked the minimum: only whether this is a full exit is needed here. The limit
+    // prices `amount`: what accrues between the read and the block is too little to move it
+    const [BNlimitPrice, { fullExit }] = await Promise.all([
+      this.getLimitPrice(netuid, binaryAmount, slippage, false),
       this.getUnstakeDetail(address, selectedTarget, netuid, amount, false, unstakeAll)
     ]);
-    const alphaToTaoPrice = new BigN(rate);
-    const limitPrice = alphaToTaoPrice
-      .multipliedBy(10 ** _getAssetDecimals(this.nativeToken))
-      .multipliedBy(1 - slippage);
-
-    const BNlimitPrice = new BigN(limitPrice.integerValue(BigN.ROUND_CEIL).toFixed());
 
     // A full exit unstakes what is there when the block runs: rewards keep accruing after the amount was read
     if (fullExit && apiPromise.api.tx.subtensorModule.removeStakeFullLimit) {

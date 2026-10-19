@@ -7,11 +7,12 @@ import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subw
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { reformatAddress } from '@subwallet/extension-base/utils';
+import { getPriceImpact, reformatAddress } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN_ZERO } from '@polkadot/util';
 
+import { simulateSubnetTrade } from './bittensor-pool';
 import TaoNativeStakingPoolHandler, { DEFAULT_DTAO_MINBOND, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
@@ -118,35 +119,47 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
   }
 
   /**
-   * The pool fee of staking `value` TAO or unstaking `value` alpha, in rao of TAO, as the chain's own
-   * simulation charges it: `FeeRate` on the amount paid in (33 / 65535 ≈ 0.0504% on every mainnet subnet,
-   * 10-19). An unstake pays it in alpha, valued at `rate`. Runtimes without the simulation fall back to the
-   * proxy's fee rate.
+   * Preview of staking `value` TAO or unstaking `value` alpha (EXT-5): price impact and pool fee from the
+   * chain's own simulation, the rate at spot, no fudge. The impact leaves the fee out; the limit price
+   * leaves the slippage setting for other trades (EXT-6), so a trade whose impact is within it goes
+   * through. Runtimes without the simulation fall back to the x·y=k estimate.
    */
-  private async getPoolFeeInTao (netuid: number, value: BigN, type: ExtrinsicType, rate: BigN): Promise<BigN> {
-    const substrateApi = await this.substrateApi.isReady;
-    const isStake = type === ExtrinsicType.STAKING_BOND;
+  public override async getEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
+    const isStake = params.type === ExtrinsicType.STAKING_BOND;
+
+    if (!isStake && params.type !== ExtrinsicType.STAKING_UNBOND) {
+      return { slippage: 0, rate: 1 };
+    }
+
+    const input = new BigN(params.value || 0);
+    const value = input.isFinite() && input.gt(0) ? input : new BigN(0);
 
     try {
-      if (isStake) {
-        const result = (await substrateApi.api.call.swapRuntimeApi.simSwapTaoForAlpha(netuid, value.toFixed(0))).toPrimitive() as { taoFee?: number | string };
+      const { api } = await this.substrateApi.isReady;
+      const { fee, out, spot } = await simulateSubnetTrade(api, params.netuid, value, isStake);
 
-        return new BigN(result.taoFee ?? 0);
+      if (spot.lte(0)) {
+        throw new Error(`Subnet ${params.netuid} has no price`);
       }
 
-      const result = (await substrateApi.api.call.swapRuntimeApi.simSwapAlphaForTao(netuid, value.toFixed(0))).toPrimitive() as { alphaFee?: number | string };
+      // What the input less its fee would fetch at spot
+      const ideal = isStake ? value.minus(fee).dividedBy(spot) : value.minus(fee).multipliedBy(spot);
 
-      return new BigN(result.alphaFee ?? 0).multipliedBy(rate).integerValue(BigN.ROUND_FLOOR);
+      return {
+        slippage: getPriceImpact(ideal, out),
+        rate: spot.toNumber(),
+        // An unstake pays the fee in alpha
+        stakingTaoFee: (isStake ? fee : fee.multipliedBy(spot)).integerValue(BigN.ROUND_FLOOR).toFixed(0)
+      };
     } catch (e) {
       console.error(e);
 
-      const feeRate = await this.bittensorCache.fetchSubnetFeeRate(netuid);
-
-      return (isStake ? value : value.multipliedBy(rate)).multipliedBy(feeRate).integerValue(BigN.ROUND_FLOOR);
+      return this.estimateEarningImpact(params);
     }
   }
 
-  public override async getEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
+  /** The x·y=k preview, with the proxy's fee rate: only for runtimes without the chain's simulation. */
+  private async estimateEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
 
@@ -157,6 +170,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const value = new BigN(params.value);
     const rate = taoIn.dividedBy(alphaIn);
 
+    const feeRate = await this.bittensorCache.fetchSubnetFeeRate(params.netuid);
+
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
       const newAlphaIn = k.dividedBy(newTaoIn);
@@ -164,28 +179,28 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const alphaIdeal = value.multipliedBy(alphaIn).dividedBy(taoIn);
       const slippage = alphaIdeal.minus(alphaReturned).dividedBy(alphaIdeal);
 
-      return {
-        slippage: slippage.plus(0.0001).toNumber(),
-        rate: rate.toNumber(),
-        stakingTaoFee: (await this.getPoolFeeInTao(params.netuid, value, ExtrinsicType.STAKING_BOND, rate)).toFixed(0)
-      };
-    } else if (params.type === ExtrinsicType.STAKING_UNBOND) {
-      const newAlphaIn = alphaIn.plus(value);
-      const newTaoReserve = k.dividedBy(newAlphaIn);
-      const taoReturned = taoIn.minus(newTaoReserve);
-      const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
-      const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
+      const bnStakingTaoFee = value.multipliedBy(feeRate);
 
       return {
         slippage: slippage.plus(0.0001).toNumber(),
         rate: rate.toNumber(),
-        stakingTaoFee: (await this.getPoolFeeInTao(params.netuid, value, ExtrinsicType.STAKING_UNBOND, rate)).toFixed(0)
+        stakingTaoFee: bnStakingTaoFee.toString()
       };
     }
 
+    const newAlphaIn = alphaIn.plus(value);
+    const newTaoReserve = k.dividedBy(newAlphaIn);
+    const taoReturned = taoIn.minus(newTaoReserve);
+    const taoIdeal = value.multipliedBy(taoIn).dividedBy(alphaIn);
+    const slippage = taoIdeal.minus(taoReturned).dividedBy(taoIdeal);
+
+    const taoAmount = value.multipliedBy(rate);
+    const bnStakingTaoFee = taoAmount.multipliedBy(feeRate);
+
     return {
-      slippage: 0,
-      rate: 1
+      slippage: slippage.plus(0.0001).toNumber(),
+      rate: rate.toNumber(),
+      stakingTaoFee: bnStakingTaoFee.toString()
     };
   }
 
