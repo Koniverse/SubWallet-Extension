@@ -240,7 +240,9 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     });
   }, [bondedValue, decimals, notify, symbol, t]);
 
-  const { earningRate, stakingFee } = useTaoStakingFee(
+  // Only the alpha → TAO rate is used: a move between validators on one subnet swaps nothing and charges no
+  // staking fee (`transfer_stake_within_subnet`, EXT-25), whatever an unstake of the same amount would cost
+  const { earningRate } = useTaoStakingFee(
     poolInfo,
     value || bondedValue,
     decimals,
@@ -274,8 +276,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
-            slippage: 0,
-            stakingFee
+            slippage: 0
           }
         })
       };
@@ -323,7 +324,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, stakingFee, symbol, t]
+    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
