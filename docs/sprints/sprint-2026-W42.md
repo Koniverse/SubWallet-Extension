@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W42
-status: in-progress
+status: closed
 start: 2026-10-12
 end: 2026-10-18
 goal: "Ship v1.3.91. Its release note (10-09) names two items — #5093's multisig notification fix and the ChainList #710 maintenance — and both are QC'd and closed on the tracker, but on day one neither is merged into the Extension: PR #5095 has sat approved since 09-28, and PR #5096 still pins a PR build of chain-list and still comments out fetchLatestChainData(). ChainList PR #713 merged this morning and chain-list 0.2.132 is on npm, so #5096 now has a release to re-pin to. The tester's gate, US-42.31, opened day one and cannot start until both merge. 13 points: US-18.5 carried at 5, US-42.31 at 8."
@@ -10,9 +10,9 @@ goal: "Ship v1.3.91. Its release note (10-09) names two items — #5093's multis
 
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095 approved 09-28, not merged | ← W40 via W41 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
+| [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095 approved 09-28, not merged → W43 | ← W40 via W41 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🟡 ready — waits on the merges | new | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113) open 10-16: Swap, root claim, alpha in Assets, on-chain alpha price (5 commits), review requested | new 10-16 (mid-sprint) | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113): 6 commits, CI green, no review → W43 | new 10-16 (mid-sprint) | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block | ← W40 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W39 | — |
 
@@ -22,6 +22,45 @@ window (set by the tester), and US-18.5 was moved here at W40's closeout.
 **10-16: 26 points, three stories.** [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md)
 (#5112, 13 points) joined mid-sprint: the issue was assigned to `tunghp2002` and moved to In Progress on
 the board. Not part of v1.3.91 — the goal above is unchanged.
+
+## Closeout — 2026-10-19
+
+Window ended **2026-10-18**; closed the next day, from `gh`, git and the notes. The board still could
+not be read. Every story's `sprint:` field was re-read: **three name `sprint-2026-W42`** — US-18.5,
+US-42.31, US-12.24 — the same three as the table; none names W43.
+
+### 0 of 3 stories · 0 of 26 points
+
+| Outcome | Stories | Pts |
+| --- | --- | --- |
+| **→ [W43](sprint-2026-W43.md)** | US-18.5 — `review`: [PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095) approved 09-28 on `f836222c51`; its head since 10-13, `448dae55f5` (R-1 – R-4 fixed), has no approval; not merged | 5 |
+| **→ [W43](sprint-2026-W43.md)** | US-12.24 — `in-progress`: [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 6 commits, CI green 10-16, no review | 13 |
+| **Listed in W43, not moved** | US-42.31 — `ready`: waits on #5095 and #5096. The tester set its window; rows the tester places are listed, never moved | 8 |
+
+**v1.3.91 did not ship.** Nothing merged into `subwallet-dev` after PR #5110 (chain-list `0.2.132`
+stable, 10-12 10:30 UTC, `c5c9668715`). [PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095) still carries only the 09-28 approval, on a
+commit that is no longer its head; [PR #5096](https://github.com/Koniverse/SubWallet-Extension/pull/5096) has not changed since 10-09 — still the PR-build pin,
+still the TEMP block that comments out `fetchLatestChainData()`. So the gate US-42.31 never started,
+and there is no v1.3.91 tag: v1.3.90 is still the latest release.
+
+**The dev work went into the TAO & subnets push.** Research 10-12 → 10-15
+([tracker](../notes/2026-10-12.md#g-research--push-tao--subnets-bittensor)), issue
+[#5112](https://github.com/Koniverse/SubWallet-Extension/issues/5112) on 10-15, story
+[US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) on 10-16, and [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113) the same
+day — six commits by 11:52 UTC, CI green. Not reviewed, body empty, and it touches `evm.ts`, which
+[PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001) rewrites.
+
+## What happened in the window
+
+| Date | Event |
+| --- | --- |
+| 10-12 | W40 and W41 closed. ChainList PR #713 merged 07:48 UTC (saltict, no review); `@subwallet/chain-list` `0.2.132` published 07:57. Extension PR #5110 (chain-list `0.2.132` stable) merged into `subwallet-dev` 10:30 — **the window's only merge** |
+| 10-12 | The TAO & subnets research opens — [2026-10-12 §G](../notes/2026-10-12.md#g-research--push-tao--subnets-bittensor) |
+| 10-13 | [PR #5095](https://github.com/Koniverse/SubWallet-Extension/pull/5095): `subwallet-dev` merged in (`ec99c4c69e`), review fix `448dae55f5` (R-1 – R-4), CI green ([note](../notes/2026-10-13.md)). The 09-28 approval stays on `f836222c51` |
+| 10-13 | [#5111](https://github.com/Koniverse/SubWallet-Extension/issues/5111) — external (`junkerderprovinz`): the Firefox add-on on addons.mozilla.org is stuck at **1.2.32** (October 2024); asks whether an update waits on the MV3 work (#4115, #4206) and offers to test. Open, no response. **No doc home yet** — the nearest story is [US-1.5](stories/US-1.5-build-ci-and-cross-browser-packaging-hardening.md) (Firefox MV3 build, #4115); owner call |
+| 10-15 | [ChainList #715](https://github.com/Koniverse/SubWallet-ChainList/issues/715) — external integration request (Coalichain Testnet). Open, no response; not scoped |
+| 10-15 | [#5112](https://github.com/Koniverse/SubWallet-Extension/issues/5112) opened — the TAO & subnets tasks |
+| 10-16 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) written for #5112; assigned to `tunghp2002`, In Progress on the board, joins this window. [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113) opened 05:19 UTC; six commits by 11:52 |
 
 ## v1.3.91 — what stands between the release note and a release
 

@@ -1,7 +1,7 @@
 # Sprint Status
 
 > **AUTO-GENERATED** by `koni-docs status`. Do not hand-edit (RULE-5).
-> Last generated: 2026-10-16 05:16:55 UTC
+> Last generated: 2026-10-19 02:20:52 UTC
 > Total stories: 337
 
 ## 📋 Backlog (71)
@@ -95,7 +95,7 @@
 | ID | Title | Epic | Pri | Points | Sprint | Assignee |
 |---|---|---|---|---|---|---|
 | US-10.11 | WalletConnect session & dashboard hardening | EPIC-10 | P1 | 3 | sprint-2026-W33 | Thiendekaco |
-| US-12.24 | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | EPIC-12 | P1 | 13 | sprint-2026-W42 | tunghp2002 |
+| US-12.24 | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | EPIC-12 | P1 | 13 | sprint-2026-W43 | tunghp2002 |
 | US-13.11 | XCM & bridge reliability hardening (runtime-upgrade & ParaSpell-version) | EPIC-13 | P2 | 5 | sprint-2026-W33 | bluezdot |
 | US-15.4 | OpenGov Phase 2: delegation & tracks | EPIC-15 | P2 | 5 | sprint-2026-W31 | frenkie-ng |
 | US-19.9 | Notification reliability & spam control (improvement on US-19.8) | EPIC-19 | P3 | 1 | sprint-2026-W31 | bluezdot |
@@ -112,7 +112,7 @@
 |---|---|---|---|---|---|---|
 | US-10.9 | dApp createTransaction API (RFC #6213) | EPIC-10 | P1 | 3 | sprint-2026-W31 | Thiendekaco |
 | US-12.11 | Trusted Stake (alpha index) | EPIC-12 | P3 | 5 | sprint-2026-W33 | tunghp2002 |
-| US-18.5 | Multisig approval notification reliability & status lifecycle | EPIC-18 | P2 | 5 | sprint-2026-W42 | tunghp2002 |
+| US-18.5 | Multisig approval notification reliability & status lifecycle | EPIC-18 | P2 | 5 | sprint-2026-W43 | tunghp2002 |
 | US-20.4 | Many-account submit performance | EPIC-20 | P1 | 5 | sprint-2026-W33 | tunghp2002 |
 | US-4.21 | Asset Hub migration hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
 | US-4.22 | RPC & endpoint-management hardening | EPIC-4 | P1 | 3 | sprint-2026-W33 | frenkie-ng |
