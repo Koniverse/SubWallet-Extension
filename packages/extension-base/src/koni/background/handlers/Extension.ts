@@ -1577,7 +1577,8 @@ export default class KoniExtension {
           to,
           transferAll: !!transferAll,
           value: txVal,
-          network: network });
+          network: network,
+          forceRefreshProtectedUtxos: true });
 
         if (calculatedBitcoinFeeRate) {
           const feeRate = parseFloat(calculatedBitcoinFeeRate);
@@ -2016,7 +2017,8 @@ export default class KoniExtension {
           to,
           transferAll: transferAll,
           value: txVal,
-          network: network });
+          network: network,
+          forceRefreshProtectedUtxos: true });
 
         if (calculatedBitcoinFeeRate) {
           const feeRate = parseFloat(calculatedBitcoinFeeRate);
@@ -2526,7 +2528,9 @@ export default class KoniExtension {
         const _feeCustom = feeCustom as BitcoinFeeRate;
         const combineFee = combineBitcoinFee(_fee, _feeOptions, _feeCustom);
         const bitcoinApi = this.#koniState.chainService.getBitcoinApi(chain);
-        let utxos = await getTransferableBitcoinUtxos(bitcoinApi, address);
+        let utxos = await getTransferableBitcoinUtxos(bitcoinApi, address, {
+          forceRefreshProtectedUtxos: true
+        });
 
         const recipients = [address, to || address];
 

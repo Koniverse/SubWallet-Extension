@@ -284,7 +284,8 @@ export class OptimexHandler implements SwapBaseInterface {
           to: depositAddress,
           transferAll: false,
           value: params.request.fromAmount,
-          network
+          network,
+          forceRefreshProtectedUtxos: true
         });
 
         const feeCombine = combineBitcoinFee(feeInfo as BitcoinFeeInfo, undefined, undefined); // todo: recheck when implement custom fee
@@ -453,7 +454,8 @@ export class OptimexHandler implements SwapBaseInterface {
         to: depositAddress,
         transferAll: false,
         value: quote.fromAmount,
-        network
+        network,
+        forceRefreshProtectedUtxos: true
       });
 
       extrinsic = transaction;

@@ -228,7 +228,8 @@ export class ChainflipSwapHandler implements SwapBaseInterface {
         to: depositAddress,
         transferAll: false,
         value: quote.fromAmount,
-        network
+        network,
+        forceRefreshProtectedUtxos: true
       });
 
       extrinsic = transaction;
