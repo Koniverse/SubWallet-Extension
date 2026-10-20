@@ -1509,6 +1509,7 @@
   "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.joinNow": "Join now",
   "ui.SETTINGS.screen.Setting.MissionPool.Item.rewards": "Rewards",
   "ui.EARNING.screen.EarningPositionDetail.RewardInfo.rewards": "Rewards",
+  "ui.EARNING.screen.EarningPositionDetail.RewardInfo.subnetRewardsCompound": "エポックごとに自動でステークに加算されます",
   "ui.SETTINGS.screen.Setting.MissionPool.all": "All",
   "ui.SETTINGS.screen.Setting.Notifications.all": "All",
   "ui.SETTINGS.screen.Setting.MissionPool.defi": "Defi",
