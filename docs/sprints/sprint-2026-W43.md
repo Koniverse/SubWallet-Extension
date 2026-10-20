@@ -11,7 +11,7 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095: the only approval is on `f836222c51` (09-28); the head, `448dae55f5`, is unreviewed | ← W42 (W40 → W42 → W43) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 21 commits (ten on 10-19, five on 10-20), no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 22 commits (ten on 10-19, six on 10-20), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` stays W42 (the tester's) | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block, unchanged since 10-09 | ← W42 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W42 | — |
@@ -38,14 +38,15 @@ fees, previews, limits and one price scale come from the chain (AC-8), unstake a
 transfer check locks, toggles and minimums before submitting (AC-9, AC-10), repeated chain reads are
 shared, change validator follows the chain's move rules, the staking minimum comes from the chain,
 and, on 10-20, subnet positions say their rewards compound and the unstaking period and reward
-timing come from the chain, Send alpha asks before locked alpha goes along, EXT-17's unit tests are in, and the pool card's labels are translatable. Before it can merge:
+timing come from the chain, Send alpha asks before locked alpha goes along, EXT-17's unit tests are in, the pool card's labels are translatable, and the subnet on screen shows its APR from the chain. Before it
+can merge:
 
 - **A review** — none yet, and the body is empty (the PR template asks for every section).
 - **The `evm.ts` overlap** — `758f50000e`, `c7a4a60722` and `8cdf70efc3` edit `balance-service/helpers/subscribe/evm.ts`, which
   [PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001) rewrites. Move the change into #5001, or agree the merge order.
 - **Its specs do not run in CI** — the test step is still commented out on `subwallet-dev`.
 
-Not yet started: AC-1, AC-11, AC-14; AC-15's own rows; the English strings in AC-12 — detail in the story's *Progress*.
+Not yet started: AC-11, AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE) — detail in the story's *Progress*.
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
