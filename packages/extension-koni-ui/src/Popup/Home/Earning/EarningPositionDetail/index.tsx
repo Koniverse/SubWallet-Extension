@@ -332,6 +332,7 @@ function Component ({ compound,
 
         <EarningInfoPart
           className={'__earning-info-part'}
+          compound={compound}
           inputAsset={inputAsset}
           poolInfo={poolInfo}
         />

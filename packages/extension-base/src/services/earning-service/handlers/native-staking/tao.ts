@@ -24,6 +24,7 @@ import { BN, BN_ZERO, noop } from '@polkadot/util';
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
+import { getSubnetApr, SubnetApr } from './bittensor-subnet-apr';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
@@ -253,6 +254,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   protected bittensorCache: BittensorCache;
   /** A claim's fee by call: flat whatever it pays (10-13), so one estimate serves 10 minutes of reward cycles */
   private readonly rootClaimFees = new SharedRead<BigN>(10 * 60 * 1000);
+  /** A subnet's APR, kept 5 minutes: it changes once an epoch */
+  private readonly subnetAprReads = new SharedRead<SubnetApr | undefined>(5 * 60 * 1000);
 
   protected getAlphaPriceScaleDecimals (): number {
     return _getAssetDecimals(this.nativeToken);
@@ -715,11 +718,67 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   /* Subscribe pool position */
 
+  /**
+   * BE-2's APR for subnet `netuid`, computed from the chain for the subnet on screen until BE serves every
+   * subnet (EXT-1): the hotkeys paid in its last epoch and their stake, 2–3 requests. Undefined when there is
+   * no figure — root, a subnet that never runs its epoch (`tempo` 0), or one that has not run an epoch since
+   * it registered; a subnet that paid no staker is a measured 0.
+   */
+  public getSubnetApr (netuid: number): Promise<SubnetApr | undefined> {
+    if (!netuid) {
+      return Promise.resolve(undefined);
+    }
+
+    return this.subnetAprReads.get(String(netuid), async () => {
+      const { api } = await this.substrateApi.isReady;
+      const q = api.query.subtensorModule;
+      const [entries, tempoCodec, lastEpochCodec, registeredCodec] = await Promise.all([
+        q.alphaDividendsPerSubnet.entries(netuid),
+        q.tempo(netuid),
+        readOptional(() => q.lastEpochBlock(netuid)),
+        readOptional(() => q.networkRegisteredAt(netuid))
+      ]);
+      const tempo = Number(tempoCodec.toString());
+
+      if (lastEpochCodec && registeredCodec && new BigN(lastEpochCodec.toString()).lte(registeredCodec.toString())) {
+        return undefined;
+      }
+
+      const paid = entries
+        .map(([key, value]) => ({ hotkey: key.args[1].toString(), dividend: new BigN(value.toString()) }))
+        .filter(({ dividend }) => dividend.gt(0));
+      // Read in the same round as the dividends would be better; A − D is 0.004% off at the median (BE-2)
+      const totals = paid.length ? await q.totalHotkeyAlpha.multi(paid.map(({ hotkey }) => [hotkey, netuid])) : [];
+
+      return getSubnetApr(paid.map((row, index) => ({ ...row, totalAlpha: new BigN(totals[index].toString()) })), tempo);
+    });
+  }
+
+  /** A validator's APR on subnet `netuid` from the chain, in percent, as the validator picker shows it */
+  private async getChainValidatorReturns (netuid?: number): Promise<((hotkey: string) => string) | undefined> {
+    let apr: SubnetApr | undefined;
+
+    try {
+      apr = netuid ? await this.getSubnetApr(netuid) : undefined;
+    } catch (e) {
+      console.error(e);
+    }
+
+    if (!apr) {
+      return undefined;
+    }
+
+    const { byHotkey } = apr;
+
+    return (hotkey: string) => new BigN(byHotkey[hotkey] ?? 0).multipliedBy(100).toFixed(2);
+  }
+
   /* Get pool targets */
   // eslint-disable-next-line @typescript-eslint/require-await
   private async getDevnetPoolTargets (netuid?: number): Promise<ValidatorInfo[]> {
     const testnetDelegate = (await this.substrateApi.api.call.delegateInfoRuntimeApi.getDelegates()).toJSON() as unknown as TestnetBittensorDelegateInfo[];
     const bnMinBond = await this.getMinBond(netuid);
+    const chainReturn = await this.getChainValidatorReturns(netuid);
 
     const filteredDelegates = testnetDelegate.filter((delegate) => {
       return delegate.returnPer1000 !== 0;
@@ -733,6 +792,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       minBond: bnMinBond.toString(),
       nominatorCount: delegate.nominators.length,
       commission: delegate.take / 1000,
+      ...(chainReturn ? { expectedReturn: chainReturn(delegate.delegateSs58) } : {}),
       blocked: false,
       isVerified: false,
       chain: this.chain,
@@ -745,7 +805,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const bnMinBond = await this.getMinBond();
     const validatorList = topValidator.data;
 
-    const aprResponse = await this.bittensorCache.fetchApr(netuid);
+    // A subnet's validators earn the chain's own APR for the last epoch (EXT-1); root keeps the proxy's until BE-11
+    const chainReturn = await this.getChainValidatorReturns(netuid);
+    const aprResponse = chainReturn ? { data: [] } : await this.bittensorCache.fetchApr(netuid);
     const aprMap: Record<string, string> = {};
 
     aprResponse.data.forEach((item) => {
@@ -765,7 +827,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         const roundedCommission = (parseFloat(commission) * 100).toFixed(0);
 
         const apr = aprMap[address];
-        const expectedReturn = apr ? new BigN(apr).multipliedBy(100).toFixed(2) : '0';
+        const expectedReturn = chainReturn ? chainReturn(address) : apr ? new BigN(apr).multipliedBy(100).toFixed(2) : '0';
 
         const name = validator.name || address;
 

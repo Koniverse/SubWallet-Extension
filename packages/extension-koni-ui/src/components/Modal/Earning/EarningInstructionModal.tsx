@@ -13,6 +13,7 @@ import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL, TANSSI_EARNING_DATA_RAW } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useSubnetApr } from '@subwallet/extension-koni-ui/hooks/earning/useSubnetApr';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBannerButtonIcon, getEarningTimeText, isAccountAll } from '@subwallet/extension-koni-ui/utils';
@@ -76,6 +77,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return accountAddress?.address;
   }, [chainInfoMap, currentAccountProxy, poolInfo.chain]);
+  const subnetApr = useSubnetApr(poolInfo);
+
   const title = useMemo(() => {
     if (!poolInfo) {
       return '';
@@ -83,13 +86,32 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const { metadata: { inputAsset },
       type } = poolInfo;
+
+    // A subnet's headline is the chain's APR, in alpha, not its emission (EXT-1): the best validator holding
+    // ≥ 1% of the stake paid in the last epoch; a measured 0 says so; without a figure, no yield is claimed
+    if (type === YieldPoolType.SUBNET_STAKING) {
+      const asset = assetRegistry[inputAsset];
+      const minJoin = poolInfo.statistic?.earningThreshold.join || '0';
+      const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
+      const { shortName, subnetData } = poolInfo.metadata;
+
+      if (subnetApr?.upTo) {
+        return `Earn up to ${formatNumber(subnetApr.upTo * 100, 0, balanceFormatter)}% APR in ${subnetData?.subnetSymbol || ''}${from} with ${shortName}`;
+      }
+
+      if (subnetApr?.upTo === 0) {
+        return `0% APR with ${shortName}: no rewards to stakers in the last epoch`;
+      }
+
+      return `Earn ${subnetData?.subnetSymbol || asset?.symbol || ''} with ${shortName}`;
+    }
+
     const totalApy = poolInfo.statistic?.totalApy;
     const totalApr = poolInfo.statistic?.totalApr;
     const minJoinPool = poolInfo.statistic?.earningThreshold.join || '0';
 
     const getOrigin = () => {
       switch (type) {
-        case YieldPoolType.SUBNET_STAKING:
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
@@ -149,7 +171,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return result;
-  }, [assetRegistry, poolInfo]);
+  }, [assetRegistry, poolInfo, subnetApr]);
 
   const buttonTitle = useMemo(() => {
     if (!poolInfo) {

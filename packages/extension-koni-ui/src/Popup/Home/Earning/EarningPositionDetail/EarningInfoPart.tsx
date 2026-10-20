@@ -3,13 +3,17 @@
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
+import { getPositionApr } from '@subwallet/extension-base/services/earning-service/handlers/native-staking/bittensor-subnet-apr';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
-import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
+import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { balanceFormatter, formatNumber } from '@subwallet/extension-base/utils';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { useCreateGetSubnetStakingTokenName, useTranslation } from '@subwallet/extension-koni-ui/hooks';
+import { useSubnetApr } from '@subwallet/extension-koni-ui/hooks/earning/useSubnetApr';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getEarningTimeText } from '@subwallet/extension-koni-ui/utils';
 import { Logo } from '@subwallet/react-ui';
+import BigN from 'bignumber.js';
 import CN from 'classnames';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -17,9 +21,10 @@ import styled from 'styled-components';
 type Props = ThemeProps & {
   inputAsset: _ChainAsset;
   poolInfo: YieldPoolInfo;
+  compound?: YieldPositionInfo;
 };
 
-function Component ({ className, inputAsset, poolInfo }: Props) {
+function Component ({ className, compound, inputAsset, poolInfo }: Props) {
   const { t } = useTranslation();
 
   const totalApy = useMemo((): number | undefined => {
@@ -40,6 +45,23 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
   }, [poolInfo.statistic]);
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
   const isBittensor = useMemo(() => _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain), [poolInfo.chain]);
+
+  // A subnet position earns its validators' APR, from the chain, weighted by the stake on each (EXT-1)
+  const subnetApr = useSubnetApr(isSubnetStaking ? poolInfo : undefined);
+  const positionApr = useMemo((): number | undefined => {
+    if (!subnetApr || !compound) {
+      return undefined;
+    }
+
+    return getPositionApr(compound.nominations.map(({ activeStake, validatorAddress }) => ({ hotkey: validatorAddress, stake: new BigN(activeStake) })), subnetApr);
+  }, [compound, subnetApr]);
+  const aprHint = useMemo((): string | undefined => {
+    if (subnetApr?.upTo === 0) {
+      return t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.noRewardsLastEpoch');
+    }
+
+    return positionApr === 0 ? t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.validatorEarnedNothing') : undefined;
+  }, [positionApr, subnetApr, t]);
 
   const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
@@ -81,14 +103,26 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
               </div>
             </MetaInfo.Default>
           )}
-        {totalApy !== undefined && (
-          <MetaInfo.Number
-            label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}
-            suffix={'% ' + t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.perYear')}
-            value={totalApy}
-            valueColorSchema='even-odd'
-          />
-        )}
+        {isSubnetStaking
+          ? (
+            <MetaInfo.Default label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}>
+              {/* A measured 0 shows as 0%; "—" only when there is no figure at all */}
+              <div>
+                {positionApr === undefined
+                  ? '—'
+                  : t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.aprInAlpha', { replace: { apr: formatNumber(positionApr * 100, 0, balanceFormatter), symbol: poolInfo.metadata.subnetData?.subnetSymbol || '' } })}
+              </div>
+              {aprHint && <div className='__apr-hint'>{aprHint}</div>}
+            </MetaInfo.Default>
+          )
+          : totalApy !== undefined && (
+            <MetaInfo.Number
+              label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}
+              suffix={'% ' + t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.perYear')}
+              value={totalApy}
+              valueColorSchema='even-odd'
+            />
+          )}
 
         <MetaInfo.Number
           decimals={inputAsset?.decimals || 0}
@@ -116,6 +150,12 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
 }
 
 export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: Props) => ({
+  '.__apr-hint': {
+    fontSize: token.fontSizeSM,
+    lineHeight: token.lineHeightSM,
+    color: token.colorTextLight4
+  },
+
   '.__label': {
     paddingRight: token.paddingXXS
   },
