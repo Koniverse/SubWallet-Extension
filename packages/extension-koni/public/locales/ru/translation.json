@@ -873,6 +873,7 @@
   "ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation": "Внимание!",
   "ui.TRANSACTION.Confirmations.EvmTransaction.payAttentionExclamation": "Внимание!",
   "ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation": "Внимание!",
+  "ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves": "{{locked}} {{symbol}} из этой суммы заблокированы: получатель получит их по-прежнему заблокированными",
   "ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation": "Внимание!",
   "ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation": "Внимание!",
   "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation": "Внимание!",

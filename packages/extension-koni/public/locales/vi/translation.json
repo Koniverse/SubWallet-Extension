@@ -875,6 +875,7 @@
   "ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation": "Chú ý!",
   "ui.TRANSACTION.Confirmations.EvmTransaction.payAttentionExclamation": "Chú ý!",
   "ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation": "Chú ý!",
+  "ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves": "{{locked}} {{symbol}} trong số này đang bị khóa: người nhận sẽ nhận phần đó ở trạng thái vẫn khóa",
   "ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation": "Chú ý!",
   "ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation": "Chú ý!",
   "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation": "Chú ý!",

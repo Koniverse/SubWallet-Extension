@@ -873,6 +873,7 @@
   "ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation": "注意してください！",
   "ui.TRANSACTION.Confirmations.EvmTransaction.payAttentionExclamation": "注意してください！",
   "ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation": "注意してください！",
+  "ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves": "この数量のうち{{locked}} {{symbol}}はロックされています。受取人にはロックされたまま届きます",
   "ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation": "注意してください！",
   "ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation": "注意してください！",
   "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation": "注意してください！",

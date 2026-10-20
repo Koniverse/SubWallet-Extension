@@ -873,6 +873,7 @@
   "ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation": "注意！",
   "ui.TRANSACTION.Confirmations.EvmTransaction.payAttentionExclamation": "注意！",
   "ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation": "注意！",
+  "ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves": "其中 {{locked}} {{symbol}} 处于锁定状态：接收方收到后仍为锁定",
   "ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation": "注意！",
   "ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation": "注意！",
   "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation": "注意！",

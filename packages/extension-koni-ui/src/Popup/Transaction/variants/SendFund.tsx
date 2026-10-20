@@ -28,7 +28,7 @@ import { MktCampaignModalContext } from '@subwallet/extension-koni-ui/contexts/M
 import { useAlert, useCoreCreateReformatAddress, useCreateGetChainAndExcludedTokenByAccountProxy, useDefaultNavigate, useFetchChainAssetInfo, useGetAccountTokenBalance, useGetBalance, useGetSubnetPoolPositionDetailByNetuid, useGetWrappedTransactionSigners, useHandleSubmitMultiTransaction, useIsPolkadotUnifiedChain, useNotification, usePreCheckAction, useRestoreTransaction, useSelector, useSetCurrentPage, useTransactionContext, useWatchTransaction } from '@subwallet/extension-koni-ui/hooks';
 import useGetConfirmationByScreen from '@subwallet/extension-koni-ui/hooks/campaign/useGetConfirmationByScreen';
 import useLazyWatchTransaction from '@subwallet/extension-koni-ui/hooks/transaction/useWatchTransactionLazy';
-import { approveSpending, cancelSubscription, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
+import { approveSpending, cancelSubscription, getAlphaLockedToMove, getOptimalTransferProcess, getTokensCanPayFee, isTonBounceableAddress, makeCrossChainTransfer, makeTransfer, subscribeMaxTransfer } from '@subwallet/extension-koni-ui/messaging';
 import { CommonActionType, commonProcessReducer, DEFAULT_COMMON_PROCESS } from '@subwallet/extension-koni-ui/reducer';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
 import { AccountAddressItemType, ChainItemType, FormCallbacks, Theme, ThemeProps, TransferParams } from '@subwallet/extension-koni-ui/types';
@@ -795,6 +795,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     };
 
     let checkTransferAll = false;
+    let checkLockedAlpha = false;
 
     const _doSubmit = async () => {
       if (values.chain !== values.destChain) {
@@ -901,6 +902,40 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
         }
       }
 
+      // Conviction-locked alpha beyond the unlocked part goes along and stays locked for the recipient: ask first (EXT-12)
+      if (netuid && values.toValidator && values.chain === values.destChain && !checkLockedAlpha) {
+        const { lockedToMove } = await getAlphaLockedToMove({ from: values.from, to: values.to, tokenSlug: values.asset, value: values.value, netuid, toValidator: values.toValidator })
+          .catch(() => ({ lockedToMove: '0' }));
+
+        if (new BigN(lockedToMove).gt(0)) {
+          openAlert({
+            type: NotificationType.WARNING,
+            content: t('ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves', { replace: { locked: formatBalance(lockedToMove, decimals), symbol: assetInfo?.symbol || '' } }),
+            title: t('ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation'),
+            okButton: {
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.continue'),
+              onClick: () => {
+                closeAlert();
+                setLoading(true);
+                checkLockedAlpha = true;
+                _doSubmit().catch((error) => {
+                  console.error('Error during submit:', error);
+                });
+              }
+            },
+            cancelButton: {
+              text: t('ui.TRANSACTION.screen.Transaction.SendFund.cancel'),
+              onClick: () => {
+                closeAlert();
+                setLoading(false);
+              }
+            }
+          });
+
+          return;
+        }
+      }
+
       const latestValue = form.getFieldsValue();
 
       doSubmit(latestValue, options);
@@ -909,7 +944,7 @@ const Component = ({ className = '', isAllAccount, targetAccountProxy }: Compone
     _doSubmit().catch((error) => {
       console.error('Error during submit:', error);
     });
-  }, [assetInfo, chainInfoMap, closeAlert, doSubmit, form, isTransferAll, openAlert, t, updateAddressInputValue]);
+  }, [assetInfo, chainInfoMap, closeAlert, decimals, doSubmit, form, isTransferAll, netuid, openAlert, t, updateAddressInputValue]);
 
   const onClickSubmit = useCallback((values: TransferParams) => {
     if (currentConfirmation) {

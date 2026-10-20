@@ -43,6 +43,22 @@ export interface AlphaTokenTransferMetadata {
   toValidator: string;
 }
 
+/** An alpha transfer about to be sent, to ask how much conviction-locked alpha it carries (EXT-12) */
+export interface RequestAlphaLockedToMove {
+  from: string;
+  to: string;
+  tokenSlug: string;
+  /** In alpha rao */
+  value: string;
+  netuid: number;
+  toValidator: string;
+}
+
+export interface ResponseAlphaLockedToMove {
+  /** In alpha rao; 0 when nothing locked moves, or the transfer would be refused anyway */
+  lockedToMove: string;
+}
+
 export interface RequestSubmitTransfer extends BaseRequestSign, TransactionFee {
   chain: string;
   from: string;

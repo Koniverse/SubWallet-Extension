@@ -841,6 +841,7 @@
   "ui.SETTING.components.Modal.RemindUpgradeFirefox.payAttentionExclamation": "Pay attention!",
   "ui.TRANSACTION.Confirmations.EvmTransaction.payAttentionExclamation": "Pay attention!",
   "ui.TRANSACTION.screen.Transaction.SendFund.payAttentionExclamation": "Pay attention!",
+  "ui.TRANSACTION.screen.Transaction.SendFund.lockedAlphaMoves": "{{locked}} {{symbol}} of this amount is locked: the recipient gets it still locked",
   "ui.EARNING.components.Modal.Earning.Instruction.payAttentionExclamation": "Pay attention!",
   "ui.DAPP.Confirmations.Sign.Substrate.payAttentionExclamation": "Pay attention!",
   "ui.TRANSACTION.Confirmations.Process.Swap.payAttentionExclamation": "Pay attention!",
