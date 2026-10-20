@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap, readOptional } from './alpha';
+import { alphaPriceToTao, getMinimumAtSpot, getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, readOptional } from './alpha';
 
 describe('Alpha balance as Earning shows it (EXT-39)', () => {
   // rao per alpha, as `current_alpha_price_all` returns it
@@ -102,5 +102,42 @@ describe('Limit prices against the price after the trade (EXT-6)', () => {
   it('measures impact without the fee, and never below 0', () => {
     expect(getPriceImpact(new BigN(100), new BigN(98))).toBeCloseTo(0.02, 12);
     expect(getPriceImpact(new BigN(100), new BigN(101))).toBe(0);
+  });
+});
+
+describe('One price scale (EXT-4, EXT-17)', () => {
+  it('reads current_alpha_price as rao of TAO per alpha, so root\'s own price of 10^9 is 1', () => {
+    // SN64 on mainnet, 10-19; `current_alpha_price(0)` reads 10^9 on mainnet and testnet
+    expect(alphaPriceToTao(66839821).toFixed()).toBe('0.066839821');
+    expect(alphaPriceToTao(1e9).toFixed()).toBe('1');
+    expect(alphaPriceToTao(1e9, 9).eq(getTaoPerAlphaMap([{ netuid: 0, price: 1e9 }])[0])).toBe(true);
+  });
+
+  it('reads a price of 0 or below as 0, never as a division', () => {
+    expect(alphaPriceToTao(0).toFixed()).toBe('0');
+    expect(alphaPriceToTao(-5).toFixed()).toBe('0');
+  });
+});
+
+describe('The minimum at spot of a move within a subnet or a transfer (EXT-17)', () => {
+  // Testnet SN3, 10-19: 0.088091246 TAO per alpha; `InitialMinTransfer` 100,000 rao
+  const price = new BigN('0.088091246');
+  const minTransfer = new BigN(100000);
+
+  it('finds the amount the chain takes: one rao of alpha less was refused AmountTooLow on testnet (10-19)', () => {
+    const minimum = getMinimumAtSpot(minTransfer, price);
+
+    expect(minimum?.toFixed()).toBe('1135187');
+    expect(getWorthAtSpot(new BigN(1135187), price).gte(minTransfer)).toBe(true);
+    expect(getWorthAtSpot(new BigN(1135186), price).lt(minTransfer)).toBe(true);
+  });
+
+  it('is the minimum itself on root, and none at a price of 0', () => {
+    expect(getMinimumAtSpot(minTransfer, new BigN(1))?.toFixed()).toBe('100000');
+    expect(getMinimumAtSpot(minTransfer, new BigN(0))).toBeUndefined();
+  });
+
+  it('rounds the worth down, as the chain does', () => {
+    expect(getWorthAtSpot(new BigN(3), new BigN('0.5')).toFixed()).toBe('1');
   });
 });

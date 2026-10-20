@@ -3,6 +3,50 @@
 
 import BigN from 'bignumber.js';
 
+/** The low 32 bits of a substrate-fixed `I96F32` are its fraction */
+const FIXED_POINT_32_DIVISOR = new BigN(2).pow(32);
+const I128_SIGN = new BigN(2).pow(127);
+const I128_RANGE = new BigN(2).pow(128);
+
+/**
+ * Threshold used when the chain's own value can't be read. Zero means nothing is filtered: a
+ * wrong guess in the other direction would hide a claimable reward and lock the owner out of the
+ * claim screen, which is worse than briefly showing dust that a claim then skips.
+ */
+export const UNKNOWN_ROOT_CLAIM_THRESHOLD = new BigN(0);
+
+/**
+ * A substrate-fixed `I96F32` as `toJSON` gives it: `{ bits }`, the bits a number while they fit in 53
+ * bits and a big-endian two's-complement hex string beyond (0.01 TAO already is). Undefined if unreadable.
+ */
+export function decodeI96F32 (raw: unknown): BigN | undefined {
+  const bits = raw !== null && typeof raw === 'object' ? (raw as { bits?: unknown }).bits : raw;
+
+  if (typeof bits !== 'number' && typeof bits !== 'string') {
+    return undefined;
+  }
+
+  let value = new BigN(bits);
+
+  // The hex form is the raw i128: its top bit is the sign
+  if (typeof bits === 'string' && bits.startsWith('0x') && value.gte(I128_SIGN)) {
+    value = value.minus(I128_RANGE);
+  }
+
+  return value.isNaN() ? undefined : value.dividedBy(FIXED_POINT_32_DIVISOR);
+}
+
+/**
+ * `RootClaimableThreshold`, in rao: the payout a validator must owe before a claim settles it — 500,000
+ * rao on mainnet and testnet (10-20). A chain that turns the dust check off reports 0, which is a value
+ * to honour; one that cannot be read, or reads below 0, falls back to `UNKNOWN_ROOT_CLAIM_THRESHOLD`.
+ */
+export function parseRootClaimThreshold (raw: unknown): BigN {
+  const value = decodeI96F32(raw);
+
+  return !value || value.lt(0) ? UNKNOWN_ROOT_CLAIM_THRESHOLD : value.integerValue(BigN.ROUND_FLOOR);
+}
+
 /** `MAX_ROOT_CLAIM_WORK`: root hotkeys plus their fund rows that one `claim_root` may walk (v478 `lib.rs:83`). */
 export const ROOT_CLAIM_WORK = 256;
 /** `MAX_ROOT_CLAIM_HOTKEY_WORK`: one validator plus its fund rows, for `claim_root_with_hotkey` (`lib.rs:89`). */

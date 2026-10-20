@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getStakeLimitPrice, isSameAddress, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
+import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getMinimumAtSpot, getStakeLimitPrice, getWorthAtSpot, isSameAddress, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -23,7 +23,7 @@ import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
-import { isRootClaimWorthNotifying, planRootClaim, RootClaimPlan, RootClaimPreview } from './bittensor-root-claim-plan';
+import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
@@ -112,20 +112,6 @@ const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 /** Bittensor's target block time, in seconds */
 export const BITTENSOR_BLOCK_TIME = 12;
-
-/**
- * `RootClaimableThreshold` is stored as a substrate-fixed `I96F32`: a 128 bit integer whose low
- * 32 bits are the fraction. Dividing the raw bits by 2^32 turns it back into a rao amount,
- * e.g. `{ bits: 2147483648000000 }` is 500_000 rao.
- */
-const FIXED_POINT_32_DIVISOR = new BigN(2).pow(32);
-
-/**
- * Threshold used when the chain's own value can't be read. Zero means nothing is filtered: a
- * wrong guess in the other direction would hide a claimable reward and lock the owner out of the
- * claim screen, which is worse than briefly showing dust that a claim then skips.
- */
-const UNKNOWN_ROOT_CLAIM_THRESHOLD = new BigN(0);
 
 /* Fetch data */
 export class BittensorCache {
@@ -250,9 +236,7 @@ export const getAlphaToTaoRate = async (substrateApi: _SubstrateApi, netuid: num
     return '1';
   }
 
-  const subnetPrice = new BigN((await substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(netuid)).toString());
-
-  return subnetPrice.lte(0) ? '0' : subnetPrice.dividedBy(new BigN(10).pow(priceScaleDecimals)).toFixed();
+  return alphaPriceToTao((await substrateApi.api.call.swapRuntimeApi.currentAlphaPrice(netuid)).toString(), priceScaleDecimals).toFixed();
 };
 
 export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHandler {
@@ -633,17 +617,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }
 
     try {
-      const raw = (await substrateApi.api.query.subtensorModule.rootClaimableThreshold(0)).toJSON() as unknown as { bits: string | number } | string | number | null;
-      const bits = raw !== null && typeof raw === 'object' ? raw.bits : raw;
-
-      if (bits === null || bits === undefined) {
-        return UNKNOWN_ROOT_CLAIM_THRESHOLD;
-      }
-
-      const threshold = new BigN(bits).dividedBy(FIXED_POINT_32_DIVISOR).integerValue(BigN.ROUND_FLOOR);
-
-      // A chain that turns the dust check off reports 0, which is a value to honour, not to replace
-      return threshold.isNaN() || threshold.lt(0) ? UNKNOWN_ROOT_CLAIM_THRESHOLD : threshold;
+      return parseRootClaimThreshold((await substrateApi.api.query.subtensorModule.rootClaimableThreshold(0)).toJSON());
     } catch (e) {
       console.error(e);
 
@@ -1073,10 +1047,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     const minTransfer = new BigN(chainApi.api.consts.subtensorModule.initialMinTransfer?.toString() || DEFAULT_MIN_TRANSFER);
 
-    if (new BigN(amount).multipliedBy(taoPerUnit).integerValue(BigN.ROUND_FLOOR).lt(minTransfer)) {
-      const minimum = minTransfer.dividedBy(taoPerUnit).integerValue(BigN.ROUND_CEIL);
+    if (getWorthAtSpot(new BigN(amount), taoPerUnit).lt(minTransfer)) {
+      const minimum = getMinimumAtSpot(minTransfer, taoPerUnit);
 
-      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow', { replace: { bnMinMoveStake: formatMinimum(minimum, decimals), symbol } })));
+      return Promise.reject(new TransactionError(BasicTxErrorType.INVALID_PARAMS, t('bg.EARNING.services.service.earning.nativeStaking.tao.moveStakeAmountTooLow', { replace: { bnMinMoveStake: minimum ? formatMinimum(minimum, decimals) : '-', symbol } })));
     }
 
     // The chain does not sweep what a move leaves, but under the nominator minimum it could then only be

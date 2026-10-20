@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
+import { getMinimumAtSpot, getWorthAtSpot } from '@subwallet/extension-base/utils/alpha';
 import BigN from 'bignumber.js';
 
 export type AlphaTransferRefusal = 'transferDisabled' | 'amountBelowMinimum' | 'recipientRejectsLocked' | 'recipientLockOnOtherValidator' | 'recipientTooManyValidators';
@@ -62,8 +63,8 @@ export function checkAlphaTransfer (state: AlphaTransferState): AlphaTransferChe
   }
 
   // The chain values the stake at spot, with no slippage
-  if (taoPerAlpha && minTransfer && amount.multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_FLOOR).lt(minTransfer)) {
-    return { refusal: 'amountBelowMinimum', minimum: taoPerAlpha.gt(0) ? minTransfer.dividedBy(taoPerAlpha).integerValue(BigN.ROUND_CEIL) : undefined, lockedToMove: none };
+  if (taoPerAlpha && minTransfer && getWorthAtSpot(amount, taoPerAlpha).lt(minTransfer)) {
+    return { refusal: 'amountBelowMinimum', minimum: getMinimumAtSpot(minTransfer, taoPerAlpha), lockedToMove: none };
   }
 
   // Within one coldkey the lock stays where it is

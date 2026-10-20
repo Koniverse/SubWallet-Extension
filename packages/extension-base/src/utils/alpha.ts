@@ -45,15 +45,38 @@ export const readAlphaPrices = (api: ApiPromise): Promise<AlphaPriceList> => {
   return alphaPriceReads.get(api.genesisHash.toHex(), async () => (await api.call.swapRuntimeApi.currentAlphaPriceAll()).toPrimitive() as AlphaPriceList);
 };
 
-/** TAO per alpha by netuid from `current_alpha_price_all`, whose prices are rao per alpha. */
+/**
+ * TAO per alpha from `current_alpha_price`, which is rao of TAO per alpha: ÷ 10^`decimals`, TAO's 9 — one
+ * scale everywhere (EXT-4). A price of 0 or below, as a pool-less subnet reads, is 0.
+ */
+export const alphaPriceToTao = (price: BigN.Value, decimals = 9): BigN => {
+  const value = new BigN(price);
+
+  return value.gt(0) ? value.shiftedBy(-decimals) : new BigN(0);
+};
+
+/** TAO per alpha by netuid from `current_alpha_price_all`; root is 1:1. */
 export const getTaoPerAlphaMap = (prices: AlphaPriceList): Record<number, BigN> => {
   const result: Record<number, BigN> = {};
 
   prices.forEach(({ netuid, price }) => {
-    result[netuid] = netuid === 0 ? new BigN(1) : new BigN(price).dividedBy(1e9);
+    result[netuid] = netuid === 0 ? new BigN(1) : alphaPriceToTao(price);
   });
 
   return result;
+};
+
+/** What `amount` alpha is worth at spot, in rao, as the chain values a move or a transfer: rounded down */
+export const getWorthAtSpot = (amount: BigN, taoPerAlpha: BigN): BigN => {
+  return amount.multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_FLOOR);
+};
+
+/**
+ * The smallest alpha amount worth `minimum` rao at spot — what a move within a subnet or a transfer must be
+ * worth (`InitialMinTransfer`). Undefined at a price of 0, where no amount is.
+ */
+export const getMinimumAtSpot = (minimum: BigN, taoPerAlpha: BigN): BigN | undefined => {
+  return taoPerAlpha.gt(0) ? minimum.dividedBy(taoPerAlpha).integerValue(BigN.ROUND_CEIL) : undefined;
 };
 
 /** A subnet pool's reserves, in rao: `SubnetTAO` and `SubnetAlphaIn` */

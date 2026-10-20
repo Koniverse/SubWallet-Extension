@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { isRootClaimWorthNotifying, planRootClaim, RootClaimPreview } from './bittensor-root-claim-plan';
+import { decodeI96F32, isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
 
 const TAO = 1e9;
 // RootClaimableThreshold on mainnet: 500,000 rao
@@ -107,5 +107,38 @@ describe('Bittensor root claim: notification', () => {
 
   it('does not notify when the fee cannot be estimated', () => {
     expect(isRootClaimWorthNotifying(new BigN(TAO), undefined)).toBe(false);
+  });
+});
+
+describe('Root claim threshold, a substrate-fixed I96F32 (EXT-17)', () => {
+  it('reads the threshold mainnet and testnet store: 500,000 rao (10-20)', () => {
+    // `rootClaimableThreshold(0).toJSON()` on both networks
+    expect(parseRootClaimThreshold({ bits: 2147483648000000 }).toFixed()).toBe('500000');
+  });
+
+  it('reads the big-endian hex string toJSON gives once the bits pass 53 bits', () => {
+    // polkadot.js `{"bits":"i128"}` for 0.01 TAO and 1 TAO
+    expect(parseRootClaimThreshold({ bits: '0x00000000000000000098968000000000' }).toFixed()).toBe('10000000');
+    expect(parseRootClaimThreshold({ bits: '0x00000000000000003b9aca0000000000' }).toFixed()).toBe('1000000000');
+  });
+
+  it('keeps the fraction in the decoded value and drops it from the rao threshold', () => {
+    // 500,000.5 rao
+    expect(decodeI96F32({ bits: 2147485795483648 })?.toFixed()).toBe('500000.5');
+    expect(parseRootClaimThreshold({ bits: 2147485795483648 }).toFixed()).toBe('500000');
+  });
+
+  it('honours 0: a chain with the dust check off filters nothing', () => {
+    expect(parseRootClaimThreshold({ bits: 0 }).toFixed()).toBe('0');
+  });
+
+  it('falls back to filtering nothing when the value cannot be read, or reads below 0', () => {
+    [null, undefined, {}, { bits: null }, 'not a number'].forEach((raw) => {
+      expect(parseRootClaimThreshold(raw).eq(UNKNOWN_ROOT_CLAIM_THRESHOLD)).toBe(true);
+    });
+    // −1 rao, as a number and as the i128's two's-complement hex
+    expect(decodeI96F32({ bits: -4294967296 })?.toFixed()).toBe('-1');
+    expect(decodeI96F32({ bits: '0xffffffffffffffffffffffff00000000' })?.toFixed()).toBe('-1');
+    expect(parseRootClaimThreshold({ bits: '0xffffffffffffffffffffffff00000000' }).eq(UNKNOWN_ROOT_CLAIM_THRESHOLD)).toBe(true);
   });
 });
