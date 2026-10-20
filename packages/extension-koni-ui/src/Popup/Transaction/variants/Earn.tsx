@@ -4,7 +4,7 @@
 import { _ChainAsset } from '@subwallet/chain-list/types';
 import { ExtrinsicType, NotificationType } from '@subwallet/extension-base/background/KoniTypes';
 import { _handleDisplayForEarningError, _handleDisplayInsufficientEarningError } from '@subwallet/extension-base/core/logic-validation/earning';
-import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol } from '@subwallet/extension-base/services/chain-service/utils';
 import { isLendingPool, isLiquidPool } from '@subwallet/extension-base/services/earning-service/utils';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { AccountProxyType, BalanceType, NominationPoolInfo, OptimalYieldPath, OptimalYieldPathParams, ProcessType, SlippageType, SubmitJoinNativeStaking, SubmitJoinNominationPool, SubmitYieldJoinData, ValidatorInfo, YieldPoolType, YieldStepType } from '@subwallet/extension-base/types';
@@ -211,7 +211,7 @@ const Component = () => {
   const nativeAsset: _ChainAsset | undefined = useMemo(() => chainAsset[nativeTokenSlug], [chainAsset, nativeTokenSlug]);
 
   const assetDecimals = inputAsset ? _getAssetDecimals(inputAsset) : 0;
-  const priceValue = priceMap[inputAsset.priceId || ''] || 0;
+  const priceValue = priceMap[_getAssetPriceId(inputAsset)] || 0;
   const convertValue = amountValue ? parseFloat(amountValue) / 10 ** assetDecimals : 0;
   const transformAmount = convertValue * priceValue;
 
@@ -223,7 +223,7 @@ const Component = () => {
         if (fee.slug !== '') {
           const asset = chainAsset[fee.slug];
           const feeDecimals = _getAssetDecimals(asset);
-          const _priceValue = asset.priceId ? (priceMap[asset.priceId] ?? 0) : 0;
+          const _priceValue = priceMap[_getAssetPriceId(asset)] ?? 0;
           const feeNumb = _priceValue * (fee.amount ? parseFloat(fee.amount) / 10 ** feeDecimals : 0);
 
           _totalFee += feeNumb;

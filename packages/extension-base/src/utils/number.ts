@@ -259,3 +259,17 @@ export const formatNumber = (
 
   return formatter(raw, metadata);
 };
+
+/**
+ * A minimum amount, in the token's smallest unit, rounded up to `digits` significant digits (3 by default):
+ * shown in full, the amount it shows is always enough. `balanceFormatter` cuts digits off past 2 below 1,
+ * which shows less than the minimum.
+ */
+export const roundUpMinimum = (value: BigNumber.Value, decimals: number, digits = 3): BigNumber => {
+  return new BigNumber(value).shiftedBy(-decimals).precision(digits, BigNumber.ROUND_UP).shiftedBy(decimals).integerValue(BigNumber.ROUND_CEIL);
+};
+
+/** A minimum as a message shows it: `roundUpMinimum`, with every digit it keeps */
+export const formatMinimum = (value: BigNumber.Value, decimals: number): string => {
+  return formatNumber(roundUpMinimum(value, decimals), decimals, balanceFormatter, { minNumberFormat: 3, maxNumberFormat: decimals || 6 });
+};

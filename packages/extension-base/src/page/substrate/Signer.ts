@@ -1,7 +1,8 @@
 // Copyright 2019-2022 @polkadot/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Signer as SignerInterface, SignerResult } from '@polkadot/api/types';
+import type { InjectedSigner, SignerPayloadVrf } from '@subwallet/extension-inject/types';
+import type { SignerResult } from '@polkadot/api/types';
 import type { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 import type { SendRequest } from '../types';
 
@@ -9,7 +10,7 @@ import type { SendRequest } from '../types';
 let sendRequest: SendRequest;
 let nextId = 0;
 
-export default class Signer implements SignerInterface {
+export default class Signer implements InjectedSigner {
   constructor (_sendRequest: SendRequest) {
     sendRequest = _sendRequest;
   }
@@ -30,6 +31,21 @@ export default class Signer implements SignerInterface {
   public async signRaw (payload: SignerPayloadRaw): Promise<SignerResult> {
     const id = ++nextId;
     const result = await sendRequest('pub(bytes.sign)', payload);
+
+    return {
+      ...result,
+      id
+    };
+  }
+
+  /**
+   * sr25519 VRF signing. See `InjectedSigner['signVrf']` for the full contract — in short:
+   * the result is `output(32) || proof(64)` and only the first 32 bytes are deterministic,
+   * so derive keys from those alone.
+   */
+  public async signVrf (payload: SignerPayloadVrf): Promise<SignerResult> {
+    const id = ++nextId;
+    const result = await sendRequest('pub(vrf.sign)', payload);
 
     return {
       ...result,

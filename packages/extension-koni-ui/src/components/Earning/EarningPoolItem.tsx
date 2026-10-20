@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
@@ -48,7 +49,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const total = useMemo((): string => {
     if (tvl && asset) {
-      const priceId = asset.priceId;
+      const priceId = _getAssetPriceId(asset);
 
       if (!priceId) {
         return '0';
@@ -108,7 +109,9 @@ const Component: React.FC<Props> = (props: Props) => {
             {!!apy && (
               <div className='__item-rewards'>
                 <div className='__item-rewards-label'>
-                  {t(`${isSubnetStaking ? 'Emission' : isBittensor ? 'Max APY' : 'Rewards'}`)}:
+                  {isSubnetStaking
+                    ? t('ui.EARNING.components.Earning.PoolItem.emission')
+                    : isBittensor ? t('ui.EARNING.components.Earning.PoolItem.maxApy') : t('ui.EARNING.components.Earning.PoolItem.rewards')}:
                 </div>
                 <div className='__item-rewards-value'>
                   <Number

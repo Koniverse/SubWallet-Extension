@@ -38,6 +38,48 @@ export async function openPopup (url: string) {
   await chrome.windows.create(popupOptions);
 }
 
+// Chrome dismisses the toolbar popup the moment it loses focus, and it draws its passkey prompt in
+// the parent browser window - so by the time a passkey unlock lands, the popup that asked for it is
+// already gone and the wallet sits there waiting for another click on the toolbar icon. Reopening it
+// has to be driven from here for that same reason: the page that would otherwise do it is dead.
+const FOCUS_SETTLE_TIME = 250;
+
+function delay (ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// The toolbar popup is the one wallet surface that is not a tab. The expanded view and the dapp
+// confirmation window are both index.html or notification.html inside one, and the side panel gives
+// itself away by its url - none of them want the toolbar popup opened on top of them.
+export function isActionPopupSender (port: chrome.runtime.Port): boolean {
+  const { tab, url } = port.sender || {};
+
+  return !tab && !!url?.includes('index.html');
+}
+
+export async function reopenActionPopup (): Promise<void> {
+  if (!chrome.action?.openPopup) {
+    return;
+  }
+
+  const windows = await chrome.windows.getAll({ windowTypes: ['normal'] });
+  const target = windows.find(({ focused }) => focused) || windows[windows.length - 1];
+
+  if (!target?.id) {
+    return;
+  }
+
+  // The browser only opens the popup for an active window, and the window manager grants focus
+  // asynchronously, so it needs a moment before the request is accepted.
+  await chrome.windows.update(target.id, { focused: true });
+  await delay(FOCUS_SETTLE_TIME);
+
+  // Deliberately not awaited: this promise settles when the popup *closes*, not when it opens, so
+  // waiting on it would hang here until the user is done with the wallet.
+  chrome.action.openPopup({ windowId: target.id })
+    .catch((error) => console.warn('Unable to reopen the extension popup', error));
+}
+
 export default class PopupHandler {
   readonly #requestService: RequestService;
   #notification: BrowserConfirmationType = DEFAULT_NOTIFICATION_TYPE;

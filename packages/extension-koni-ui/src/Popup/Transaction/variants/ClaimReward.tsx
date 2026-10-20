@@ -7,12 +7,12 @@ import { _getSubstrateGenesisHash, _isChainEvmCompatible } from '@subwallet/exte
 import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountJson, EarningRewardItem, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { isSameAddress } from '@subwallet/extension-base/utils';
-import { AccountSelector, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
+import { AccountSelector, AlertBox, HiddenInput, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
 import { useGetNativeTokenBasicInfo, useHandleSubmitTransaction, useInitValidateTransaction, usePreCheckAction, useRestoreTransaction, useSelector, useTransactionContext, useWatchTransaction, useYieldPositionDetail } from '@subwallet/extension-koni-ui/hooks';
 import { yieldSubmitStakingClaimReward } from '@subwallet/extension-koni-ui/messaging';
 import { ClaimRewardParams, FormCallbacks, FormFieldData, ThemeProps } from '@subwallet/extension-koni-ui/types';
-import { convertFieldToObject, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
+import { convertFieldToObject, formatBalance, isAccountAll, simpleCheckForm } from '@subwallet/extension-koni-ui/utils';
 import { Button, Checkbox, Form, Icon } from '@subwallet/react-ui';
 import BigN from 'bignumber.js';
 import CN from 'classnames';
@@ -72,10 +72,12 @@ const filterAccount = (
     const isMythosNetwork = _STAKING_CHAIN_GROUP.mythos.includes(_poolChain);
     const isAmplitudeNetwork = _STAKING_CHAIN_GROUP.amplitude.includes(_poolChain);
     const isTanssiNetwork = _STAKING_CHAIN_GROUP.tanssi.includes(_poolChain);
+    // Root claims only exist for the netuid 0 position
+    const isBittensorRootNetwork = poolType === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.bittensor.includes(_poolChain);
     const bnUnclaimedReward = new BigN(reward?.unclaimedReward || '0');
 
     return (
-      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
+      ((poolType === YieldPoolType.NOMINATION_POOL || isAmplitudeNetwork || isMythosNetwork || isTanssiNetwork || isBittensorRootNetwork) && bnUnclaimedReward.gt(BN_ZERO)) ||
       isAstarNetwork
     );
   };
@@ -108,7 +110,8 @@ const Component = () => {
   const [loading, setLoading] = useState(false);
   const [isBalanceReady, setIsBalanceReady] = useState(true);
 
-  const isHideCheckBox = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain) || _STAKING_CHAIN_GROUP.tanssi.includes(poolChain), [poolChain]);
+  // Bittensor re-stakes the claimed TAO on root itself, so the opt-in checkbox is meaningless there
+  const isHideCheckBox = useMemo(() => _STAKING_CHAIN_GROUP.mythos.includes(poolChain) || _STAKING_CHAIN_GROUP.tanssi.includes(poolChain) || _STAKING_CHAIN_GROUP.bittensor.includes(poolChain), [poolChain]);
 
   const handleDataForInsufficientAlert = useCallback(
     (estimateFee: AmountData) => {
@@ -234,6 +237,24 @@ const Component = () => {
               }
             </MetaInfo>
           </Form.Item>
+          {
+            // Bittensor root: more validators than one claim can settle, so this claim takes the one paying most
+            reward?.partialClaim && (
+              <AlertBox
+                className={'claim-reward-partial-alert'}
+                description={t('ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorDescription', {
+                  replace: {
+                    validators: reward.partialClaim.remainingValidators + 1,
+                    amount: formatBalance(reward.unclaimedReward || '0', decimals),
+                    remaining: formatBalance(reward.partialClaim.remainingReward, decimals),
+                    symbol
+                  }
+                })}
+                title={t('ui.TRANSACTION.screen.Transaction.ClaimReward.claimOneValidatorTitle')}
+                type={'info'}
+              />
+            )
+          }
           <Form.Item
             hidden={isHideCheckBox}
             name={'bondReward'}
@@ -309,6 +330,10 @@ const ClaimReward = styled(Wrapper)<Props>(({ theme: { token } }: Props) => {
 
     '.claim-reward-meta-info': {
       marginTop: token.marginXXS
+    },
+
+    '.claim-reward-partial-alert': {
+      marginBottom: token.marginSM
     },
 
     '.ant-checkbox-wrapper': {

@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { InjectedAccount } from '@subwallet/extension-inject/types';
+import type { InjectedAccount, SignerPayloadVrf } from '@subwallet/extension-inject/types';
 
 import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import { _AssetType } from '@subwallet/chain-list/types';
@@ -13,6 +13,7 @@ import { createSubscription, unsubscribe } from '@subwallet/extension-base/backg
 import { AddNetworkRequestExternal, AddTokenRequestExternal, BitcoinDAppAddress, BitcoinProviderErrorType, BitcoinRequestGetAddressesResult, BitcoinSendTransactionParams, BitcoinSendTransactionResult, BitcoinSignMessageParams, BitcoinSignMessageResult, BitcoinSignPsbtParams, BitcoinSignPsbtResult, CardanoProviderErrorType, Cbor, EvmAppState, EvmEventType, EvmProviderErrorType, EvmSendTransactionParams, PassPhishing, RequestAddPspToken, RequestCardanoGetCollateral, RequestCardanoGetUtxos, RequestCardanoSignData, RequestCardanoSignTransaction, RequestEvmProviderSend, RequestSettingsType, ResponseCardanoSignData, ResponseCardanoSignTransaction, ValidateNetworkResponse } from '@subwallet/extension-base/background/KoniTypes';
 import RequestBytesSign from '@subwallet/extension-base/background/RequestBytesSign';
 import RequestExtrinsicSign from '@subwallet/extension-base/background/RequestExtrinsicSign';
+import RequestVrfSign from '@subwallet/extension-base/background/RequestVrfSign';
 import { AccountAuthType, MessageTypes, RequestAccountList, RequestAccountSubscribe, RequestAccountUnsubscribe, RequestAuthorizeTab, RequestRpcSend, RequestRpcSubscribe, RequestRpcUnsubscribe, RequestTypes, ResponseRpcListProviders, ResponseSigning, ResponseTypes, SubscriptionMessageTypes } from '@subwallet/extension-base/background/types';
 import { ALL_ACCOUNT_KEY, CRON_GET_API_MAP_STATUS, MAX_COLLATERAL_AMOUNT, PERMISSIONS_TO_REVOKE } from '@subwallet/extension-base/constants';
 import { generateValidationProcess, PayloadValidated, validationAuthMiddleware } from '@subwallet/extension-base/core/logic-validation';
@@ -191,6 +192,28 @@ export default class KoniTabs {
     } else {
       throw errors[0];
     }
+  }
+
+  private async vrfSign (url: string, request: SignerPayloadVrf): Promise<ResponseSigning> {
+    const payloadValidate: PayloadValidated = {
+      address: request.address,
+      networkKey: '',
+      type: 'substrate',
+      errors: [],
+      payloadAfterValidated: request
+    };
+
+    const { errors, pair } = await generateValidationProcess(this.#koniState, url, payloadValidate, [validationAuthMiddleware]);
+
+    if (errors.length) {
+      throw errors[0];
+    }
+
+    if (pair?.type !== 'sr25519') {
+      throw new Error('VRF signing requires an sr25519 account');
+    }
+
+    return this.#koniState.sign(url, new RequestVrfSign(request, url));
   }
 
   private async extrinsicSign (url: string, request: SignerPayloadJSON): Promise<ResponseSigning> {
@@ -1663,6 +1686,9 @@ export default class KoniTabs {
 
       case 'pub(extrinsic.sign)':
         return this.extrinsicSign(url, request as SignerPayloadJSON);
+
+      case 'pub(vrf.sign)':
+        return this.vrfSign(url, request as SignerPayloadVrf);
 
       case 'pub(metadata.list)':
         return this.metadataList(url);

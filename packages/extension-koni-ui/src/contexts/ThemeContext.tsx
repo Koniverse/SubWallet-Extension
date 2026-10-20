@@ -62,6 +62,17 @@ const GlobalStyle = createGlobalStyle<ThemeProps>(({ theme }) => {
       }
     },
 
+    // The browser passkey prompt needs a wider surface than the wallet uses, so the layout stretches
+    // with whatever room was reserved for it - left at its own width it would sit between two bars
+    // of bare background. Applies to both the toolbar popup and the dapp confirmation window.
+    '.-passkey-prompt-mode': {
+      '.main-page-container': {
+        '.main-layout-content': {
+          width: '100%'
+        }
+      }
+    },
+
     '.-side-panel-mode': {
       '.main-page-container': {
         height: '100%',

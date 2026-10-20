@@ -6,3 +6,4 @@ export { default as EvmSignatureWithProcess } from './EvmSignatureWithProcess';
 export { default as CardanoSignatureConfirmation } from './CardanoSignatureConfirmation';
 export { default as BitcoinSignatureConfirmation } from './BitcoinSignatureConfirmation';
 export { default as SignConfirmation } from './SignConfirmation';
+export { default as VrfSignConfirmation } from './VrfSignConfirmation';

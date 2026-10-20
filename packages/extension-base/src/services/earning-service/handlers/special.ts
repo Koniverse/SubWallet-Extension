@@ -298,8 +298,8 @@ export default abstract class BaseSpecialStakingPoolHandler extends BasePoolHand
             throw new Error('Error estimating XCM fee');
           }
 
-          const xcmOriginFee = BigN(xcmFeeInfo.origin.fee).toFixed(0, 1);
-          const xcmDestinationFee = BigN(xcmFeeInfo.destination.fee).toFixed(0, 1);
+          const xcmOriginFee = BigN(xcmFeeInfo.origin.fee || '0').toFixed(0, 1);
+          const xcmDestinationFee = BigN(xcmFeeInfo.destination.fee || '0').toFixed(0, 1);
 
           const fee: YieldTokenBaseInfo = {
             slug: altInputTokenSlug,

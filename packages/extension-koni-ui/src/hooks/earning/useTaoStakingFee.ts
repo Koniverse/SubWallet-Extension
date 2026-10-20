@@ -6,6 +6,7 @@ import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { balanceNoPrefixFormater } from '@subwallet/extension-base/utils';
 import { getEarningImpact } from '@subwallet/extension-koni-ui/messaging';
 import { formatNumber } from '@subwallet/react-ui';
+import BigN from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 
 export const useTaoStakingFee = (
@@ -43,7 +44,10 @@ export const useTaoStakingFee = (
             return;
           }
 
-          setStakingFee(formatNumber(impact.stakingTaoFee || '0', decimals, balanceNoPrefixFormater));
+          // A fee under the 6 decimals the formatter shows reads "0 TAO": leave it out so no fee notice shows
+          const isFeeShown = new BigN(impact.stakingTaoFee || 0).gte(new BigN(10).pow(decimals - 6));
+
+          setStakingFee(isFeeShown ? formatNumber(impact.stakingTaoFee || '0', decimals, balanceNoPrefixFormater) : undefined);
           setEarningSlippage(impact.slippage);
           setEarningRate(impact.rate);
         })

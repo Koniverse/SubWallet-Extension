@@ -35,8 +35,18 @@ export interface EarningRewardItem extends BasePoolInfo {
   totalSlash?: string;
   /** Un-claim reward */
   unclaimedReward?: string;
+  /** Set when one claim cannot settle every validator: `unclaimedReward` is then what the next claim pays (Bittensor root) */
+  partialClaim?: EarningRewardPartialClaim;
 
   /* Special info */
+}
+
+/** What is left to claim after the next claim, when a claim settles one validator at a time. */
+export interface EarningRewardPartialClaim {
+  /** Validators still holding a claimable reward after the next claim */
+  remainingValidators: number;
+  /** What they hold, in the smallest unit */
+  remainingReward: string;
 }
 
 export interface EarningRewardJson {

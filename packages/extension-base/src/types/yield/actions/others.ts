@@ -35,6 +35,10 @@ export interface SubnetYieldLeaveParams {
   slippage?: number;
   /** stakingFee (subnet staking) */
   stakingFee?: string;
+  /** TAO the unstake is expected to return, in rao: the confirmation warns when the network fee is not less */
+  expectedTao?: string;
+  /** All of the position (Max): what accrues before the block goes too (Bittensor) */
+  unstakeAll?: boolean;
 }
 
 export type YieldLeaveParams = BaseYieldLeaveParams & Partial<SubnetYieldLeaveParams>;
@@ -111,4 +115,17 @@ export interface RequestEarningImpact {
   value: string;
   netuid: number;
   type: ExtrinsicType;
+}
+
+/** A subnet's APR from the chain (EXT-1, BE-2), in alpha, as a fraction a year: 0.34 is 34% APR */
+export interface SubnetAprResult {
+  /** Each hotkey paid in the subnet's last epoch; a hotkey left out earned nothing there: 0% */
+  byHotkey: Record<string, number>;
+  /** The best APR among hotkeys holding ≥ 1% of the stake paid in the last epoch; 0 when no staker was paid */
+  upTo: number;
+}
+
+export interface RequestSubnetApr {
+  slug: string;
+  netuid: number;
 }
