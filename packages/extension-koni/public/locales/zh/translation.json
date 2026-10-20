@@ -905,6 +905,7 @@
   "ui.NETWORK.components.NetworkInformation.minimumActive": "最低有效",
   "ui.NETWORK.components.NetworkInformation.unstakingPeriod": "解除质押周期",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod": "解除质押周期",
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately": "立即",
   "ui.EARNING.components.StakingItem.Nomination.staked": "Staked:",
   "ui.EARNING.components.StakingItem.Pool.staked": "Staked",
   "ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked": "Staked",

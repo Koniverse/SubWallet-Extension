@@ -873,6 +873,7 @@
   "ui.NETWORK.components.NetworkInformation.minimumActive": "Minimum active",
   "ui.NETWORK.components.NetworkInformation.unstakingPeriod": "Unstaking period",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod": "Unstaking period",
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately": "Immediately",
   "ui.EARNING.components.StakingItem.Nomination.staked": "Staked:",
   "ui.EARNING.components.StakingItem.Pool.staked": "Staked",
   "ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked": "Staked",

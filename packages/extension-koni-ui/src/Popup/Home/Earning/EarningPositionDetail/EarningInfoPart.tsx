@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { NormalYieldPoolStatistic, YieldCompoundingPeriod, YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import { CollapsiblePanel, MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -38,6 +39,7 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
     }
   }, [poolInfo.statistic]);
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
+  const isBittensor = useMemo(() => _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain), [poolInfo.chain]);
 
   const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
@@ -97,8 +99,15 @@ function Component ({ className, inputAsset, poolInfo }: Props) {
         />
         {unstakePeriod !== undefined && (
           <MetaInfo.Default label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod')}>
-            {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING) && <span className={'__label'}>Up to</span>}
-            {getEarningTimeText(t, unstakePeriod)}
+            {/* A Bittensor unstake is an immediate swap; a root hold, when the chain sets one, lasts up to that long (EXT-16) */}
+            {isBittensor && unstakePeriod === 0
+              ? t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately')
+              : (
+                <>
+                  {(poolInfo.type === YieldPoolType.LIQUID_STAKING || poolInfo.type === YieldPoolType.SUBNET_STAKING || isBittensor) && <span className={'__label'}>Up to</span>}
+                  {getEarningTimeText(t, unstakePeriod)}
+                </>
+              )}
           </MetaInfo.Default>
         )}
       </MetaInfo>

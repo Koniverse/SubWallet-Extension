@@ -905,6 +905,7 @@
   "ui.NETWORK.components.NetworkInformation.minimumActive": "Минимальный актив",
   "ui.NETWORK.components.NetworkInformation.unstakingPeriod": "Время вывода",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod": "Время вывода",
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately": "Сразу",
   "ui.EARNING.components.StakingItem.Nomination.staked": "Staked:",
   "ui.EARNING.components.StakingItem.Pool.staked": "Staked",
   "ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked": "Staked",

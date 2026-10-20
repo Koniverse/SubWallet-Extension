@@ -907,6 +907,7 @@
   "ui.NETWORK.components.NetworkInformation.minimumActive": "Số stake tối thiểu để có lợi nhuận",
   "ui.NETWORK.components.NetworkInformation.unstakingPeriod": "Thời gian unstake",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod": "Thời gian unstake",
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately": "Ngay lập tức",
   "ui.EARNING.components.StakingItem.Nomination.staked": "Staked:",
   "ui.EARNING.components.StakingItem.Pool.staked": "Staked",
   "ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked": "Staked",

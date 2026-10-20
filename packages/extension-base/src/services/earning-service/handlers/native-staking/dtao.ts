@@ -13,7 +13,7 @@ import BigN from 'bignumber.js';
 import { BN_ZERO } from '@polkadot/util';
 
 import { simulateSubnetTrade } from './bittensor-pool';
-import TaoNativeStakingPoolHandler, { RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
+import TaoNativeStakingPoolHandler, { BITTENSOR_BLOCK_TIME, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
   netuid: number;
@@ -23,6 +23,7 @@ export interface SubnetData {
   maxAllowedValidators: number;
   taoIn: number;
   taoInEmission: number;
+  tempo: number;
 }
 
 interface DynamicInfo {
@@ -35,6 +36,8 @@ interface DynamicInfo {
   },
   taoIn: number;
   taoInEmission: number;
+  /** Blocks between the subnet's epochs, when it pays its stakers */
+  tempo: number;
 }
 
 interface SubnetsInfo {
@@ -238,7 +241,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
               ownerHotkey: dynInfo.ownerHotkey,
               maxAllowedValidators: extraInfo ? extraInfo.maxAllowedValidators : 0,
               taoIn: dynInfo.taoIn,
-              taoInEmission: dynInfo.taoInEmission
+              taoInEmission: dynInfo.taoInEmission,
+              tempo: dynInfo.tempo
             };
           });
 
@@ -301,9 +305,11 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
                 defaultUnstake: '0',
                 fastUnstake: '0'
               },
-              eraTime: 24,
+              // A subnet pays its stakers every epoch, `tempo` blocks: 72 minutes on 124 of 128 mainnet subnets, 10-20.
+              // An unstake is an immediate swap (EXT-16)
+              eraTime: (subnet.tempo || 0) * BITTENSOR_BLOCK_TIME / 3600,
               era: 0,
-              unstakingPeriod: 1.2,
+              unstakingPeriod: 0,
               tvl: bnTaoIn.toString(),
               totalApy: emission.toNumber()
             }

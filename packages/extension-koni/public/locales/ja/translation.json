@@ -905,6 +905,7 @@
   "ui.NETWORK.components.NetworkInformation.minimumActive": "最小アクティブ",
   "ui.NETWORK.components.NetworkInformation.unstakingPeriod": "ステーキング期間",
   "ui.EARNING.screen.EarningPositionDetail.EarningInfo.unstakingPeriod": "ステーキング期間",
+  "ui.EARNING.screen.EarningPositionDetail.EarningInfo.immediately": "即時",
   "ui.EARNING.components.StakingItem.Nomination.staked": "Staked:",
   "ui.EARNING.components.StakingItem.Pool.staked": "Staked",
   "ui.TRANSACTION.screen.Transaction.part.BondedBalance.staked": "Staked",

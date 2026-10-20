@@ -110,6 +110,9 @@ interface SubnetFeeRate {
 
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
+/** Bittensor's target block time, in seconds */
+export const BITTENSOR_BLOCK_TIME = 12;
+
 /**
  * `RootClaimableThreshold` is stored as a substrate-fixed `I96F32`: a 128 bit integer whose low
  * 32 bits are the fraction. Dividing the raw bits by 2^32 turns it back into a rao amount,
@@ -347,6 +350,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const rxMaxValidators = substrateApi.api.rx.query.subtensorModule.maxAllowedValidators(0);
     // A runtime constant: no subscription
     const bnMinStake = await this.getMinBond();
+    // An unstake is an immediate swap; only root can hold stake, `RootStakeUnlockInterval` blocks after its last
+    // change — 0 (off) on mainnet and testnet, 10-20. In hours, as the screens read it (EXT-16)
+    const rootHoldBlocks = Number((await readOptional(() => substrateApi.api.query.subtensorModule.rootStakeUnlockInterval()))?.toPrimitive() ?? 0);
+    const unstakingPeriod = rootHoldBlocks * BITTENSOR_BLOCK_TIME / 3600;
 
     const subscription = combineLatest([rxMaxValidators, rxSubnetTAO, aprSubject]).subscribe({
       next: ([maxValidators, taoIn, apr]) => {
@@ -374,9 +381,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
                 defaultUnstake: '0',
                 fastUnstake: '0'
               },
-              eraTime: 24,
+              // Root rewards wait in the validator's basket for a claim: there is no payout period (EXT-16)
+              eraTime: 0,
               era: 0,
-              unstakingPeriod: 1.2,
+              unstakingPeriod,
               tvl: bnTaoIn.toString(),
               totalApy: apr
             }

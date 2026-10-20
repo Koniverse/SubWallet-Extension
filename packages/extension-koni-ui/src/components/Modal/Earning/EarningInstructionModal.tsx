@@ -281,7 +281,11 @@ const Component: React.FC<Props> = (props: Props) => {
           }
 
           if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
-            return EARNING_DATA_RAW.BITTENSOR_STAKING.map((item) => {
+            const isSubnet = poolInfo.type === YieldPoolType.SUBNET_STAKING;
+            // A subnet's epoch, from its `tempo`: in minutes under 2 hours (72 on most subnets), else in hours (EXT-16)
+            const epochTime = isSubnet && paidOut ? (paidOut < 2 ? `${Math.round(paidOut * 60)} minutes` : `${Number(paidOut.toFixed(1))} hours`) : '';
+
+            return (isSubnet ? EARNING_DATA_RAW.BITTENSOR_SUBNET_STAKING : EARNING_DATA_RAW.BITTENSOR_STAKING).map((item) => {
               const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
               replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
@@ -289,11 +293,7 @@ const Component: React.FC<Props> = (props: Props) => {
               replaceEarningValue(_item, '{periodNumb}', unBondedTime);
               replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
               replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
-
-              if (paidOut !== undefined) {
-                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
-                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
-              }
+              replaceEarningValue(_item, '{epochTime}', epochTime ? ` — every ${epochTime} on this subnet —` : '');
 
               return _item;
             });
