@@ -109,7 +109,9 @@ const Component: React.FC<Props> = (props: Props) => {
             {!!apy && (
               <div className='__item-rewards'>
                 <div className='__item-rewards-label'>
-                  {t(`${isSubnetStaking ? 'Emission' : isBittensor ? 'Max APY' : 'Rewards'}`)}:
+                  {isSubnetStaking
+                    ? t('ui.EARNING.components.Earning.PoolItem.emission')
+                    : isBittensor ? t('ui.EARNING.components.Earning.PoolItem.maxApy') : t('ui.EARNING.components.Earning.PoolItem.rewards')}:
                 </div>
                 <div className='__item-rewards-value'>
                   <Number

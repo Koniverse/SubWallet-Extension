@@ -235,7 +235,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const notifyTooHighAmount = useCallback(() => {
     notify({
-      message: t(`Amount too high. Lower your amount to no more than ${formatBalance(bondedValue, decimals)} ${symbol || ''} and try again`),
+      message: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountTooHigh', { replace: { maxAmount: formatBalance(bondedValue, decimals), symbol: symbol || '' } }),
       type: 'error',
       duration: 5
     });
