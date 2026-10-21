@@ -11,7 +11,7 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095: the only approval is on `f836222c51` (09-28); the head, `448dae55f5`, is unreviewed | ← W42 (W40 → W42 → W43) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 23 commits (ten on 10-19, six on 10-20, one on 10-21), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 25 commits (ten on 10-19, six on 10-20, three on 10-21), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` stays W42 (the tester's) | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block, unchanged since 10-09 | ← W42 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W42 | — |
@@ -46,9 +46,9 @@ can merge:
   [PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001) rewrites. Move the change into #5001, or agree the merge order.
 - **Its specs do not run in CI** — the test step is still commented out on `subwallet-dev`.
 
-Not yet started: AC-11, AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE).
-For AC-11, the proxy half is up on the dev proxy (10-21, `Cloudflare-Workers` [`f10e80c`](https://github.com/Koniverse/Cloudflare-Workers/commit/f10e80c)): each validator's nominator
-count per subnet, from TAO.com; stake and take are to be read from the chain — detail in the story's *Progress*.
+Not yet started: AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE).
+AC-11 is on the branch since 10-21 (`3891e2e504`): per-subnet validator lists from the chain, nominator counts from
+the proxy route (`Cloudflare-Workers` [`f10e80c`](https://github.com/Koniverse/Cloudflare-Workers/commit/f10e80c)) — live on the dev proxy, 404 in production — detail in the story's *Progress*.
 
 ## Static earning data — stale since 09-18, cause found 10-21 (BE-1)
 
