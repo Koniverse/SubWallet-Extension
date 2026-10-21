@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getMinimumAtSpot, getStakeLimitPrice, getWorthAtSpot, isSameAddress, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
+import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getMinimumAtSpot, getStakeLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, isSameAddress, readAlphaPrices, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
@@ -25,6 +25,7 @@ import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
 import { getSubnetApr, SubnetApr } from './bittensor-subnet-apr';
+import { decodeTaoWeight, formatTake, getPermittedUids, getSubnetValidatorHotkeys, getSubnetValidatorStake } from './bittensor-subnet-validators';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
@@ -107,6 +108,10 @@ interface SubnetRateFeeResponse {
 interface SubnetFeeRate {
   netuid: number;
   fee_rate: string;
+}
+
+interface NominatorCountResponse {
+  data?: Array<{ hotkey: string; nominatorCount: number }>;
 }
 
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
@@ -223,6 +228,31 @@ export class BittensorCache {
       console.error(error);
 
       return '0.0005'; // Default fee rate if fetch fails
+    }
+  }
+
+  /**
+   * Each validator's nominator count on subnet `netuid`, by hotkey. Not on the chain in a readable form — a count
+   * scans every stake on the hotkey — so the proxy serves it (EXT-14); empty when it has none.
+   */
+  public async fetchNominatorCounts (netuid: number): Promise<Record<string, number>> {
+    try {
+      const resp = await fetchFromProxyService(ProxyServiceRoute.BITTENSOR, `/subnet/validator/nominators/latest/v1?netuid=${netuid}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!resp.ok) {
+        return {};
+      }
+
+      const rawData = await resp.json() as NominatorCountResponse;
+
+      return Object.fromEntries((rawData.data ?? []).map(({ hotkey, nominatorCount }) => [hotkey, nominatorCount]));
+    } catch (error) {
+      console.error(error);
+
+      return {};
     }
   }
 }
@@ -800,7 +830,81 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }) as unknown as ValidatorInfo);
   }
 
+  /**
+   * Subnet `netuid`'s validators from the chain (EXT-14, BE-4): permit holders and the hotkeys paid in its last
+   * epoch, with their stake on this subnet and on root, take, identity and APR — 9 requests at one block besides
+   * the APR's — largest stake weight first. Nominator counts come from the proxy, 0 when it has none. Empty before
+   * the subnet's first epoch, with no permits and nobody paid.
+   */
+  private async getSubnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
+    const { api } = await this.substrateApi.isReady;
+    // One block for the whole list; pinned, each `multi` is one `state_queryStorageAt` instead of a subscription
+    const at = await api.at((await api.rpc.chain.getBlockHash()).toHex(), api.runtimeVersion);
+    const q = at.query.subtensorModule;
+    const [permits, apr, taoWeightCodec, prices, bnMinBond, nominatorCounts] = await Promise.all([
+      q.validatorPermit(netuid),
+      this.getSubnetApr(netuid),
+      readOptional(() => q.taoWeight()),
+      readAlphaPrices(api),
+      this.getMinBond(netuid),
+      this.bittensorCache.fetchNominatorCounts(netuid)
+    ]);
+    const uids = getPermittedUids(permits.toPrimitive() as boolean[]);
+    const permitted = uids.length ? (await q.keys.multi(uids.map((uid) => [netuid, uid]))).map(String) : [];
+    const hotkeys = getSubnetValidatorHotkeys(permitted, Object.keys(apr?.byHotkey ?? {}));
+
+    if (!hotkeys.length) {
+      return [];
+    }
+
+    const [alphas, rootStakes, takes, owners] = await Promise.all([
+      q.totalHotkeyAlpha.multi(hotkeys.map((hotkey) => [hotkey, netuid])),
+      q.totalHotkeyAlpha.multi(hotkeys.map((hotkey) => [hotkey, 0])),
+      q.delegates.multi(hotkeys),
+      q.owner.multi(hotkeys)
+    ]);
+    const identities = await q.identitiesV2.multi(owners.map(String));
+    const taoPerAlpha = getTaoPerAlphaMap(prices)[netuid] ?? new BigN(0);
+    const taoWeight = decodeTaoWeight(taoWeightCodec?.toString());
+
+    return hotkeys
+      .map((address, index) => {
+        const { rootWeight, subnetStake, totalStake } = getSubnetValidatorStake(
+          { alpha: new BigN(alphas[index].toString()), hotkey: address, rootStake: new BigN(rootStakes[index].toString()) },
+          taoPerAlpha,
+          taoWeight
+        );
+        const name = (identities[index].toPrimitive() as { name?: string } | null)?.name;
+
+        return {
+          address,
+          totalStake: totalStake.toFixed(0),
+          ownStake: rootWeight.toFixed(0),
+          otherStake: subnetStake.toFixed(0),
+          minBond: bnMinBond.toString(),
+          nominatorCount: nominatorCounts[address] ?? 0,
+          commission: formatTake(takes[index].toString()),
+          ...(apr ? { expectedReturn: new BigN(apr.byHotkey[address] ?? 0).multipliedBy(100).toFixed(2) } : {}),
+          blocked: false,
+          isVerified: false,
+          chain: this.chain,
+          isCrowded: false,
+          identity: name || address
+        } as unknown as ValidatorInfo;
+      })
+      .sort((a, b) => new BigN(b.totalStake).comparedTo(a.totalStake));
+  }
+
   private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
+    if (netuid) {
+      const subnetTargets = await this.getSubnetPoolTargets(netuid);
+
+      // A subnet before its first epoch has none yet: the root validators' list, as before EXT-14
+      if (subnetTargets.length) {
+        return subnetTargets;
+      }
+    }
+
     const topValidator = await this.bittensorCache.get();
     // A subnet's validators take its minimum, with the pool fee; netuid 0 is root's
     const bnMinBond = await this.getMinBond(netuid);

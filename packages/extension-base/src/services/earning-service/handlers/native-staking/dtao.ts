@@ -219,8 +219,11 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const subnetsInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getSubnetsInfoV2()).toJSON() as SubnetsInfo[] | undefined;
 
       if (dynamicInfo && subnetsInfo) {
+        // Testnet only keeps the subnets that pay: 65 of 595 on 10-21. The others made 85% of the static cache's
+        // validator lists, all copies of one global list, and of the files it rewrites each run
+        const isTestnet = this.chain === 'bittensor_testnet';
         const mergedData = dynamicInfo
-          .filter((dynInfo) => dynInfo.netuid !== 0)
+          .filter((dynInfo) => dynInfo.netuid !== 0 && (!isTestnet || Number(dynInfo.taoInEmission) > 0))
           .map((dynInfo) => {
             const extraInfo = subnetsInfo.find((subnet) => subnet.netuid === dynInfo.netuid);
 
