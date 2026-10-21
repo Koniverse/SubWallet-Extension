@@ -802,7 +802,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
   private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
     const topValidator = await this.bittensorCache.get();
-    const bnMinBond = await this.getMinBond();
+    // A subnet's validators take its minimum, with the pool fee; netuid 0 is root's
+    const bnMinBond = await this.getMinBond(netuid);
     const validatorList = topValidator.data;
 
     // A subnet's validators earn the chain's own APR for the last epoch (EXT-1); root keeps the proxy's until BE-11
