@@ -48,6 +48,15 @@ can merge:
 
 Not yet started: AC-11, AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE) — detail in the story's *Progress*.
 
+## Static earning data — stale since 09-18, cause found 10-21 (BE-1)
+
+Both scheduler workflows in `Static-Data-Caching` fail before any step runs: `Unable to resolve action
+cloudflare/pages-action, not found` (`cloudflare/pages-action@v1` in the deploy step). Production (`main`)
+last succeeded 2026-09-18 13:40 UTC, dev 14:20; every run since fails in about 7 s. The hand-made dev refresh
+of 10-20 ([`0d929d1374`](https://github.com/Koniverse/Static-Data-Caching/commit/0d929d1374e084169fce98ec4d8df8d87943a972)) has the right Bittensor minimums and the chain APR on subnet validators, but its
+own run failed the same way, so neither site serves it. Fix: deploy with `cloudflare/wrangler-action`, and
+alert on a failing run.
+
 ## Inherited decision — 20 stories with a live status in a closed window
 
 Unchanged at 96 points. Raised in eight windows running; still a board decision.
