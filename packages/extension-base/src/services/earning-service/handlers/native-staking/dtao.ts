@@ -355,7 +355,6 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
 
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
-    const _delegateInfo = await this.bittensorCache.get();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
@@ -366,6 +365,9 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       if (!delegateStateInfos || delegateStateInfos.length === 0) {
         return;
       }
+
+      const subnetHotkeys = delegateStateInfos.flatMap(([, stakeInfos]) => stakeInfos.filter(({ netuid }) => netuid !== 0).map(({ hotkey }) => hotkey));
+      const names = await this.getHotkeyNames([...new Set(subnetHotkeys)]);
 
       delegateStateInfos.forEach(([coldkey, stakeInfos]) => {
         const owner = reformatAddress(coldkey, 42);
@@ -391,19 +393,11 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
             };
           }
 
-          let identity = '';
-
-          if (_delegateInfo) {
-            const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
-
-            identity = delegateInfo ? delegateInfo.name : '';
-          }
-
           subnetPositions[netuid].delegatorState.push({
             owner: hotkey,
             amount: stake.toString(),
             rate: alphaToTaoPrice,
-            identity
+            identity: names[hotkey] ?? ''
           });
 
           subnetPositions[netuid].totalBalance = subnetPositions[netuid].totalBalance.plus(new BigN(stake.toString()));
