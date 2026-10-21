@@ -58,6 +58,11 @@ own run failed the same way, so neither site serves it. Fix: deploy with `cloudf
 alert on a failing run. Regenerate the data first: its subnet targets carry root's `minBond`, which PR #5113's
 `f19b9e8318` (10-21) fixes.
 
+**Later on 10-21 — fixed on `dev`:** [`3b51d0bbe1`](https://github.com/Koniverse/Static-Data-Caching/commit/3b51d0bbe1f) switches both workflows to `cloudflare/wrangler-action`; the
+regenerated data is live on the dev site (03:47 UTC), `validator.json` included. **Still open:** `main` keeps the
+old action, and scheduled runs use `main`'s workflow files — so production and every scheduled run still fail.
+Bring the fix to `main`.
+
 ## Inherited decision — 20 stories with a live status in a closed window
 
 Unchanged at 96 points. Raised in eight windows running; still a board decision.
