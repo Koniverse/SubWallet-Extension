@@ -13,19 +13,18 @@ import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earni
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
 import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getMinimumAtSpot, getStakeLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, isSameAddress, readAlphaPrices, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
-import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 
-import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { ApiDecoration, SubmittableExtrinsic } from '@polkadot/api/types';
 import { BN, BN_ZERO, noop } from '@polkadot/util';
 
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
 import { getSubnetApr, SubnetApr } from './bittensor-subnet-apr';
-import { decodeTaoWeight, formatTake, getPermittedUids, getSubnetValidatorHotkeys, getSubnetValidatorStake } from './bittensor-subnet-validators';
+import { decodeTaoWeight, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
@@ -48,37 +47,6 @@ export interface TaoStakingStakeOption {
   amount: string;
   rate?: BigN;
   identity?: string
-}
-
-export interface RawDelegateState {
-  data: Array<{
-    hotkey_name: string;
-    hotkey: {
-      ss58: string;
-    };
-    stake: string;
-  }>;
-}
-
-interface ValidatorResponse {
-  data: Validator[];
-}
-
-interface Validator {
-  hotkey: {
-    ss58: string;
-  };
-  name: string;
-  global_nominators: number;
-  validator_return_per_day: string;
-  nominator_return_per_day: string;
-  stake: string;
-  validator_stake: string;
-  take: string;
-  root_stake: string;
-  global_weighted_stake: string;
-  weighted_root_stake: string;
-  global_alpha_stake_as_tao: string;
 }
 
 interface ValidatorAprResponse {
@@ -114,17 +82,23 @@ interface NominatorCountResponse {
   data?: Array<{ hotkey: string; nominatorCount: number }>;
 }
 
+/** Who a picker lists besides permit holders, and the APR shown for each, in percent; none when there is no figure */
+interface ValidatorReturns {
+  paid: string[];
+  expectedReturn?: (hotkey: string) => string;
+}
+
 const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 
 /** Bittensor's target block time, in seconds */
 export const BITTENSOR_BLOCK_TIME = 12;
 
-/* Fetch data */
+/**
+ * What still comes from the proxy: root's 30-day APR (until BE-11), the subnet fee rate, and nominator counts. Validator
+ * lists and names are read from the chain; the static `validator.json`, and its timer re-reading it every minute, are gone
+ */
 export class BittensorCache {
   private static instance: BittensorCache | null = null;
-  private cache: ValidatorResponse | null = null;
-  private cacheTimeout: NodeJS.Timeout | null = null;
-  private promise: Promise<ValidatorResponse> | null = null;
 
   // eslint-disable-next-line no-useless-constructor, @typescript-eslint/no-empty-function
   private constructor () {}
@@ -135,59 +109,6 @@ export class BittensorCache {
     }
 
     return BittensorCache.instance;
-  }
-
-  public async get (): Promise<ValidatorResponse> {
-    if (this.cache) {
-      return this.cache;
-    }
-
-    if (this.promise) {
-      return this.promise;
-    }
-
-    this.promise = this.fetchData();
-
-    return this.promise;
-  }
-
-  private async fetchData (): Promise<ValidatorResponse> {
-    try {
-      const fetchData = await fetchStaticCache<{ data: Record<string, Validator> }>(
-        'earning/dtao/validator.json',
-        { data: {} }
-      );
-
-      const validators = Object.values(fetchData.data);
-
-      const data = {
-        data: validators.filter((validator) => parseFloat(validator.root_stake) > 0)
-      };
-
-      this.cache = data;
-      this.promise = null;
-
-      if (this.cacheTimeout) {
-        clearTimeout(this.cacheTimeout);
-      }
-
-      this.cacheTimeout = setTimeout(() => {
-        this.fetchData()
-          .then((newData) => {
-            if (newData.data.length > 0) {
-              this.cache = newData;
-            }
-          })
-          .catch(console.error);
-      }, 60 * 1000); // Cache 1 minute
-
-      return data;
-    } catch (error) {
-      console.error(error);
-      this.promise = null;
-
-      return this.cache || { data: [] };
-    }
   }
 
   public async fetchApr (netuid: number): Promise<ValidatorAprResponse> {
@@ -286,9 +207,28 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   private readonly rootClaimFees = new SharedRead<BigN>(10 * 60 * 1000);
   /** A subnet's APR, kept 5 minutes: it changes once an epoch */
   private readonly subnetAprReads = new SharedRead<SubnetApr | undefined>(5 * 60 * 1000);
+  /** A hotkey's name, kept an hour: an identity rarely changes */
+  private readonly hotkeyNames = new SharedRead<string>(60 * 60 * 1000);
 
   protected getAlphaPriceScaleDecimals (): number {
     return _getAssetDecimals(this.nativeToken);
+  }
+
+  /**
+   * Positions' validator names from the chain, in place of the static `validator.json`: each hotkey's owner coldkey
+   * identity, '' when it has none. Concurrent reads go out batched; one that fails is asked again next time.
+   */
+  protected async getHotkeyNames (hotkeys: string[]): Promise<Record<string, string>> {
+    const { api } = await this.substrateApi.isReady;
+    const q = api.query.subtensorModule;
+    const names = await Promise.all(hotkeys.map((hotkey) => this.hotkeyNames.get(hotkey, async () => {
+      const owner = await q.owner(hotkey);
+      const identity = await q.identitiesV2(owner.toString());
+
+      return (identity.toPrimitive() as { name?: string } | null)?.name ?? '';
+    }).catch(() => '')));
+
+    return Object.fromEntries(hotkeys.map((hotkey, index) => [hotkey, names[index]]));
   }
 
   /**
@@ -473,7 +413,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     const substrateApi = await this.substrateApi.isReady;
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
-    const _delegateInfo = await this.bittensorCache.get();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfo = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
@@ -482,6 +421,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       if (!delegateStateInfo || delegateStateInfo.length === 0) {
         return;
       }
+
+      const rootHotkeys = delegateStateInfo.flatMap(([, stakeInfos]) => stakeInfos.filter(({ netuid }) => netuid === 0).map(({ hotkey }) => hotkey));
+      const names = await this.getHotkeyNames([...new Set(rootHotkeys)]);
 
       delegateStateInfo.forEach(([coldkey, stakeInfos]) => {
         const owner = reformatAddress(coldkey, 42);
@@ -508,18 +450,11 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
         for (const hotkey in totalDelegate) {
           bnTotalBalance = bnTotalBalance.add(new BN(totalDelegate[hotkey]));
-          let identity = '';
-
-          if (_delegateInfo) {
-            const delegateInfo = _delegateInfo.data.find((info) => info.hotkey.ss58 === hotkey);
-
-            identity = delegateInfo ? delegateInfo.name : '';
-          }
 
           delegatorState.push({
             owner: hotkey,
             amount: totalDelegate[hotkey],
-            identity: identity
+            identity: names[hotkey] ?? ''
           });
         }
 
@@ -830,20 +765,52 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     }) as unknown as ValidatorInfo);
   }
 
+  /** A subnet's paid hotkeys and their APR from the chain's last epoch (EXT-1); no APR when the chain has no figure */
+  private async getSubnetReturns (netuid: number): Promise<ValidatorReturns> {
+    const apr = await this.getSubnetApr(netuid);
+
+    return {
+      paid: Object.keys(apr?.byHotkey ?? {}),
+      expectedReturn: apr ? (hotkey) => new BigN(apr.byHotkey[hotkey] ?? 0).multipliedBy(100).toFixed(2) : undefined
+    };
+  }
+
+  /** Root's paid hotkeys, root dividends on any subnet in its last epoch, and their 30-day APR from the proxy until BE-11 */
+  private async getRootReturns (at: ApiDecoration<'promise'>): Promise<ValidatorReturns> {
+    const [dividends, aprResponse] = await Promise.all([
+      readOptional(() => at.query.subtensorModule.rootAlphaDividendsPerSubnet.entries()),
+      this.bittensorCache.fetchApr(0)
+    ]);
+    const aprMap: Record<string, string> = {};
+
+    aprResponse.data.forEach((item) => {
+      aprMap[item.hotkey.ss58] = item.thirty_day_apy;
+    });
+
+    const paid = (dividends ?? []).filter(([, value]) => new BigN(value.toString()).gt(0)).map(([key]) => key.args[1].toString());
+
+    return {
+      paid: [...new Set(paid)],
+      expectedReturn: (hotkey) => (aprMap[hotkey] ? new BigN(aprMap[hotkey]).multipliedBy(100).toFixed(2) : '0')
+    };
+  }
+
   /**
-   * Subnet `netuid`'s validators from the chain (EXT-14, BE-4): permit holders and the hotkeys paid in its last
-   * epoch, with their stake on this subnet and on root, take, identity and APR — 9 requests at one block besides
-   * the APR's — largest stake weight first. Nominator counts come from the proxy, 0 when it has none. Empty before
-   * the subnet's first epoch, with no permits and nobody paid.
+   * The validators on `netuid` from the chain (EXT-14, BE-4), root (0) included, which replaced the static
+   * `validator.json`; all at one block. Listed: permit holders and the hotkeys paid in the last epoch, on root its root
+   * dividends on any subnet: 52 hotkeys on 10-21, all registered on root, holding its root stake; a subnet before its
+   * first epoch has neither and lists its owner's hotkey. Each with its stake on this subnet, on root its alpha on every
+   * subnet at spot, plus root stake × TaoWeight, take and owner identity; largest stake weight first. Nominator counts
+   * come from the proxy, 0 when it has none.
    */
-  private async getSubnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
+  private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
     const { api } = await this.substrateApi.isReady;
     // One block for the whole list; pinned, each `multi` is one `state_queryStorageAt` instead of a subscription
     const at = await api.at((await api.rpc.chain.getBlockHash()).toHex(), api.runtimeVersion);
     const q = at.query.subtensorModule;
-    const [permits, apr, taoWeightCodec, prices, bnMinBond, nominatorCounts] = await Promise.all([
+    const [permits, { expectedReturn, paid }, taoWeightCodec, prices, bnMinBond, nominatorCounts] = await Promise.all([
       q.validatorPermit(netuid),
-      this.getSubnetApr(netuid),
+      netuid ? this.getSubnetReturns(netuid) : this.getRootReturns(at),
       readOptional(() => q.taoWeight()),
       readAlphaPrices(api),
       this.getMinBond(netuid),
@@ -851,27 +818,37 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     ]);
     const uids = getPermittedUids(permits.toPrimitive() as boolean[]);
     const permitted = uids.length ? (await q.keys.multi(uids.map((uid) => [netuid, uid]))).map(String) : [];
-    const hotkeys = getSubnetValidatorHotkeys(permitted, Object.keys(apr?.byHotkey ?? {}));
+    let hotkeys = getValidatorHotkeys(permitted, paid);
+
+    if (!hotkeys.length && netuid) {
+      const ownerHotkey = await readOptional(() => q.subnetOwnerHotkey(netuid));
+
+      hotkeys = ownerHotkey && !ownerHotkey.isEmpty ? [ownerHotkey.toString()] : [];
+    }
 
     if (!hotkeys.length) {
       return [];
     }
 
+    const taoPerAlpha = getTaoPerAlphaMap(prices);
+    // Root shows each validator's alpha on every subnet, as `validator.json`'s `global_alpha_stake_as_tao` did
+    const stakeNetuids = netuid ? [netuid] : prices.map((price) => price.netuid).filter((id) => id > 0);
     const [alphas, rootStakes, takes, owners] = await Promise.all([
-      q.totalHotkeyAlpha.multi(hotkeys.map((hotkey) => [hotkey, netuid])),
+      q.totalHotkeyAlpha.multi(hotkeys.flatMap((hotkey) => stakeNetuids.map((id) => [hotkey, id]))),
       q.totalHotkeyAlpha.multi(hotkeys.map((hotkey) => [hotkey, 0])),
       q.delegates.multi(hotkeys),
       q.owner.multi(hotkeys)
     ]);
     const identities = await q.identitiesV2.multi(owners.map(String));
-    const taoPerAlpha = getTaoPerAlphaMap(prices)[netuid] ?? new BigN(0);
     const taoWeight = decodeTaoWeight(taoWeightCodec?.toString());
 
     return hotkeys
       .map((address, index) => {
-        const { rootWeight, subnetStake, totalStake } = getSubnetValidatorStake(
-          { alpha: new BigN(alphas[index].toString()), hotkey: address, rootStake: new BigN(rootStakes[index].toString()) },
-          taoPerAlpha,
+        const { rootWeight, subnetStake, totalStake } = getValidatorStake(
+          {
+            alphas: stakeNetuids.map((id, k) => ({ alpha: new BigN(alphas[index * stakeNetuids.length + k].toString()), taoPerAlpha: taoPerAlpha[id] ?? new BigN(0) })),
+            rootStake: new BigN(rootStakes[index].toString())
+          },
           taoWeight
         );
         const name = (identities[index].toPrimitive() as { name?: string } | null)?.name;
@@ -884,7 +861,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           minBond: bnMinBond.toString(),
           nominatorCount: nominatorCounts[address] ?? 0,
           commission: formatTake(takes[index].toString()),
-          ...(apr ? { expectedReturn: new BigN(apr.byHotkey[address] ?? 0).multipliedBy(100).toFixed(2) } : {}),
+          ...(expectedReturn ? { expectedReturn: expectedReturn(address) } : {}),
           blocked: false,
           isVerified: false,
           chain: this.chain,
@@ -893,66 +870,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         } as unknown as ValidatorInfo;
       })
       .sort((a, b) => new BigN(b.totalStake).comparedTo(a.totalStake));
-  }
-
-  private async getMainnetPoolTargets (netuid: number): Promise<ValidatorInfo[]> {
-    if (netuid) {
-      const subnetTargets = await this.getSubnetPoolTargets(netuid);
-
-      // A subnet before its first epoch has none yet: the root validators' list, as before EXT-14
-      if (subnetTargets.length) {
-        return subnetTargets;
-      }
-    }
-
-    const topValidator = await this.bittensorCache.get();
-    // A subnet's validators take its minimum, with the pool fee; netuid 0 is root's
-    const bnMinBond = await this.getMinBond(netuid);
-    const validatorList = topValidator.data;
-
-    // A subnet's validators earn the chain's own APR for the last epoch (EXT-1); root keeps the proxy's until BE-11
-    const chainReturn = await this.getChainValidatorReturns(netuid);
-    const aprResponse = chainReturn ? { data: [] } : await this.bittensorCache.fetchApr(netuid);
-    const aprMap: Record<string, string> = {};
-
-    aprResponse.data.forEach((item) => {
-      aprMap[item.hotkey.ss58] = item.thirty_day_apy;
-    });
-
-    return await Promise.all(
-      validatorList.map((validator) => {
-        const address = validator.hotkey.ss58;
-        // With bittensor we use total weight, root weight and alpha staked insted of total stake, own stake and other stake
-        const bnTotalWeightStake = new BigN(validator.global_weighted_stake);
-        const bnRootWeightStake = new BigN(validator.weighted_root_stake);
-        const bnAlphaStake = new BigN(validator.global_alpha_stake_as_tao);
-
-        const nominatorCount = validator.global_nominators;
-        const commission = validator.take;
-        const roundedCommission = (parseFloat(commission) * 100).toFixed(0);
-
-        const apr = aprMap[address];
-        const expectedReturn = chainReturn ? chainReturn(address) : apr ? new BigN(apr).multipliedBy(100).toFixed(2) : '0';
-
-        const name = validator.name || address;
-
-        return {
-          address: address,
-          totalStake: bnTotalWeightStake.toString(),
-          ownStake: bnRootWeightStake.toString(),
-          otherStake: bnAlphaStake.toString(),
-          minBond: bnMinBond.toString(),
-          nominatorCount: nominatorCount,
-          commission: roundedCommission,
-          expectedReturn: expectedReturn,
-          blocked: false,
-          isVerified: false,
-          chain: this.chain,
-          isCrowded: false,
-          identity: name
-        } as unknown as ValidatorInfo;
-      })
-    );
   }
 
   async getPoolTargets (netuid?: number): Promise<ValidatorInfo[]> {
