@@ -46,7 +46,9 @@ can merge:
   [PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001) rewrites. Move the change into #5001, or agree the merge order.
 - **Its specs do not run in CI** — the test step is still commented out on `subwallet-dev`.
 
-Not yet started: AC-11, AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE) — detail in the story's *Progress*.
+Not yet started: AC-11, AC-14; AC-15's own rows; the English strings in AC-12; in AC-1, pool cards and root (wait on BE).
+For AC-11, the proxy half is up on the dev proxy (10-21, `Cloudflare-Workers` [`f10e80c`](https://github.com/Koniverse/Cloudflare-Workers/commit/f10e80c)): each validator's nominator
+count per subnet, from TAO.com; stake and take are to be read from the chain — detail in the story's *Progress*.
 
 ## Static earning data — stale since 09-18, cause found 10-21 (BE-1)
 
