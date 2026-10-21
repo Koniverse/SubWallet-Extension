@@ -65,6 +65,10 @@ regenerated data is live on the dev site (03:47 UTC), `validator.json` included.
 old action, and scheduled runs use `main`'s workflow files — so production and every scheduled run still fail.
 Bring the fix to `main`.
 
+**10:56 UTC:** `dev` now runs with PR #5113's code ([`5685f6d8b3`](https://github.com/Koniverse/Static-Data-Caching/commit/5685f6d8b37), runner = extension `587c566579`): the dev site
+serves 10:33 data, SN64 with its own 61 validators and nominator counts, testnet down to 100 subnets. `main` is
+unchanged — the 10:00 scheduled run failed again, and production is still 09-18.
+
 ## Inherited decision — 20 stories with a live status in a closed window
 
 Unchanged at 96 points. Raised in eight windows running; still a board decision.
