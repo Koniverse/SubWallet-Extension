@@ -62,6 +62,9 @@ interface SubnetPosition {
   originalTotalStake: BigN;
 }
 
+/** Bittensor testnet's subnets listed as pools: the first this many by netuid */
+const TESTNET_SUBNET_LIMIT = 100;
+
 const getAlphaToTaoRateMap = async (substrateApi: _SubstrateApi, priceScaleDecimals = 9): Promise<Record<number, string>> => {
   const result = Object.create(null) as Record<number, string>;
   const PRICE_SCALE = new BigN(10).pow(priceScaleDecimals);
@@ -219,11 +222,10 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       const subnetsInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getSubnetsInfoV2()).toJSON() as SubnetsInfo[] | undefined;
 
       if (dynamicInfo && subnetsInfo) {
-        // Testnet only keeps the subnets that pay: 65 of 595 on 10-21. The others made 85% of the static cache's
-        // validator lists, all copies of one global list, and of the files it rewrites each run
-        const isTestnet = this.chain === 'bittensor_testnet';
-        const mergedData = dynamicInfo
-          .filter((dynInfo) => dynInfo.netuid !== 0 && (!isTestnet || Number(dynInfo.taoInEmission) > 0))
+        // Testnet keeps only its first 100 subnets by netuid, of 595 on 10-21. The others made 85% of the static
+        // cache's validator lists, all copies of one global list, and of the files it rewrites each run
+        const subnets = dynamicInfo.filter((dynInfo) => dynInfo.netuid !== 0).sort((a, b) => a.netuid - b.netuid);
+        const mergedData = (this.chain === 'bittensor_testnet' ? subnets.slice(0, TESTNET_SUBNET_LIMIT) : subnets)
           .map((dynInfo) => {
             const extraInfo = subnetsInfo.find((subnet) => subnet.netuid === dynInfo.netuid);
 
