@@ -11,7 +11,7 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095: the only approval is on `f836222c51` (09-28); the head, `448dae55f5`, is unreviewed | ← W42 (W40 → W42 → W43) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 26 commits (ten on 10-19, six on 10-20, four on 10-21), no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 27 commits (ten on 10-19, six on 10-20, five on 10-21), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` stays W42 (the tester's) | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block, unchanged since 10-09 | ← W42 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W42 | — |
@@ -68,6 +68,13 @@ Bring the fix to `main`.
 **10:56 UTC:** `dev` now runs with PR #5113's code ([`5685f6d8b3`](https://github.com/Koniverse/Static-Data-Caching/commit/5685f6d8b37), runner = extension `587c566579`): the dev site
 serves 10:33 data, SN64 with its own 61 validators and nominator counts, testnet down to 100 subnets. `main` is
 unchanged — the 10:00 scheduled run failed again, and production is still 09-18.
+
+## Proxy — BE-20 fixed in production (10-21)
+
+`Cloudflare-Workers` `subwallet-api-proxier` took the dev branch on 10-21 (merge [`9be2028`](https://github.com/Koniverse/Cloudflare-Workers/commit/9be2028)): the APR cron no
+longer stops after its first batch, missing or old data is fetched on request, the nominator counts route is live,
+and Taostats moved to its `/v1` API ([`0f58f2b`](https://github.com/Koniverse/Cloudflare-Workers/commit/0f58f2b)) ahead of the old paths stopping on 2026-11-09. Checked
+10-22: SN0, 1, 64, 100 answer with 10-21 data. BE-20 is ready to tick.
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
