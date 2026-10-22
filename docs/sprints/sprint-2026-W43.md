@@ -84,6 +84,14 @@ legs the submit sends, over root stake, never on an empty batch; the quote itsel
 amount above the usable stake. Later the same day [`00b4ec2`](https://github.com/Koniverse/SubWallet-Monorepos/commit/00b4ec2) adds BE-15 and BE-16 — the quote's price impact on the subnet's own
 pool, both legs of an ALPHA → ALPHA swap. Then [`b0d2793`](https://github.com/Koniverse/SubWallet-Monorepos/commit/b0d2793) adds BE-17 — an ALPHA → ALPHA quote charges the pool fee once, on the sale. PR #167: 3 commits, no review, no CI checks.
 
+## APR — stays on Taostats; BE-2, BE-11, BE-3, BE-20 off #5112 (10-22, owner)
+
+The APR keeps coming from Taostats through the proxy; BE computes none of its own, and the four items are deleted
+from #5112. Checked first: Taostats gives a non-zero 30-day figure for all 52 root validators the chain paid in the
+last epoch and for no other; subnets already read their APR from the chain in the extension (US-12.24 AC-1).
+BE-20's freshness alert is dropped too. Still open: the subnet pool cards (*Emission*) and BE-12's question (what `thirty_day_apy` is).
+Detail: [docs/notes/2026-10-22.md](../notes/2026-10-22.md) §I.
+
 ## Inherited decision — 20 stories with a live status in a closed window
 
 Unchanged at 96 points. Raised in eight windows running; still a board decision.
