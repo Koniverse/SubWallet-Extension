@@ -11,7 +11,7 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095: the only approval is on `f836222c51` (09-28); the head, `448dae55f5`, is unreviewed | ← W42 (W40 → W42 → W43) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 27 commits (ten on 10-19, six on 10-20, five on 10-21), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 28 commits (ten on 10-19, six on 10-20, five on 10-21, one on 10-22), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` stays W42 (the tester's) | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block, unchanged since 10-09 | ← W42 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W42 | — |
@@ -75,6 +75,9 @@ unchanged — the 10:00 scheduled run failed again, and production is still 09-1
 longer stops after its first batch, missing or old data is fetched on request, the nominator counts route is live,
 and Taostats moved to its `/v1` API ([`0f58f2b`](https://github.com/Koniverse/Cloudflare-Workers/commit/0f58f2b)) ahead of the old paths stopping on 2026-11-09. Checked
 10-22: SN0, 1, 64, 100 answer with 10-21 data. BE-20 is ready to tick.
+
+**Static cache, 10-22:** `dev` builds `validator.json` — kept for released clients — from the chain instead of Taostats'
+old path, which stops on 2026-11-09 ([`58bfdb62c1`](https://github.com/Koniverse/Static-Data-Caching/commit/58bfdb62c15)). `main` needs both that and the deploy fix before 2026-11-09.
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
