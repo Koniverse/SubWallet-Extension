@@ -79,6 +79,10 @@ and Taostats moved to its `/v1` API ([`0f58f2b`](https://github.com/Koniverse/Cl
 **Static cache, 10-22:** `dev` builds `validator.json` — kept for released clients — from the chain instead of Taostats'
 old path, which stops on 2026-11-09 ([`58bfdb62c1`](https://github.com/Koniverse/Static-Data-Caching/commit/58bfdb62c15)). `main` needs both that and the deploy fix before 2026-11-09.
 
+**Swap backend, 10-22:** BE-14 on `SubWallet-Monorepos` `koni/dev/issue-5112-extension` ([`10d7d69`](https://github.com/Koniverse/SubWallet-Monorepos/commit/10d7d69), no PR yet) — the Bittensor quote's fee is estimated on the
+legs the submit sends, over root stake, never on an empty batch; the quote itself is not capped, the extension refuses an
+amount above the usable stake.
+
 ## Inherited decision — 20 stories with a live status in a closed window
 
 Unchanged at 96 points. Raised in eight windows running; still a board decision.
