@@ -4,6 +4,8 @@
 import { getWorthAtSpot } from '@subwallet/extension-base/utils/alpha';
 import BigN from 'bignumber.js';
 
+import { hexToString, isHex } from '@polkadot/util';
+
 const U64_MAX = new BigN('18446744073709551615');
 
 /** `DefaultTaoWeight`, also what mainnet reads (10-21) */
@@ -50,6 +52,20 @@ export function getValidatorStake ({ alphas, rootStake }: ValidatorStakeRow, tao
 
   return { rootWeight, subnetStake, totalStake: rootWeight.plus(subnetStake) };
 }
+
+/**
+ * The name in an `IdentitiesV2` entry's JSON, '' without one. Its bytes come as hex there, decoded here as UTF-8:
+ * `toPrimitive()` gives text for ASCII only, so "Openτensor Foundaτion" came out as `0x4f70…`
+ */
+export const decodeIdentityName = (identity: unknown): string => {
+  const name = (identity as { name?: unknown } | null)?.name;
+
+  if (typeof name !== 'string') {
+    return '';
+  }
+
+  return isHex(name) ? hexToString(name) : name;
+};
 
 /** `Delegates(hotkey)` as the picker prints a take: percent, up to 2 decimals — 11,796 is 18, 5,898 is 9 */
 export const formatTake = (raw: BigN.Value): string => new BigN(raw).dividedBy(TAKE_SCALE).multipliedBy(100).decimalPlaces(2).toString();

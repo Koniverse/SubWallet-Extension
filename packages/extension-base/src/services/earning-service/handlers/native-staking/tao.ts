@@ -24,7 +24,7 @@ import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
 import { getSubnetApr, SubnetApr } from './bittensor-subnet-apr';
-import { decodeTaoWeight, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
+import { decodeIdentityName, decodeTaoWeight, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
 type Nominators = [Array<[number, number]>]
@@ -225,7 +225,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       const owner = await q.owner(hotkey);
       const identity = await q.identitiesV2(owner.toString());
 
-      return (identity.toPrimitive() as { name?: string } | null)?.name ?? '';
+      return decodeIdentityName(identity.toJSON());
     }).catch(() => '')));
 
     return Object.fromEntries(hotkeys.map((hotkey, index) => [hotkey, names[index]]));
@@ -851,7 +851,7 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           },
           taoWeight
         );
-        const name = (identities[index].toPrimitive() as { name?: string } | null)?.name;
+        const name = decodeIdentityName(identities[index].toJSON());
 
         return {
           address,
