@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { decodeTaoWeight, DEFAULT_TAO_WEIGHT, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
+import { decodeIdentityName, decodeTaoWeight, DEFAULT_TAO_WEIGHT, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
 
 const RAO = 1e9;
 const TAO_WEIGHT = decodeTaoWeight('3320413933267719290');
@@ -51,6 +51,14 @@ describe('A subnet\'s validators from the chain (EXT-14)', () => {
     expect(stake.subnetStake.toNumber()).toBe(150 * RAO);
     expect(stake.rootWeight.toNumber()).toBe(1800 * RAO);
     expect(stake.totalStake.toNumber()).toBe(1950 * RAO);
+  });
+
+  it('decodes an identity\'s name as UTF-8, not ASCII only', () => {
+    // Mainnet names on 10-22, as `IdentitiesV2` JSON gives them
+    expect(decodeIdentityName({ name: '0x4f70656ecf84656e736f7220466f756e6461cf84696f6e' })).toBe('Openτensor Foundaτion');
+    expect(decodeIdentityName({ name: '0x74616f2e626f74', url: '0x' })).toBe('tao.bot');
+    expect(decodeIdentityName({ name: '0x' })).toBe('');
+    expect(decodeIdentityName(null)).toBe('');
   });
 
   it('prints a take in percent the way the picker always has, without u16 rounding noise', () => {
