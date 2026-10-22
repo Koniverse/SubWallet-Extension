@@ -82,7 +82,7 @@ old path, which stops on 2026-11-09 ([`58bfdb62c1`](https://github.com/Koniverse
 **Swap backend, 10-22:** BE-14 on `SubWallet-Monorepos` `koni/dev/issue-5112-extension` ([`10d7d69`](https://github.com/Koniverse/SubWallet-Monorepos/commit/10d7d69), ~~no PR yet~~ [PR #167](https://github.com/Koniverse/SubWallet-Monorepos/pull/167)) — the Bittensor quote's fee is estimated on the
 legs the submit sends, over root stake, never on an empty batch; the quote itself is not capped, the extension refuses an
 amount above the usable stake. Later the same day [`00b4ec2`](https://github.com/Koniverse/SubWallet-Monorepos/commit/00b4ec2) adds BE-15 and BE-16 — the quote's price impact on the subnet's own
-pool, both legs of an ALPHA → ALPHA swap. PR #167: 2 commits, no review, no CI checks.
+pool, both legs of an ALPHA → ALPHA swap. Then [`b0d2793`](https://github.com/Koniverse/SubWallet-Monorepos/commit/b0d2793) adds BE-17 — an ALPHA → ALPHA quote charges the pool fee once, on the sale. PR #167: 3 commits, no review, no CI checks.
 
 ## Inherited decision — 20 stories with a live status in a closed window
 
