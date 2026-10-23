@@ -695,7 +695,6 @@
   "ui.EARNING.components.Earning.PoolItem.maxApy": "Max APY",
   "ui.EARNING.components.Earning.PoolItem.rewards": "Rewards",
   "ui.EARNING.components.Earning.PoolItem.upTo": "Up to",
-  "ui.EARNING.components.Earning.PoolItem.aprIn": "APR in {{symbol}}",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.Item.tbd": "TBD",

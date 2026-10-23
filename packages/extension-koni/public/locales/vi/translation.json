@@ -729,7 +729,6 @@
   "ui.EARNING.components.Earning.PoolItem.maxApy": "APY tối đa",
   "ui.EARNING.components.Earning.PoolItem.rewards": "Phần thưởng",
   "ui.EARNING.components.Earning.PoolItem.upTo": "Lên đến",
-  "ui.EARNING.components.Earning.PoolItem.aprIn": "APR tính bằng {{symbol}}",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.Item.tbd": "TBD",

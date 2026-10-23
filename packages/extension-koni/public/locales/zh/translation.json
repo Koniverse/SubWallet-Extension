@@ -727,7 +727,6 @@
   "ui.EARNING.components.Earning.PoolItem.maxApy": "最高 APY",
   "ui.EARNING.components.Earning.PoolItem.rewards": "奖励",
   "ui.EARNING.components.Earning.PoolItem.upTo": "最高",
-  "ui.EARNING.components.Earning.PoolItem.aprIn": "APR（以 {{symbol}} 计）",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.Item.tbd": "TBD",

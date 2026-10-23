@@ -110,8 +110,8 @@ const Component: React.FC<Props> = (props: Props) => {
 
             {isBittensor
               ? (
-                // "Up to X% APR": the best validator holding ≥ 1% of the stake (EXT-1), on a subnet in its alpha. A
-                // measured 0 reads "0% APR", never "Up to 0%"; "—" only without a figure
+                // "Up to X%": the best validator holding ≥ 1% of the stake (EXT-1), on a subnet in its alpha. A measured 0
+                // reads "0%", never "Up to 0%"; "—" only without a figure
                 <div className='__item-rewards'>
                   {!!upToApr && (
                     <div className='__item-rewards-label'>
@@ -124,9 +124,7 @@ const Component: React.FC<Props> = (props: Props) => {
                       : (
                         <Number
                           decimal={0}
-                          suffix={isSubnetStaking
-                            ? '% ' + t('ui.EARNING.components.Earning.PoolItem.aprIn', { replace: { symbol: poolInfo.metadata.subnetData?.subnetSymbol || '' } })
-                            : '% APR'}
+                          suffix={'%'}
                           value={upToApr}
                         />
                       )}
