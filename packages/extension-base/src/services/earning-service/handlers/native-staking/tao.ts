@@ -902,7 +902,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
           isVerified: false,
           chain: this.chain,
           isCrowded: false,
-          identity: name || address
+          // '' without a name: the picker then shows the address shortened, as for every network
+          identity: name
         } as unknown as ValidatorInfo;
       })
       .sort((a, b) => new BigN(b.totalStake).comparedTo(a.totalStake));
