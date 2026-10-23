@@ -8,8 +8,17 @@ import BigN from 'bignumber.js';
 import { SharedRead } from './shared-read';
 
 /**
+ * What `alpha` is worth at `taoPerAlpha`, in rao of TAO, rounded half up: the TAO value Earning shows for a hotkey's
+ * stake (`parseNominatorMetadataBase`), and Assets' test of which stake to count. One rule for both, so the two screens
+ * agree on the alpha they show and on what it is worth (EXT-10).
+ */
+export const getAlphaWorthInTao = (alpha: BigN.Value, taoPerAlpha: BigN.Value): BigN => {
+  return new BigN(alpha).multipliedBy(taoPerAlpha).integerValue(BigN.ROUND_HALF_UP);
+};
+
+/**
  * Each account's alpha by netuid, counting only the stake Earning shows: a hotkey whose stake is worth
- * at least 1 rao of TAO (`parseNominatorMetadataBase`). Unstaking leaves 1 rao behind on a subnet;
+ * 1 rao of TAO or more, rounded (`getAlphaWorthInTao`). Unstaking leaves 1 rao behind on a subnet;
  * counted, it shows as a "0" balance that "Show zero balance" cannot hide (EXT-39). Without
  * `taoPerAlpha`, when the runtime gives no prices, every stake counts, as before.
  */
@@ -19,7 +28,7 @@ export const getShownAlphaStakes = (rows: Array<[string, Array<{ netuid: number,
 
     stakes.forEach(({ netuid, stake }) => {
       const value = new BigN(stake);
-      const shown = taoPerAlpha ? new BigN(value.multipliedBy(taoPerAlpha[netuid] || 0).toFixed(0)).gt(0) : value.gt(0);
+      const shown = taoPerAlpha ? getAlphaWorthInTao(value, taoPerAlpha[netuid] || 0).gt(0) : value.gt(0);
 
       if (shown) {
         byNetuid[netuid] = (byNetuid[netuid] || new BigN(0)).plus(value);

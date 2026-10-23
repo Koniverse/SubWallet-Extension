@@ -50,6 +50,8 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
   private refreshTimeout: NodeJS.Timeout | undefined;
   private priceIds = new Set<string>();
   private readonly currency = new CurrentCurrencyStore();
+  /** The last on-chain alpha prices read, for a refresh whose read fails or is late */
+  private lastTaoPerAlpha: Record<number, number> = {};
 
   constructor (dbService: DatabaseService, eventService: EventService, chainService: ChainService) {
     this.priceSubject = new BehaviorSubject({ ...DEFAULT_PRICE_SUBJECT });
@@ -93,33 +95,40 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     ]);
   }
 
-  /** TAO per alpha by netuid, read on chain; empty when Bittensor is off or does not answer in time. */
+  /**
+   * TAO per alpha by netuid, read on chain; empty when Bittensor is off. A read that fails or is late gives the last
+   * one, so Assets and Swap keep valuing alpha as Earning does (EXT-10) instead of switching to CoinGecko's price for a
+   * refresh — CoinGecko's only when the chain has not answered since the start.
+   */
   private async getTaoPerAlpha (): Promise<Record<number, number>> {
-    const result: Record<number, number> = {};
+    if (!this.chainService.getChainStateByKey(ALPHA_PRICE_CHAIN)?.active) {
+      return {};
+    }
 
     try {
-      if (!this.chainService.getChainStateByKey(ALPHA_PRICE_CHAIN)?.active) {
-        return result;
-      }
-
       const substrateApi = await Promise.race([this.chainService.getSubstrateApi(ALPHA_PRICE_CHAIN).isReady, wait(ALPHA_PRICE_TIMEOUT)]);
 
       if (!substrateApi) {
-        return result;
+        return this.lastTaoPerAlpha;
       }
 
       // Shared with the alpha balances and Earning, which read it on their own timers
       const prices = await readAlphaPrices(substrateApi.api);
+      const result: Record<number, number> = {};
 
       // rao per alpha
       prices.forEach(({ netuid, price }) => {
         result[netuid] = Number(price) / 1e9;
       });
+
+      if (Object.keys(result).length) {
+        this.lastTaoPerAlpha = result;
+      }
     } catch (e) {
       console.error(e);
     }
 
-    return result;
+    return this.lastTaoPerAlpha;
   }
 
   /** The CoinGecko id of each subnet's alpha on Bittensor, where it has one. */
