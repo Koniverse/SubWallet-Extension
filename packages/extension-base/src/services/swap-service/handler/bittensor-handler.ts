@@ -17,7 +17,7 @@ import { ISubmittableResult } from '@polkadot/types/types';
 import { BalanceService } from '../../balance-service';
 import { ChainService } from '../../chain-service';
 import { _getAssetDecimals, _getAssetSymbol, _isNativeTokenBySlug } from '../../chain-service/utils';
-import { SimulatedSubnetTrade, simulateSubnetTrade } from '../../earning-service/handlers/native-staking/bittensor-pool';
+import { SimulatedSubnetTrade, simulateMoveIntoSubnet, simulateSubnetTrade } from '../../earning-service/handlers/native-staking/bittensor-pool';
 import { TaoStakeInfo } from '../../earning-service/handlers/native-staking/tao';
 import FeeService from '../../fee-service/service';
 import { SwapBaseHandler, SwapBaseInterface } from './base-handler';
@@ -323,13 +323,18 @@ export class BittensorSwapHandler implements SwapBaseInterface {
 
   /**
    * The whole swap through the chain's own simulation: sell on the origin pool, buy on the destination
-   * pool, root priced 1:1 and without a pool. `received` is what it returns, in the destination's unit.
+   * pool, root priced 1:1 and without a pool. Between two subnets the pool fee is paid once, on the sale,
+   * as the chain charges it. `received` is what it returns, in the destination's unit.
    */
   private simulateSwap (api: ApiPromise, block: PinnedBlock, fromNetuid: number, toNetuid: number, amount: BigNumber): Promise<SimulatedSwap> {
     return this.swapSims.get([block.hash, fromNetuid, toNetuid, amount.toFixed(0)].join('-'), async () => {
       const origin = fromNetuid === 0 ? undefined : await simulateSubnetTrade(api, fromNetuid, amount, false, block.at);
       const taoBetween = origin ? origin.out : amount;
-      const destination = toNetuid === 0 ? undefined : await simulateSubnetTrade(api, toNetuid, taoBetween, true, block.at);
+      const destination = toNetuid === 0
+        ? undefined
+        : origin
+          ? await simulateMoveIntoSubnet(api, toNetuid, taoBetween, block.at)
+          : await simulateSubnetTrade(api, toNetuid, taoBetween, true, block.at);
 
       return { origin, destination, received: destination ? destination.out : taoBetween };
     });

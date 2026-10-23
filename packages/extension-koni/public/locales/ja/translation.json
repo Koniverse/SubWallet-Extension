@@ -727,7 +727,6 @@
   "ui.EARNING.components.Earning.PoolItem.maxApy": "最大APY",
   "ui.EARNING.components.Earning.PoolItem.rewards": "報酬",
   "ui.EARNING.components.Earning.PoolItem.upTo": "最大",
-  "ui.EARNING.components.Earning.PoolItem.aprIn": "APR（{{symbol}}建て）",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.DetailModal.tbd": "TBD",
   "ui.SETTINGS.screen.Setting.MissionPool.Item.tbd": "TBD",

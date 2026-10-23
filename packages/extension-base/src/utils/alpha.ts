@@ -139,6 +139,26 @@ export const DEFAULT_MIN_TRANSFER = '100000';
 /** The swap pallet's default `FeeRate`, 33 / 65535 ≈ 0.0504% of a trade's input: every mainnet subnet's on 10-12 */
 export const DEFAULT_SWAP_FEE_RATE = 33 / 65535;
 
+/** What a `FeeRate` is out of: a rate of r takes r / 65535 of a trade's input (u16::MAX) */
+export const SWAP_FEE_RATE_SCALE = 65535;
+
+/**
+ * An input whose pool fee — `floor(input × feeRate / 65535)`, as the chain takes it — leaves exactly `net` for the
+ * pool. A move between subnets buys without the fee (BE-17) and the chain's simulation always charges it; what a buy
+ * pays out depends only on what reaches the pool, so simulating this input gives what `net` buys there.
+ */
+export const getInputBeforeFee = (net: BigN, feeRate: BigN): BigN => {
+  if (feeRate.lte(0) || feeRate.gte(SWAP_FEE_RATE_SCALE)) {
+    return net;
+  }
+
+  const leftForPool = (input: BigN) => input.minus(input.multipliedBy(feeRate).dividedBy(SWAP_FEE_RATE_SCALE).integerValue(BigN.ROUND_FLOOR));
+  // Leaves `net` or 1 rao more, the fee being rounded down; then 1 rao less leaves exactly `net`
+  const input = net.multipliedBy(SWAP_FEE_RATE_SCALE).dividedBy(new BigN(SWAP_FEE_RATE_SCALE).minus(feeRate)).integerValue(BigN.ROUND_CEIL);
+
+  return leftForPool(input).gt(net) ? input.minus(1) : input;
+};
+
 /**
  * A chain read that only refines a check: `undefined` when the runtime no longer has the storage or
  * runtime API, or the call fails, so the check is skipped and the action goes on as before it existed.

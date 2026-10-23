@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-base
 // SPDX-License-Identifier: Apache-2.0
 
-import { getPriceAfterStake, getPriceAfterUnstake } from '@subwallet/extension-base/utils/alpha';
+import { getInputBeforeFee, getPriceAfterStake, getPriceAfterUnstake, readOptional } from '@subwallet/extension-base/utils/alpha';
 import BigN from 'bignumber.js';
 
 import { ApiPromise } from '@polkadot/api';
@@ -51,4 +51,30 @@ export async function simulateSubnetTrade (api: ApiPromise, netuid: number, amou
   const fee = new BigN(sim.alphaFee ?? 0);
 
   return { spot, out, fee, priceAfter: getPriceAfterUnstake(spot, pool, amount, fee, out) };
+}
+
+/**
+ * Subnet `netuid`'s pool fee, `Swap.FeeRate(netuid)`, out of 65535: 33 on every mainnet subnet (10-23). Read from the
+ * chain, no longer the proxy's `fee_rate` (BE-5). Undefined when the runtime does not have it.
+ */
+export async function readSubnetFeeRate (source: ApiPromise | ApiDecoration<'promise'>, netuid: number): Promise<BigN | undefined> {
+  const rate = await readOptional(() => source.query.swap?.feeRate(netuid));
+
+  return rate ? new BigN(rate.toString()) : undefined;
+}
+
+/**
+ * Buys alpha on subnet `netuid` with `tao`, as the second leg of a move from another subnet. The chain makes that
+ * leg without the pool fee — a move pays it once, on the sale (`drop_fee_destination`, v482 `move_stake.rs:509–510`;
+ * BE-17) — while its simulation always charges it, so this simulates the input that leaves `tao` for the pool once
+ * the fee is off: what `tao` buys, and the price it leaves. Without the fee rate the fee stays in, about 0.05% low.
+ */
+export async function simulateMoveIntoSubnet (api: ApiPromise, netuid: number, tao: BigN, at?: ApiDecoration<'promise'>): Promise<SimulatedSubnetTrade> {
+  const feeRate = await readSubnetFeeRate(at ?? api, netuid);
+
+  if (!feeRate) {
+    return simulateSubnetTrade(api, netuid, tao, true, at);
+  }
+
+  return { ...await simulateSubnetTrade(api, netuid, getInputBeforeFee(tao, feeRate), true, at), fee: new BigN(0) };
 }

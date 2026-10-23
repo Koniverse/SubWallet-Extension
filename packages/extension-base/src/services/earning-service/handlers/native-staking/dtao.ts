@@ -7,12 +7,12 @@ import { BITTENSOR_REFRESH_STAKE_APY, BITTENSOR_REFRESH_STAKE_INFO } from '@subw
 import KoniState from '@subwallet/extension-base/koni/background/handlers/State';
 import { _SubstrateApi } from '@subwallet/extension-base/services/chain-service/types';
 import { BaseYieldPositionInfo, EarningStatus, NativeYieldPoolInfo, RequestEarningImpact, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { getPriceImpact, readAlphaPrices, reformatAddress } from '@subwallet/extension-base/utils';
+import { DEFAULT_SWAP_FEE_RATE, getPriceImpact, readAlphaPrices, reformatAddress, SWAP_FEE_RATE_SCALE } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 
 import { BN_ZERO } from '@polkadot/util';
 
-import { simulateSubnetTrade } from './bittensor-pool';
+import { readSubnetFeeRate, simulateSubnetTrade } from './bittensor-pool';
 import TaoNativeStakingPoolHandler, { BITTENSOR_BLOCK_TIME, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
@@ -165,7 +165,7 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     }
   }
 
-  /** The x·y=k preview, with the proxy's fee rate: only for runtimes without the chain's simulation. */
+  /** The x·y=k preview, with the chain's fee rate (BE-5): only for runtimes without the chain's simulation. */
   private async estimateEarningImpact (params: RequestEarningImpact): Promise<EarningImpactResult> {
     const substrateApi = await this.substrateApi.isReady;
     const subnetInfo = (await substrateApi.api.call.subnetInfoRuntimeApi.getDynamicInfo(params.netuid)).toJSON() as RateSubnetData | undefined;
@@ -177,7 +177,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
     const value = new BigN(params.value);
     const rate = taoIn.dividedBy(alphaIn);
 
-    const feeRate = await this.bittensorCache.fetchSubnetFeeRate(params.netuid);
+    const chainFeeRate = await readSubnetFeeRate(substrateApi.api, params.netuid);
+    const feeRate = chainFeeRate ? chainFeeRate.dividedBy(SWAP_FEE_RATE_SCALE) : new BigN(DEFAULT_SWAP_FEE_RATE);
 
     if (params.type === ExtrinsicType.STAKING_BOND) {
       const newTaoIn = taoIn.plus(value);
