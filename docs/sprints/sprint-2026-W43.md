@@ -11,7 +11,7 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095: the only approval is on `f836222c51` (09-28); the head, `448dae55f5`, is unreviewed | ← W42 (W40 → W42 → W43) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 29 commits (ten on 10-19, six on 10-20, five on 10-21, one on 10-22, one on 10-23), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), 33 commits (ten on 10-19, six on 10-20, five on 10-21, one on 10-22, five on 10-23), CI green, no review | ← W42 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` stays W42 (the tester's) | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | PR #5096 open — PR-build pin + TEMP block, unchanged since 10-09 | ← W42 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 | ← W42 | — |
@@ -40,7 +40,9 @@ shared, change validator follows the chain's move rules, the staking minimum com
 and, on 10-20, subnet positions say their rewards compound and the unstaking period and reward
 timing come from the chain, Send alpha asks before locked alpha goes along, EXT-17's unit tests are in, the pool card's labels are translatable, and the subnet on screen shows its APR from the chain. On 10-23
 (`691b6e9c00`) the pool cards show *Up to X% APR* — subnets from the chain, built in the static-cache job; root by
-the ≥ 1% rule on Taostats' list — and root positions show their validators' APR. Before it
+the ≥ 1% rule on Taostats' list — and root positions show their validators' APR. Later on 10-23: the card
+shortened to *Up to X%*, a subnet → subnet estimate without the buy fee the chain does not charge, the fee rate
+from the chain, unnamed validators shown by their address shortened, the modal's figure from the cache. Before it
 can merge:
 
 - **A review** — none yet, and the body is empty (the PR template asks for every section).
@@ -49,7 +51,7 @@ can merge:
 - **Its specs do not run in CI** — the test step is still commented out on `subwallet-dev`.
 
 Not yet started: AC-14; AC-15's own rows; the English strings in AC-12; ~~in AC-1, pool cards and root (wait on BE)~~ (on the branch since 10-23; they reach users once the cache job runs
-with that code — `upToApr` is on no static cache yet).
+with that code — ~~`upToApr` is on no static cache yet~~ on the dev site since 08:27 UTC 10-23; production waits on BE-1).
 AC-11 is on the branch since 10-21 (`3891e2e504`): per-subnet validator lists from the chain, nominator counts from
 the proxy route (`Cloudflare-Workers` [`f10e80c`](https://github.com/Koniverse/Cloudflare-Workers/commit/f10e80c)) — live on the dev proxy, 404 in production — detail in the story's *Progress*.
 
@@ -71,6 +73,10 @@ Bring the fix to `main`.
 **10:56 UTC:** `dev` now runs with PR #5113's code ([`5685f6d8b3`](https://github.com/Koniverse/Static-Data-Caching/commit/5685f6d8b37), runner = extension `587c566579`): the dev site
 serves 10:33 data, SN64 with its own 61 validators and nominator counts, testnet down to 100 subnets. `main` is
 unchanged — the 10:00 scheduled run failed again, and production is still 09-18.
+
+**10-23:** the `dev` runner moved to `ac8da255` ([`8ad7a6ab61`](https://github.com/Koniverse/Static-Data-Caching/commit/8ad7a6ab61), 08:24) and then `f814a46a`
+([`3e95b1e9a4`](https://github.com/Koniverse/Static-Data-Caching/commit/3e95b1e9a4), 09:54), builds with PR #5113's 10-23 code: the dev site carries the pool
+cards' `upToApr` on 229 of 231 Bittensor pools (data 09:56 UTC). `main` unchanged; production still 09-18.
 
 ## Proxy — BE-20 fixed in production (10-21)
 
