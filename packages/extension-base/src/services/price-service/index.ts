@@ -5,12 +5,14 @@ import { CurrencyJson, CurrencyType, CurrentTokenPrice, ExchangeRateJSON, Histor
 import { CRON_REFRESH_PRICE_INTERVAL, CURRENCY } from '@subwallet/extension-base/constants';
 import { CronServiceInterface, PersistDataServiceInterface, ServiceStatus, StoppableServiceInterface } from '@subwallet/extension-base/services/base/types';
 import { ChainService } from '@subwallet/extension-base/services/chain-service';
+import { _getAssetNetuid, _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { EventService } from '@subwallet/extension-base/services/event-service';
+import { ALPHA_PRICE_ID_PREFIX, getAlphaPrices } from '@subwallet/extension-base/services/price-service/alpha';
 import { getExchangeRateMap, getHistoryPrice, getPriceMap } from '@subwallet/extension-base/services/price-service/coingecko';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { CurrentCurrencyStore } from '@subwallet/extension-base/stores';
-import { getTokenPriceHistoryId, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
+import { getTokenPriceHistoryId, readAlphaPrices, TIME_INTERVAL, wait } from '@subwallet/extension-base/utils';
 import { createPromiseHandler } from '@subwallet/extension-base/utils/promise';
 import { staticData, StaticKey } from '@subwallet/extension-base/utils/staticData';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Subject } from 'rxjs';
@@ -26,6 +28,11 @@ const DEFAULT_PRICE_SUBJECT: PriceJson = {
   exchangeRateMap: {},
   lastUpdatedMap: {}
 };
+
+/** The chain whose on-chain alpha prices value every subnet's alpha (EXT-2) */
+const ALPHA_PRICE_CHAIN = 'bittensor';
+/** How long a price refresh waits for the Bittensor connection before going without on-chain alpha prices */
+const ALPHA_PRICE_TIMEOUT = 5000;
 
 const checkFetchSuccess = (obj1: Omit<PriceJson, 'exchangeRateMap'>, obj2: Record<CurrencyType, ExchangeRateJSON>) => {
   return Object.keys(obj1).length > 0 && Object.keys(obj2).length > 0;
@@ -70,11 +77,13 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     const getPriceData = async () => {
       await Promise.all([
         getExchangeRateMap(),
-        getPriceMap(priceIds, currency)
-      ]).then(([exchangeRateMap, priceMap]) => {
+        // The last answer stands in for any page no source answers this time
+        getPriceMap(priceIds, currency, undefined, this.rawPriceSubject.value),
+        this.getTaoPerAlpha()
+      ]).then(([exchangeRateMap, priceMap, taoPerAlpha]) => {
         if (checkFetchSuccess(priceMap, exchangeRateMap)) {
           this.rawExchangeRateMap.next(exchangeRateMap);
-          this.rawPriceSubject.next(priceMap);
+          this.rawPriceSubject.next(this.addAlphaPrices(priceMap, taoPerAlpha));
         }
       });
     };
@@ -82,6 +91,89 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
     await Promise.race([
       getPriceData(), wait(10 * 1000)
     ]);
+  }
+
+  /** TAO per alpha by netuid, read on chain; empty when Bittensor is off or does not answer in time. */
+  private async getTaoPerAlpha (): Promise<Record<number, number>> {
+    const result: Record<number, number> = {};
+
+    try {
+      if (!this.chainService.getChainStateByKey(ALPHA_PRICE_CHAIN)?.active) {
+        return result;
+      }
+
+      const substrateApi = await Promise.race([this.chainService.getSubstrateApi(ALPHA_PRICE_CHAIN).isReady, wait(ALPHA_PRICE_TIMEOUT)]);
+
+      if (!substrateApi) {
+        return result;
+      }
+
+      // Shared with the alpha balances and Earning, which read it on their own timers
+      const prices = await readAlphaPrices(substrateApi.api);
+
+      // rao per alpha
+      prices.forEach(({ netuid, price }) => {
+        result[netuid] = Number(price) / 1e9;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+
+    return result;
+  }
+
+  /** The CoinGecko id of each subnet's alpha on Bittensor, where it has one. */
+  private getAlphaCoingeckoIds (): Record<number, string> {
+    const result: Record<number, string> = {};
+
+    Object.values(this.chainService.getAssetRegistry()).forEach((asset) => {
+      const netuid = asset.originChain === ALPHA_PRICE_CHAIN ? _getAssetNetuid(asset) : -1;
+
+      if (netuid > 0 && asset.priceId) {
+        result[netuid] = asset.priceId;
+      }
+    });
+
+    return result;
+  }
+
+  /** CoinGecko's id behind an alpha price key, for its chart; the key itself for anything else. */
+  private toCoingeckoId (priceId: string, coingeckoIds?: Record<number, string>): string {
+    if (!priceId.startsWith(ALPHA_PRICE_ID_PREFIX)) {
+      return priceId;
+    }
+
+    return (coingeckoIds || this.getAlphaCoingeckoIds())[Number(priceId.slice(ALPHA_PRICE_ID_PREFIX.length))] || '';
+  }
+
+  /** Adds every subnet's alpha price, keyed by netuid (EXT-2). */
+  private addAlphaPrices (raw: Omit<PriceJson, 'exchangeRateMap'>, taoPerAlpha: Record<number, number>): Omit<PriceJson, 'exchangeRateMap'> {
+    const coingeckoIds = this.getAlphaCoingeckoIds();
+    const alpha = getAlphaPrices({
+      taoPerAlpha,
+      coingeckoIds,
+      taoPriceId: _getAssetPriceId(this.chainService.getNativeTokenInfo(ALPHA_PRICE_CHAIN)),
+      priceMap: raw.priceMap,
+      price24hMap: raw.price24hMap
+    });
+    const now = new Date();
+    const lastUpdatedMap = { ...raw.lastUpdatedMap };
+
+    Object.keys(alpha.priceMap).forEach((key) => {
+      lastUpdatedMap[key] = now;
+    });
+
+    // The chart of an alpha price key draws CoinGecko's history, where it has one
+    const supported = new Set(raw.priceCoinGeckoSupported || []);
+    const alphaSupported = Object.keys(alpha.priceMap).filter((key) => supported.has(this.toCoingeckoId(key, coingeckoIds)));
+
+    return {
+      ...raw,
+      priceMap: { ...raw.priceMap, ...alpha.priceMap },
+      price24hMap: { ...raw.price24hMap, ...alpha.price24hMap },
+      priceCoinGeckoSupported: [...supported, ...alphaSupported],
+      lastUpdatedMap
+    };
   }
 
   private getCurrentCurrencySubject (): Subject<CurrencyType> {
@@ -227,8 +319,10 @@ export class PriceService implements StoppableServiceInterface, PersistDataServi
       history.length === 0 ||
       now - history[history.length - 1].time > timeInterval;
 
-    if (needsRefresh) {
-      const { history: newHistory } = await getHistoryPrice(priceId, timeframe);
+    const coingeckoId = this.toCoingeckoId(priceId);
+
+    if (needsRefresh && coingeckoId) {
+      const { history: newHistory } = await getHistoryPrice(coingeckoId, timeframe);
 
       if (newHistory.length > 0) {
         history = newHistory;

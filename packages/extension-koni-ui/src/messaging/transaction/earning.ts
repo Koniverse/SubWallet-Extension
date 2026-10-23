@@ -4,7 +4,7 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { RequestStakePoolingUnbonding, RequestYieldFastWithdrawal } from '@subwallet/extension-base/background/KoniTypes';
 import { SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
-import { NominationPoolInfo, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestGetYieldPoolTargets, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, SubmitChangeValidatorStaking, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo } from '@subwallet/extension-base/types';
+import { NominationPoolInfo, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestGetYieldPoolTargets, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubnetApr, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, SubmitChangeValidatorStaking, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo } from '@subwallet/extension-base/types';
 import { sendMessage } from '@subwallet/extension-koni-ui/messaging';
 
 export async function fetchPoolTarget (request: RequestGetYieldPoolTargets) {
@@ -63,6 +63,10 @@ export async function yieldSubmitRedeem (data: RequestYieldFastWithdrawal) {
 
 export async function getEarningImpact (data: RequestEarningImpact) {
   return sendMessage('pri(yield.getEarningImpact)', data);
+}
+
+export async function getSubnetApr (data: RequestSubnetApr) {
+  return sendMessage('pri(yield.getSubnetApr)', data);
 }
 
 export async function changeEarningValidator (data: SubmitChangeValidatorStaking) {

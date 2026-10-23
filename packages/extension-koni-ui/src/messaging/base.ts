@@ -47,7 +47,8 @@ function onConnectPort () {
       // eslint-disable-next-line @typescript-eslint/ban-types
       (handler.subscriber as Function)(data.subscription);
     } else if (data.error) {
-      handler.reject(new Error(data.error));
+      // Code and data travel with the message, so a caller can tell errors apart without reading translated text
+      handler.reject(Object.assign(new Error(data.error), { code: data.errorCode, data: data.errorData }));
     } else {
       handler.resolve(data.response);
     }
