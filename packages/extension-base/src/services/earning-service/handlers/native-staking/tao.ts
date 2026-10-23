@@ -71,15 +71,6 @@ export interface RateSubnetData {
   alphaOut: string;
 }
 
-interface SubnetRateFeeResponse {
-  data: SubnetFeeRate[];
-}
-
-interface SubnetFeeRate {
-  netuid: number;
-  fee_rate: string;
-}
-
 interface NominatorCountResponse {
   data?: Array<{ hotkey: string; nominatorCount: number }>;
 }
@@ -96,8 +87,9 @@ const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 export const BITTENSOR_BLOCK_TIME = 12;
 
 /**
- * What still comes from the proxy: root's 30-day APR (it stays there: BE-11 dropped, 10-22), the subnet fee rate, and nominator counts. Validator
- * lists and names are read from the chain; the static `validator.json`, and its timer re-reading it every minute, are gone
+ * What still comes from the proxy: root's 30-day APR (it stays there: BE-11 dropped, 10-22) and nominator counts. Validator
+ * lists and names, and the subnet fee rate (BE-5), are read from the chain; the static `validator.json`, and its timer
+ * re-reading it every minute, are gone
  */
 export class BittensorCache {
   private static instance: BittensorCache | null = null;
@@ -128,29 +120,6 @@ export class BittensorCache {
       console.error(error);
 
       return { data: [] };
-    }
-  }
-
-  public async fetchSubnetFeeRate (netuid: number): Promise<string> {
-    try {
-      const resp = await fetchFromProxyService(
-        ProxyServiceRoute.BITTENSOR,
-        '/subnet/latest/v1',
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-
-      const rawData = await resp.json() as SubnetRateFeeResponse;
-
-      const subnet = rawData.data.find((item) => item.netuid === netuid);
-
-      return subnet?.fee_rate ?? '0.0005';
-    } catch (error) {
-      console.error(error);
-
-      return '0.0005'; // Default fee rate if fetch fails
     }
   }
 

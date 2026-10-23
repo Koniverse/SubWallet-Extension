@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { alphaPriceToTao, getMinimumAtSpot, getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, readOptional } from './alpha';
+import { alphaPriceToTao, getInputBeforeFee, getMinimumAtSpot, getPriceAfterStake, getPriceAfterUnstake, getPriceImpact, getShownAlphaStakes, getStakeLimitPrice, getSwapLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, readOptional, SWAP_FEE_RATE_SCALE } from './alpha';
 
 describe('Alpha balance as Earning shows it (EXT-39)', () => {
   // rao per alpha, as `current_alpha_price_all` returns it
@@ -139,5 +139,23 @@ describe('The minimum at spot of a move within a subnet or a transfer (EXT-17)',
 
   it('rounds the worth down, as the chain does', () => {
     expect(getWorthAtSpot(new BigN(3), new BigN('0.5')).toFixed()).toBe('1');
+  });
+});
+
+describe('A move\'s buy leg without the pool fee (BE-17)', () => {
+  // As the chain takes it: floor(input × FeeRate / 65535)
+  const leftForPool = (input: BigN, feeRate: number) => input.minus(input.multipliedBy(feeRate).dividedBy(SWAP_FEE_RATE_SCALE).integerValue(BigN.ROUND_FLOOR));
+
+  it('finds an input whose fee leaves exactly the TAO the sale paid', () => {
+    for (const feeRate of [33, 1, 1000, 65000]) {
+      for (const net of ['1', '2000000', '6526400000', '123456789012', '1000000000000000']) {
+        expect(leftForPool(getInputBeforeFee(new BigN(net), new BigN(feeRate)), feeRate).toFixed()).toBe(net);
+      }
+    }
+  });
+
+  it('adds the 0.0504% fee at the default rate, and nothing without a fee', () => {
+    expect(getInputBeforeFee(new BigN(1e9), new BigN(33)).toFixed()).toBe('1000503801');
+    expect(getInputBeforeFee(new BigN(1e9), new BigN(0)).toFixed()).toBe('1000000000');
   });
 });
