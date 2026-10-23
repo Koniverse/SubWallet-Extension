@@ -86,6 +86,11 @@ pool, both legs of an ALPHA → ALPHA swap. Then [`b0d2793`](https://github.com/
 four other chains). PR #167: 5 commits, +429 / −32, no review, no CI checks — every swap-backend item of #5112 is on it. On 10-23 [`4bc0099`](https://github.com/Koniverse/SubWallet-Monorepos/commit/4bc0099)
 makes the quote's legs those the extension submits (117 of 117 plans identical on mainnet); PR #167 is 8 commits.
 
+**Swap backend in production, 10-23 (outside #5112):** [`a3f56a2`](https://github.com/Koniverse/SubWallet-Monorepos/commit/a3f56a2) and [`8d72db2`](https://github.com/Koniverse/SubWallet-Monorepos/commit/8d72db2) are on `subwallet-backend-dev`
+and `-prod`, deployed at 03:28 UTC. Every Asset Hub swap quote had been failing (`ERROR_FETCHING_QUOTE`):
+the runtime's `LPFee` is now a Permill and was read as a 300% fee; the amount out now comes from the chain's own quote.
+Chain-list `0.2.132` in the backend. PR #167 merged them in ([`96f95ca`](https://github.com/Koniverse/SubWallet-Monorepos/commit/96f95ca)), its diff unchanged; it is 9 commits.
+
 ## APR — stays on Taostats; BE-2, BE-11, BE-3, BE-20 off #5112 (10-22, owner)
 
 The APR keeps coming from Taostats through the proxy; BE computes none of its own, and the four items are deleted
