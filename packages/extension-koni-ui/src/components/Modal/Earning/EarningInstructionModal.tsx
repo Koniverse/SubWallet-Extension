@@ -77,7 +77,10 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return accountAddress?.address;
   }, [chainInfoMap, currentAccountProxy, poolInfo.chain]);
-  const subnetApr = useSubnetApr(poolInfo);
+  // The card's figure, from the static cache, shows at once; the chain is read only when the cache has none (EXT-1)
+  const cachedUpToApr = poolInfo?.statistic?.upToApr;
+  const subnetApr = useSubnetApr(cachedUpToApr === undefined ? poolInfo : undefined);
+  const upToApr = cachedUpToApr ?? (subnetApr ? subnetApr.upTo * 100 : undefined);
 
   const title = useMemo(() => {
     if (!poolInfo) {
@@ -95,8 +98,8 @@ const Component: React.FC<Props> = (props: Props) => {
       const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
       const { shortName, subnetData } = poolInfo.metadata;
 
-      if (subnetApr?.upTo) {
-        return `Earn up to ${formatNumber(subnetApr.upTo * 100, 0, balanceFormatter)}% APR in ${subnetData?.subnetSymbol || ''}${from} with ${shortName}`;
+      if (upToApr) {
+        return `Earn up to ${formatNumber(upToApr, 0, balanceFormatter)}% APR in ${subnetData?.subnetSymbol || ''}${from} with ${shortName}`;
       }
 
       return `Earn ${subnetData?.subnetSymbol || asset?.symbol || ''} with ${shortName}`;
@@ -110,8 +113,8 @@ const Component: React.FC<Props> = (props: Props) => {
       const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
       const { shortName } = poolInfo.metadata;
 
-      if (subnetApr?.upTo) {
-        return `Earn up to ${formatNumber(subnetApr.upTo * 100, 0, balanceFormatter)}% APR in TAO, before the claim fee,${from} with ${shortName}`;
+      if (upToApr) {
+        return `Earn up to ${formatNumber(upToApr, 0, balanceFormatter)}% APR in TAO, before the claim fee,${from} with ${shortName}`;
       }
 
       return `Earn ${asset?.symbol || ''} with ${shortName}`;
@@ -182,7 +185,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return result;
-  }, [assetRegistry, poolInfo, subnetApr]);
+  }, [assetRegistry, poolInfo, upToApr]);
 
   const buttonTitle = useMemo(() => {
     if (!poolInfo) {
