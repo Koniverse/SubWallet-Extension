@@ -278,8 +278,20 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
       }
 
       try {
+        // Every subnet's APR in one pass: the static-data job runs this, clients read the cards from its cache (EXT-1)
+        const aprs = await this.getAllSubnetAprs().catch((e) => {
+          console.error(e);
+
+          return undefined;
+        });
+
+        if (cancel) {
+          return;
+        }
+
         for (const subnet of this.subnetData) {
           const minStake = (await this.getMinBond(subnet.netuid)).toString();
+          const apr = aprs?.[subnet.netuid];
           const netuid = subnet.netuid.toString().padStart(2, '0');
           const subnetSlug = `${this.slug}__subnet_${netuid}`;
           const subnetName = `${subnet.name || 'Unknown'} ${netuid}`;
@@ -316,7 +328,9 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
               era: 0,
               unstakingPeriod: 0,
               tvl: bnTaoIn.toString(),
-              totalApy: emission.toNumber()
+              // Released clients show `totalApy` as the subnet's "Emission"; the card's APR is `upToApr`
+              totalApy: emission.toNumber(),
+              upToApr: apr ? apr.upTo * 100 : undefined
             }
           };
 

@@ -3,7 +3,7 @@
 
 import BigN from 'bignumber.js';
 
-import { BITTENSOR_BLOCKS_PER_YEAR, getPositionApr, getSubnetApr, getValidatorApr } from './bittensor-subnet-apr';
+import { BITTENSOR_BLOCKS_PER_YEAR, getPositionApr, getRootApr, getSubnetApr, getSubnetAprs, getValidatorApr } from './bittensor-subnet-apr';
 
 const ALPHA = 1e9;
 const row = (hotkey: string, dividend: number, totalAlpha: number) => ({ hotkey, dividend: new BigN(dividend), totalAlpha: new BigN(totalAlpha) });
@@ -53,5 +53,38 @@ describe('Subnet APR from the chain (EXT-1, BE-2)', () => {
     expect(split).toBeCloseTo(apr.byHotkey.a * 0.75, 12);
     expect(getPositionApr([{ hotkey: 'unpaid', stake: new BigN(ALPHA) }], apr)).toBe(0);
     expect(getPositionApr([], apr)).toBeUndefined();
+  });
+
+  it('gives every subnet, from one read of the whole dividend map, what it gives one subnet', () => {
+    const one = [row('a', 40 * ALPHA, 1000040 * ALPHA), row('b', 60 * ALPHA, 1000060 * ALPHA)];
+    const all = getSubnetAprs([
+      ...one.map((r) => ({ ...r, netuid: 1 })),
+      { ...row('c', 5 * ALPHA, 1005 * ALPHA), netuid: 2 }
+    ], { 0: 360, 1: 360, 2: 0, 3: 360, 4: 360 }, new Set([4]));
+
+    expect(all[1]).toEqual(getSubnetApr(one, 360));
+    // A tempo of 0 never runs its epoch; SN3 paid no one; SN4 has not run an epoch since it registered; root has no row
+    expect(all[2]).toBeUndefined();
+    expect(all[3]).toEqual({ byHotkey: {}, upTo: 0 });
+    expect(4 in all && all[4] === undefined).toBe(true);
+    expect(0 in all).toBe(false);
+  });
+});
+
+describe('Root APR from the proxy\'s 30-day figures (EXT-1, BE-3)', () => {
+  const TAO = 1e9;
+  const rootRow = (hotkey: string, stake: number, apr: number) => ({ hotkey, stake: new BigN(stake * TAO), apr });
+
+  it('sets "Up to" from validators holding at least 1% of the root stake listed, not the highest figure', () => {
+    // As on 10-23: the highest figure, 9.89%, is a small validator's; the best of those holding ≥ 1% is 5.85%
+    const apr = getRootApr([rootRow('large', 1000000, 0.0547), rootRow('best', 200000, 0.0585), rootRow('small', 5000, 0.0989), rootRow('idle', 300000, 0)]);
+
+    expect(apr?.upTo).toBe(0.0585);
+    expect(apr?.byHotkey).toEqual({ large: 0.0547, best: 0.0585, small: 0.0989, idle: 0 });
+  });
+
+  it('is a measured 0 when no validator listed earned, and has no figure when the proxy lists none', () => {
+    expect(getRootApr([rootRow('a', 100, 0), rootRow('b', 100, 0)])).toEqual({ byHotkey: { a: 0, b: 0 }, upTo: 0 });
+    expect(getRootApr([])).toBeUndefined();
   });
 });

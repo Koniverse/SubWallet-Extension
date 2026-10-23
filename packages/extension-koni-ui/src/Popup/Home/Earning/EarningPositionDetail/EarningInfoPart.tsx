@@ -46,8 +46,9 @@ function Component ({ className, compound, inputAsset, poolInfo }: Props) {
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
   const isBittensor = useMemo(() => _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain), [poolInfo.chain]);
 
-  // A subnet position earns its validators' APR, from the chain, weighted by the stake on each (EXT-1)
-  const subnetApr = useSubnetApr(isSubnetStaking ? poolInfo : undefined);
+  // A Bittensor position earns its validators' APR, weighted by the stake on each (EXT-1): on a subnet from the chain,
+  // on root the proxy's 30-day figures
+  const subnetApr = useSubnetApr(isBittensor ? poolInfo : undefined);
   const positionApr = useMemo((): number | undefined => {
     if (!subnetApr || !compound) {
       return undefined;
@@ -55,14 +56,6 @@ function Component ({ className, compound, inputAsset, poolInfo }: Props) {
 
     return getPositionApr(compound.nominations.map(({ activeStake, validatorAddress }) => ({ hotkey: validatorAddress, stake: new BigN(activeStake) })), subnetApr);
   }, [compound, subnetApr]);
-  const aprHint = useMemo((): string | undefined => {
-    if (subnetApr?.upTo === 0) {
-      return t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.noRewardsLastEpoch');
-    }
-
-    return positionApr === 0 ? t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.validatorEarnedNothing') : undefined;
-  }, [positionApr, subnetApr, t]);
-
   const getSubnetStakingTokenName = useCreateGetSubnetStakingTokenName();
 
   const subnetToken = useMemo(() => {
@@ -103,16 +96,17 @@ function Component ({ className, compound, inputAsset, poolInfo }: Props) {
               </div>
             </MetaInfo.Default>
           )}
-        {isSubnetStaking
+        {isBittensor
           ? (
             <MetaInfo.Default label={t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.estimatedEarnings')}>
               {/* A measured 0 shows as 0%; "—" only when there is no figure at all */}
               <div>
                 {positionApr === undefined
                   ? '—'
-                  : t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.aprInAlpha', { replace: { apr: formatNumber(positionApr * 100, 0, balanceFormatter), symbol: poolInfo.metadata.subnetData?.subnetSymbol || '' } })}
+                  : isSubnetStaking
+                    ? t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.aprInAlpha', { replace: { apr: formatNumber(positionApr * 100, 0, balanceFormatter), symbol: poolInfo.metadata.subnetData?.subnetSymbol || '' } })
+                    : t('ui.EARNING.screen.EarningPositionDetail.EarningInfo.aprInTao', { replace: { apr: formatNumber(positionApr * 100, 0, balanceFormatter) } })}
               </div>
-              {aprHint && <div className='__apr-hint'>{aprHint}</div>}
             </MetaInfo.Default>
           )
           : totalApy !== undefined && (
@@ -150,12 +144,6 @@ function Component ({ className, compound, inputAsset, poolInfo }: Props) {
 }
 
 export const EarningInfoPart = styled(Component)<Props>(({ theme: { token } }: Props) => ({
-  '.__apr-hint': {
-    fontSize: token.fontSizeSM,
-    lineHeight: token.lineHeightSM,
-    color: token.colorTextLight4
-  },
-
   '.__label': {
     paddingRight: token.paddingXXS
   },

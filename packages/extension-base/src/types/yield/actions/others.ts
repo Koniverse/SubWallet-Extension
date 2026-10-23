@@ -117,11 +117,14 @@ export interface RequestEarningImpact {
   type: ExtrinsicType;
 }
 
-/** A subnet's APR from the chain (EXT-1, BE-2), in alpha, as a fraction a year: 0.34 is 34% APR */
+/**
+ * A Bittensor pool's APR (EXT-1), as a fraction a year: 0.34 is 34% APR. A subnet's from the chain's last epoch, in
+ * alpha; root's (netuid 0) from the proxy's 30-day figures, in TAO
+ */
 export interface SubnetAprResult {
-  /** Each hotkey paid in the subnet's last epoch; a hotkey left out earned nothing there: 0% */
+  /** Each hotkey with a figure; a hotkey left out earned nothing there: 0% */
   byHotkey: Record<string, number>;
-  /** The best APR among hotkeys holding ≥ 1% of the stake paid in the last epoch; 0 when no staker was paid */
+  /** The best APR among hotkeys holding ≥ 1% of the stake — on a subnet the stake paid in its last epoch; 0 when none earned */
   upTo: number;
 }
 
