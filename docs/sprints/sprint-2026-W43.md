@@ -82,7 +82,8 @@ old path, which stops on 2026-11-09 ([`58bfdb62c1`](https://github.com/Koniverse
 **Swap backend, 10-22:** BE-14 on `SubWallet-Monorepos` `koni/dev/issue-5112-extension` ([`10d7d69`](https://github.com/Koniverse/SubWallet-Monorepos/commit/10d7d69), ~~no PR yet~~ [PR #167](https://github.com/Koniverse/SubWallet-Monorepos/pull/167)) — the Bittensor quote's fee is estimated on the
 legs the submit sends, over root stake, never on an empty batch; the quote itself is not capped, the extension refuses an
 amount above the usable stake. Later the same day [`00b4ec2`](https://github.com/Koniverse/SubWallet-Monorepos/commit/00b4ec2) adds BE-15 and BE-16 — the quote's price impact on the subnet's own
-pool, both legs of an ALPHA → ALPHA swap. Then [`b0d2793`](https://github.com/Koniverse/SubWallet-Monorepos/commit/b0d2793) adds BE-17 — an ALPHA → ALPHA quote charges the pool fee once, on the sale. PR #167: 3 commits, no review, no CI checks.
+pool, both legs of an ALPHA → ALPHA swap. Then [`b0d2793`](https://github.com/Koniverse/SubWallet-Monorepos/commit/b0d2793) adds BE-17 — an ALPHA → ALPHA quote charges the pool fee once, on the sale. Then [`b51ac4c`](https://github.com/Koniverse/SubWallet-Monorepos/commit/b51ac4c) (BE-19, a quote under the chain minimum refused) and [`f8d9546`](https://github.com/Koniverse/SubWallet-Monorepos/commit/f8d9546) (BE-18, a second RPC for Bittensor and
+four other chains). PR #167: 5 commits, +429 / −32, no review, no CI checks — every swap-backend item of #5112 is on it.
 
 ## APR — stays on Taostats; BE-2, BE-11, BE-3, BE-20 off #5112 (10-22, owner)
 
