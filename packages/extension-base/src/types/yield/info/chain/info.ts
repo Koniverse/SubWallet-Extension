@@ -179,6 +179,7 @@ export type YieldPoolMetadata = NormalYieldPoolMetadata | SpecialYieldPoolMetada
  * @prop {string} [tvl] - Total value staked in pool
  * @prop {number} [totalApy] - Total apy of earning assets
  * @prop {number} [totalApr] - Total apr of earning assets
+ * @prop {number} [upToApr] - Bittensor: the pool's headline APR, in percent
  * */
 export interface BaseYieldPoolStatistic {
   /* Common info */
@@ -205,6 +206,13 @@ export interface BaseYieldPoolStatistic {
 
   /** Total apr of earning assets */
   totalApr?: number;
+
+  /**
+   * Bittensor (EXT-1): the pool card's "Up to" APR, in percent — the best validator holding ≥ 1% of the stake, in alpha
+   * on a subnet (from the chain), in TAO on root (the proxy's 30-day figure). 0 when measured at 0; absent without a
+   * figure. A field of its own: released clients read `totalApy` as a subnet's emission and root's "Max APY"
+   */
+  upToApr?: number;
 
   /* Common info */
 }

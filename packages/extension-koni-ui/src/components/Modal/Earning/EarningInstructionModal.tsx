@@ -88,7 +88,7 @@ const Component: React.FC<Props> = (props: Props) => {
       type } = poolInfo;
 
     // A subnet's headline is the chain's APR, in alpha, not its emission (EXT-1): the best validator holding
-    // ≥ 1% of the stake paid in the last epoch; a measured 0 says so; without a figure, no yield is claimed
+    // ≥ 1% of the stake paid in the last epoch; at 0 or without a figure, no yield is claimed
     if (type === YieldPoolType.SUBNET_STAKING) {
       const asset = assetRegistry[inputAsset];
       const minJoin = poolInfo.statistic?.earningThreshold.join || '0';
@@ -99,11 +99,22 @@ const Component: React.FC<Props> = (props: Props) => {
         return `Earn up to ${formatNumber(subnetApr.upTo * 100, 0, balanceFormatter)}% APR in ${subnetData?.subnetSymbol || ''}${from} with ${shortName}`;
       }
 
-      if (subnetApr?.upTo === 0) {
-        return `0% APR with ${shortName}: no rewards to stakers in the last epoch`;
+      return `Earn ${subnetData?.subnetSymbol || asset?.symbol || ''} with ${shortName}`;
+    }
+
+    // Root's headline: the 30-day APR of the best validator holding ≥ 1% of root stake, in TAO, before the claim fee
+    // (EXT-1); at 0 or without a figure, no yield is claimed
+    if (type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
+      const asset = assetRegistry[inputAsset];
+      const minJoin = poolInfo.statistic?.earningThreshold.join || '0';
+      const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
+      const { shortName } = poolInfo.metadata;
+
+      if (subnetApr?.upTo) {
+        return `Earn up to ${formatNumber(subnetApr.upTo * 100, 0, balanceFormatter)}% APR in TAO, before the claim fee,${from} with ${shortName}`;
       }
 
-      return `Earn ${subnetData?.subnetSymbol || asset?.symbol || ''} with ${shortName}`;
+      return `Earn ${asset?.symbol || ''} with ${shortName}`;
     }
 
     const totalApy = poolInfo.statistic?.totalApy;

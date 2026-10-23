@@ -23,7 +23,7 @@ import { BN, BN_ZERO, noop } from '@polkadot/util';
 import { findMinLeg } from '../../../swap-service/handler/bittensor-swap-plan';
 import { simulateSubnetTrade } from './bittensor-pool';
 import { isRootClaimWorthNotifying, parseRootClaimThreshold, planRootClaim, RootClaimPlan, RootClaimPreview, UNKNOWN_ROOT_CLAIM_THRESHOLD } from './bittensor-root-claim-plan';
-import { getSubnetApr, SubnetApr } from './bittensor-subnet-apr';
+import { getRootApr, getSubnetApr, getSubnetAprs, NetuidDividendRow, SubnetApr } from './bittensor-subnet-apr';
 import { decodeIdentityName, decodeTaoWeight, formatTake, getPermittedUids, getValidatorHotkeys, getValidatorStake } from './bittensor-subnet-validators';
 import { planUnstake, UnstakePlan } from './bittensor-unstake-plan';
 
@@ -59,6 +59,8 @@ interface ValidatorApr {
   },
   name: string;
   netuid: number;
+  /** In rao: on root, the validator's root stake */
+  stake: string;
   thirty_day_apy: string;
 }
 
@@ -94,7 +96,7 @@ const DEFAULT_BITTENSOR_SLIPPAGE = 0.005;
 export const BITTENSOR_BLOCK_TIME = 12;
 
 /**
- * What still comes from the proxy: root's 30-day APR (until BE-11), the subnet fee rate, and nominator counts. Validator
+ * What still comes from the proxy: root's 30-day APR (it stays there: BE-11 dropped, 10-22), the subnet fee rate, and nominator counts. Validator
  * lists and names are read from the chain; the static `validator.json`, and its timer re-reading it every minute, are gone
  */
 export class BittensorCache {
@@ -205,8 +207,10 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   protected bittensorCache: BittensorCache;
   /** A claim's fee by call: flat whatever it pays (10-13), so one estimate serves 10 minutes of reward cycles */
   private readonly rootClaimFees = new SharedRead<BigN>(10 * 60 * 1000);
-  /** A subnet's APR, kept 5 minutes: it changes once an epoch */
+  /** A subnet's APR, kept 5 minutes: it changes once an epoch; root's under netuid 0 */
   private readonly subnetAprReads = new SharedRead<SubnetApr | undefined>(5 * 60 * 1000);
+  /** Every subnet's APR at once, for the pool cards; kept 5 minutes */
+  private readonly allSubnetAprReads = new SharedRead<Record<number, SubnetApr | undefined>>(5 * 60 * 1000);
   /** A hotkey's name, kept an hour: an identity rarely changes */
   private readonly hotkeyNames = new SharedRead<string>(60 * 60 * 1000);
 
@@ -281,17 +285,17 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     let cancel = false;
     const substrateApi = await this.substrateApi.isReady;
 
-    const aprSubject = new BehaviorSubject<number>(0);
+    // `totalApy` stays the highest figure, which released clients show as "Max APY"; `upToApr` is the card's "Up to" (EXT-1)
+    const aprSubject = new BehaviorSubject<{ totalApy: number, upToApr?: number }>({ totalApy: 0 });
 
     const fetchAPR = async () => {
       try {
-        const _topValidator = await this.bittensorCache.fetchApr(0);
-        const validators = _topValidator.data;
-        const highestApr = validators?.[0];
+        const apr = await this.getRootApr();
 
-        const apr = this.chain === 'bittensor' ? Number(highestApr?.thirty_day_apy || 0) * 100 : 0;
-
-        aprSubject.next(apr);
+        aprSubject.next({
+          totalApy: apr ? Math.max(0, ...Object.values(apr.byHotkey)) * 100 : 0,
+          upToApr: apr ? apr.upTo * 100 : undefined
+        });
       } catch (e) {
         console.error('Fetch APR error:', e);
       }
@@ -343,7 +347,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
               era: 0,
               unstakingPeriod,
               tvl: bnTaoIn.toString(),
-              totalApy: apr
+              totalApy: apr.totalApy,
+              upToApr: apr.upToApr
             }
           };
 
@@ -684,14 +689,14 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
   /* Subscribe pool position */
 
   /**
-   * BE-2's APR for subnet `netuid`, computed from the chain for the subnet on screen until BE serves every
-   * subnet (EXT-1): the hotkeys paid in its last epoch and their stake, 2–3 requests. Undefined when there is
-   * no figure — root, a subnet that never runs its epoch (`tempo` 0), or one that has not run an epoch since
-   * it registered; a subnet that paid no staker is a measured 0.
+   * The APR of the pool on screen (EXT-1). A subnet's from the chain, as BE-2 defined it: the hotkeys paid in its last
+   * epoch and their stake, 2–3 requests. Undefined when there is no figure — a subnet that never runs its epoch
+   * (`tempo` 0), or one that has not run an epoch since it registered; a subnet that paid no staker is a measured 0.
+   * Root's (netuid 0) from the proxy's 30-day figures (`getRootApr`).
    */
   public getSubnetApr (netuid: number): Promise<SubnetApr | undefined> {
     if (!netuid) {
-      return Promise.resolve(undefined);
+      return this.getRootApr();
     }
 
     return this.subnetAprReads.get(String(netuid), async () => {
@@ -716,6 +721,73 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
       const totals = paid.length ? await q.totalHotkeyAlpha.multi(paid.map(({ hotkey }) => [hotkey, netuid])) : [];
 
       return getSubnetApr(paid.map((row, index) => ({ ...row, totalAlpha: new BigN(totals[index].toString()) })), tempo);
+    });
+  }
+
+  /**
+   * Root's APR from the proxy's 30-day figures, which stay its source (BE-11 dropped, 10-22): each validator's, and the
+   * best among those holding ≥ 1% of the root stake listed. Undefined on testnet, which the proxy has no figures for,
+   * or when the proxy lists none.
+   */
+  private getRootApr (): Promise<SubnetApr | undefined> {
+    if (this.chain !== 'bittensor') {
+      return Promise.resolve(undefined);
+    }
+
+    return this.subnetAprReads.get('0', async () => {
+      const { data } = await this.bittensorCache.fetchApr(0);
+
+      return getRootApr(data.map((item) => ({ hotkey: item.hotkey.ss58, stake: new BigN(item.stake || 0), apr: Number(item.thirty_day_apy) || 0 })));
+    });
+  }
+
+  /**
+   * Every subnet's APR at once, for the pool cards (EXT-1). Clients do not subscribe Bittensor pools: the static-data job
+   * runs this and they read its figures from `yield-pools.json`. The whole dividend map, then the paid hotkeys' stakes:
+   * on mainnet on 10-23, 16 requests and 3.7 MiB, against 2–3 requests a subnet for `getSubnetApr` one by one.
+   */
+  protected getAllSubnetAprs (): Promise<Record<number, SubnetApr | undefined>> {
+    return this.allSubnetAprReads.get('all', async () => {
+      const { api } = await this.substrateApi.isReady;
+      const q = api.query.subtensorModule;
+      const [entries, tempos, lastEpochs, registered] = await Promise.all([
+        q.alphaDividendsPerSubnet.entries(),
+        q.tempo.entries(),
+        readOptional(() => q.lastEpochBlock.entries()),
+        readOptional(() => q.networkRegisteredAt.entries())
+      ]);
+      const paid = entries
+        .map(([key, value]) => ({ netuid: Number(key.args[0].toString()), hotkey: key.args[1].toString(), dividend: new BigN(value.toString()) }))
+        .filter(({ dividend }) => dividend.gt(0));
+      const totals: string[] = [];
+
+      for (let i = 0; i < paid.length; i += 500) {
+        const stakes = await q.totalHotkeyAlpha.multi(paid.slice(i, i + 500).map(({ hotkey, netuid }) => [hotkey, netuid]));
+
+        totals.push(...stakes.map((stake) => stake.toString()));
+      }
+
+      const tempoByNetuid: Record<number, number> = {};
+      const registeredAt: Record<number, string> = {};
+      const notRun = new Set<number>();
+
+      tempos.forEach(([key, value]) => {
+        tempoByNetuid[Number(key.args[0].toString())] = Number(value.toString());
+      });
+      (registered ?? []).forEach(([key, value]) => {
+        registeredAt[Number(key.args[0].toString())] = value.toString();
+      });
+      (lastEpochs ?? []).forEach(([key, value]) => {
+        const netuid = Number(key.args[0].toString());
+
+        if (registeredAt[netuid] !== undefined && new BigN(value.toString()).lte(registeredAt[netuid])) {
+          notRun.add(netuid);
+        }
+      });
+
+      const rows: NetuidDividendRow[] = paid.map((row, index) => ({ ...row, totalAlpha: new BigN(totals[index]) }));
+
+      return getSubnetAprs(rows, tempoByNetuid, notRun);
     });
   }
 
@@ -775,23 +847,18 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
     };
   }
 
-  /** Root's paid hotkeys, root dividends on any subnet in its last epoch, and their 30-day APR from the proxy until BE-11 */
+  /** Root's paid hotkeys, root dividends on any subnet in its last epoch, and their 30-day APR from the proxy (`getRootApr`) */
   private async getRootReturns (at: ApiDecoration<'promise'>): Promise<ValidatorReturns> {
-    const [dividends, aprResponse] = await Promise.all([
+    const [dividends, apr] = await Promise.all([
       readOptional(() => at.query.subtensorModule.rootAlphaDividendsPerSubnet.entries()),
-      this.bittensorCache.fetchApr(0)
+      this.getRootApr()
     ]);
-    const aprMap: Record<string, string> = {};
-
-    aprResponse.data.forEach((item) => {
-      aprMap[item.hotkey.ss58] = item.thirty_day_apy;
-    });
 
     const paid = (dividends ?? []).filter(([, value]) => new BigN(value.toString()).gt(0)).map(([key]) => key.args[1].toString());
 
     return {
       paid: [...new Set(paid)],
-      expectedReturn: (hotkey) => (aprMap[hotkey] ? new BigN(aprMap[hotkey]).multipliedBy(100).toFixed(2) : '0')
+      expectedReturn: apr ? (hotkey) => new BigN(apr.byHotkey[hotkey] ?? 0).multipliedBy(100).toFixed(2) : undefined
     };
   }
 
