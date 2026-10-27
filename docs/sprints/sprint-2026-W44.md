@@ -104,6 +104,15 @@ and `ce80a2ebff`'s run, pending in §D, finished green too. The new component ke
 validator-change fee case that nothing reaches since `11716c1f52` (10-19), so AC-3 holds and the
 case can go. Detail in [notes/2026-10-27.md](../notes/2026-10-27.md) §E.
 
+**41 commits at 08:31.** Three fixes for one figure computed two ways: a hidden alpha token no
+longer comes back when Bittensor's RPC or explorer is edited (AC-7, a regression in this PR's own
+auto-enable), swap fees carry one USD value on every screen (AC-2), and each address's root claim
+notice uses its own claim's fee (AC-6). CI green. **Then #5112's checklist ticked seven boxes at
+08:48 — none of them live**: four are on this open PR, BE-13 and BE-18 are built but not deployed
+(production `yield-pools.json` still has the 09-18 root minimum; Monorepos PR #167 is open), and
+BE-10 has no work this record found. The docs' own ticks stay put. Detail in
+[notes/2026-10-27.md](../notes/2026-10-27.md) §F.
+
 ## New and unhomed
 
 - [#5111](https://github.com/Koniverse/SubWallet-Extension/issues/5111) — Firefox AMO stuck at
