@@ -8,6 +8,7 @@ import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import { ThemeProps } from '@subwallet/extension-koni-ui/types';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 interface Props extends ThemeProps {
   transaction: SWTransactionResult;
@@ -79,6 +80,10 @@ function Component ({ className, transaction }: Props) {
   );
 }
 
-const BittensorStakingFeeArea = Component;
+const BittensorStakingFeeArea = styled(Component)<Props>(({ theme: { token } }: ThemeProps) => {
+  return {
+    marginTop: token.marginSM
+  };
+});
 
 export default BittensorStakingFeeArea;

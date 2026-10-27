@@ -202,10 +202,7 @@ const Component: React.FC<Props> = (props: Props) => {
             setDisable={setIsDisabledSubstrateApprove}
             transaction={transaction}
           />}
-          <BittensorStakingFeeArea
-            className={'staking-fee-box'}
-            transaction={transaction}
-          />
+          <BittensorStakingFeeArea transaction={transaction} />
           {
             transaction.extrinsicType === ExtrinsicType.STAKING_CLAIM_REWARD &&
             <span className={CN('bond-reward-label', 'text-light-4')}>
@@ -322,7 +319,7 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
     '--content-gap': 0,
     marginTop: token.marginXS,
 
-    '.network-box, .address-format-info-box, .staking-fee-box': {
+    '.network-box, .address-format-info-box': {
       marginTop: token.marginSM
     },
 
