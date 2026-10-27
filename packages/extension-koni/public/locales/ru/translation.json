@@ -2037,7 +2037,7 @@
   "bg.EARNING.services.service.earning.lending.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.liquidStaking.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "Слишком маленькая сумма. Застейкайте не меньше {{bnMinStake}} {{symbol}}",
-  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Amount too low. Unstake at least {{bnMinUnstake}} {{symbol}}, or the whole position",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Слишком маленькая сумма. Выведите не меньше {{bnMinUnstake}} {{symbol}} или всё",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum": "После этого в стейке останется {{remaining}} {{symbol}} — меньше {{minimum}} TAO, которые может оставить номинатор. Выведите меньше или всё",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked": "Часть вашего стейка в этой подсети заблокирована. Можно вывести не больше {{available}} {{symbol}}",
   "bg.ACCOUNT.services.keyring.handler.Derive.accountExistsWithName": "Account already exists under the name \"{{name}}\"",

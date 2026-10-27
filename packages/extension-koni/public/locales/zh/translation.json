@@ -2037,7 +2037,7 @@
   "bg.EARNING.services.service.earning.lending.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.liquidStaking.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "数量过低。请至少质押 {{bnMinStake}} {{symbol}}",
-  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Amount too low. Unstake at least {{bnMinUnstake}} {{symbol}}, or the whole position",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "数量过低。请至少解除质押 {{bnMinUnstake}} {{symbol}}，或全部解除质押",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum": "这样会剩余 {{remaining}} {{symbol}} 质押，低于提名人可保留的 {{minimum}} TAO。请减少解除质押数量，或全部解除质押",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked": "您在此子网的部分质押已锁定。最多可解除质押 {{available}} {{symbol}}",
   "bg.ACCOUNT.services.keyring.handler.Derive.accountExistsWithName": "Account already exists under the name \"{{name}}\"",

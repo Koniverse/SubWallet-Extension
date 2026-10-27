@@ -13,6 +13,7 @@ import BigN from 'bignumber.js';
 import { BN_ZERO } from '@polkadot/util';
 
 import { readSubnetFeeRate, simulateSubnetTrade } from './bittensor-pool';
+import { createPositionGate } from './bittensor-positions';
 import TaoNativeStakingPoolHandler, { BITTENSOR_BLOCK_TIME, RateSubnetData, TaoStakeInfo, TaoStakingStakeOption } from './tao';
 
 export interface SubnetData {
@@ -370,6 +371,8 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
 
     const defaultInfo = this.baseInfo;
     const chainInfo = this.chainInfo;
+    // Each subnet's empty position once, not on every read (EXT-34)
+    const shouldSend = createPositionGate();
 
     const getPoolPosition = async () => {
       const rawDelegateStateInfos = await substrateApi.api.call.stakeInfoRuntimeApi.getStakeInfoForColdkeys(useAddresses);
@@ -426,8 +429,13 @@ export default class SubnetTaoStakingPoolHandler extends TaoNativeStakingPoolHan
           const subnetSymbol = subnet.symbol || 'dTAO';
 
           const { delegatorState = [], originalTotalStake = BN_ZERO } = subnetPositions[netuid] || {};
+          const hasStake = delegatorState.length > 0;
 
-          if (delegatorState.length > 0) {
+          if (!shouldSend(owner, subnetSlug, hasStake)) {
+            return;
+          }
+
+          if (hasStake) {
             this.parseNominatorMetadata(chainInfo, delegatorState, netuid)
               .then((nominatorMetadata) => {
                 rsCallback({
