@@ -1,6 +1,6 @@
 ---
 id: sprint-2026-W43
-status: in-progress
+status: closed
 start: 2026-10-19
 end: 2026-10-25
 goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #5095 needs a fresh approval on its 10-13 head and a merge; PR #5096 needs the 0.2.132 re-pin and the TEMP block reverted; then the tester's gate, US-42.31. And US-12.24 (#5112): PR #5113 has six commits and green CI but no review and no body, and it touches evm.ts, which PR #5001 rewrites. 18 points: US-18.5 at 5, US-12.24 at 13."
@@ -18,6 +18,29 @@ goal: "Two threads, both carried from W42, where nothing merged. v1.3.91: PR #50
 
 **18 points, two stories** whose `sprint:` names this window. US-42.31's 8 points stay counted in W42,
 where the tester placed it.
+
+**Closed 2026-10-27 at 0 of 2 stories, 0 of 18 points — the second window in a row at zero.** Every
+story's `sprint:` field was re-read at closeout: exactly two name `sprint-2026-W43` (US-18.5 at 5,
+`review`; US-12.24 at 13, `in-progress`), one still names W42 (US-42.31 at 8, `ready`), and none
+names W44. The figure is verified, not assumed.
+
+**Nothing merged, for the same reason W42 closed empty.** No pull request has reached
+`subwallet-dev` since [PR #5110](https://github.com/Koniverse/SubWallet-Extension/pull/5110) on
+**10-12 10:30** — 15 days — and the Extension repo has had no activity of any kind since 10-23
+09:44. Both carried stories moved *within* their PRs (US-12.24's grew from 6 commits to **33**),
+which is work, but **no point closed**. W42 closed 0 of 3 / 0 of 26; W43 closes 0 of 2 / 0 of 18.
+
+**#5096's blocker expired inside this window and the PR did not move.** ChainList PR #713 merged
+10-12 and `0.2.132` went to npm the same day, so the `0.2.132` re-pin became possible on day one of
+W42. The diff is **unchanged since 10-09**: still `0.2.132-beta.5-pr-713-885df11c`, still
+`fetchLatestChainData()` commented out, still **FR-34 off if merged**. Detail in
+[notes/2026-10-27.md](../notes/2026-10-27.md) §C.
+
+**One thing did land, outside this repo and unrecorded**: production `list.json` now carries #710's
+deactivations — 198 `INACTIVE` of 362 chains, with `moonbeam`, `moonriver`, `robonomics`,
+`centrifuge`, `manta_network` and `interlay` all flipped. **#710's 24 new chains are in neither
+`list.json` nor `preview.json`** and only arrive with a build bundling `0.2.132`. See
+[notes/2026-10-27.md](../notes/2026-10-27.md) §A.
 
 ## v1.3.91 — still the same two merges
 
