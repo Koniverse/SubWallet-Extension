@@ -47,6 +47,8 @@ export class BalanceService implements StoppableServiceInterface {
 
   private isReload = false;
   private requireOptimizeTokenList = false;
+  // Whether each Bittensor chain was on at its last `chain.updateState`, which an RPC or block explorer edit sends too
+  private bittensorChainActive: Record<string, boolean> = {};
 
   get isStarted (): boolean {
     return this.status === ServiceStatus.STARTED;
@@ -79,6 +81,10 @@ export class BalanceService implements StoppableServiceInterface {
 
     // Start service
     // await this.start(); // Commented out to avoid auto start when app not fully initialized
+
+    _BALANCE_CHAIN_GROUP.bittensor.forEach((chain) => {
+      this.bittensorChainActive[chain] = !!this.state.chainService.getChainStateByKey(chain)?.active;
+    });
 
     // Handle events
     this.state.eventService.onLazy(this.handleEvents.bind(this));
@@ -187,9 +193,18 @@ export class BalanceService implements StoppableServiceInterface {
         }
       }
 
-      // Turning Bittensor on brings back only its native and priority tokens: add the subnets staked into
-      if (event.type === 'chain.updateState' && _BALANCE_CHAIN_GROUP.bittensor.includes(event.data[0] as string) && this.state.chainService.getChainStateByKey(event.data[0] as string)?.active) {
-        stakedAddresses.push(...keyring.getPairs().map((account) => account.address));
+      // Turning Bittensor on brings back only its native and priority tokens: add the subnets staked into. Only on
+      // turning it on — an RPC or block explorer edit on a chain already on would bring back the tokens the user hid
+      if (event.type === 'chain.updateState' && _BALANCE_CHAIN_GROUP.bittensor.includes(event.data[0] as string)) {
+        const chain = event.data[0] as string;
+        const active = !!this.state.chainService.getChainStateByKey(chain)?.active;
+        const turnedOn = active && !this.bittensorChainActive[chain];
+
+        this.bittensorChainActive[chain] = active;
+
+        if (turnedOn) {
+          stakedAddresses.push(...keyring.getPairs().map((account) => account.address));
+        }
       }
     });
 
