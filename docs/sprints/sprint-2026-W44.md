@@ -11,7 +11,7 @@ goal: "The third window carrying the same two stories, and the first with a date
 | US | Title | Epic | Pri | Points | Status | Carry | Story file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095's only approval is on `f836222c51` (09-28); head `448dae55f5` unreviewed since 10-13 | ← W43 (W40 → W42 → W43 → W44) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
-| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), **33 commits**, CI green, **no review**, body empty | ← W43 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
+| [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), **36 commits** (pushed 10-27 04:13), +4492/−695 over 78 files, **no review in 11 days**, body empty; CI **pending** on the new head | ← W43 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
 | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` still **W42**, the tester's | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ⚠️ PR #5096 open — PR-build pin + TEMP block, **unchanged since 10-09** | ← W43 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 — **possibly now redundant**, #5096 bumps the dependency instead | ← W43 | — |
@@ -58,7 +58,7 @@ own *"TODO: TEMP … Revert before commit"*, which switches off
 without a release* invariant. Open, **no review, empty body, not draft**. US-42.31 AC-12 would catch
 it on release day; a one-line re-pin and a two-block revert catches it now.
 
-**PR #5113 has the momentum and no reader** — 33 commits, CI green, **no review in eleven days** —
+**PR #5113 has the momentum and no reader** — **36 commits** since the 10-27 04:13 push, +4492/−695 over 78 files, **no review in eleven days** —
 and it touches `evm.ts`, which [PR #5001](https://github.com/Koniverse/SubWallet-Extension/pull/5001)
 rewrites, so the conflict grows while both wait. #5001 itself is 21 days untouched and cannot merge
 until a chain-list release carries `evmInfo.multicall3`, which `0.2.132` does not.
@@ -71,6 +71,31 @@ neither `list.json` nor `preview.json`** — they arrive only with a build bundl
 is v1.3.91. A 1.3.90 user today sees chains leave and none arrive. Two #710 follow-ups are still
 live in production: `storyPartner_testnet` `ACTIVE` with no providers, and `curio` `ACTIVE` while
 halted. Detail in [notes/2026-10-27.md](../notes/2026-10-27.md).
+
+## PR #5113's 10-27 push closed two of its own open rows
+
+Three commits landed since W43's closeout read: `b131e5e7a7` (10-23 11:47, *align alpha valuation
+across Assets, Earning and Swap*), `c9c4e91f77` and `ce80a2ebff` (both 10-27 04:13). **Two of them
+close items [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) itself listed as "not
+touched yet"** — EXT-34 and the last of AC-12's English strings.
+
+**`ce80a2ebff` (EXT-34)** quantifies what it fixes: a position read lists every subnet for every
+account, nearly all without stake, and each was written to the store and IndexedDB on every read —
+**128 rows per account every 30 s, about 6.5 MiB an hour for one account**. An empty position now
+goes out once per subscription and again only when a stake there is gone.
+
+**`c9c4e91f77`** translates `unstakeAmountTooLow` into `vi`, `ja`, `ru` and `zh`, so **every key
+#5112 added is now translated in all five locales.** Which sharpens the contrast with US-18.5:
+re-read today, PR #5095's **five English strings are unchanged since 09-28 — 29 days** — only
+`multisigTxStatusUnavailable` translated. Same author, same week, two open PRs, opposite outcomes;
+US-42.31 AC-13 is set to find the US-18.5 half on release day, and the fix is four one-line edits
+with the pattern already proven next door.
+
+**US-12.24 is the counter-example to the no-unit-test run**: **108 cases across 12 new spec files**
+at `ce80a2ebff`, up from 103. **But the specs do not run in CI** — the test step is still commented
+out on `subwallet-dev` (`scripts/koni-ci-build-dev.mjs:39`), as AC-13 records. 108 cases nothing
+executes on merge are a reviewer's aid, not a gate; **that one-line uncomment is the cheapest item
+in this window.** Detail in [notes/2026-10-27.md](../notes/2026-10-27.md) §D.
 
 ## New and unhomed
 
