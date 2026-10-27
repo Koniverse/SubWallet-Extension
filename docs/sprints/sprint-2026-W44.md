@@ -97,6 +97,13 @@ out on `subwallet-dev` (`scripts/koni-ci-build-dev.mjs:39`), as AC-13 records. 1
 executes on merge are a reviewer's aid, not a gate; **that one-line uncomment is the cheapest item
 in this window.** Detail in [notes/2026-10-27.md](../notes/2026-10-27.md) §D.
 
+**Later the same day, 38 commits.** `0a44dfca00` (05:27) moves the TAO staking, unstaking and
+validator-change fee notes after the signer a proxy or a multisig adds, so they are the last thing
+read before signing; it broke `tsc --build` (TS2741) and `95c94351b0` (07:21) fixed it — CI green,
+and `ce80a2ebff`'s run, pending in §D, finished green too. The new component keeps a
+validator-change fee case that nothing reaches since `11716c1f52` (10-19), so AC-3 holds and the
+case can go. Detail in [notes/2026-10-27.md](../notes/2026-10-27.md) §E.
+
 ## New and unhomed
 
 - [#5111](https://github.com/Koniverse/SubWallet-Extension/issues/5111) — Firefox AMO stuck at
