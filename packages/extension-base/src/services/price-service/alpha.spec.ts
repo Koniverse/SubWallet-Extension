@@ -1,6 +1,9 @@
 // Copyright 2019-2022 @subwallet/extension-base authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { alphaPriceToTao, getAlphaWorthInTao, getShownAlphaStakes, getTaoPerAlphaMap } from '@subwallet/extension-base/utils/alpha';
+import BigN from 'bignumber.js';
+
 import { getAlphaPrices, getAlphaPriceIdByNetuid } from './alpha';
 
 const TAO_ID = 'bittensor';
@@ -48,5 +51,30 @@ describe('Alpha prices on chain (EXT-2)', () => {
     const result = getAlphaPrices({ taoPerAlpha: { 83: 0.01 }, coingeckoIds: {}, taoPriceId: TAO_ID, priceMap: {}, price24hMap: {} });
 
     expect(result.priceMap).toEqual({});
+  });
+});
+
+describe('One position, one value on Assets, Earning and Swap (EXT-10)', () => {
+  // SN64 on 10-23: three hotkeys, one with a leftover worth under half a rao of TAO
+  const prices = [{ netuid: 0, price: 1e9 }, { netuid: 64, price: 67907638 }];
+  const stakes = [{ netuid: 64, stake: '1000000000000' }, { netuid: 64, stake: '250500000000' }, { netuid: 64, stake: '7' }];
+  const taoPrice = 262.09;
+
+  it('counts the same alpha and the same USD on Assets and Swap as Earning shows in TAO', () => {
+    // Assets and Swap: the alpha counted, at the price service's on-chain alpha price
+    const alpha = getShownAlphaStakes([['coldkey', stakes]], getTaoPerAlphaMap(prices))[0][64];
+    const alphaPrice = getAlphaPrices({ taoPerAlpha: { 64: 67907638 / 1e9 }, coingeckoIds: {}, taoPriceId: TAO_ID, priceMap: { [TAO_ID]: taoPrice }, price24hMap: {} }).priceMap[getAlphaPriceIdByNetuid(64)];
+    const assetsUsd = alpha.shiftedBy(-9).multipliedBy(alphaPrice);
+
+    // Earning: each hotkey worth a rao or more, at its TAO value; the position's USD at TAO's price
+    const worth = stakes.map(({ stake }) => getAlphaWorthInTao(stake, alphaPriceToTao(67907638)));
+    const kept = stakes.filter((_, i) => worth[i].gt(0));
+    const earningTao = worth.reduce((sum, w) => sum.plus(w), new BigN(0));
+    const earningUsd = earningTao.shiftedBy(-9).multipliedBy(taoPrice);
+
+    expect(kept.reduce((sum, { stake }) => sum.plus(stake), new BigN(0)).toFixed()).toBe(alpha.toFixed());
+    expect(alpha.toFixed()).toBe('1250500000000');
+    // Within the half rao each hotkey's TAO value is rounded by
+    expect(assetsUsd.minus(earningUsd).abs().lte(new BigN(kept.length * 0.5e-9).multipliedBy(taoPrice))).toBe(true);
   });
 });

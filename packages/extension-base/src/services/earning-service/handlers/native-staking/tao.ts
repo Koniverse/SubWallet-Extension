@@ -12,7 +12,7 @@ import { _getAssetDecimals, _getAssetSymbol } from '@subwallet/extension-base/se
 import BaseParaStakingPoolHandler from '@subwallet/extension-base/services/earning-service/handlers/native-staking/base-para';
 import { BaseYieldPositionInfo, BasicTxErrorType, EarningRewardItem, EarningStatus, NativeYieldPoolInfo, OptimalYieldPath, StakeCancelWithdrawalParams, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, SubmitJoinNativeStaking, TransactionData, UnstakingInfo, ValidatorInfo, YieldPoolInfo, YieldPoolMethodInfo, YieldPoolType, YieldPositionInfo, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { ProxyServiceRoute } from '@subwallet/extension-base/types/environment';
-import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getMinimumAtSpot, getStakeLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, isSameAddress, readAlphaPrices, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
+import { alphaPriceToTao, DEFAULT_MIN_STAKE, DEFAULT_MIN_TRANSFER, DEFAULT_SWAP_FEE_RATE, fetchFromProxyService, formatMinimum, formatNumber, getAlphaWorthInTao, getMinimumAtSpot, getStakeLimitPrice, getTaoPerAlphaMap, getWorthAtSpot, isSameAddress, readAlphaPrices, readOptional, reformatAddress, roundUpMinimum, SharedRead } from '@subwallet/extension-base/utils';
 import BigN from 'bignumber.js';
 import { t } from 'i18next';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -344,7 +344,8 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     for (const delegate of delegatorState) {
       const stake = new BigN(delegate.amount);
-      const originActiveStake = applyRate ? stake.multipliedBy(delegate.rate || 1).toFixed(0) : stake.toFixed(0);
+      // A subnet's stake at its TAO value, by the rule Assets counts it with (EXT-10)
+      const originActiveStake = applyRate ? getAlphaWorthInTao(stake, delegate.rate || 1).toFixed(0) : stake.toFixed(0);
       const bnActiveStake = new BN(originActiveStake);
 
       if (bnActiveStake.gt(BN_ZERO)) {
