@@ -2041,7 +2041,7 @@
   "bg.EARNING.services.service.earning.lending.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.liquidStaking.unstakeMinimumAmount": "You need to unstake at least {{amount}} {{token}}",
   "bg.EARNING.services.service.earning.nativeStaking.tao.insufficientStakeToEarn": "Số lượng quá nhỏ. Hãy stake ít nhất {{bnMinStake}} {{symbol}}",
-  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Amount too low. Unstake at least {{bnMinUnstake}} {{symbol}}, or the whole position",
+  "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountTooLow": "Số lượng quá nhỏ. Hãy rút ít nhất {{bnMinUnstake}} {{symbol}}, hoặc rút toàn bộ",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeRemainderBelowMinimum": "Lệnh này sẽ để lại {{remaining}} {{symbol}} đang stake, dưới mức {{minimum}} TAO mà nominator được giữ. Hãy rút ít hơn, hoặc rút toàn bộ",
   "bg.EARNING.services.service.earning.nativeStaking.tao.unstakeAmountLocked": "Một phần stake của bạn trên subnet này đang bị khoá. Bạn chỉ có thể rút tối đa {{available}} {{symbol}}",
   "bg.ACCOUNT.services.keyring.handler.Derive.accountExistsWithName": "Account already exists under the name \"{{name}}\"",
