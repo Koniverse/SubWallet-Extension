@@ -8,7 +8,7 @@ import { ProcessType, RequestStakeClaimReward, SwapBaseTxData } from '@subwallet
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, AlertBoxInstant } from '@subwallet/extension-koni-ui/components';
 import { useIsPolkadotUnifiedChain, useTranslation } from '@subwallet/extension-koni-ui/hooks';
-import { SubmitApiArea, WrappedTransactionInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
+import { BittensorStakingFeeArea, SubmitApiArea, WrappedTransactionInfoArea } from '@subwallet/extension-koni-ui/Popup/Confirmations/parts';
 import CardanoSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Cardano';
 import TonSignArea from '@subwallet/extension-koni-ui/Popup/Confirmations/parts/Sign/Ton';
 import { RootState } from '@subwallet/extension-koni-ui/stores';
@@ -202,6 +202,10 @@ const Component: React.FC<Props> = (props: Props) => {
             setDisable={setIsDisabledSubstrateApprove}
             transaction={transaction}
           />}
+          <BittensorStakingFeeArea
+            className={'staking-fee-box'}
+            transaction={transaction}
+          />
           {
             transaction.extrinsicType === ExtrinsicType.STAKING_CLAIM_REWARD &&
             <span className={CN('bond-reward-label', 'text-light-4')}>
@@ -318,7 +322,7 @@ const TransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: 
     '--content-gap': 0,
     marginTop: token.marginXS,
 
-    '.network-box, .address-format-info-box': {
+    '.network-box, .address-format-info-box, .staking-fee-box': {
       marginTop: token.marginSM
     },
 

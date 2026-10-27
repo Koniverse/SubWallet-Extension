@@ -3,7 +3,6 @@
 
 import { NotificationType, RequestUnbondingSubmit } from '@subwallet/extension-base/background/KoniTypes';
 import { SubnetYieldLeaveParams } from '@subwallet/extension-base/types';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import useGetNativeTokenBasicInfo from '@subwallet/extension-koni-ui/hooks/common/useGetNativeTokenBasicInfo';
@@ -25,7 +24,6 @@ const Component: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
   const subnetSymbol = data.poolInfo?.metadata.subnetData?.subnetSymbol;
-  const stakingFee = data.stakingFee;
   const expectedTao = data.expectedTao;
   const networkFee = transaction.estimateFee?.value;
 
@@ -71,24 +69,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />}
       </MetaInfo>
-      {!!stakingFee && (
-        <AlertBox
-          className={CN(className, 'alert-box')}
-          description={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
-          title={t('ui.TRANSACTION.Confirmations.Unbond.taoUnstakingFee')}
-          type='info'
-        />
-      )}
     </div>
   );
 };
 
-const UnbondTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {
-    '&.alert-box': {
-      marginTop: token.marginSM
-    }
-  };
+const UnbondTransactionConfirmation = styled(Component)<Props>(() => {
+  return {};
 });
 
 export default UnbondTransactionConfirmation;
