@@ -580,7 +580,6 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
 
     // Same for every address, so read it once per cycle rather than per address
     const threshold = await this.getRootClaimThreshold();
-    let feePromise: Promise<BigN | undefined> | undefined;
 
     await Promise.all(useAddresses.map(async (address) => {
       if (cancel) {
@@ -604,10 +603,9 @@ export default class TaoNativeStakingPoolHandler extends BaseParaStakingPoolHand
         };
 
         if (plan.pays.gt(0)) {
-          // The fee is flat whatever a claim pays, so one estimate serves every address in the cycle
-          feePromise = feePromise ?? this.getRootClaimFee(address, plan);
-
-          if (isRootClaimWorthNotifying(plan.pays, await feePromise)) {
+          // Each address's own claim: `claimRoot` and `claimRootWithHotkey` cost differently, and the fee cache
+          // keeps one estimate per call
+          if (isRootClaimWorthNotifying(plan.pays, await this.getRootClaimFee(address, plan))) {
             await this.createClaimNotification(earningRewardItem, this.nativeToken);
           }
         }
