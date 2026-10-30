@@ -723,8 +723,6 @@
   "ui.EARNING.components.Earning.OptionItem.viewOnDapp": "View on dApp",
   "ui.EARNING.components.Earning.PositionItem.viewOnDapp": "View on dApp",
   "ui.EARNING.components.Earning.PoolItem.totalValueStaked": "Total value staked",
-  "ui.EARNING.components.Earning.PoolItem.emission": "エミッション",
-  "ui.EARNING.components.Earning.PoolItem.maxApy": "最大APY",
   "ui.EARNING.components.Earning.PoolItem.rewards": "報酬",
   "ui.EARNING.components.Earning.PoolItem.upTo": "最大",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",

@@ -725,8 +725,6 @@
   "ui.EARNING.components.Earning.OptionItem.viewOnDapp": "View on dApp",
   "ui.EARNING.components.Earning.PositionItem.viewOnDapp": "View on dApp",
   "ui.EARNING.components.Earning.PoolItem.totalValueStaked": "Total value staked",
-  "ui.EARNING.components.Earning.PoolItem.emission": "Phát hành",
-  "ui.EARNING.components.Earning.PoolItem.maxApy": "APY tối đa",
   "ui.EARNING.components.Earning.PoolItem.rewards": "Phần thưởng",
   "ui.EARNING.components.Earning.PoolItem.upTo": "Lên đến",
   "ui.EARNING.components.Earning.PoolItem.tbd": "TBD",
