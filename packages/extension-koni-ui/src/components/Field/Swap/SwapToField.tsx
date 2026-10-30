@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { _ChainAsset } from '@subwallet/chain-list/types';
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { BN_TEN, formatNumberString, swapCustomFormatter } from '@subwallet/extension-base/utils';
 import { SwapTokenSelector } from '@subwallet/extension-koni-ui/components/Field/Swap/parts';
 import { BN_ZERO } from '@subwallet/extension-koni-ui/constants';
@@ -34,8 +35,7 @@ const Component = (props: Props) => {
 
   const getConvertedBalance = useMemo(() => {
     if (toAsset) {
-      const { priceId } = toAsset;
-      const price = priceMap[priceId || ''] || 0;
+      const price = priceMap[_getAssetPriceId(toAsset)] || 0;
 
       return new BigN(swapValue).multipliedBy(price);
     }

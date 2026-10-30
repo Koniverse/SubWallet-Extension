@@ -170,6 +170,15 @@ function Component ({ className, closeAlert, compound, inputAsset, isShowBalance
         </>
       )}
 
+      {type === YieldPoolType.SUBNET_STAKING && (
+        // Nothing to claim on a subnet: the chain adds the validator's dividends to the stake every epoch (EXT-15)
+        <div className={'__claim-reward-area'}>
+          <div className={'__auto-compound-label'}>
+            {t('ui.EARNING.screen.EarningPositionDetail.RewardInfo.subnetRewardsCompound')}
+          </div>
+        </div>
+      )}
+
       {!!(rewardHistories && rewardHistories.length) && (
         <>
           <div className={'__separator'}></div>
@@ -268,7 +277,7 @@ export const RewardInfoPart = styled(Component)<Props>(({ theme: { token } }: Pr
     }
   },
 
-  '.__visit-dapp-label': {
+  '.__visit-dapp-label, .__auto-compound-label': {
     fontSize: token.fontSize,
     lineHeight: token.lineHeight,
     color: token.colorTextLight4

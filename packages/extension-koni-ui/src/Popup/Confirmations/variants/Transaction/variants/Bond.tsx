@@ -3,7 +3,6 @@
 
 import { RequestBondingSubmit, StakingType } from '@subwallet/extension-base/background/KoniTypes';
 import { getValidatorLabel } from '@subwallet/extension-base/koni/api/staking/bonding/utils';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import { useGetChainPrefixBySlug } from '@subwallet/extension-koni-ui/hooks';
@@ -24,8 +23,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return getValidatorLabel(transaction.chain);
   }, [transaction.chain]);
   const networkPrefix = useGetChainPrefixBySlug(transaction.chain);
-
-  const stakingFee = data.subnetData?.stakingFee;
 
   const { t } = useTranslation();
   const { decimals, symbol } = useGetNativeTokenBasicInfo(transaction.chain);
@@ -61,24 +58,12 @@ const Component: React.FC<Props> = (props: Props) => {
           value={transaction.estimateFee?.value || 0}
         />}
       </MetaInfo>
-      {!!stakingFee && (
-        <AlertBox
-          className={CN(className, 'alert-box')}
-          description={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFeeDeductedInfo', { replace: { fee: stakingFee } })}
-          title={t('ui.TRANSACTION.Confirmations.Bond.taoStakingFee')}
-          type='info'
-        />
-      )}
     </div>
   );
 };
 
-const BondTransactionConfirmation = styled(Component)<Props>(({ theme: { token } }: Props) => {
-  return {
-    '&.alert-box': {
-      marginTop: token.marginSM
-    }
-  };
+const BondTransactionConfirmation = styled(Component)<Props>(() => {
+  return {};
 });
 
 export default BondTransactionConfirmation;

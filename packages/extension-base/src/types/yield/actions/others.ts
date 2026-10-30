@@ -35,6 +35,10 @@ export interface SubnetYieldLeaveParams {
   slippage?: number;
   /** stakingFee (subnet staking) */
   stakingFee?: string;
+  /** TAO the unstake is expected to return, in rao: the confirmation warns when the network fee is not less */
+  expectedTao?: string;
+  /** All of the position (Max): what accrues before the block goes too (Bittensor) */
+  unstakeAll?: boolean;
 }
 
 export type YieldLeaveParams = BaseYieldLeaveParams & Partial<SubnetYieldLeaveParams>;
@@ -111,4 +115,20 @@ export interface RequestEarningImpact {
   value: string;
   netuid: number;
   type: ExtrinsicType;
+}
+
+/**
+ * A Bittensor pool's APR (EXT-1), as a fraction a year: 0.34 is 34% APR. A subnet's from the chain's last epoch, in
+ * alpha; root's (netuid 0) from the proxy's 30-day figures, in TAO
+ */
+export interface SubnetAprResult {
+  /** Each hotkey with a figure; a hotkey left out earned nothing there: 0% */
+  byHotkey: Record<string, number>;
+  /** The best APR among hotkeys holding ≥ 1% of the stake — on a subnet the stake paid in its last epoch; 0 when none earned */
+  upTo: number;
+}
+
+export interface RequestSubnetApr {
+  slug: string;
+  netuid: number;
 }

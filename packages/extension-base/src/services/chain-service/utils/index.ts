@@ -5,6 +5,7 @@ import { _AssetRef, _AssetRefPath, _AssetType, _ChainAsset, _ChainInfo, _ChainSt
 import { BasicTokenInfo, ChainType } from '@subwallet/extension-base/background/KoniTypes';
 import { _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainState, _CUSTOM_PREFIX, _DataMap, _SMART_CONTRACT_STANDARDS } from '@subwallet/extension-base/services/chain-service/types';
+import { getAlphaPriceIdByNetuid } from '@subwallet/extension-base/services/price-service/alpha';
 import { IChain } from '@subwallet/extension-base/services/storage-service/databases';
 import { AccountChainType, AccountSignMode } from '@subwallet/extension-base/types';
 import { AllSubstrateKeypairTypes, BitcoinMainnetKeypairTypes, BitcoinTestnetKeypairTypes, CardanoKeypairTypes, EthereumKeypairTypes, KeypairType, TonKeypairTypes } from '@subwallet/keyring/types';
@@ -478,8 +479,26 @@ export function _getMultiChainAsset (assetInfo?: _ChainAsset) {
   return assetInfo?.multiChainAsset || '';
 }
 
+/** Chains whose alpha has no market price */
+const _UNPRICED_ALPHA_CHAINS = ['bittensor_testnet'];
+
+/**
+ * The price key of a subnet's alpha, shared by its copies on Bittensor, Subtensor-EVM and Base: the
+ * price service values each on chain by netuid (EXT-2). Empty for any other asset.
+ */
+export function _getAlphaPriceId (assetInfo?: _ChainAsset): string {
+  if (!assetInfo || _UNPRICED_ALPHA_CHAINS.includes(assetInfo.originChain)) {
+    return '';
+  }
+
+  const netuid = _getAssetNetuid(assetInfo);
+
+  // Netuid 0 is TAO itself, priced under its own id
+  return netuid > 0 ? getAlphaPriceIdByNetuid(netuid) : '';
+}
+
 export function _getAssetPriceId (assetInfo?: _ChainAsset) {
-  return assetInfo?.priceId || '';
+  return _getAlphaPriceId(assetInfo) || assetInfo?.priceId || '';
 }
 
 export function _getAssetName (assetInfo?: _ChainAsset) {
