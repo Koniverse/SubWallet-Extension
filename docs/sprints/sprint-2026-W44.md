@@ -12,13 +12,13 @@ goal: "The third window carrying the same two stories, and the first with a date
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) | Multisig approval notification reliability & status lifecycle | [EPIC-18](epics/EPIC-18.md) | P2 | 5 | 👀 review — PR #5095's only approval is on `f836222c51` (09-28); head `448dae55f5` unreviewed since 10-13 | ← W43 (W40 → W42 → W43 → W44) | [US-18.5](stories/US-18.5-multisig-notification-improvement.md) |
 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) | Bittensor TAO & subnet accuracy — on-chain yield, prices, staking and swap | [EPIC-12](epics/EPIC-12.md) | P1 | 13 | 🚧 in-progress — [PR #5113](https://github.com/Koniverse/SubWallet-Extension/pull/5113), **36 commits** (pushed 10-27 04:13), +4492/−695 over 78 files, **no review in 11 days**, body empty; CI **pending** on the new head | ← W43 | [US-12.24](stories/US-12.24-bittensor-tao-and-subnet-accuracy.md) |
-| [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | — | 🟡 ready — waits on the merges; `sprint:` still **W42**, the tester's | listed, not moved | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
+| [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) | QC — Release SubWallet Extension v1.3.91 | [EPIC-42](epics/EPIC-42.md) | P2 | 8 | 🚧 in-progress — started 10-30 on the dev build, 24 of 42. The multisig half passes, 23 of 23 on testnet plus the live-network re-check (AC-1c) | ← W42 (tester moved it here when the run started) | [US-42.31](stories/US-42.31-qc-release-extension-v1-3-91.md) |
 | — | *ChainList #710 Extension half — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P2 | — | ⚠️ PR #5096 open — PR-build pin + TEMP block, **unchanged since 10-09** | ← W43 | — |
 | — | *chain-list pin bump for X Layer — epic-owned, [rule 10](../../AGENTS.md)* | [EPIC-4](epics/EPIC-4.md) | P3 | — | PR #5089 open, unreviewed since 09-25 — **possibly now redundant**, #5096 bumps the dependency instead | ← W43 | — |
 
-**18 points, two stories**, both carried for a third window. Every story's `sprint:` was re-read
-when W43 closed: two name W43 and none named W44, so these two are moved here deliberately and
-US-42.31's 8 points stay counted in W42, where the tester placed them.
+**26 points, three stories.** US-18.5 and US-12.24 are carried for a third window. US-42.31 moved here
+from W42 on 2026-10-30, when the tester started running it: W42 and W43 are both closed, so a story
+in flight cannot stay counted in a window that is shut. Its `sprint:` now reads W44.
 
 **Opened 2026-10-27, day two.** W42 closed 0 of 3 / 0 of 26; **W43 closed 0 of 2 / 0 of 18.**
 
