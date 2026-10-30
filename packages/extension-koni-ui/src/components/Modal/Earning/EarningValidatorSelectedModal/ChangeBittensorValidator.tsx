@@ -262,6 +262,10 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     return earningRate > 0 ? roundUpMinimum(new BigN(DEFAULT_MIN_TRANSFER).div(earningRate), decimals) : undefined;
   }, [decimals, earningRate, poolInfo.type]);
 
+  // Every digit `roundUpMinimum` keeps, as the backend's `formatMinimum` shows it: the default keeps 2 below 1,
+  // which would show less than the minimum
+  const minimumToMoveMetadata = useMemo(() => ({ minNumberFormat: 3, maxNumberFormat: decimals || 6 }), [decimals]);
+
   const onClickSubmit = useCallback(
     (values: ChangeValidatorParams) => {
       const { originValidator, value } = values;
@@ -504,6 +508,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                 <Number
                   className='minimum-stake__value'
                   decimal={decimals}
+                  metadata={minimumToMoveMetadata}
                   suffix={symbol}
                   value={minimumToMove}
                 />
