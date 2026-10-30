@@ -14,7 +14,7 @@ import { TaoStakeInfo } from '@subwallet/extension-base/services/earning-service
 import { EventItem, EventType } from '@subwallet/extension-base/services/event-service/types';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
 import DetectAccountBalanceStore from '@subwallet/extension-base/stores/DetectAccountBalance';
-import { BalanceItem, BalanceJson, BalanceType, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
+import { BalanceItem, BalanceJson, BalanceType, BondingSubmitParams, CommonOptimalTransferPath } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAlphaAssetsByChain, getShownAlphaStakes, getTaoPerAlphaMap, isAccountAll, PromiseHandler, readAlphaPrices, readOptional, waitTimeout } from '@subwallet/extension-base/utils';
 import { getKeypairTypeByAddress } from '@subwallet/keyring';
 import { AllSubstrateKeypairTypes, EthereumKeypairTypes } from '@subwallet/keyring/types';
@@ -176,7 +176,9 @@ export class BalanceService implements StoppableServiceInterface {
       }
     }
 
-    const stakedAddresses: string[] = [];
+    // Per Bittensor chain: the accounts that staked into a subnet, and those subnets
+    const subnetStakes: Record<string, { addresses: string[], netuids: number[] }> = {};
+    const turnedOnChains: string[] = [];
 
     events.forEach((event) => {
       if (event.type === 'account.remove' || event.type === 'accountProxy.remove') {
@@ -187,9 +189,18 @@ export class BalanceService implements StoppableServiceInterface {
       if (event.type === 'transaction.done') {
         const transaction = event.data[0] as SWTransactionBase;
 
-        // A subnet stake turns its alpha token on, as a swap does (EXT-39)
+        // A subnet stake turns its alpha token on, as a swap does (EXT-39): only that subnet's, as the user may have
+        // hidden the others. Root (netuid 0) stakes TAO and has no alpha token
         if (_BALANCE_CHAIN_GROUP.bittensor.includes(transaction.chain) && [ExtrinsicType.STAKING_BOND, ExtrinsicType.JOIN_YIELD_POOL].includes(transaction.extrinsicType)) {
-          stakedAddresses.push(transaction.address);
+          const netuid = (transaction.data as Partial<BondingSubmitParams> | undefined)?.subnetData?.netuid;
+
+          if (netuid) {
+            const stakes = subnetStakes[transaction.chain] || { addresses: [], netuids: [] };
+
+            stakes.addresses.push(transaction.address);
+            stakes.netuids.push(netuid);
+            subnetStakes[transaction.chain] = stakes;
+          }
         }
       }
 
@@ -203,14 +214,20 @@ export class BalanceService implements StoppableServiceInterface {
         this.bittensorChainActive[chain] = active;
 
         if (turnedOn) {
-          stakedAddresses.push(...keyring.getPairs().map((account) => account.address));
+          turnedOnChains.push(chain);
         }
       }
     });
 
-    if (stakedAddresses.length) {
-      this.autoEnableBittensorAlphaTokens([...new Set(stakedAddresses)]).catch(console.error);
-    }
+    // Only the chain turned on: the other one's hidden tokens stay hidden. It brings back every subnet staked into,
+    // which covers a stake on it
+    [...new Set(turnedOnChains)].forEach((chain) => {
+      this.autoEnableBittensorAlphaTokens(keyring.getPairs().map((account) => account.address), false, [chain]).catch(console.error);
+    });
+
+    Object.entries(subnetStakes).filter(([chain]) => !turnedOnChains.includes(chain)).forEach(([chain, { addresses, netuids }]) => {
+      this.autoEnableBittensorAlphaTokens([...new Set(addresses)], false, [chain], netuids).catch(console.error);
+    });
 
     if (removedAddresses.length > 0) {
       this.balanceMap.removeBalanceItems([...removedAddresses, ALL_ACCOUNT_KEY]); // Add all account key to recalculate all account balances
@@ -696,10 +713,11 @@ export class BalanceService implements StoppableServiceInterface {
    * Turns on the alpha token of every subnet an account holds a position on that Earning shows (EXT-39).
    * Only visible tokens are read, and a stake through Earning — unlike a swap — turns nothing on, so it
    * would drop out of the Assets total. Subscan, behind `autoEnableChains`, does not cover Bittensor, so
-   * this reads the chain. Runs on start for tokens never set (`onlyUnset`), and for any hidden token when
-   * Bittensor is turned on — which hides all of its tokens when turned off — or after a subnet stake.
+   * this reads the chain. Runs on start for tokens never set (`onlyUnset`), for any hidden token on a Bittensor
+   * chain turned on — which hides all of its tokens when turned off — and, after a subnet stake, for the token of
+   * that subnet (`netuids`) alone.
    */
-  public async autoEnableBittensorAlphaTokens (addresses: string[], onlyUnset = false) {
+  public async autoEnableBittensorAlphaTokens (addresses: string[], onlyUnset = false, chains: string[] = _BALANCE_CHAIN_GROUP.bittensor, netuids?: number[]) {
     const assetMap = this.state.chainService.getAssetRegistry();
     const currentAssetSettings = await this.state.chainService.getAssetSettings();
     const coldkeys = addresses.filter((address) => AllSubstrateKeypairTypes.includes(getKeypairTypeByAddress(address)));
@@ -711,9 +729,10 @@ export class BalanceService implements StoppableServiceInterface {
       return;
     }
 
-    for (const chain of _BALANCE_CHAIN_GROUP.bittensor) {
+    for (const chain of chains) {
       const chainState = this.state.chainService.getChainStateByKey(chain);
-      const hidden = Object.values(filterAlphaAssetsByChain(assetMap, chain)).filter((asset) => canEnable(currentAssetSettings, asset.slug));
+      const hidden = Object.values(filterAlphaAssetsByChain(assetMap, chain))
+        .filter((asset) => canEnable(currentAssetSettings, asset.slug) && (!netuids || netuids.includes(_getAssetNetuid(asset))));
 
       // The stake read needs the chain on; `manualTurnOff` stays set after the user turns it back on, so it is not checked
       if (!chainState?.active || !hidden.length) {
@@ -741,14 +760,16 @@ export class BalanceService implements StoppableServiceInterface {
     }
 
     if (enable.length) {
-      // Re-read: `autoEnableChains` may have written while the chain was read, and its changes must stay
-      const latestAssetSettings = await this.state.chainService.getAssetSettings();
+      // Re-read: `autoEnableChains` may have written while the chain was read, and its changes must stay. A copy, read
+      // and written with no await between: `setAssetSettings` emits `asset.updateState`, which subscribes the token's
+      // balance, only for what differs from the stored settings, so a change made in place would subscribe nothing
+      const latestAssetSettings = { ...this.state.chainService.subscribeAssetSettings().value };
 
       enable.filter((slug) => canEnable(latestAssetSettings, slug)).forEach((slug) => {
         latestAssetSettings[slug] = { visible: true };
       });
 
-      this.state.chainService.setAssetSettings({ ...latestAssetSettings });
+      this.state.chainService.setAssetSettings(latestAssetSettings);
     }
   }
 
