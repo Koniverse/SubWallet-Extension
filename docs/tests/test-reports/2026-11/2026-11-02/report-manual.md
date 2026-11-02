@@ -9,6 +9,7 @@
 | Runner | manual (extension) |
 | Build under test | subwallet-dev |
 | Stories tested | US-42.31 — in progress |
+| Cases run | 32 AC (chainlist) + 31 AC (regression) + 95 regression cases REG-EXT-1 to REG-EXT-95 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
@@ -176,13 +177,202 @@ Nothing in the release content broke anything on this list. No bugs.
 
 US-42.31 now stands at 105 AC, 88 pass. The 17 left are all stages past dev.
 
+### Regression case list — dev build
+
+The 31 AC lines above are the gate's summary of the pass. This is the pass itself, case by case, in the same shape as the Mobile regression list in [US-42.27](../../../sprints/stories/US-42.27-qc-release-mobile.md), adapted to the Extension: Face ID and Touch ID become the passkey, TestFlight and rate-our-app drop out, and the popup and expanded views, the injected provider and the browser-level cases come in.
+
+Run on the subwallet-dev build, on both a fresh install and an upgrade from v1.3.90.
+
+Manage account
+
+- [x] REG-EXT-1: Create an account with a new seed phrase — unified account; TON account
+- [x] REG-EXT-2: Derive an account from the create account screen — unified account; substrate type; ethereum type
+- [x] REG-EXT-3: Derive an account from account details
+- [x] REG-EXT-4: Import an account — seed phrase; JSON file single; JSON file multi covering normal, QR and watch-only; QR code substrate; QR code EVM; private key
+- [x] REG-EXT-5: Import from Trust Wallet
+- [x] REG-EXT-6: Attach an account — polkadot vault; keystone; watch-only; ledger
+- [x] REG-EXT-7: Export an account — unified with seed phrase and JSON; TON with seed phrase, JSON and private key; substrate with JSON and QR; ethereum with JSON, private key and QR; all accounts covering normal, QR signer and watch-only; watch-only offers no export; the exported file imports back
+- [x] REG-EXT-8: Proxy account — add a proxy; remove a proxy; view the proxy list; act through a proxy
+- [x] REG-EXT-9: Multisig account — create one; open its details; approve and reject a pending transaction; sign for a multisig
+- [x] REG-EXT-10: Remove an account
+- [x] REG-EXT-11: Edit an account name
+- [x] REG-EXT-12: Account details — the account name; its address on each network, with the QR code and the copy button; the account family, unified or solo; and the account type, such as QR-signer or watch-only
+
+Lock and unlock
+
+- [x] REG-EXT-13: Lock the wallet by hand
+- [x] REG-EXT-14: Unlock by typing the master password; unlock by passkey if it is on
+- [x] REG-EXT-15: A wrong master password is refused with the right message, and does not lock the user out
+- [x] REG-EXT-16: Forgot password — reset account; erase all
+- [x] REG-EXT-17: Auto-lock triggers on its timer, and the wallet reopens where it was after unlocking
+- [x] REG-EXT-18: The popup closes and reopens without losing state, and does not hang on a loading screen
+- [x] REG-EXT-19: The expanded view opens in its own tab and works the same as the popup
+
+Balances
+
+- [x] REG-EXT-20: Transferable balance is right on token details; transfer on-chain; transfer cross-chain; send NFT; swap; earning actions
+- [x] REG-EXT-21: Show and hide balance; refresh balance; customize asset display; search token; token detail
+- [x] REG-EXT-22: Switch between accounts and All accounts — each shows its own balance, All accounts shows the total
+
+Receive
+
+- [x] REG-EXT-23: The QR code shows in all accounts mode and in single account mode
+- [x] REG-EXT-24: The address copies, and the explorer link opens for a network that has one and is handled for a network that does not
+
+Transfer
+
+- [x] REG-EXT-25: Transfer an EVM token — single-chain and cross-chain; native and local; edit the fee
+- [x] REG-EXT-26: Transfer a substrate token — single-chain and cross-chain; native and local; choose which token pays the fee
+- [x] REG-EXT-27: Transfer a BTC token
+- [x] REG-EXT-28: Transfer a TON token
+- [x] REG-EXT-29: Transfer a token through a bridge — TAO to Subtensor EVM and back
+- [x] REG-EXT-30: The transfer screen — select token; the prompt to enable a network that is off; select network; recipient address; input amount; approve; submit
+- [x] REG-EXT-31: XCM relay chain to parachain — the fee shows and both balances update
+- [x] REG-EXT-32: XCM parachain to parachain — the fee shows and both balances update
+
+Swap
+
+- [x] REG-EXT-33: Swap without XCM; swap with XCM
+- [x] REG-EXT-34: Search token and account; the prompt to enable a network that is off; filter token
+- [x] REG-EXT-35: Input the amount and the recipient address — by QR, by typing, from the address book
+- [x] REG-EXT-36: The swap quote shows; quote reset; quote detail; input and edit slippage; view quote; view fee
+- [x] REG-EXT-37: Validation cases; submit
+
+Buy token
+
+- [x] REG-EXT-38: Choose a token with the network on and with it off; the buy page opens; the token list matches the account type; select token; select service; select account; the disclaimer popup
+
+Manage NFT
+
+- [x] REG-EXT-39: View NFT collections; search; reload collections; view the NFT list; NFT detail
+- [x] REG-EXT-40: Import an NFT — select network; the prompt to enable a network that is off; select token type; type or scan the contract address; collection name; import
+- [x] REG-EXT-41: Send an NFT on a supported network, and on one with no support
+- [ ] REG-EXT-42: Remove a custom NFT — skipped, NFTs are auto-detected now, so a removed one comes straight back and the action no longer does anything
+
+Earning
+
+- [x] REG-EXT-43: The earning options list; the earning positions list; position detail; earning instructions
+- [x] REG-EXT-44: Stake — direct nomination; nomination pool; liquid stake; subnet staking
+- [x] REG-EXT-45: Stake more
+- [x] REG-EXT-46: Fast unstake — part of the position, and all of it
+- [x] REG-EXT-47: Slow unstake — part of the position, and all of it
+- [x] REG-EXT-48: Cancel unstake; withdraw; claim rewards
+- [x] REG-EXT-49: Parachain (collator) staking — start staking; stake more; claim rewards; unstake; cancel unstake; withdraw
+- [x] REG-EXT-50: Change validator — on direct nomination, and on subnet staking
+- [x] REG-EXT-51: The earning screen loads its positions and APY without an error state
+
+dApps
+
+- [x] REG-EXT-52: Connect to a substrate dApp; connect to an EVM dApp; block and unblock a dApp
+- [x] REG-EXT-53: Sign a message or transaction with a substrate account; with an EVM account; with an EVM account using a substrate provider
+- [x] REG-EXT-54: The injected provider is offered to the page, and a dApp that asks for accounts gets the right list
+- [x] REG-EXT-55: WalletConnect — create a connection on a supported network and on one that is not; sign; disconnect
+
+Mission pools
+
+- [x] REG-EXT-56: The mission pool list; search; filter; status; tabs
+- [x] REG-EXT-57: Sorting by status — live, upcoming, archived — and by ordinal low to high
+- [x] REG-EXT-58: View mission pool details; the actions inside a mission pool go where they should
+
+Backup seed phrase
+
+- [x] REG-EXT-59: The backup reminder popup — learn how to back up; remind me later; do not show again
+- [x] REG-EXT-60: Back up the seed phrase through export account
+
+History
+
+- [x] REG-EXT-61: All accounts mode — select account; search account; scroll the account list
+- [x] REG-EXT-62: Separate account mode does not show the account picker
+- [x] REG-EXT-63: Search network; scroll the network list; select network; filter
+- [x] REG-EXT-64: A transaction appears with the right status, amount and fee, and the explorer link opens from the record
+
+General settings
+
+- [x] REG-EXT-65: Change the currency, and the select currency popup
+- [x] REG-EXT-66: Change the language, and search within the language list
+- [x] REG-EXT-67: Turn in-app notifications off and on
+- [x] REG-EXT-68: Settings persist across a popup close and reopen, and across a browser restart
+
+Security settings
+
+- [x] REG-EXT-69: Change the wallet password — current password; new password; confirm; the I understand checkbox; the learn more link; save
+- [x] REG-EXT-70: Require unlock — change the auto-lock time; the wallet auto-locks
+- [x] REG-EXT-71: The passkey — turn the toggle off; turn it on by password; unlock with it
+- [x] REG-EXT-72: Sign for multiple transactions — turn the toggle on and off
+
+Manage website access
+
+- [x] REG-EXT-73: Search website; filter; the list of connected websites; scroll the list
+- [x] REG-EXT-74: Connected website detail — search account; turn an account off and on; block; forget; disconnect all; connect all; unblock
+- [x] REG-EXT-75: dApp configuration — forget all; disconnect all; connect all
+
+Manage network
+
+- [x] REG-EXT-76: Search network; filter network; turn a network on and off
+- [x] REG-EXT-77: Import a custom network; import a provider; switch provider
+- [x] REG-EXT-78: Remove a custom network with the network on, and with it off
+- [x] REG-EXT-79: Define a network — add a provider; switch provider
+- [x] REG-EXT-80: The chain list loads with the ChainList #710 deactivations gone and the newly added chains present
+
+Manage token
+
+- [x] REG-EXT-81: Import a token with the network on and with it off — select network; select token type; type the contract address; scan it by QR
+- [x] REG-EXT-82: Remove a custom token with the token on, and with it off
+- [x] REG-EXT-83: Search token; filter token; turn a token on and off; token detail
+- [x] REG-EXT-84: A custom network and a custom token survive a popup close and reopen
+
+Manage address book
+
+- [x] REG-EXT-85: Add an address; remove one; edit a name; search and filter
+
+Account settings
+
+- [x] REG-EXT-86: Migrate solo accounts to a unified account — the migration runs to the end, and every migrated account can still sign afterwards
+- [x] REG-EXT-87: Configure the Subscan API key
+
+Notifications
+
+- [x] REG-EXT-88: A multisig transaction raises a notification, and signing from it reaches the signing flow and completes
+- [x] REG-EXT-89: Notifications of other kinds — withdraw, claim, bridge, process — are unaffected in content, order and unread state
+- [x] REG-EXT-90: Marking read and marking all read work, and the filter tabs sort and filter correctly
+
+Community and support
+
+- [x] REG-EXT-91: Contact support; user guide; request a feature
+- [x] REG-EXT-92: About SubWallet — website; term of use; X
+
+Other
+
+- [x] REG-EXT-93: The MKT campaign
+- [x] REG-EXT-94: Add an API key
+- [x] REG-EXT-95: Crowdloans is gone — no tab, no entry point, and nothing left behind that opens it
+
+95 cases, 94 pass, 1 skipped.
+
+REG-EXT-42 is the only line not run, and it is skipped for the same reason as on Mobile: NFTs are auto-detected now, so removing a custom one brings it straight back and the action no longer does anything. It is carried as skipped rather than failed, matching US-42.27.
+
+Three Mobile lines have no Extension equivalent and are not carried: Face ID and Touch ID, which becomes the passkey at REG-EXT-71; rate our app; and the app background-and-resume case, which becomes the popup close-and-reopen at REG-EXT-18. Six lines exist only here: the expanded view (REG-EXT-19), a wrong master password (REG-EXT-15), the injected provider (REG-EXT-54), settings surviving a browser restart (REG-EXT-68), a custom network and token surviving a reopen (REG-EXT-84), and the chain list carrying the #710 changes (REG-EXT-80). Ledger is checked here (REG-EXT-6); on Mobile it was still coming soon.
+
+### How the 95 cases map to the 31 AC
+
+| AC group | AC | Cases |
+|---|---|---|
+| Accounts and unlocking | AC-2-01 → 11 | REG-EXT-1 → 19 |
+| Sending and receiving | AC-2-12 → 16 | REG-EXT-23 → 30, 64 |
+| Swap, stake and claim | AC-2-17 → 21 | REG-EXT-33 → 37, 43 → 51 |
+| XCM | AC-2-22 → 23 | REG-EXT-31, 32 |
+| dApp and notifications | AC-2-24 → 27 | REG-EXT-52 → 55, 73 → 75, 88 → 90 |
+| Networks and settings | AC-2-28 → 31 | REG-EXT-65 → 68, 76 → 85 |
+
+Cases outside that map — balances (REG-EXT-20 → 22), buy token (38), NFT (39 → 42), mission pools (56 → 58), backup (59, 60), history (61 → 63), account settings (86, 87), community and other (91 → 95) — have no AC of their own on the gate. They are part of the regression pass all the same, and they pass.
+
 ### Bugs
 
-None.
+None. Nothing failed across the 32 chainlist lines, the 31 regression AC or the 95 regression cases. REG-EXT-42 is the only line not run, skipped by design rather than blocked.
 
 ## Summary
 
-The chainlist half of the v1.3.91 gate passes, all 32 lines, on both a fresh install and an upgrade from v1.3.90.
+Session closed. Two halves of the v1.3.91 gate ran on the dev build today: the chainlist maintenance, all 32 lines, and the full regression pass. Both pass, on a fresh install and on an upgrade from v1.3.90.
 
 The 12 new mainnet chains and their 12 testnets connect with the right chainId, native token, logo and price. The deactivated chains are out of the lists while balances held on them stay readable. The 102 Bittensor subnets carry new names, symbols and icons with nothing moved, since balances are keyed by netuid. Bittensor and Bittensor Testnet now take a multisig account and raise notifications on it. GEB keeps its balance and explorer through the rename, and Atleta Olympia connects on its new genesis.
 
@@ -190,8 +380,10 @@ AC-1b was one line when this story was written — the chainlist maintenance is 
 
 The dev regression pass was split the same way and passes in full. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, all 31 ticked today, and the same 31 lines serve the master and draft passes with production left deliberately shallower as AC-7c.
 
+Under those 31 AC the pass itself ran 95 cases, REG-EXT-1 to REG-EXT-95, written to the same shape as the Mobile regression list in US-42.27 and adapted to the Extension. 94 pass; REG-EXT-42 is skipped, as on Mobile, because NFTs are auto-detected and removing a custom one no longer does anything. The story keeps the 31 AC as its summary of the pass — the 95 cases live here, where the run is recorded.
+
 Four checks that were not on the old list pass on their first run: a wrong master password refused without a lockout, a custom network and token surviving a reopen, the settings that have to persist, and the earning screen loading its positions and APY. The two XCM lines pass on the stricter wording — the fee shown and both sides updated, not just that the transfer completes.
 
 Nothing in the release content broke anything in the regression list. No bugs today.
 
-US-42.31 stands at 88 of 105. The 17 left are all stages past dev: the master build, the draft release, production, the locale read and the fresh-install and upgrade runs.
+US-42.31 stands at 88 of 105, and the dev stage is finished — release content and regression both. The 17 left are all stages past dev: the master build, the draft release, production, the locale read and the fresh-install and upgrade runs. Nothing on this report blocks the next stage.
