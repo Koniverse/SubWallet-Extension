@@ -14,15 +14,15 @@
 | P1 | 0 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
 ## US-42.31 — Release SubWallet Extension v1.3.91
 
-Today covers the chainlist half of the gate — the ChainList #710 maintenance on the dev build. The multisig half passed on 10-30.
+Today covers two things on the dev build: the chainlist half of the gate (the ChainList #710 maintenance) and the full regression pass. The multisig half passed on 10-30.
 
-Run on both a fresh install and an upgrade from v1.3.90. Every line below holds on both.
+The chainlist lines were run on both a fresh install and an upgrade from v1.3.90, and hold on both.
 
 ### AC results
 
@@ -112,7 +112,7 @@ The 72 chains whose provider lists were rewritten all connect, with every remove
 
 Every line above was run twice, once on a clean profile and once as an upgrade from v1.3.90. The upgrade keeps accounts, chains, tokens, balances and settings, and the new chain list arrives with it.
 
-### The regression pass on dev was also split — not run yet
+### The regression pass on dev — split today, and passed
 
 Same problem as AC-1a and AC-1b, third form. AC-2 read "regression pass on dev finds no new issues", pointing at a 17-line checklist headed "run this list at each stage". Those 17 lines were shared by dev, master, draft and production, so ticking one for dev would have claimed it for the other three, and AC-2 itself only moved once the whole pass was finished. A full day of regression testing would have had nowhere to go.
 
@@ -133,23 +133,48 @@ The same 31 lines serve the master build (AC-4) and the draft build (AC-6) — r
 
 Two things changed in content, not just in shape. XCM had two items with no fee or balance check on one of them, and both now require the fee shown and both sides updated, which is where XCM fails when it fails. A wrong master password, a custom network and token, and the settings that have to persist were not on the old list at all.
 
-Seven of the 31 ran today and pass — the sending and receiving group and XCM.
+All 31 lines ran today and pass, so AC-2 is ticked.
 
 | AC | Description | Result | Notes |
 |---|---|---|---|
+| AC-2-01 | Create a new account, the seed phrase shows and the account opens with its balance | ✅ Pass | |
+| AC-2-02 | Import an account from a mnemonic, the address matches what it was before | ✅ Pass | |
+| AC-2-03 | Import an account from a private key, the address matches | ✅ Pass | |
+| AC-2-04 | Switch between accounts, each shows its own balance across chains | ✅ Pass | |
+| AC-2-05 | All accounts shows the total and lists every account | ✅ Pass | |
+| AC-2-06 | The master password unlocks the wallet | ✅ Pass | |
+| AC-2-07 | A wrong master password is refused with the right message, no lockout | ✅ Pass | |
+| AC-2-08 | The passkey unlocks the wallet if it is on | ✅ Pass | |
+| AC-2-09 | Auto-lock triggers on its timer and the wallet reopens correctly | ✅ Pass | |
+| AC-2-10 | Export an account as JSON and as a seed phrase, both correct | ✅ Pass | |
+| AC-2-11 | Remove an account, it is gone and the others are untouched | ✅ Pass | |
 | AC-2-12 | Send a native token on a substrate chain, fee shown before signing, balance updates after | ✅ Pass | |
 | AC-2-13 | Send a native token on an EVM chain, same check | ✅ Pass | |
 | AC-2-14 | Send a non-native token, the fee is charged in the right token | ✅ Pass | |
 | AC-2-15 | Receive — the address shows, copies, and the QR scans | ✅ Pass | |
 | AC-2-16 | The transaction appears in History with the right status, amount and fee | ✅ Pass | |
+| AC-2-17 | Swap on at least one route, the quote shows and the swap completes | ✅ Pass | |
+| AC-2-18 | Stake on at least one network, the position shows after | ✅ Pass | |
+| AC-2-19 | Unstake on the same network, the unstaking entry shows with its unlock time | ✅ Pass | |
+| AC-2-20 | Claim rewards on at least one network | ✅ Pass | |
+| AC-2-21 | The earning screen loads its positions and APY without an error state | ✅ Pass | |
 | AC-2-22 | XCM relay chain to parachain, the fee shows and both balances update | ✅ Pass | |
 | AC-2-23 | XCM parachain to parachain, the fee shows and both balances update | ✅ Pass | |
+| AC-2-24 | Connect to a dApp over WalletConnect, sign a message and a transaction | ✅ Pass | |
+| AC-2-25 | Connect to a dApp over the injected provider, sign a message and a transaction | ✅ Pass | |
+| AC-2-26 | A multisig transaction raises a notification, and signing from it completes | ✅ Pass | |
+| AC-2-27 | Notifications of other kinds are unaffected in content, order and unread state | ✅ Pass | |
+| AC-2-28 | Manage networks opens, the chain list loads, deactivated gone and new ones present | ✅ Pass | |
+| AC-2-29 | Enable and disable a network, the token list follows and nothing else breaks | ✅ Pass | |
+| AC-2-30 | Add a custom network and a custom token, both work and survive a reopen | ✅ Pass | |
+| AC-2-31 | Settings — language, currency and the hide-balance toggle all apply and persist | ✅ Pass | |
+| AC-2 | Regression pass on dev finds no new issues — all 31 lines pass | ✅ Pass | |
 
-Both XCM lines were the ones rewritten today to require the fee and both sides, rather than just that the transfer goes through. They pass on that stricter reading.
+Four of these were not on the old 17-line checklist at all and pass on their first run: a wrong master password being refused without locking the user out (AC-2-07), a custom network and token surviving a reopen (AC-2-30), and the settings that have to persist (AC-2-31), plus the earning screen loading its positions and APY (AC-2-21). The two XCM lines also pass on the stricter wording written in the same session — the fee shown and both sides updated, not just that the transfer completes.
 
-The other 24 lines have not run: accounts and unlocking (AC-2-01 to 11), swap, stake and claim (AC-2-17 to 21), dApp and notifications (AC-2-24 to 27), networks and settings (AC-2-28 to 31). AC-2 itself stays open until they do.
+Nothing in the release content broke anything on this list. No bugs.
 
-US-42.31 now stands at 105 AC, 63 pass.
+US-42.31 now stands at 105 AC, 88 pass. The 17 left are all stages past dev.
 
 ### Bugs
 
@@ -163,8 +188,10 @@ The 12 new mainnet chains and their 12 testnets connect with the right chainId, 
 
 AC-1b was one line when this story was written — the chainlist maintenance is live — covering a change that spans 24 chains added, 66 deactivated, 102 subnets resynced, 72 provider lists rewritten and five feature updates. It is now 32 lines taken from the sections of ChainList #710, so a session's work can be recorded as it happens.
 
-The dev regression pass was split the same way and has started. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, and the same 31 lines serve the master and draft passes, with production left deliberately shallower as AC-7c.
+The dev regression pass was split the same way and passes in full. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, all 31 ticked today, and the same 31 lines serve the master and draft passes with production left deliberately shallower as AC-7c.
 
-Seven of those 31 pass today: sending and receiving (AC-2-12 to 16) and both XCM lines (AC-2-22, AC-2-23), the latter on the stricter wording written in the same session — the fee shown and both sides updated, not just that the transfer completes.
+Four checks that were not on the old list pass on their first run: a wrong master password refused without a lockout, a custom network and token surviving a reopen, the settings that have to persist, and the earning screen loading its positions and APY. The two XCM lines pass on the stricter wording — the fee shown and both sides updated, not just that the transfer completes.
 
-US-42.31 stands at 63 of 105. Left: 24 of the dev regression lines plus AC-2 itself, and every stage past dev.
+Nothing in the release content broke anything in the regression list. No bugs today.
+
+US-42.31 stands at 88 of 105. The 17 left are all stages past dev: the master build, the draft release, production, the locale read and the fresh-install and upgrade runs.
