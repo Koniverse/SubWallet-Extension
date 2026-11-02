@@ -133,7 +133,23 @@ The same 31 lines serve the master build (AC-4) and the draft build (AC-6) — r
 
 Two things changed in content, not just in shape. XCM had two items with no fee or balance check on one of them, and both now require the fee shown and both sides updated, which is where XCM fails when it fails. A wrong master password, a custom network and token, and the settings that have to persist were not on the old list at all.
 
-None of these 31 lines has run. US-42.31 now stands at 105 AC, 56 pass.
+Seven of the 31 ran today and pass — the sending and receiving group and XCM.
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-2-12 | Send a native token on a substrate chain, fee shown before signing, balance updates after | ✅ Pass | |
+| AC-2-13 | Send a native token on an EVM chain, same check | ✅ Pass | |
+| AC-2-14 | Send a non-native token, the fee is charged in the right token | ✅ Pass | |
+| AC-2-15 | Receive — the address shows, copies, and the QR scans | ✅ Pass | |
+| AC-2-16 | The transaction appears in History with the right status, amount and fee | ✅ Pass | |
+| AC-2-22 | XCM relay chain to parachain, the fee shows and both balances update | ✅ Pass | |
+| AC-2-23 | XCM parachain to parachain, the fee shows and both balances update | ✅ Pass | |
+
+Both XCM lines were the ones rewritten today to require the fee and both sides, rather than just that the transfer goes through. They pass on that stricter reading.
+
+The other 24 lines have not run: accounts and unlocking (AC-2-01 to 11), swap, stake and claim (AC-2-17 to 21), dApp and notifications (AC-2-24 to 27), networks and settings (AC-2-28 to 31). AC-2 itself stays open until they do.
+
+US-42.31 now stands at 105 AC, 63 pass.
 
 ### Bugs
 
@@ -147,6 +163,8 @@ The 12 new mainnet chains and their 12 testnets connect with the right chainId, 
 
 AC-1b was one line when this story was written — the chainlist maintenance is live — covering a change that spans 24 chains added, 66 deactivated, 102 subnets resynced, 72 provider lists rewritten and five feature updates. It is now 32 lines taken from the sections of ChainList #710, so a session's work can be recorded as it happens.
 
-The dev regression pass was split the same way but not run. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, and the same 31 lines serve the master and draft passes, with production left deliberately shallower as AC-7c.
+The dev regression pass was split the same way and has started. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, and the same 31 lines serve the master and draft passes, with production left deliberately shallower as AC-7c.
 
-US-42.31 stands at 56 of 105. Left: the dev regression pass (32 lines) and every stage past dev.
+Seven of those 31 pass today: sending and receiving (AC-2-12 to 16) and both XCM lines (AC-2-22, AC-2-23), the latter on the stricter wording written in the same session — the fee shown and both sides updated, not just that the transfer completes.
+
+US-42.31 stands at 63 of 105. Left: 24 of the dev regression lines plus AC-2 itself, and every stage past dev.
