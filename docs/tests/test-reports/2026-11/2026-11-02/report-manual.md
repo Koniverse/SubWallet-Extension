@@ -112,6 +112,29 @@ The 72 chains whose provider lists were rewritten all connect, with every remove
 
 Every line above was run twice, once on a clean profile and once as an upgrade from v1.3.90. The upgrade keeps accounts, chains, tokens, balances and settings, and the new chain list arrives with it.
 
+### The regression pass on dev was also split — not run yet
+
+Same problem as AC-1a and AC-1b, third form. AC-2 read "regression pass on dev finds no new issues", pointing at a 17-line checklist headed "run this list at each stage". Those 17 lines were shared by dev, master, draft and production, so ticking one for dev would have claimed it for the other three, and AC-2 itself only moved once the whole pass was finished. A full day of regression testing would have had nowhere to go.
+
+It is now AC-2-01 to AC-2-31 on the story, one line per thing a tester finishes and can tick:
+
+| Group | Lines | Covers |
+|---|---|---|
+| Accounts and unlocking | AC-2-01 → 11 | create, import by mnemonic and by private key, account switching, All accounts, master password, a wrong password, passkey, auto-lock, export, remove |
+| Sending and receiving | AC-2-12 → 16 | native on substrate, native on EVM, a non-native token, receive and QR, the History entry |
+| Swap, stake and claim | AC-2-17 → 21 | one swap route, stake, unstake with its unlock time, claim, the earning screen loading |
+| XCM | AC-2-22 → 23 | relay to parachain and parachain to parachain, each with the fee shown and both sides updating |
+| dApp and notifications | AC-2-24 → 27 | WalletConnect, the injected provider, the multisig notification, the other notification kinds |
+| Networks and settings | AC-2-28 → 31 | Manage networks, enable and disable, a custom network and token, language, currency and hide-balance |
+
+AC-2 stays as the single line meaning the dev pass is complete, ticked last.
+
+The same 31 lines serve the master build (AC-4) and the draft build (AC-6) — run again on that build and recorded in that day's report, rather than copied into the story four times. Production is deliberately shallower: AC-7c is unlock, balances, one send, one swap, the multisig notification and Manage networks, because the published build is the one already tested at draft. The upgrade path came out of the per-stage list and is AC-11, run once at draft.
+
+Two things changed in content, not just in shape. XCM had two items with no fee or balance check on one of them, and both now require the fee shown and both sides updated, which is where XCM fails when it fails. A wrong master password, a custom network and token, and the settings that have to persist were not on the old list at all.
+
+None of these 31 lines has run. US-42.31 now stands at 105 AC, 56 pass.
+
 ### Bugs
 
 None.
@@ -124,4 +147,6 @@ The 12 new mainnet chains and their 12 testnets connect with the right chainId, 
 
 AC-1b was one line when this story was written — the chainlist maintenance is live — covering a change that spans 24 chains added, 66 deactivated, 102 subnets resynced, 72 provider lists rewritten and five feature updates. It is now 32 lines taken from the sections of ChainList #710, so a session's work can be recorded as it happens.
 
-US-42.31 stands at 56 of 73. Left: the regression passes and every stage past dev.
+The dev regression pass was split the same way but not run. AC-2 was one line over a 17-line checklist shared by all four stages, so a day of regression testing could not be recorded for dev without claiming master and draft as well. It is now AC-2-01 to AC-2-31, and the same 31 lines serve the master and draft passes, with production left deliberately shallower as AC-7c.
+
+US-42.31 stands at 56 of 105. Left: the dev regression pass (32 lines) and every stage past dev.
