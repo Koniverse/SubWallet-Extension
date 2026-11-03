@@ -5,68 +5,79 @@
 | Epic | EPIC-42 — QA Coverage Tracking |
 | Date | 2026-11-03 |
 | Tester | MaiThuongNinni |
-| Environment | Extension — master build |
-| Runner | manual (extension) |
-| Build under test | master |
-| Stories tested | US-42.31 — in progress |
-| Cases run | — |
-| Total bugs found | 0 |
+| Environment | Web App — https://7ae7468d.subwallet-webapp.pages.dev/ |
+| Runner | manual (web app) |
+| Build under test | PR #5011, Extension code up to v1.3.86 |
+| Stories tested | US-42.32 — in progress |
+| Total bugs found | 1 |
 | P0 | 0 |
-| P1 | 0 |
+| P1 | 1 |
 | P2 | 0 |
 | P3 | 0 |
 | Status | in progress |
 
 ---
 
-## US-42.31 — Release SubWallet Extension v1.3.91
+## US-42.32 — Web App after PR #5011
 
-Stage 2 of the gate — the master build. Dev finished on 11-02: the release content on both halves and the full regression pass, 88 of 105 AC, no bugs.
-
-This stage repeats the release-item checks on a build made from master and runs the regression again on it. Where dev answered "the code works", master answers "the code works in the build that ships".
+Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Two features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, and the locked balance display (AC-11), which passes in full.
 
 ### AC results
 
+Turn off all networks (AC-1)
+
 | AC | Description | Result | Notes |
 |---|---|---|---|
-| AC-3a | Multisig notification (#5093) works correctly on the master build | — | not run |
-| AC-3b | The chainlist maintenance (ChainList #710) is live on the master build | — | not run |
-| AC-4 | Regression pass on the master build finds no new issues | — | not run |
-| AC-12 | The build carries a published release of `@subwallet/chain-list`, not a PR build, and `fetchLatestChainData()` is not commented out | — | not run |
+| AC-1-01 | Manage networks shows a Turn off all networks switch at the top | ✅ Pass | |
+| AC-1-02 | With at least one network on, the switch reads off and can be pressed | ✅ Pass | |
+| AC-1-03 | With every network off, the switch reads on and is greyed out | ✅ Pass | |
+| AC-1-04 | Pressing it opens a confirmation, not an immediate action | ✅ Pass | |
+| AC-1-05 | The confirmation wording and the explanation | ✅ Pass | |
+| AC-1-06 | Turn off button and a way to cancel; cancelling changes nothing | ✅ Pass | |
+| AC-1-07 | Confirming turns off every network | ✅ Pass | substrate and EVM both go off |
+| AC-1-08 | With every network off, the screens show an empty state, not an error | ✅ Pass | |
+| AC-1-09 | Enabling any one network flips the switch back to off and makes it pressable | ❌ Fail | passes on EVM; substrate stays loading — BUG-42.32-01 |
+| AC-1-10 | A failed call says so and leaves the networks as they were | ✅ Pass | |
+| AC-1-11 | The switch shows a loading state and cannot be pressed twice | ✅ Pass | |
+| AC-1-12 | The state survives a page reload | ✅ Pass | |
 
-### Before the stage can start
+11 of 12 pass. Only AC-1-09 fails, and only for substrate — EVM networks re-enable normally.
 
-Checked on 2026-11-03.
+Turning off is not the problem. Every network, substrate and EVM, goes off correctly, and the switch, the confirmation, the empty states and the reload all behave. The failure is only on the way back up, and only for substrate.
 
-| Item | State |
-|---|---|
-| PR #5095 — multisig notification | merged 2026-10-29, merge commit `f035c59dcb` |
-| PR #5096 — chainlist | still open, last touched 2026-10-09 |
-| ChainList #713 | merged 2026-10-12, chain-list 0.2.132 published |
-| A build from master carrying both items | not confirmed |
+Locked balance (AC-11)
 
-AC-12 is the one to settle first. The diff of PR #5096 still pins `@subwallet/chain-list` to `0.2.132-beta.5-pr-713-885df11c` instead of the published `0.2.132`, and still has `fetchLatestChainData()` commented out. Merged as it stands it would ship a PR build of the chain list and switch off the live chain-data fetch. Checking this before the rest of the stage saves re-running everything on a build that was never valid.
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-11-01 | Token detail opens a Locked details view for a token with locked balance | ✅ Pass | |
+| AC-11-02 | The view breaks the locked amount into Governance, Democracy, Reserved and Others, and the parts add up | ✅ Pass | |
+| AC-11-03 | Others has a tooltip covering multisig, proxy, identity and the rest | ✅ Pass | |
+| AC-11-04 | A token with no locked balance does not offer the view, or shows it empty rather than broken | ✅ Pass | |
+| AC-11-05 | The modal is titled Token details for a token and Account details for an account | ✅ Pass | |
+| AC-11-06 | Earning position detail shows Total stake, Active stake and Unstaked, and the three agree | ✅ Pass | |
+| AC-11-07 | Earning position detail shows Your validators and the nomination info | ✅ Pass | |
+| AC-11-08 | The numbers match the chain, checked against an explorer | ✅ Pass | |
 
-### Release content on the master build
-
-Not run.
-
-The checks are the same lines as dev: AC-1a-01 to AC-1a-23 for the multisig notification and AC-1b-01 to AC-1b-32 for the chainlist, recorded on the [2026-10-30](../2026-10/2026-10-30/report-manual.md) and [2026-11-02](../2026-11-02/report-manual.md) reports. They are re-run here against the master build rather than re-listed.
-
-### Regression on the master build
-
-Not run.
-
-The list is REG-EXT-1 to REG-EXT-95, the same 95 cases run on dev and written out in full on the [2026-11-02 report](../2026-11-02/report-manual.md). REG-EXT-42 stays skipped — NFTs are auto-detected, so removing a custom one no longer does anything.
+All 8 pass. The figures agree with each other inside the app and with the chain — the locked breakdown and the stake figures were both checked against an explorer.
 
 ### Bugs
 
-None yet.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.32-01 | Substrate networks stay on a spinning toggle when turned back on after Turn off all networks | Settings → Manage networks → press Turn off all networks and confirm → every network goes off → turn Ethereum back on → then turn Polkadot, Kusama, Moonbeam, Aleph Zero, Astar, Polkadot Asset Hub and Acala back on | - EVM networks turn on right away<br>- Every substrate network sticks on a spinning toggle and never finishes, with an Error toast at the top of the screen<br>- Switching that network to a different valid RPC does turn it on | Each substrate network turns back on the same as an EVM one — the toggle settles and the chain connects, without having to change the RPC | P1 | todo | ![](img/BUG-42.32-01.png) |
+
+Changing the RPC is the key detail. Enabling the chain is not broken — the chain comes up as soon as it is pointed at a different valid endpoint. What does not work is re-enabling on the endpoint already selected, which is the one *Turn off all networks* just disconnected from. So the fault is in the reconnect to an endpoint that was torn down, not in the enable path and not in the switch.
+
+That also explains why only substrate is affected: EVM chains talk over plain HTTP requests with nothing to tear down, while substrate holds an open WebSocket that *turn off all* closes. The provider instance appears not to be rebuilt on a re-enable, so the chain waits forever on a socket that is gone, while choosing another RPC forces a fresh one.
+
+A workaround exists for users who hit this — switch the RPC — but it is not discoverable, and the Error toast gives no hint. Keeping P1.
+
+Worth putting in the issue when one is filed: the console output on a failing enable, and whether a page reload also brings the chains back.
 
 ## Summary
 
-Session open. Stage 2 of the v1.3.91 gate, the master build, has not started.
+Session open. Web App only today — US-42.32, the first run on the build from PR #5011.
 
-The blocker to settle first is AC-12, re-checked today: PR #5096 is still open and untouched since 2026-10-09, still pins a chain-list PR build rather than the published `0.2.132`, and still has `fetchLatestChainData()` commented out. A master build made from it would not be the build that ships. PR #5095 is in — merged 2026-10-29 as `f035c59dcb`.
+BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
-US-42.31 stands at 88 of 105, unchanged from 11-02.
+AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. The locked balance display passes in full, 8 of 8, including the cross-check against an explorer. The other eight features have not been touched yet.

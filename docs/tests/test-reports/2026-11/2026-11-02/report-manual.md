@@ -9,7 +9,6 @@
 | Runner | manual (extension) |
 | Build under test | subwallet-dev |
 | Stories tested | US-42.31 — in progress |
-| Cases run | 32 AC (chainlist) + 31 AC (regression) + 95 regression cases REG-EXT-1 to REG-EXT-95 |
 | Total bugs found | 0 |
 | P0 | 0 |
 | P1 | 0 |
