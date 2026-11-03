@@ -20,7 +20,7 @@
 
 ## US-42.32 — Web App after PR #5011
 
-Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Two features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, and the locked balance display (AC-11), which passes in full.
+Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Three features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, the locked balance display (AC-11), which passes in full, and the crowdloan removal (AC-8), which also passes in full.
 
 ### AC results
 
@@ -60,6 +60,17 @@ Locked balance (AC-11)
 
 All 8 pass. The figures agree with each other inside the app and with the chain — the locked breakdown and the stake figures were both checked against an explorer.
 
+Crowdloan removed (AC-8)
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-8-01 | There is no Crowdloans entry in the side menu | ✅ Pass | |
+| AC-8-02 | There is no Crowdloans tab or entry point anywhere in the app | ✅ Pass | |
+| AC-8-03 | Opening the old crowdloan URL by hand does not reach a crowdloan screen | ✅ Pass | |
+| AC-8-04 | Nothing elsewhere links to it, and no screen breaks where it used to be | ✅ Pass | |
+
+All 4 pass. Crowdloan is gone from the menu and from every other entry point, the old URL no longer lands on a crowdloan screen, and nothing is left broken where it used to sit.
+
 ### Bugs
 
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
@@ -80,4 +91,4 @@ Session open. Web App only today — US-42.32, the first run on the build from P
 
 BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
-AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. The locked balance display passes in full, 8 of 8, including the cross-check against an explorer. The other eight features have not been touched yet.
+AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. The locked balance display passes in full, 8 of 8, including the cross-check against an explorer, and the crowdloan removal passes in full, 4 of 4. The other seven features have not been touched yet.
