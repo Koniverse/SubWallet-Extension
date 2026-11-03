@@ -20,7 +20,7 @@
 
 ## US-42.32 — Web App after PR #5011
 
-Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Three features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, the locked balance display (AC-11), which passes in full, and the crowdloan removal (AC-8), which also passes in full.
+Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Four features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, and the locked balance display (AC-11), the crowdloan removal (AC-8) and import from Trust Wallet (AC-2), all three passing in full.
 
 ### AC results
 
@@ -71,6 +71,27 @@ Crowdloan removed (AC-8)
 
 All 4 pass. Crowdloan is gone from the menu and from every other entry point, the old URL no longer lands on a crowdloan screen, and nothing is left broken where it used to sit.
 
+Import from Trust Wallet (AC-2)
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-2-01 | The import account modal offers Import from Trust Wallet as its own option, with the Trust Wallet logo | ✅ Pass | |
+| AC-2-02 | Choosing it opens the account type modal first, then the import screen | ✅ Pass | |
+| AC-2-03 | The import screen is titled Import from Trust Wallet and asks for the 12-word seed phrase | ✅ Pass | |
+| AC-2-04 | The word-count picker offers 12 only — the normal import still offers 12, 15 and 24 | ✅ Pass | |
+| AC-2-05 | The screen explains that this creates a solo Polkadot account usable on both SubWallet and Trust Wallet | ✅ Pass | |
+| AC-2-06 | It also says that importing the same phrase through Import from seed phrase instead gives a unified account | ✅ Pass | |
+| AC-2-07 | A valid 12-word Trust Wallet phrase imports, and the address matches the one Trust Wallet shows | ✅ Pass | |
+| AC-2-08 | The imported account is a solo Polkadot account, not a unified one — account details say so | ✅ Pass | |
+| AC-2-09 | Pasting a general seed phrase into this screen warns the user rather than importing silently | ✅ Pass | |
+| AC-2-10 | A phrase with an invalid word is refused with a clear message | ✅ Pass | |
+| AC-2-11 | Importing the same phrase a second time is handled — no duplicate account created silently | ✅ Pass | |
+| AC-2-12 | The imported account can sign a transaction | ✅ Pass | |
+| AC-2-13 | Back from the import screen returns to the Trust Wallet modal, not to the general import modal | ✅ Pass | |
+| AC-2-14 | The same phrase imported through the normal seed-phrase option still gives a unified account | ✅ Pass | |
+
+All 14 pass. The option is its own entry with the Trust Wallet logo, the screen takes 12 words only while the normal import keeps 12, 15 and 24, and the address matches what Trust Wallet shows. The account comes in as a solo Polkadot account and signs, a general phrase is warned about rather than imported silently, an invalid word is refused, and the same phrase through the normal seed-phrase option still gives a unified account.
+
 ### Bugs
 
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
@@ -91,4 +112,4 @@ Session open. Web App only today — US-42.32, the first run on the build from P
 
 BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
-AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. The locked balance display passes in full, 8 of 8, including the cross-check against an explorer, and the crowdloan removal passes in full, 4 of 4. The other seven features have not been touched yet.
+AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. Three features pass in full: locked balance 8 of 8 including the cross-check against an explorer, crowdloan removed 4 of 4, and import from Trust Wallet 14 of 14. 37 of 112 AC settled. The other six features have not been touched yet.
