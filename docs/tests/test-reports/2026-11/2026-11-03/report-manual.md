@@ -11,8 +11,8 @@
 | Stories tested | US-42.32 — in progress |
 | Total bugs found | 3 |
 | P0 | 0 |
-| P1 | 2 |
-| P2 | 1 |
+| P1 | 3 |
+| P2 | 0 |
 | P3 | 0 |
 | Status | in progress |
 
@@ -136,20 +136,10 @@ All 6 blocked. The Swap screen never loads, so none of these can be reached — 
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.32-01 | Substrate networks stay on a spinning toggle when turned back on after Turn off all networks | Settings → Manage networks → press Turn off all networks and confirm → every network goes off → turn Ethereum back on → then turn Polkadot, Kusama, Moonbeam, Aleph Zero, Astar, Polkadot Asset Hub and Acala back on | - EVM networks turn on right away<br>- Every substrate network sticks on a spinning toggle and never finishes, with an Error toast at the top of the screen<br>- Switching that network to a different valid RPC does turn it on | Each substrate network turns back on the same as an EVM one — the toggle settles and the chain connects, without having to change the RPC | P1 | todo | ![](img/BUG-42.32-01.png) |
-| BUG-42.32-02 | Web App rounds the cross-chain fee to 0 ASTR on an XCM transfer, and labels the network fee differently from the Extension | Open the Web App and the Extension side by side on the same account → Send → choose ASTR, destination chain Hydration → paste the same recipient address into both → enter the same amount, 34 → compare the two fee rows | - Web App shows Cross-chain fee `~ 0 ASTR` / `~ $0`<br>- Extension shows `~ 0.00000051 ASTR` / `~ $0` for the same transfer<br>- Web App names the first row Estimated fee, the Extension names it Network fee — the value is the same, 0.018 ASTR<br>- Web App puts the token amount under the dollar figure, the Extension puts it above | Both clients show the same cross-chain fee for the same transfer — `~ 0.00000051 ASTR`, not rounded away to 0 — and use the same row label for the network fee | P2 | todo | ![](img/BUG-42.32-02.png) |
+| BUG-42.32-02 | Fee rows on a cross-chain transfer are wrong on the Web App — values in the wrong position, and on some routes the cross-chain fee row is missing altogether | Open the Web App and the Extension side by side on the same account, and compare the fee rows on the same transfer.<br>Case 1 — Send ASTR to Hydration, amount 34.<br>Case 2 — Send DOT to Kusama Asset Hub, amount 12. | Case 1 — the Web App shows two rows but the values are the wrong way round: *Estimated fee* reads `~ $0.0001` large with `~ 0.018 ASTR` small underneath, where the Extension shows `~ 0.018 ASTR` large with `~ $0.0001` underneath. The cross-chain fee reads `~ 0 ASTR` against the Extension's `~ 0.00000051 ASTR`.<br>Case 2 — the Web App shows one row only, *Estimated fee* `~ $0.036` / `~ 0.038 DOT`. There is no *Network fee* row and no *Cross-chain fee* row. The Extension shows both: *Network fee* `~ 0.038 DOT` and *Cross-chain fee* `~ 0.00034 DOT`. | Both clients show the same two rows on a cross-chain transfer, *Network fee* and *Cross-chain fee*, each with the token amount as the main figure and the dollar value underneath, and the same values — including a cross-chain fee that is not rounded away to 0 | P1 | todo | ![](img/BUG-42.32-02.png)<br>![](img/BUG-42.32-02b.png) |
 | BUG-42.32-03 | Swap screen will not load on the Web App — Unable to load data, and Reload now does not recover it | Open the Web App → click Swap in the side menu | - The screen shows *Unable to load data* with *Something went wrong while loading data for this screen* and a *Reload now* link<br>- Clicking *Reload now* leaves the same error — the screen never loads<br>- No swap form, no token pickers, nothing to interact with<br>- The header reads *0 connection* while *231 networks* are enabled | The Swap screen loads its form and token pickers so a swap can be quoted and submitted; if data genuinely fails to load, *Reload now* recovers it | P1 | todo | ![](img/BUG-42.32-03.png) |
 
-This one takes a whole feature out. The screen is not slow or partly drawn — it renders the empty-state error instead of the swap form, so there is no form to fill, no token to pick and no quote to read. *Reload now* is the app's own recovery link and it does not work, which means a user who hits this has nothing left to try on that screen.
-
-The header saying *0 connection* while *231 networks* are enabled is worth passing on with the bug. Whether the swap screen fails because no chain is connected, or both symptoms come from the same cause, is for the developer to say — but a swap needs chain data, and the count being zero is the kind of detail that shortens the hunt. Note that BUG-42.32-01 also leaves networks disconnected after a turn-off-all; whether this session had been through that is worth stating when the issue is filed.
-
-P1: an entire top-level feature is unusable and the in-app recovery does not help. It blocks AC-12 in full, all six lines, and those are recorded as blocked rather than failed — the code behind them has not been reached, so nothing is known about it either way.
-
-The fee is the real defect; the labels are a second, smaller thing in the same screenshot. `0.00000051 ASTR` is not zero, and the Web App has the room to show it — it prints eight decimals for the ASTR amount elsewhere on the same screen. Showing `0` where the Extension shows a real figure makes the two clients disagree about what the transfer costs, and a user who checks one against the other cannot tell which is right. Rounding to zero also hides the fee entirely on chains where the destination fee is small but not negligible.
-
-The row label is separate: the Web App calls the first row *Estimated fee* while the Extension calls it *Network fee*, for the same 0.018 ASTR. The Web App also stacks the two figures the other way round, dollars above token. Same feature, same release, two different presentations — worth raising with the developer even though nothing is wrong with the number.
-
-P2 rather than P1: nothing is blocked and no funds are at risk, but the number shown is wrong and the two clients contradict each other.
+BUG-42.32-01
 
 Changing the RPC is the key detail. Enabling the chain is not broken — the chain comes up as soon as it is pointed at a different valid endpoint. What does not work is re-enabling on the endpoint already selected, which is the one *Turn off all networks* just disconnected from. So the fault is in the reconnect to an endpoint that was torn down, not in the enable path and not in the switch.
 
@@ -159,13 +149,31 @@ A workaround exists for users who hit this — switch the RPC — but it is not 
 
 Worth putting in the issue when one is filed: the console output on a failing enable, and whether a page reload also brings the chains back.
 
+BUG-42.32-02
+
+Case 2 is the serious half. On DOT to Kusama Asset Hub the Web App shows one fee row where the Extension shows two, and the row it keeps is labelled *Estimated fee* — so the user is told what the transfer costs without being told that a destination fee exists at all. The `~ 0.038 DOT` shown matches the Extension's network fee, which means the missing `~ 0.00034 DOT` is simply absent from the total the user sees, not folded into it. On a route where the destination fee is larger, a user budgeting from this screen would come up short.
+
+Case 1 is the display order. The Web App makes the dollar value the main figure and puts the token amount underneath; the Extension does the opposite. On a wallet screen the token amount is the number that matters — it is what leaves the balance — and the two clients disagreeing about which one to lead with is the kind of thing that gets noticed in review.
+
+The `~ 0 ASTR` cross-chain fee from case 1 belongs with case 2 rather than on its own. `0.00000051 ASTR` is not zero and the same screen prints eight decimals elsewhere, so the figure is being rounded away rather than genuinely absent. Rounded to zero on one route, missing entirely on another — both leave the user without a destination fee they are actually paying.
+
+Raised to P1 from the P2 this was first logged at. Case 1 alone is cosmetic, but case 2 hides a real cost from the person approving the transfer, and that is not a presentation issue. Both cases are the same fee-display code, so they stay in one bug.
+
+BUG-42.32-03
+
+This one takes a whole feature out. The screen is not slow or partly drawn — it renders the empty-state error instead of the swap form, so there is no form to fill, no token to pick and no quote to read. *Reload now* is the app's own recovery link and it does not work, which means a user who hits this has nothing left to try on that screen.
+
+The header saying *0 connection* while *231 networks* are enabled is worth passing on with the bug. Whether the swap screen fails because no chain is connected, or both symptoms come from the same cause, is for the developer to say — but a swap needs chain data, and the count being zero is the kind of detail that shortens the hunt. Note that BUG-42.32-01 also leaves networks disconnected after a turn-off-all; whether this session had been through that is worth stating when the issue is filed.
+
+P1: an entire top-level feature is unusable and the in-app recovery does not help. It blocks AC-12 in full, all six lines, and those are recorded as blocked rather than failed — the code behind them has not been reached, so nothing is known about it either way.
+
 ## Summary
 
 Session open. Web App only today — US-42.32, the first run on the build from PR #5011.
 
 BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
-BUG-42.32-02 found while comparing the Web App against the Extension on the same XCM transfer. The Web App rounds the cross-chain fee to `~ 0 ASTR` where the Extension shows `~ 0.00000051 ASTR`, and labels the network fee row differently. P2 — nothing blocked, but the number is wrong and the two clients disagree. AC-13 as a whole has not been run yet; this came out of a side-by-side check.
+BUG-42.32-02 is the fee display on cross-chain transfers, in two cases. On DOT to Kusama Asset Hub the Web App shows one fee row, *Estimated fee*, where the Extension shows *Network fee* and *Cross-chain fee* — the destination fee is simply not there. On ASTR to Hydration both rows appear but the dollar value leads and the token amount sits underneath, the reverse of the Extension, and the cross-chain fee is rounded to `~ 0 ASTR` against the Extension's `~ 0.00000051 ASTR`. P1, because the missing row hides a cost from the person approving the transfer. AC-13 as a whole has not been run; this came out of side-by-side checks.
 
 BUG-42.32-03 takes the Swap screen out entirely. It renders *Unable to load data* instead of the swap form and the in-app *Reload now* link does not recover it, so there is nothing a user can do on that screen. P1. It blocks AC-12 in full — all six lines are recorded as blocked, not failed, because the code behind them was never reached.
 
