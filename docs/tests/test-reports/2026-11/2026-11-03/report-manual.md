@@ -9,10 +9,10 @@
 | Runner | manual (web app) |
 | Build under test | PR #5011, Extension code up to v1.3.86 |
 | Stories tested | US-42.32 — in progress |
-| Total bugs found | 1 |
+| Total bugs found | 3 |
 | P0 | 0 |
-| P1 | 1 |
-| P2 | 0 |
+| P1 | 2 |
+| P2 | 1 |
 | P3 | 0 |
 | Status | in progress |
 
@@ -20,7 +20,7 @@
 
 ## US-42.32 — Web App after PR #5011
 
-Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Four features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, and the locked balance display (AC-11), the crowdloan removal (AC-8) and import from Trust Wallet (AC-2), all three passing in full.
+Started today on the Web App build at `https://7ae7468d.subwallet-webapp.pages.dev/`. Six features checked: the turn-off-all-networks switch (AC-1), 11 of 12 with one substrate-only failure, and the locked balance display (AC-11), the crowdloan removal (AC-8), import from Trust Wallet (AC-2), subnet token names (AC-3) and the asset display name (AC-4), all five passing in full.
 
 ### AC results
 
@@ -92,11 +92,64 @@ Import from Trust Wallet (AC-2)
 
 All 14 pass. The option is its own entry with the Trust Wallet logo, the screen takes 12 words only while the normal import keeps 12, 15 and 24, and the address matches what Trust Wallet shows. The account comes in as a solo Polkadot account and signs, a general phrase is warned about rather than imported silently, an invalid word is refused, and the same phrase through the normal seed-phrase option still gives a unified account.
 
+Subnet token names (AC-3)
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-3-01 | A Bittensor subnet token shows its subnet name in the token list, not a bare symbol | ✅ Pass | |
+| AC-3-02 | The same name shows on token detail and in the balance rows | ✅ Pass | |
+| AC-3-03 | Two subnets that share a symbol are told apart on screen | ✅ Pass | |
+| AC-3-04 | A token that is not a subnet token is unaffected | ✅ Pass | |
+
+All 4 pass. Subnet tokens carry their subnet name in the list, on token detail and in the balance rows, two subnets sharing a symbol can be told apart, and ordinary tokens are left as they were.
+
+Asset display name (AC-4)
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-4-01 | The token list shows the asset display name | ✅ Pass | |
+| AC-4-02 | Token detail and the desktop detail list show the same name | ✅ Pass | |
+| AC-4-03 | Manage tokens shows it, and searching by that name finds the token | ✅ Pass | |
+| AC-4-04 | The token picker on Send shows it | ✅ Pass | |
+| AC-4-05 | The token selector in the Receive modal shows it | ✅ Pass | |
+| AC-4-06 | Buy token shows it | ✅ Pass | |
+| AC-4-07 | The toggle rows in Manage tokens show it | ✅ Pass | |
+| AC-4-08 | An asset with no display name falls back to its symbol rather than showing blank | ✅ Pass | |
+
+All 8 pass. The display name is used on every screen that shows a token — the list, token detail and the desktop detail list, Manage tokens and its toggle rows, the Send picker, the Receive selector and Buy token — search by that name finds the token, and an asset with no display name falls back to its symbol instead of going blank.
+
+Bittensor staked swap balance (AC-12) — blocked
+
+| AC | Description | Result | Notes |
+|---|---|---|---|
+| AC-12-01 | Swapping a Bittensor token shows Staked balance alongside the available balance | ⛔ Blocked | BUG-42.32-03 |
+| AC-12-02 | The staked balance has a tooltip saying the staked amount is used to perform the swap | ⛔ Blocked | BUG-42.32-03 |
+| AC-12-03 | The available balance has its own tooltip, Available balance for swap | ⛔ Blocked | BUG-42.32-03 |
+| AC-12-04 | A swap that draws on the staked balance quotes and completes, and the position drops by what was swapped | ⛔ Blocked | BUG-42.32-03 |
+| AC-12-05 | A swap larger than staked plus available is refused before submitting | ⛔ Blocked | BUG-42.32-03 |
+| AC-12-06 | A non-Bittensor swap shows no staked balance row and behaves as before | ⛔ Blocked | BUG-42.32-03 |
+
+All 6 blocked. The Swap screen never loads, so none of these can be reached — there is no swap form to open, no token to pick and no quote to read. Nothing here is known to be broken or working; it is untested.
+
 ### Bugs
 
 | ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
 |---|---|---|---|---|---|---|---|
 | BUG-42.32-01 | Substrate networks stay on a spinning toggle when turned back on after Turn off all networks | Settings → Manage networks → press Turn off all networks and confirm → every network goes off → turn Ethereum back on → then turn Polkadot, Kusama, Moonbeam, Aleph Zero, Astar, Polkadot Asset Hub and Acala back on | - EVM networks turn on right away<br>- Every substrate network sticks on a spinning toggle and never finishes, with an Error toast at the top of the screen<br>- Switching that network to a different valid RPC does turn it on | Each substrate network turns back on the same as an EVM one — the toggle settles and the chain connects, without having to change the RPC | P1 | todo | ![](img/BUG-42.32-01.png) |
+| BUG-42.32-02 | Web App rounds the cross-chain fee to 0 ASTR on an XCM transfer, and labels the network fee differently from the Extension | Open the Web App and the Extension side by side on the same account → Send → choose ASTR, destination chain Hydration → paste the same recipient address into both → enter the same amount, 34 → compare the two fee rows | - Web App shows Cross-chain fee `~ 0 ASTR` / `~ $0`<br>- Extension shows `~ 0.00000051 ASTR` / `~ $0` for the same transfer<br>- Web App names the first row Estimated fee, the Extension names it Network fee — the value is the same, 0.018 ASTR<br>- Web App puts the token amount under the dollar figure, the Extension puts it above | Both clients show the same cross-chain fee for the same transfer — `~ 0.00000051 ASTR`, not rounded away to 0 — and use the same row label for the network fee | P2 | todo | ![](img/BUG-42.32-02.png) |
+| BUG-42.32-03 | Swap screen will not load on the Web App — Unable to load data, and Reload now does not recover it | Open the Web App → click Swap in the side menu | - The screen shows *Unable to load data* with *Something went wrong while loading data for this screen* and a *Reload now* link<br>- Clicking *Reload now* leaves the same error — the screen never loads<br>- No swap form, no token pickers, nothing to interact with<br>- The header reads *0 connection* while *231 networks* are enabled | The Swap screen loads its form and token pickers so a swap can be quoted and submitted; if data genuinely fails to load, *Reload now* recovers it | P1 | todo | ![](img/BUG-42.32-03.png) |
+
+This one takes a whole feature out. The screen is not slow or partly drawn — it renders the empty-state error instead of the swap form, so there is no form to fill, no token to pick and no quote to read. *Reload now* is the app's own recovery link and it does not work, which means a user who hits this has nothing left to try on that screen.
+
+The header saying *0 connection* while *231 networks* are enabled is worth passing on with the bug. Whether the swap screen fails because no chain is connected, or both symptoms come from the same cause, is for the developer to say — but a swap needs chain data, and the count being zero is the kind of detail that shortens the hunt. Note that BUG-42.32-01 also leaves networks disconnected after a turn-off-all; whether this session had been through that is worth stating when the issue is filed.
+
+P1: an entire top-level feature is unusable and the in-app recovery does not help. It blocks AC-12 in full, all six lines, and those are recorded as blocked rather than failed — the code behind them has not been reached, so nothing is known about it either way.
+
+The fee is the real defect; the labels are a second, smaller thing in the same screenshot. `0.00000051 ASTR` is not zero, and the Web App has the room to show it — it prints eight decimals for the ASTR amount elsewhere on the same screen. Showing `0` where the Extension shows a real figure makes the two clients disagree about what the transfer costs, and a user who checks one against the other cannot tell which is right. Rounding to zero also hides the fee entirely on chains where the destination fee is small but not negligible.
+
+The row label is separate: the Web App calls the first row *Estimated fee* while the Extension calls it *Network fee*, for the same 0.018 ASTR. The Web App also stacks the two figures the other way round, dollars above token. Same feature, same release, two different presentations — worth raising with the developer even though nothing is wrong with the number.
+
+P2 rather than P1: nothing is blocked and no funds are at risk, but the number shown is wrong and the two clients contradict each other.
 
 Changing the RPC is the key detail. Enabling the chain is not broken — the chain comes up as soon as it is pointed at a different valid endpoint. What does not work is re-enabling on the endpoint already selected, which is the one *Turn off all networks* just disconnected from. So the fault is in the reconnect to an endpoint that was torn down, not in the enable path and not in the switch.
 
@@ -112,4 +165,8 @@ Session open. Web App only today — US-42.32, the first run on the build from P
 
 BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
-AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. Three features pass in full: locked balance 8 of 8 including the cross-check against an explorer, crowdloan removed 4 of 4, and import from Trust Wallet 14 of 14. 37 of 112 AC settled. The other six features have not been touched yet.
+BUG-42.32-02 found while comparing the Web App against the Extension on the same XCM transfer. The Web App rounds the cross-chain fee to `~ 0 ASTR` where the Extension shows `~ 0.00000051 ASTR`, and labels the network fee row differently. P2 — nothing blocked, but the number is wrong and the two clients disagree. AC-13 as a whole has not been run yet; this came out of a side-by-side check.
+
+BUG-42.32-03 takes the Swap screen out entirely. It renders *Unable to load data* instead of the swap form and the in-app *Reload now* link does not recover it, so there is nothing a user can do on that screen. P1. It blocks AC-12 in full — all six lines are recorded as blocked, not failed, because the code behind them was never reached.
+
+AC-1 stands at 11 of 12 pass — only AC-1-09 fails, and only for substrate. Five features pass in full: locked balance 8 of 8 including the cross-check against an explorer, crowdloan removed 4 of 4, import from Trust Wallet 14 of 14, subnet token names 4 of 4 and the asset display name 8 of 8. AC-12 is blocked in full, 6 lines. 49 of 112 AC settled, 6 blocked, the rest not run.
