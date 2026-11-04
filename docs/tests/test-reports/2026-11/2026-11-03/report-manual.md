@@ -14,7 +14,7 @@
 | P1 | 3 |
 | P2 | 0 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -169,7 +169,7 @@ P1: an entire top-level feature is unusable and the in-app recovery does not hel
 
 ## Summary
 
-Session open. Web App only today — US-42.32, the first run on the build from PR #5011.
+Session closed. Web App only today — US-42.32, the first run on the build from PR #5011.
 
 BUG-42.32-01 found on the first feature checked. After *Turn off all networks*, substrate networks stay on a spinning toggle when turned back on, while EVM networks enable normally. Pointing the chain at a different valid RPC does enable it, so the fault is the reconnect to the endpoint that was just torn down, not the enable itself. P1, failing AC-1-09.
 
