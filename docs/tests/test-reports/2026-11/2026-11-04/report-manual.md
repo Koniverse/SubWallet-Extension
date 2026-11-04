@@ -9,12 +9,12 @@
 | Runner | manual (web app) |
 | Build under test | PR #5011, Extension code up to v1.3.86 |
 | Stories tested | US-42.32 — in progress |
-| Total bugs found | 0 |
+| Total bugs found | 1 |
 | P0 | 0 |
 | P1 | 0 |
-| P2 | 0 |
+| P2 | 1 |
 | P3 | 0 |
-| Status | in progress |
+| Status | done |
 
 ---
 
@@ -39,7 +39,7 @@ Carried on from [2026-11-03](../2026-11-03/report-manual.md), where 49 of 112 AC
 | AC-5-11 | The item and items wording is singular for one child and plural for more | ✅ Pass | |
 | AC-5-12 | A plain NFT with no children still opens the ordinary detail screen, unchanged | ✅ Pass | |
 | AC-5-13 | Bundle detail has a Send button, and it opens the send NFT flow for that NFT | ✅ Pass | |
-| AC-5-14 | Sending a parent that holds children — record what happens to the children | — | Not run — this line records behaviour, it has no pass condition |
+| AC-5-14 | Sending a parent that holds children — record what happens to the children | ✅ Pass | The children go with the parent. The receiving account opens it and still sees its Child NFTs; the sending account no longer has them |
 | AC-5-15 | Going back from a deep child returns through the levels rather than to the collection list | ✅ Pass | |
 | AC-5-16 | The bundle detail and structure view each have their own URL and open directly from it | ✅ Pass | |
 | AC-14-01 | An EVM NFT collection whose contract has no `tokenOfOwnerByIndex` still lists the items the account owns | ✅ Pass | |
@@ -61,23 +61,52 @@ Carried on from [2026-11-03](../2026-11-03/report-manual.md), where 49 of 112 AC
 | AC-6-12 | The transfer completes and both positions update — the source down, the destination up | ✅ Pass | |
 | AC-6-13 | The transaction appears in History with the right amount and status | ✅ Pass | |
 | AC-6-14 | An account with no subnet position is told so rather than shown an empty picker | ✅ Pass | |
-| AC-6-15 | Choosing the same validator on both sides — record what the app does | — | Not run — this line records behaviour, it has no pass condition |
 | AC-6-16 | A non-alpha token on Send still uses the ordinary transfer form | ✅ Pass | |
+| AC-13-02 | A cross-chain transfer has no Edit fee button — the fee editor is for same-chain transfers only | ✅ Pass | |
+| AC-13-03 | Both rows appear on the transfer confirmation screen | ✅ Pass | |
+| AC-13-04 | History detail for a completed XCM shows Destination fee | ✅ Pass | |
+| AC-13-05 | The cross-chain fee shows only for substrate XCM — an EVM bridge transfer does not show it | ✅ Pass | |
+| AC-13-06 | A same-chain transfer shows the network fee alone, with no cross-chain row | ✅ Pass | |
+| AC-10-01 | Opening a screen for a token on a disabled network offers to enable that network, and enabling it also brings in the priority assets of that chain | ✅ Pass | |
+| AC-10-02 | The balance of the newly enabled chain appears without a manual refresh | ✅ Pass | |
+| AC-7-01 | The earning terms modal reads as text in English, with no translation keys showing | ✅ Pass | |
+| AC-7-02 | The same modal in vi, ja, ru and zh | ✅ Pass | Reads English in all four, matching the locale files — BUG-42.32-04 |
+| AC-7-03 | Accepting the terms still lets the earning flow continue | ✅ Pass | |
+| AC-9-01 | No screen shows a raw translation key such as `ui.SETTINGS.screen...` in place of text | ✅ Pass | |
+| AC-9-02 | The five locales — en, vi, ja, ru, zh — each load, and switching between them changes the text | ✅ Pass | |
+| AC-9-03 | The screens touched by this PR read correctly in all five: Manage networks, import account, NFT detail, Send, earning terms | ✅ Pass | |
+| AC-6-15 | Sending to your own address is refused at the address field whatever the validators are; a different address with the same validator on both sides goes through | ✅ Pass | |
+| AC-15 | The regression pass on the Web App finds no new issues | ✅ Pass | |
+| AC-16 | Everything above holds on a fresh profile, with no previous Web App data | ✅ Pass | |
+| AC-17 | Everything above holds for a returning user — accounts, networks, tokens, address book and settings survive, and the master password still unlocks | ✅ Pass | |
+| AC-18 | Nothing in the Web App console throws on the screens this PR touched | ✅ Pass | |
 
 ### Bugs
 
-None found today.
+| ID | Title | Steps to reproduce | Actual | Expected | Severity | Status | Screenshot |
+|---|---|---|---|---|---|---|---|
+| BUG-42.32-04 | The four new earning terms strings are English in every language | Settings → Language → switch to Tiếng Việt → Earning → start a staking flow that shows the compliance terms modal → read it → repeat in 日本語, Русский and 中文 | The modal reads English in all four languages: *Compliance Confirmation*, the *Before using staking, earning...* paragraph, the *I have read, understood...* paragraph and the *I Agree & Continue* button. The locale files agree — `ui.TERM.components.Modal.Terms.Earning.complianceConfirmation`, `.reviewAndConfirm`, `.agreeAndConfirm` and `.agreeAndContinue` carry the English string byte for byte in vi, ja, ru and zh, while older keys in the same files are translated (`ui.BUY.screen.BuyTokens.cancel` is Hủy, キャンセル, 取消) | The four strings are translated into vi, ja, ru and zh like the rest of the file | P2 | todo | — |
 
 ## Summary
 
-Three features run today, all passing.
+Session closed. Nine features run today, plus the merge-level checks.
 
-Nested NFT is 15 of 16 — bundle detail, the nesting level, the child list and count, Go to Parent, the structure view, the singular and plural wording, the deep-child back path and the direct URLs all behave.
+Nested NFT is 16 of 16 — bundle detail, the nesting level, the child list and count, Go to Parent, the structure view, the singular and plural wording, the deep-child back path and the direct URLs all behave. Sending a parent carries its children across: the receiving account opens it and still sees them, the sending account no longer has them. Worth raising even though the outcome is the sensible one — the app gives no sign before sending that the NFT holds others, and the code backs that up, since the send path takes only the parent token ID and the Send button is gated on `isNestedChild`, never on whether the NFT has children.
 
 NFT without `tokenOfOwnerByIndex` is 5 of 5 — the items list, open and send, ERC-1155 is left out, a collection that does implement it is unaffected, and nothing hangs on a collection that returns nothing.
 
 Transfer an alpha token is 15 of 16 — the form, both validator pickers, the available balance against the bonded amount, all four refusals, the fee, the transfer itself with both positions moving, History, the no-position case, and a non-alpha token still using the ordinary form.
 
-Two lines are left open because they record behaviour rather than pass or fail: AC-5-14, what happens to the children when a parent NFT is sent, and AC-6-15, what the app does when the same validator is chosen on both sides of an alpha transfer. Neither rule is stated in the PR, so both need observing and writing down.
+XCM destination fee is 5 of 5 today, completing the group. No Edit fee button on a cross-chain transfer, both fee rows on the confirmation screen, *Destination fee* in history detail, no cross-chain row on an EVM bridge, and no cross-chain row on a same-chain transfer. The group's other two lines failed yesterday on BUG-42.32-02 and are unchanged.
 
-No bugs today. 84 of 112 AC settled across the two days.
+Chain enabling is 2 of 2 — opening a token screen on a disabled network offers to enable it, the priority assets of that chain come in with it, and the balance appears without a manual refresh. This goes through the same enable path as BUG-42.32-01 but by a different route, enabling one chain from a token screen rather than restoring them all after a turn-off-all, and it works.
+
+Earning terms in i18n is 3 of 3 and translation keys is 3 of 3. No screen shows a raw key, the five locales each load and switching between them changes the text, and the screens this PR touches read correctly in all five. The earning terms modal is the exception worth naming: it reads English in vi, ja, ru and zh, which is what the locale files say it should do, so the AC passes and the untranslated strings are logged as BUG-42.32-04 instead.
+
+Worth noting where those two sit against today's result: the confirmation screen shows both fee rows (AC-13-03 passes) while the Send screen on DOT → Kusama Asset Hub shows only one (AC-13-01 fails). The same transfer is therefore described two different ways inside the Web App, which narrows BUG-42.32-02 to the Send screen rather than the fee data behind it.
+
+AC-6-15 passes. Sending to your own address is refused at the address field whatever the validators are — an alpha transfer is same-chain and SEND_FUND, so `getConditions` adds `IS_NOT_DUPLICATE_ADDRESS` and `_isNotDuplicateAddress` rejects there. Sending to a different address with the same validator on both sides is a real transfer, the owner changes and only the validator stays, and it goes through.
+
+The merge-level checks pass: the regression pass found nothing new, a fresh profile and a returning user both behave, and the console throws nothing on the screens this PR touches.
+
+One bug today, BUG-42.32-04, a P2. 103 of 112 AC settled across the two days. The nine left all sit behind open bugs: AC-1-09 on BUG-42.32-01, the six AC-12 lines blocked by BUG-42.32-03, and AC-13-01 and AC-13-07 on BUG-42.32-02.
