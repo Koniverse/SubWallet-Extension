@@ -22,6 +22,11 @@ function runTest() {
   execSync('yarn test');
 }
 
+// The full test suite is not runnable yet, so only run the suites that are known to pass
+function runStableTest() {
+  execSync('yarn test:one packages/extension-base/src/services/multisig-service');
+}
+
 function runBuild() {
   execSync('yarn build');
 }
@@ -37,6 +42,7 @@ function npmGetVersion() {
 runClean();
 runCheck();
 // runTest();
+runStableTest();
 runBuild();
 
 // Web runner

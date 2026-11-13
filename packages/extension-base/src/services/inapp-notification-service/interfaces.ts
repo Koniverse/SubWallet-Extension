@@ -104,6 +104,16 @@ export interface MultisigApprovalNotificationMetadata {
   extrinsicIndex: number;
   currentSigner: string;
   approvals: string[];
+
+  // undefined while the tx is still waiting for approval of the current signer
+  status?: MultisigApprovalNotificationStatus;
+}
+
+export enum MultisigApprovalNotificationStatus {
+  /** The current signer has approved, the tx is still waiting for other signatories */
+  APPROVED = 'APPROVED',
+  /** The tx is no longer on chain: executed or cancelled */
+  RESOLVED = 'RESOLVED'
 }
 
 export enum NotificationTimePeriod {
