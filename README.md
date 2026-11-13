@@ -5,25 +5,25 @@ Our SubWallet is forked from polkadot-js/extension. We aim to add more features 
 ![Main Concept](https://github.com/Koniverse/Subwallet-V2/wiki/images/ExtensionConcept.png)
 The extension is compiled from folder `packages/extension-koni`
 - **Background environment**: The Background environment is compiled from `packages/extension-koni/src/background.ts`.
-  - The Background is used to handle messages from Extensions pages and Chrome tabs via Chrome API Message Passing.
+  - The Background is used to handle messages from Extension pages and Chrome tabs via Chrome API Message Passing.
   - Save all state to store and persist to chrome storage.
-  - Run cronjob.
+  - Run cron jobs.
 - **Extension**: Is frontend and page of extension:
-  - popup.html: Frontend page open when click to extension icon in browser.
+  - popup.html: Frontend page opened when clicking the extension icon in the browser.
   - portfolio.html: Frontend to display more complicated view.
 - **Inject Scripts**: Inject script into chrome tabs.
 
 All data requests must be called and processed in the background. Extension Pages and Inject Scripts use data from the background environment and do not call APIs directly.
 
 ## Project structure
-- **extension-base** - Contains main features run in background, call api, persist data into chrome store and inject script
+- **extension-base** - Contains the main features that run in the background, call APIs, persist data into chrome store and inject script
 - **extension-dapp** - A convenience wrapper to work with the injected objects, simplifying data extraction for any dapp that wishes to integrate the extension (or any extension that supports the interface)
 - **extension-inject** - A convenience wrapper that allows extension developers to inject their extension for use by any dapp
 - **extension-chains** - Definitions for chains that are supported by this extension. It contains the bare definitions as well as a stripped-down (call-only) metadata format.
 - **extension-dapp** - The actual in-depth technical breakdown is given in the next section for any dapp developer wishing to work with the raw objects injected into the window. However, convenience wrappers are provided that allows for any dapp to use this extension (or any other extension that conforms to the interface) without having to manage any additional info.
 - **extension-mocks** - Mock data for testing
 - **extension-compat-metamask**: Compatible with MetaMask
-- **extension-koni-base**: Custom package, extension extension base
+- **extension-koni-base**: Custom package, extension base
 - **extension-koni-ui** *(replace extension-ui)*: The UI components for the extension, to build up the popup
 - **extension-koni** *(replace extension)*: All the injection and background processing logic (the main entry)
 
@@ -31,14 +31,14 @@ All data requests must be called and processed in the background. Extension Page
 
 ## Add an API
 - API is defined in folder `packages/extension-koni-base/src/api`
-  - Add new file depend on types of API.
-  - Simple API can be defined in function, more complicated API should define in Object.
+  - Add a new file depending on the type of API.
+  - Simple API can be defined in function, more complicated API should be defined in an Object.
 
 ## Add a store
 Store is used to persist data into local storage. Stores are defined in folder `packages/extension-koni-base/src/store`
-- Store class should extend class `BaseStore` or `SubscribableStore` and overwrite class prefix call via constructor.
-  - `BaseStore` include basic functions persist with chrome local storage
-  - `SubscribableStore` extend `BaseStore`, include rxjs subject and can be subscribed with method `getSubject()`. This subject trigger every time data is set.
+- Store class should extend class `BaseStore` or `SubscribableStore` and override the class prefix via the constructor.
+  - `BaseStore` includes basic functions to persist with chrome local storage
+  - `SubscribableStore` extends `BaseStore`, includes an rxjs subject and can be subscribed with method `getSubject()`. This subject triggers every time data is set.
   ``` typescript
   export default class Price extends SubscribableStore<PriceJson> {
     constructor () {
@@ -46,7 +46,7 @@ Store is used to persist data into local storage. Stores are defined in folder `
     }
   }
   ```
-- Defined in class `KoniState` and call by `KoniExtension`, `KoniTabs` or `KoniCron`.
+- Defined in class `KoniState` and called by `KoniExtension`, `KoniTabs` or `KoniCron`.
   ```typescript
   export default class KoniState extends State {
     private readonly priceStore = new Price();
@@ -71,8 +71,8 @@ SubWallet extension uses message passing concept via browser API to interact bet
 - Extension or Chrome Tabs sends a message with id and type to Background
 - Background handles message by id and type and responds with data.
 - There are 2 message types:
-  - One time message: Extension Or Chrome Tabs will send message request and listen response. Listener will be deleted after receive response.
-  - Subscription message: Same as one time message but listener continues to receive data until window close.
+  - One time message: Extension or Chrome Tabs will send a message request and listen for the response. The listener will be deleted after receiving the response.
+  - Subscription message: Same as one time message but listener continues to receive data until the window closes.
 - Steps to add new message handle:
   - Add request type:
     - New request type must be defined in interface `KoniRequestSignatures`
@@ -95,27 +95,27 @@ SubWallet extension uses message passing concept via browser API to interact bet
 
 ## Add a cron
 Cronjob is defined in folder `packages/extension-koni-base/src/cron`.
-- Group of cron action should define in separate file in this folder.
+- Groups of cron actions should be defined in separate files in this folder.
 - Define new cronjob in method init of class `KoniCron`
 
 ## Develop UI
 
 ### UI Structure
 - SubWallet Extension UI is built with ReactJS.
-- Popup: Main extension page, show when click into extension icon in browser extension list.
+- Popup: Main extension page, shown when clicking the extension icon in browser extension list.
 - Portfolio (Coming soon): Display more complicated view like dashboard, transaction...
-- Another folders:
+- Other folders:
   - assets: images, resources of extensions.
-  - components: Common components use in extension pages.
+  - components: Common components used in extension pages.
   - hooks: public hook for global function.
   - i18n: Internationalization.
   - stores: Redux stores generated with react hook.
   - partials: Header components.
-  - util: utilities methods.
+  - util: utility methods.
   - messaging.ts: Send to background and handle return message.
 
 ### Add new redux store
-- Subwallet extension use [redux-toolkit](https://redux-toolkit.js.org/) to generate store.
+- SubWallet extension uses [redux-toolkit](https://redux-toolkit.js.org/) to generate store.
 - Define redux store reducers and state into separate file by method `createSlice` of redux toolkit.
 - Map reducer into root store in file index.ts
 
@@ -123,16 +123,16 @@ Cronjob is defined in folder `packages/extension-koni-base/src/cron`.
 Read "Add a message handle"
 
 ## Auto validate
-Extension auto validate code with eslint. Please setup eslint in editor and run `yarn lint` before commit code.
+Extension automatically validates code with ESLint. Please set up ESLint in your editor and run `yarn lint` before committing code.
 
 ## Write test
-Subwallet run test with [jest](https://jestjs.io/). Create new file with name `filename.spec.ts` to write test.
+SubWallet runs tests with [jest](https://jestjs.io/). Create new file with name `filename.spec.ts` to write test.
 
 ## Commit and Build
 - Please run `yarn lint` and `yarn test`
 - Versioning:
-  - Dev version: Dev version is auto generated by Github Action.
+  - Dev version: Dev version is auto generated by GitHub Actions.
   - Stable version:
-    - Manual change version in main file package.json from x.y.z-nn to x.y.z
+    - Manually change the version in the main file package.json from x.y.z-nn to x.y.z
     - Update CHANGELOG.md
-    - Github Action will auto generate version file of each package.
+    - GitHub Actions will auto generate version file of each package.
