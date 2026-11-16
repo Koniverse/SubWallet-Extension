@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.3.91
+Build date: Nov 16, 2026.
+
+Features & Updates:
+- Improve multisig notification (#5093)
+- Update chainlist stable:
+  - Maintenance of chainlist
+
+
 ## 1.3.90
 Build date: Sep 17, 2026.
 
