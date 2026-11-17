@@ -284,9 +284,11 @@ function Component ({ className, setDisable, transaction }: Props) {
               }
             </MetaInfo>
 
-            <Typography.Text className={CN('description-text')}>
-              {descriptionContent}
-            </Typography.Text>
+            {!!descriptionContent && (
+              <Typography.Text className={CN('description-text')}>
+                {descriptionContent}
+              </Typography.Text>
+            )}
 
             {
               !!transactionError && (

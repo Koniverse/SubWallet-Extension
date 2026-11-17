@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetOriginChain, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetOriginChain, _getAssetPriceId, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { SwapTxData } from '@subwallet/extension-base/types/swap';
 import { AlertBox, MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { SwapTransactionBlock } from '@subwallet/extension-koni-ui/components/Swap';
@@ -36,8 +36,8 @@ const Component: React.FC<Props> = (props: Props) => {
       const asset = assetRegistryMap[feeItem.tokenSlug];
 
       if (asset) {
-        const { decimals, priceId } = asset;
-        const price = priceMap[priceId || ''] || 0;
+        const { decimals } = asset;
+        const price = priceMap[_getAssetPriceId(asset)] || 0;
 
         totalBalance = totalBalance.plus(new BigN(feeItem.amount).div(BN_TEN.pow(decimals || 0)).multipliedBy(price));
       }

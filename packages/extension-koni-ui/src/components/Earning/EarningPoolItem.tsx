@@ -1,6 +1,8 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
+import { _STAKING_CHAIN_GROUP } from '@subwallet/extension-base/services/earning-service/constants';
 import { calculateReward } from '@subwallet/extension-base/services/earning-service/utils';
 import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
 import EarningTypeTag from '@subwallet/extension-koni-ui/components/Earning/EarningTypeTag';
@@ -26,6 +28,7 @@ const Component: React.FC<Props> = (props: Props) => {
   const { inputAsset, logo, shortName } = metadata;
   const totalApy = poolInfo.statistic?.totalApy;
   const totalApr = poolInfo.statistic?.totalApr;
+  const upToApr = poolInfo.statistic?.upToApr;
   const tvl = poolInfo.statistic?.tvl;
 
   const asset = useGetChainAssetInfo(inputAsset);
@@ -48,7 +51,7 @@ const Component: React.FC<Props> = (props: Props) => {
 
   const total = useMemo((): string => {
     if (tvl && asset) {
-      const priceId = asset.priceId;
+      const priceId = _getAssetPriceId(asset);
 
       if (!priceId) {
         return '0';
@@ -66,7 +69,7 @@ const Component: React.FC<Props> = (props: Props) => {
   }, [asset, priceMap, tvl]);
 
   const isSubnetStaking = useMemo(() => [YieldPoolType.SUBNET_STAKING].includes(poolInfo.type), [poolInfo.type]);
-  const isBittensor = useMemo(() => poolInfo.chain === 'bittensor', [poolInfo.chain]);
+  const isBittensor = useMemo(() => _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain), [poolInfo.chain]);
   const subnetToken = useMemo(() => {
     return getSubnetStakingTokenName(poolInfo.chain, poolInfo.metadata.subnetData?.netuid || 0);
   }, [getSubnetStakingTokenName, poolInfo.chain, poolInfo.metadata.subnetData?.netuid]);
@@ -105,20 +108,43 @@ const Component: React.FC<Props> = (props: Props) => {
               </span>
             </div>
 
-            {!!apy && (
-              <div className='__item-rewards'>
-                <div className='__item-rewards-label'>
-                  {t(`${isSubnetStaking ? 'Emission' : isBittensor ? 'Max APY' : 'Rewards'}`)}:
+            {isBittensor
+              ? (
+                // "Up to X%": the best validator holding ≥ 1% of the stake (EXT-1), on a subnet in its alpha. A measured 0
+                // reads "0%", never "Up to 0%"; "—" only without a figure
+                <div className='__item-rewards'>
+                  {!!upToApr && (
+                    <div className='__item-rewards-label'>
+                      {t('ui.EARNING.components.Earning.PoolItem.upTo')}
+                    </div>
+                  )}
+                  <div className='__item-rewards-value'>
+                    {upToApr === undefined
+                      ? '—'
+                      : (
+                        <Number
+                          decimal={0}
+                          suffix={'%'}
+                          value={upToApr}
+                        />
+                      )}
+                  </div>
                 </div>
-                <div className='__item-rewards-value'>
-                  <Number
-                    decimal={0}
-                    suffix={'%'}
-                    value={apy}
-                  />
+              )
+              : !!apy && (
+                <div className='__item-rewards'>
+                  <div className='__item-rewards-label'>
+                    {t('ui.EARNING.components.Earning.PoolItem.rewards')}:
+                  </div>
+                  <div className='__item-rewards-value'>
+                    <Number
+                      decimal={0}
+                      suffix={'%'}
+                      value={apy}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
 
           <div className='__item-line-2'>

@@ -238,6 +238,8 @@ const Component: React.FC = () => {
     }
   }, [mustChooseValidator, poolInfo.metadata.inputAsset, poolInfo.statistic?.assetEarning, poolInfo.type, positionInfo?.activeStake, selectedValidator?.activeStake]);
 
+  const isBittensor = useMemo(() => _STAKING_CHAIN_GROUP.bittensor.includes(poolChain), [poolChain]);
+
   const [isChangeData, setIsChangeData] = useState(false);
 
   const persistValidator = useMemo(() => {
@@ -327,6 +329,12 @@ const Component: React.FC = () => {
 
     const { fastLeave, from, slug, value } = values;
 
+    // What the unstake returns in TAO, so the confirmation can warn when the network fee is not less (EXT-26)
+    const unstaked = new BigN(value);
+    const expectedTao = !isBittensor || (isSubnetStaking && earningRate <= 0)
+      ? undefined
+      : (isSubnetStaking ? unstaked.multipliedBy(earningRate) : unstaked).toFixed(0);
+
     const request: RequestYieldLeave = {
       address: from,
       amount: value,
@@ -334,7 +342,10 @@ const Component: React.FC = () => {
       slug,
       poolInfo: poolInfo,
       slippage: maxSlippage.slippage.toNumber(),
-      stakingFee: stakingFee
+      stakingFee: stakingFee,
+      expectedTao,
+      // Max: what accrues before the block goes too, rather than leaving it behind
+      unstakeAll: isBittensor ? new BigN(value).gte(bondedValue) : undefined
     };
 
     if (mustChooseValidator) {
@@ -353,7 +364,7 @@ const Component: React.FC = () => {
           setLoading(false);
         });
     }, 300);
-  }, [currentValidator, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
+  }, [bondedValue, currentValidator, earningRate, isBittensor, isSubnetStaking, maxSlippage.slippage, mustChooseValidator, onError, onSuccess, poolInfo, positionInfo, stakingFee]);
 
   const onClickSubmit = useCallback((values: UnStakeParams) => {
     if (currentConfirmation) {

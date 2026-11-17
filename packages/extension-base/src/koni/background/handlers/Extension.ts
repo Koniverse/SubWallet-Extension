@@ -33,6 +33,7 @@ import KoniState from '@subwallet/extension-base/koni/background/handlers/State'
 import { RequestOptimalTransferProcess } from '@subwallet/extension-base/services/balance-service/helpers/process';
 import { DEFAULT_CARDANO_TTL_OFFSET } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/cardano/consts';
 import { isBounceableAddress } from '@subwallet/extension-base/services/balance-service/helpers/subscribe/ton/utils';
+import { getAlphaTransferCheck, validateAlphaTransfer } from '@subwallet/extension-base/services/balance-service/transfer/alpha';
 import { createBitcoinTransaction } from '@subwallet/extension-base/services/balance-service/transfer/bitcoin-transfer';
 import { createCardanoTransaction } from '@subwallet/extension-base/services/balance-service/transfer/cardano-transfer';
 import { getERC20TransactionObject, getERC721Transaction, getEVMTransactionObject, getPSP34TransferExtrinsic } from '@subwallet/extension-base/services/balance-service/transfer/smart-contract';
@@ -45,7 +46,7 @@ import { _isBittensorToSubtensorBridge, _isSubtensorToBittensorBridge } from '@s
 import { _isPolygonChainBridge, getClaimPolygonBridge, isClaimedPolygonBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/polygonBridge';
 import { _isPosChainBridge, getClaimPosBridge } from '@subwallet/extension-base/services/balance-service/transfer/xcm/posBridge';
 import { estimateXcmFee, isXcmCurrencySupported } from '@subwallet/extension-base/services/balance-service/transfer/xcm/utils';
-import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
+import { _DEFAULT_MANTA_ZK_CHAIN, _MANTA_ZK_CHAIN_GROUP, _TRANSFER_CHAIN_GROUP, _ZK_ASSET_PREFIX } from '@subwallet/extension-base/services/chain-service/constants';
 import { _ChainApiStatus, _ChainConnectionStatus, _ChainState, _NetworkUpsertParams, _ValidateCustomAssetRequest, _ValidateCustomAssetResponse, EnableChainParams, EnableMultiChainParams } from '@subwallet/extension-base/services/chain-service/types';
 import { _getAssetDecimals, _getAssetSymbol, _getChainNativeTokenBasicInfo, _getContractAddressOfToken, _getEvmChainId, _isAssetSmartContractNft, _isChainBitcoinCompatible, _isChainCompatibleLedgerEvm, _isChainEnabled, _isChainEvmCompatible, _isChainSubstrateCompatible, _isCustomAsset, _isLocalToken, _isMantaZkAsset, _isNativeToken, _isNativeTokenBySlug, _isPureEvmChain, _isTokenEvmSmartContract, _isTokenTransferredByBitcoin, _isTokenTransferredByCardano, _isTokenTransferredByEvm, _isTokenTransferredByTon } from '@subwallet/extension-base/services/chain-service/utils';
 import { TokenHasBalanceInfo, TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
@@ -67,13 +68,13 @@ import { isProposalExpired, isSupportWalletConnectChain, isSupportWalletConnectN
 import { ResultApproveWalletConnectSession, WalletConnectNotSupportRequest, WalletConnectSessionRequest } from '@subwallet/extension-base/services/wallet-connect-service/types';
 import { SWStorage } from '@subwallet/extension-base/storage';
 import { AccountsStore } from '@subwallet/extension-base/stores';
-import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, MultisigTxErrorType, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
+import { AccountChainType, AccountJson, AccountProxyMap, AccountSignMode, AccountsWithCurrentAddress, BalanceJson, BalanceType, BasicTxErrorType, BasicTxWarningCode, BitcoinFeeDetail, BitcoinFeeInfo, BitcoinFeeRate, BriefProcessStep, BuyServiceInfo, BuyTokenInfo, CommonOptimalTransferPath, CommonStepFeeInfo, CommonStepType, EarningProcessType, EarningRewardJson, EvmFeeInfo, FeeChainType, FeeCustom, FeeDetail, FeeInfo, FeeOption, HandleYieldStepData, MultisigTxErrorType, NominationPoolInfo, OptimalYieldPathParams, ProcessStep, ProcessTransactionData, ProcessType, RequestAccountBatchExportV2, RequestAccountCreateSuriV2, RequestAccountNameValidate, RequestBatchJsonGetAccountInfo, RequestBatchRestoreV2, RequestBounceableValidate, RequestChangeAllowOneSign, RequestChangeTonWalletContractVersion, RequestCheckPublicAndSecretKey, RequestClaimBridge, RequestCrossChainTransfer, RequestDeriveCreateMultiple, RequestDeriveCreateV3, RequestDeriveValidateV2, RequestEarlyValidateYield, RequestEarningImpact, RequestExportAccountProxyMnemonic, RequestGetAllTonWalletContractVersion, RequestGetAmountForPair, RequestGetDeriveAccounts, RequestGetDeriveSuggestion, RequestGetTokensCanPayFee, RequestGetYieldPoolTargets, RequestInputAccountSubscribe, RequestJsonGetAccountInfo, RequestJsonRestoreV2, RequestMetadataHash, RequestMnemonicCreateV2, RequestMnemonicValidateV2, RequestPrivateKeyValidateV2, RequestShortenMetadata, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubmitProcessTransaction, RequestSubnetApr, RequestSubscribeProcessById, RequestUnlockDotCheckCanMint, RequestUnlockDotSubscribeMintedData, RequestYieldLeave, RequestYieldStepSubmit, RequestYieldWithdrawal, ResponseAccountBatchExportV2, ResponseAccountCreateSuriV2, ResponseAccountNameValidate, ResponseBatchJsonGetAccountInfo, ResponseCheckPublicAndSecretKey, ResponseDeriveValidateV2, ResponseExportAccountProxyMnemonic, ResponseGetAllTonWalletContractVersion, ResponseGetDeriveAccounts, ResponseGetDeriveSuggestion, ResponseGetYieldPoolTargets, ResponseInputAccountSubscribe, ResponseJsonGetAccountInfo, ResponseMetadataHash, ResponseMnemonicCreateV2, ResponseMnemonicValidateV2, ResponsePrivateKeyValidateV2, ResponseShortenMetadata, ResponseSubscribeProcessAlive, ResponseSubscribeProcessById, StakingTxErrorType, StepStatus, StorageDataInterface, SubmitChangeValidatorStaking, SummaryEarningProcessData, SwapBaseTxData, SwapFeeType, SwapRequestV2, TokenSpendingApprovalParams, ValidateYieldProcessParams, YieldPoolType, YieldStepType, YieldTokenBaseInfo } from '@subwallet/extension-base/types';
 import { RequestAccountProxyEdit, RequestAccountProxyForget } from '@subwallet/extension-base/types/account/action/edit';
-import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
+import { AlphaTokenTransferMetadata, RequestAlphaLockedToMove, RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseAlphaLockedToMove, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 import { ApprovePendingTxRequest, CancelPendingTxRequest, ExecutePendingTxRequest, InitMultisigTxRequest, PendingMultisigTxRequest, PrepareMultisigSignRequest, PrepareMultisigSignResponse, RequestGetSignableAccountInfos } from '@subwallet/extension-base/types/multisig';
 import { GetNotificationParams, MarkAllReadParams, RequestIsClaimedPolygonBridge, RequestSwitchStatusParams } from '@subwallet/extension-base/types/notification';
 import { HandleSubstrateProxyWrappedTxRequest, RequestAddSubstrateProxyAccount, RequestGetSubstrateProxyAccountGroup, RequestRemoveSubstrateProxyAccount } from '@subwallet/extension-base/types/substrateProxyAccount';
-import { SwapPair, SwapQuoteResponse, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
+import { BittensorSwapEstimate, BittensorSwapMax, RequestBittensorSwapEstimate, RequestBittensorSwapMax, SwapPair, SwapQuoteResponse, SwapRequestResult, SwapSubmitParams, SwapSubmitStepData, ValidateSwapProcessParams } from '@subwallet/extension-base/types/swap';
 import { _analyzeAddress, CalculateMaxTransferable, calculateMaxTransferable, combineAllAccountProxy, combineBitcoinFee, createPromiseHandler, createTransactionFromRLP, detectTransferTxType, filterUneconomicalUtxos, getAccountJsonByAddress, getAccountSignMode, getSizeInfo, getTransferableBitcoinUtxos, isSameAddress, isSubstrateEcdsaLedgerAssetSupported, MODULE_SUPPORT, reformatAddress, signatureToHex, Transaction as QrTransaction, transformAccounts, transformAddresses, uniqueStringArray } from '@subwallet/extension-base/utils';
 import { parseContractInput, parseEvmRlp } from '@subwallet/extension-base/utils/eth/parseTransaction';
 import { getId } from '@subwallet/extension-base/utils/getId';
@@ -1462,6 +1463,18 @@ export default class KoniExtension {
     });
   }
 
+  /**
+   * The conviction-locked alpha a transfer would carry to the recipient, still locked, so Send can ask first;
+   * 0 when the transfer would be refused anyway — the submit says why (EXT-12)
+   */
+  private async getAlphaLockedToMove ({ from, netuid, to, toValidator, tokenSlug, value }: RequestAlphaLockedToMove): Promise<ResponseAlphaLockedToMove> {
+    const tokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
+    const substrateApi = this.#koniState.getSubstrateApi(tokenInfo.originChain);
+    const { lockedToMove, refusal } = await getAlphaTransferCheck({ substrateApi, from, to, netuid, hotkey: toValidator.split('___')[0], amount: value });
+
+    return { lockedToMove: refusal ? '0' : lockedToMove.toFixed(0) };
+  }
+
   private async makeTransfer (inputData: RequestSubmitTransfer): Promise<SWTransactionResponse> {
     const { chain, feeCustom, feeOption, from, metadata, to, tokenPayFeeSlug, tokenSlug, transferAll, transferBounceable, value } = inputData;
     const transferTokenInfo = this.#koniState.chainService.getAssetBySlug(tokenSlug);
@@ -1606,6 +1619,22 @@ export default class KoniExtension {
           substrateApi,
           metadata
         });
+
+        // Bittensor alpha: what the chain would refuse only inside the block, with the fee paid (EXT-12)
+        if (_TRANSFER_CHAIN_GROUP.bittensor.includes(chain) && metadata) {
+          const { netuid, toValidator } = metadata as AlphaTokenTransferMetadata;
+
+          errors.push(...await validateAlphaTransfer({
+            substrateApi,
+            from,
+            to,
+            netuid,
+            hotkey: toValidator.split('___')[0],
+            amount: transferAmount.value,
+            decimals: _getAssetDecimals(transferTokenInfo),
+            symbol: _getAssetSymbol(transferTokenInfo)
+          }));
+        }
 
         if (_SUPPORT_TOKEN_PAY_FEE_GROUP.hydration.includes(chain)) {
           const hydrationFeeAssetId = tokenPayFeeSlug && this.#koniState.chainService.getAssetBySlug(tokenPayFeeSlug).metadata?.assetId;
@@ -5609,6 +5638,14 @@ export default class KoniExtension {
     return this.#koniState.swapService.validateSwapProcessV2(params);
   }
 
+  private async getBittensorSwapMax (request: RequestBittensorSwapMax): Promise<BittensorSwapMax> {
+    return this.#koniState.swapService.getBittensorSwapMax(request);
+  }
+
+  private async getBittensorSwapEstimate (request: RequestBittensorSwapEstimate): Promise<BittensorSwapEstimate> {
+    return this.#koniState.swapService.getBittensorSwapEstimate(request);
+  }
+
   private async handleSwapStep (inputData: SwapSubmitParams): Promise<SWTransactionResponse> {
     const { address, errorOnTimeOut, isPassConfirmation, onSend, process, processId, quote, recipient } = inputData;
     let step: BriefProcessStep | undefined;
@@ -6490,6 +6527,8 @@ export default class KoniExtension {
         return await this.yieldSubmitClaimReward(request as RequestStakeClaimReward);
       case 'pri(yield.getEarningImpact)':
         return await this.yieldGetEarningImpact(request as RequestEarningImpact);
+      case 'pri(yield.getSubnetApr)':
+        return await this.#koniState.earningService.getSubnetApr(request as RequestSubnetApr);
       case 'pri(yield.changeValidator.submit)':
         return await this.handleYieldChangeValidator(request as SubmitChangeValidatorStaking);
         /* Others */
@@ -6639,6 +6678,8 @@ export default class KoniExtension {
       case 'pri(assetSetting.update)':
         return await this.updateAssetSetting(request as AssetSettingUpdateReq);
 
+      case 'pri(transfer.getAlphaLockedToMove)':
+        return this.getAlphaLockedToMove(request as RequestAlphaLockedToMove);
       case 'pri(transfer.subscribe)':
         return this.subscribeMaxTransferable(request as RequestSubscribeTransfer, id, port);
       case 'pri(transfer.confirmation.subscribe)':
@@ -6929,6 +6970,10 @@ export default class KoniExtension {
         return this.getLatestSwapQuote(request as SwapRequestV2);
       case 'pri(swapService.validateSwapProcess)':
         return this.validateSwapProcess(request as ValidateSwapProcessParams);
+      case 'pri(swapService.getBittensorSwapMax)':
+        return this.getBittensorSwapMax(request as RequestBittensorSwapMax);
+      case 'pri(swapService.getBittensorSwapEstimate)':
+        return this.getBittensorSwapEstimate(request as RequestBittensorSwapEstimate);
       case 'pri(swapService.handleSwapStep)':
         return this.handleSwapStep(request as SwapSubmitParams);
         /* Swap service */

@@ -4,6 +4,9 @@
 export interface Message extends MessageEvent {
   data: {
     error?: string;
+    /** Sent with `error`: the error's code and data */
+    errorCode?: number;
+    errorData?: unknown;
     id: string;
     origin: string;
     response?: string;

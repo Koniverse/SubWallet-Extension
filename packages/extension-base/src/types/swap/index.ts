@@ -221,6 +221,29 @@ export interface OptimalSwapPathParamsV2 {
   path: DynamicSwapAction[];
 }
 
+export interface RequestBittensorSwapMax {
+  address: string;
+  fromTokenSlug: string;
+}
+
+/** What a Bittensor swap from a token can spend now, in the token's smallest unit. */
+export interface BittensorSwapMax {
+  /** The most a swap can spend now — what Max fills in. */
+  usable: string;
+}
+
+export interface RequestBittensorSwapEstimate {
+  fromTokenSlug: string;
+  toTokenSlug: string;
+  /** In the from token's smallest unit */
+  fromAmount: string;
+}
+
+/** What a Bittensor swap returns now by the chain's simulation, in the to token's smallest unit. */
+export interface BittensorSwapEstimate {
+  toAmount: string;
+}
+
 export interface ValidateSwapProcessParams {
   address: string;
   process: CommonOptimalSwapPath;

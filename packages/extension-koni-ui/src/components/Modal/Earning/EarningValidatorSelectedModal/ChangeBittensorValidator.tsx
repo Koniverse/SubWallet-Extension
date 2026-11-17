@@ -4,7 +4,8 @@
 import { TransactionError } from '@subwallet/extension-base/background/errors/TransactionError';
 import { ExtrinsicType, NotificationType, ValidatorInfo } from '@subwallet/extension-base/background/KoniTypes';
 import { isActionFromValidator } from '@subwallet/extension-base/services/earning-service/utils';
-import { NominationInfo, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
+import { NominationInfo, StakingTxErrorType, SubmitBittensorChangeValidatorStaking, YieldPoolType } from '@subwallet/extension-base/types';
+import { DEFAULT_MIN_TRANSFER, roundUpMinimum } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
 import { BasicInputWrapper } from '@subwallet/extension-koni-ui/components/Field/Base';
 import { WalletModalContext } from '@subwallet/extension-koni-ui/contexts/WalletModalContextProvider';
@@ -234,13 +235,15 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
   const notifyTooHighAmount = useCallback(() => {
     notify({
-      message: t(`Amount too high. Lower your amount to no more than ${formatBalance(bondedValue, decimals)} ${symbol || ''} and try again`),
+      message: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.amountTooHigh', { replace: { maxAmount: formatBalance(bondedValue, decimals), symbol: symbol || '' } }),
       type: 'error',
       duration: 5
     });
   }, [bondedValue, decimals, notify, symbol, t]);
 
-  const { earningRate, stakingFee } = useTaoStakingFee(
+  // Only the alpha → TAO rate is used: a move between validators on one subnet swaps nothing and charges no
+  // staking fee (`transfer_stake_within_subnet`, EXT-25), whatever an unstake of the same amount would cost
+  const { earningRate } = useTaoStakingFee(
     poolInfo,
     value || bondedValue,
     decimals,
@@ -248,6 +251,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
     ExtrinsicType.STAKING_UNBOND,
     setSubmitLoading
   );
+
+  // What the chain checks on a move within the subnet: worth `InitialMinTransfer` at spot; root is 1:1 (EXT-20).
+  // Rounded up, so the amount shown is always enough
+  const minimumToMove = useMemo(() => {
+    if (poolInfo.type !== YieldPoolType.SUBNET_STAKING) {
+      return new BigN(DEFAULT_MIN_TRANSFER);
+    }
+
+    return earningRate > 0 ? roundUpMinimum(new BigN(DEFAULT_MIN_TRANSFER).div(earningRate), decimals) : undefined;
+  }, [decimals, earningRate, poolInfo.type]);
+
+  // Every digit `roundUpMinimum` keeps, as the backend's `formatMinimum` shows it: the default keeps 2 below 1,
+  // which would show less than the minimum
+  const minimumToMoveMetadata = useMemo(() => ({ minNumberFormat: 3, maxNumberFormat: decimals || 6 }), [decimals]);
 
   const onClickSubmit = useCallback(
     (values: ChangeValidatorParams) => {
@@ -274,8 +291,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         ...(netuid !== undefined && {
           subnetData: {
             netuid,
-            slippage: 0,
-            stakingFee
+            slippage: 0
           }
         })
       };
@@ -291,7 +307,8 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
         (changeEarningValidator(submitData))
           .then(onSuccess)
           .catch((error: TransactionError) => {
-            if (error.message.includes('remaining')) {
+            // What would stay on the current validator is under the nominator minimum: offer to move it all
+            if ((error.data as { errorType?: string } | undefined)?.errorType === StakingTxErrorType.REMAINING_AMOUNT_TOO_LOW) {
               openAlert({
                 type: NotificationType.WARNING,
                 title: t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.payAttentionExclamation'),
@@ -323,7 +340,7 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
 
       send(isShowAmountChange ? value : bondedValue);
     },
-    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, stakingFee, symbol, t]
+    [bondedValue, closeAlert, from, isShowAmountChange, netuid, notifyTooHighAmount, onError, onSuccess, openAlert, poolInfo.slug, poolTargets, symbol, t]
   );
   const { onCancelSelectValidator } = useSelectValidators(modalId, chain, maxCount, onChange, isSingleSelect);
 
@@ -483,21 +500,20 @@ const Component = (props: Props, ref: ForwardedRef<InputRef>) => {
                 showMaxButton={true}
               />
             </Form.Item>
-            <div className={'minimum-stake__info'}>
-              <div className={'minimum-stake__label'}>
-                {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumActiveStake')}
+            {minimumToMove && (
+              <div className={'minimum-stake__info'}>
+                <div className={'minimum-stake__label'}>
+                  {t('ui.EARNING.components.Modal.Earning.Validator.ChangeBittensor.minimumToMove')}
+                </div>
+                <Number
+                  className='minimum-stake__value'
+                  decimal={decimals}
+                  metadata={minimumToMoveMetadata}
+                  suffix={symbol}
+                  value={minimumToMove}
+                />
               </div>
-              <Number
-                className='minimum-stake__value'
-                decimal={decimals}
-                suffix={ earningRate > 0 ? symbol : bondedAsset?.symbol}
-                value={
-                  earningRate > 0
-                    ? BigN(poolInfo.statistic?.earningThreshold.join || 0).div(earningRate)
-                    : BigN(poolInfo.statistic?.earningThreshold.join || 0)
-                }
-              />
-            </div>
+            )}
           </div>
         )}
       </Form>

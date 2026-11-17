@@ -4,3 +4,4 @@
 export { default as SubmitApiArea } from './SubmitApiArea';
 export { default as MultisigInfoArea } from './MultisigInfoArea';
 export { default as WrappedTransactionInfoArea } from './WrappedTransactionInfoArea';
+export { default as BittensorStakingFeeArea } from './BittensorStakingFeeArea';

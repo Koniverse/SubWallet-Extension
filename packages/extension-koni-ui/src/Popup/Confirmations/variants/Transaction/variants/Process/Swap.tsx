@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-web-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { getSwapChainsFromPath, getTokenPairFromStep } from '@subwallet/extension-base/services/swap-service/utils';
 import { ProcessTransactionData, ProcessType } from '@subwallet/extension-base/types';
 import { SwapBaseTxData, SwapProviderId } from '@subwallet/extension-base/types/swap';
@@ -44,8 +45,8 @@ const Component: React.FC<Props> = (props: Props) => {
       const asset = assetRegistryMap[feeItem.tokenSlug];
 
       if (asset) {
-        const { decimals, priceId } = asset;
-        const price = priceMap[priceId || ''] || 0;
+        const { decimals } = asset;
+        const price = priceMap[_getAssetPriceId(asset)] || 0;
 
         totalBalance = totalBalance.plus(new BigN(feeItem.amount).div(BN_TEN.pow(decimals || 0)).multipliedBy(price));
       }

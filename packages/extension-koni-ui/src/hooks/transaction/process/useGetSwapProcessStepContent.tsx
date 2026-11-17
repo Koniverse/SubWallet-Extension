@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetDecimals, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAssetDecimals, _getAssetPriceId, _getAssetSymbol, _getChainName } from '@subwallet/extension-base/services/chain-service/utils';
 import { BaseStepType, BaseSwapStepMetadata, BriefSwapStep, CommonStepDetail, CommonStepFeeInfo, CommonStepType, SwapQuote, SwapStepType } from '@subwallet/extension-base/types';
 import { swapNumberMetadata } from '@subwallet/extension-base/utils';
 import { NumberDisplay } from '@subwallet/extension-koni-ui/components';
@@ -125,8 +125,8 @@ const useGetSwapProcessStepContent = () => {
       const asset = assetRegistry[feeItem.tokenSlug];
 
       if (asset) {
-        const { decimals, priceId } = asset;
-        const price = priceMap[priceId || ''] || 0;
+        const { decimals } = asset;
+        const price = priceMap[_getAssetPriceId(asset)] || 0;
 
         result = result.plus(new BigN(feeItem.amount).div(BN_TEN.pow(decimals || 0)).multipliedBy(price));
       }

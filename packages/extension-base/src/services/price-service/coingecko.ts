@@ -101,9 +101,53 @@ const fetchDerivativeTokenSlugs = async () => {
   }
 };
 
-export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType = 'USD', skipDerivativePrice?: boolean): Promise<Omit<PriceJson, 'exchangeRateMap'>> => {
-  const idStr = Array.from(priceIds).join(',');
+/** `coins/markets` answers at most this many coins a request, and cuts the rest without an error (EXT-40) */
+export const PRICE_PAGE_SIZE = 250;
+
+/** One page of prices: CoinGecko, then the backup API, then the static cache; undefined when all of them fail. */
+const fetchPricePage = async (ids: string[], currency: CurrencyType): Promise<GeckoItem[] | undefined> => {
+  const idStr = ids.join(',');
   let response: Response | undefined;
+
+  if (!useBackupApi) {
+    try {
+      response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.toLowerCase()}&per_page=${PRICE_PAGE_SIZE}&ids=${idStr}`);
+    } catch (err) {
+      useBackupApi = true;
+    }
+  }
+
+  if (useBackupApi || response?.status !== 200) {
+    useBackupApi = true;
+
+    try {
+      response = await fetch(`${apiCacheDomain}/api/price/get?ids=${idStr}`);
+    } catch (e) {}
+
+    if (response?.status !== 200) {
+      try {
+        response = await fetch('https://static-cache.subwallet.app/price/data.json');
+      } catch (e) {}
+    }
+  }
+
+  if (response?.status !== 200) {
+    return undefined;
+  }
+
+  const generateDataPriceRaw = await response.json() as unknown || [];
+
+  return isArray(generateDataPriceRaw)
+    ? generateDataPriceRaw as Array<GeckoItem>
+    : Object.entries(generateDataPriceRaw as Record<string, Omit<GeckoItem, 'id'>>).map(([id, value]) => ({ ...value, id }) as GeckoItem);
+};
+
+/**
+ * Prices for `priceIds`, asked in pages of `PRICE_PAGE_SIZE`: one request for every id lost all past the
+ * 250 largest. A page no source answers keeps its ids' `previous` prices instead of reading as $0.
+ */
+export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType = 'USD', skipDerivativePrice?: boolean, previous?: Partial<Omit<PriceJson, 'exchangeRateMap'>>): Promise<Omit<PriceJson, 'exchangeRateMap'>> => {
+  const ids = Array.from(priceIds);
 
   try {
     const derivativePriceMap: Record<string, number> = {};
@@ -132,46 +176,41 @@ export const getPriceMap = async (priceIds: Set<string>, currency: CurrencyType 
       }
     }
 
-    if (!useBackupApi) {
-      try {
-        response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.toLowerCase()}&per_page=250&ids=${idStr}`);
-      } catch (err) {
-        useBackupApi = true;
-      }
-    }
-
-    if (useBackupApi || response?.status !== 200) {
-      useBackupApi = true;
-
-      try {
-        response = await fetch(`${apiCacheDomain}/api/price/get?ids=${idStr}`);
-      } catch (e) {}
-
-      if (response?.status !== 200) {
-        try {
-          response = await fetch('https://static-cache.subwallet.app/price/data.json');
-        } catch (e) {}
-      }
-    }
-
-    const generateDataPriceRaw = await response?.json() as unknown || [];
-    const responseDataPrice = isArray(generateDataPriceRaw)
-      ? generateDataPriceRaw as Array<GeckoItem>
-      : Object.entries(generateDataPriceRaw).map(([id, value]) => ({ ...value, id }) as GeckoItem);
     const currencyData = staticData[StaticKey.CURRENCY_SYMBOL][currency || DEFAULT_CURRENCY] as CurrencyJson;
     const priceMap: Record<string, number> = {};
     const price24hMap: Record<string, number> = {};
-    const priceCoinGeckoSupported: string[] = [];
+    const supported = new Set<string>();
 
-    responseDataPrice.forEach((val) => {
-      const currentPrice = val.current_price || 0;
-      const price24h = currentPrice - (val.price_change_24h || 0);
+    // One page after another, to stay inside CoinGecko's rate limit
+    for (let start = 0; start < ids.length; start += PRICE_PAGE_SIZE) {
+      const page = ids.slice(start, start + PRICE_PAGE_SIZE);
+      const responseDataPrice = await fetchPricePage(page, currency);
 
-      priceCoinGeckoSupported.push(val.id);
-      priceMap[val.id] = currentPrice;
-      price24hMap[val.id] = price24h;
-      lastUpdatedMap[val.id] = new Date(val.last_updated || val.last_updated_at || Date.now());
-    });
+      if (!responseDataPrice) {
+        page.forEach((id) => {
+          if (previous?.priceMap?.[id] !== undefined) {
+            priceMap[id] = previous.priceMap[id];
+            price24hMap[id] = previous.price24hMap?.[id] ?? previous.priceMap[id];
+            previous.lastUpdatedMap?.[id] && (lastUpdatedMap[id] = previous.lastUpdatedMap[id]);
+            previous.priceCoinGeckoSupported?.includes(id) && supported.add(id);
+          }
+        });
+
+        continue;
+      }
+
+      responseDataPrice.forEach((val) => {
+        const currentPrice = val.current_price || 0;
+        const price24h = currentPrice - (val.price_change_24h || 0);
+
+        supported.add(val.id);
+        priceMap[val.id] = currentPrice;
+        price24hMap[val.id] = price24h;
+        lastUpdatedMap[val.id] = new Date(val.last_updated || val.last_updated_at || Date.now());
+      });
+    }
+
+    const priceCoinGeckoSupported = [...supported];
 
     const derivativeTokenSlugs = await fetchDerivativeTokenSlugs();
 

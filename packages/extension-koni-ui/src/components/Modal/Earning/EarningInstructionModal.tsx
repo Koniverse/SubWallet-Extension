@@ -13,6 +13,7 @@ import { InstructionItem } from '@subwallet/extension-koni-ui/components';
 import { getInputValuesFromString } from '@subwallet/extension-koni-ui/components/Field/AmountInput';
 import { EARNING_DATA_RAW, EARNING_INSTRUCTION_MODAL, TANSSI_EARNING_DATA_RAW } from '@subwallet/extension-koni-ui/constants';
 import { useSelector } from '@subwallet/extension-koni-ui/hooks';
+import { useSubnetApr } from '@subwallet/extension-koni-ui/hooks/earning/useSubnetApr';
 import { earlyValidateJoin } from '@subwallet/extension-koni-ui/messaging';
 import { AlertDialogProps, PhosphorIcon, ThemeProps } from '@subwallet/extension-koni-ui/types';
 import { getBannerButtonIcon, getEarningTimeText, isAccountAll } from '@subwallet/extension-koni-ui/utils';
@@ -76,6 +77,11 @@ const Component: React.FC<Props> = (props: Props) => {
 
     return accountAddress?.address;
   }, [chainInfoMap, currentAccountProxy, poolInfo.chain]);
+  // The card's figure, from the static cache, shows at once; the chain is read only when the cache has none (EXT-1)
+  const cachedUpToApr = poolInfo?.statistic?.upToApr;
+  const subnetApr = useSubnetApr(cachedUpToApr === undefined ? poolInfo : undefined);
+  const upToApr = cachedUpToApr ?? (subnetApr ? subnetApr.upTo * 100 : undefined);
+
   const title = useMemo(() => {
     if (!poolInfo) {
       return '';
@@ -83,13 +89,43 @@ const Component: React.FC<Props> = (props: Props) => {
 
     const { metadata: { inputAsset },
       type } = poolInfo;
+
+    // A subnet's headline is the chain's APR, in alpha, not its emission (EXT-1): the best validator holding
+    // ≥ 1% of the stake paid in the last epoch; at 0 or without a figure, no yield is claimed
+    if (type === YieldPoolType.SUBNET_STAKING) {
+      const asset = assetRegistry[inputAsset];
+      const minJoin = poolInfo.statistic?.earningThreshold.join || '0';
+      const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
+      const { shortName, subnetData } = poolInfo.metadata;
+
+      if (upToApr) {
+        return `Earn up to ${formatNumber(upToApr, 0, balanceFormatter)}% APR in ${subnetData?.subnetSymbol || ''}${from} with ${shortName}`;
+      }
+
+      return `Earn ${subnetData?.subnetSymbol || asset?.symbol || ''} with ${shortName}`;
+    }
+
+    // Root's headline: the 30-day APR of the best validator holding ≥ 1% of root stake, in TAO, before the claim fee
+    // (EXT-1); at 0 or without a figure, no yield is claimed
+    if (type === YieldPoolType.NATIVE_STAKING && _STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
+      const asset = assetRegistry[inputAsset];
+      const minJoin = poolInfo.statistic?.earningThreshold.join || '0';
+      const from = asset && Number(minJoin) ? ` from ${formatNumber(minJoin, asset.decimals || 0, balanceFormatter)} ${asset.symbol}` : '';
+      const { shortName } = poolInfo.metadata;
+
+      if (upToApr) {
+        return `Earn up to ${formatNumber(upToApr, 0, balanceFormatter)}% APR in TAO, before the claim fee,${from} with ${shortName}`;
+      }
+
+      return `Earn ${asset?.symbol || ''} with ${shortName}`;
+    }
+
     const totalApy = poolInfo.statistic?.totalApy;
     const totalApr = poolInfo.statistic?.totalApr;
     const minJoinPool = poolInfo.statistic?.earningThreshold.join || '0';
 
     const getOrigin = () => {
       switch (type) {
-        case YieldPoolType.SUBNET_STAKING:
         case YieldPoolType.NOMINATION_POOL:
         case YieldPoolType.NATIVE_STAKING:
         case YieldPoolType.LIQUID_STAKING:
@@ -149,7 +185,7 @@ const Component: React.FC<Props> = (props: Props) => {
     }
 
     return result;
-  }, [assetRegistry, poolInfo]);
+  }, [assetRegistry, poolInfo, upToApr]);
 
   const buttonTitle = useMemo(() => {
     if (!poolInfo) {
@@ -281,7 +317,11 @@ const Component: React.FC<Props> = (props: Props) => {
           }
 
           if (_STAKING_CHAIN_GROUP.bittensor.includes(poolInfo.chain)) {
-            return EARNING_DATA_RAW.BITTENSOR_STAKING.map((item) => {
+            const isSubnet = poolInfo.type === YieldPoolType.SUBNET_STAKING;
+            // A subnet's epoch, from its `tempo`: in minutes under 2 hours (72 on most subnets), else in hours (EXT-16)
+            const epochTime = isSubnet && paidOut ? (paidOut < 2 ? `${Math.round(paidOut * 60)} minutes` : `${Number(paidOut.toFixed(1))} hours`) : '';
+
+            return (isSubnet ? EARNING_DATA_RAW.BITTENSOR_SUBNET_STAKING : EARNING_DATA_RAW.BITTENSOR_STAKING).map((item) => {
               const _item: BoxProps = { ...item, id: item.icon, icon: getBannerButtonIcon(item.icon) as PhosphorIcon };
 
               replaceEarningValue(_item, '{validatorNumber}', maxCandidatePerFarmer.toString());
@@ -289,11 +329,7 @@ const Component: React.FC<Props> = (props: Props) => {
               replaceEarningValue(_item, '{periodNumb}', unBondedTime);
               replaceEarningValue(_item, '{maintainBalance}', maintainBalance);
               replaceEarningValue(_item, '{maintainSymbol}', maintainSymbol);
-
-              if (paidOut !== undefined) {
-                replaceEarningValue(_item, '{paidOut}', paidOut >= 1 ? paidOut.toString() : (paidOut * 60).toString());
-                replaceEarningValue(_item, '{paidOutTimeUnit}', paidOut > 1 ? 'hours' : paidOut === 1 ? 'hour' : 'minutes');
-              }
+              replaceEarningValue(_item, '{epochTime}', epochTime ? ` — every ${epochTime} on this subnet —` : '');
 
               return _item;
             });

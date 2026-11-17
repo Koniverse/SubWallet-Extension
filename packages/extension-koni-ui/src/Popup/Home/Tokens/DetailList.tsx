@@ -1,7 +1,7 @@
 // Copyright 2019-2022 @polkadot/extension-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
+import { _getAlphaPriceId, _getAssetPriceId, _getMultiChainAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { TON_CHAINS } from '@subwallet/extension-base/services/earning-service/constants';
 import { AccountChainType, AccountProxy, AccountProxyType, BuyTokenInfo } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
@@ -134,11 +134,12 @@ function Component (): React.ReactElement {
     if (assetRegistryMap[tokenGroupSlug]) {
       return _getAssetPriceId(assetRegistryMap[tokenGroupSlug]);
     } else if (multiChainAssetMap[tokenGroupSlug]) {
-      return _getMultiChainAssetPriceId(multiChainAssetMap[tokenGroupSlug]);
+      // A group of alpha copies has no price id of its own: it takes its subnet's (EXT-2)
+      return _getMultiChainAssetPriceId(multiChainAssetMap[tokenGroupSlug]) || _getAlphaPriceId(assetRegistryMap[(tokenGroupMap[tokenGroupSlug] || [])[0]]);
     }
 
     return undefined;
-  }, [assetRegistryMap, multiChainAssetMap, tokenGroupSlug]);
+  }, [assetRegistryMap, multiChainAssetMap, tokenGroupMap, tokenGroupSlug]);
 
   const buyInfos = useMemo(() => {
     const slug = tokenGroupSlug || '';

@@ -13,7 +13,7 @@ import MythosNativeStakingPoolHandler from '@subwallet/extension-base/services/e
 import { EventService } from '@subwallet/extension-base/services/event-service';
 import DatabaseService from '@subwallet/extension-base/services/storage-service/DatabaseService';
 import { SWTransactionBase } from '@subwallet/extension-base/services/transaction-service/types';
-import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, EarningStatus, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
+import { BasicTxErrorType, EarningRewardHistoryItem, EarningRewardItem, EarningRewardJson, EarningStatus, HandleYieldStepData, HandleYieldStepParams, OptimalYieldPath, OptimalYieldPathParams, RequestEarlyValidateYield, RequestEarningImpact, RequestStakeCancelWithdrawal, RequestStakeClaimReward, RequestSubnetApr, RequestYieldLeave, RequestYieldWithdrawal, ResponseEarlyValidateYield, SubmitChangeValidatorStaking, SubnetAprResult, TransactionData, ValidateYieldProcessParams, ValidatorInfo, YieldPoolInfo, YieldPoolTarget, YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { addLazy, createPromiseHandler, filterAddressByChainInfo, PromiseHandler, removeLazy } from '@subwallet/extension-base/utils';
 import { fetchStaticCache } from '@subwallet/extension-base/utils/fetchStaticCache';
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -1153,7 +1153,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const handler = this.getPoolHandler(slug);
 
     if (handler) {
-      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo);
+      return handler.validateYieldLeave(params.amount, params.address, params.fastLeave, params.selectedTarget, slug, params.poolInfo, params.unstakeAll);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -1168,7 +1168,7 @@ export default class EarningService implements StoppableServiceInterface, Persis
     const slippage = params.slippage;
 
     if (handler) {
-      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid, slippage);
+      return handler.handleYieldLeave(params.fastLeave, params.amount, params.address, params.selectedTarget, netuid, slippage, params.unstakeAll);
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
@@ -1227,6 +1227,19 @@ export default class EarningService implements StoppableServiceInterface, Persis
     } else {
       return Promise.reject(new TransactionError(BasicTxErrorType.INTERNAL_ERROR));
     }
+  }
+
+  /** A Bittensor subnet's APR from the chain, for the subnet on screen (EXT-1); null when there is no figure */
+  public async getSubnetApr ({ netuid, slug }: RequestSubnetApr): Promise<SubnetAprResult | null> {
+    await this.eventService.waitChainReady;
+
+    const handler = this.getPoolHandler(slug) as (BasePoolHandler & { getSubnetApr?: (netuid: number) => Promise<SubnetAprResult | undefined> }) | undefined;
+
+    if (!handler?.getSubnetApr) {
+      return Promise.reject(new TransactionError(BasicTxErrorType.UNSUPPORTED));
+    }
+
+    return (await handler.getSubnetApr(netuid)) ?? null;
   }
 
   public async handleYieldChangeValidator (params: SubmitChangeValidatorStaking): Promise<TransactionData> {

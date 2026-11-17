@@ -6,7 +6,7 @@ import { RequestOptimalTransferProcess } from '@subwallet/extension-base/service
 import { TokenPayFeeInfo } from '@subwallet/extension-base/services/fee-service/interfaces';
 import { BitcoinTransactionData, SWTransactionResponse } from '@subwallet/extension-base/services/transaction-service/types';
 import { CommonOptimalTransferPath, RequestCrossChainTransfer, RequestGetAmountForPair, RequestGetTokensCanPayFee, TokenSpendingApprovalParams } from '@subwallet/extension-base/types';
-import { RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
+import { RequestAlphaLockedToMove, RequestSubmitSignPsbtTransfer, RequestSubmitTransfer, RequestSubmitTransferWithId, RequestSubscribeTransfer, ResponseAlphaLockedToMove, ResponseSubscribeTransfer, ResponseSubscribeTransferConfirmation } from '@subwallet/extension-base/types/balance/transfer';
 
 import { sendMessage } from '../base';
 
@@ -32,6 +32,10 @@ export async function getBitcoinTransactionData (request: RequestSubmitTransfer)
 
 export async function approveSpending (request: TokenSpendingApprovalParams): Promise<SWTransactionResponse> {
   return sendMessage('pri(accounts.approveSpending)', request);
+}
+
+export async function getAlphaLockedToMove (request: RequestAlphaLockedToMove): Promise<ResponseAlphaLockedToMove> {
+  return sendMessage('pri(transfer.getAlphaLockedToMove)', request);
 }
 
 export async function getMaxTransfer (request: RequestMaxTransferable): Promise<AmountData> {

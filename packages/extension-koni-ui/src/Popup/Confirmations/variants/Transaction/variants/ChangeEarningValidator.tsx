@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SubmitBittensorChangeValidatorStaking, YieldPoolInfo, YieldPositionInfo } from '@subwallet/extension-base/types';
-import { AlertBox } from '@subwallet/extension-koni-ui/components';
 import CommonTransactionInfo from '@subwallet/extension-koni-ui/components/Confirmation/CommonTransactionInfo';
 import MetaInfo from '@subwallet/extension-koni-ui/components/MetaInfo/MetaInfo';
 import EarningValidatorSelectedModal from '@subwallet/extension-koni-ui/components/Modal/Earning/EarningValidatorSelectedModal';
@@ -181,7 +180,6 @@ const Component: React.FC<Props> = (props: Props) => {
     return transaction.chain === 'bittensor' || transaction.chain === 'bittensor_testnet';
   }, [transaction.chain]);
 
-  const stakingFee = data.subnetData?.stakingFee;
   const isShowAmount = useMemo(() => {
     return new BigN(data.amount).gt(0);
   }, [data.amount]);
@@ -229,34 +227,24 @@ const Component: React.FC<Props> = (props: Props) => {
       </MetaInfo>
 
       {isBittensorChain && (
-        <>
-          <MetaInfo
-            className='nomination-wrapper'
-            hasBackgroundWrapper
-          >
-            <ValidatorAddress
-              account={deselectedValidatorAccounts[0]}
-              className='deselected'
-              label='From validator'
-              title='Deselected validators'
-            />
+        <MetaInfo
+          className='nomination-wrapper'
+          hasBackgroundWrapper
+        >
+          <ValidatorAddress
+            account={deselectedValidatorAccounts[0]}
+            className='deselected'
+            label='From validator'
+            title='Deselected validators'
+          />
 
-            <ValidatorAddress
-              account={newValidatorAccounts[0]}
-              className='newly-selected'
-              label='To validator'
-              title='Newly selected validators'
-            />
-          </MetaInfo>
-          {!!stakingFee && (
-            <AlertBox
-              className={'alert-box'}
-              description={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFeeInfo', { replace: { number: stakingFee } })}
-              title={t('ui.TRANSACTION.Confirmations.Earning.Validator.Change.validatorChangeFee')}
-              type='info'
-            />
-          )}
-        </>
+          <ValidatorAddress
+            account={newValidatorAccounts[0]}
+            className='newly-selected'
+            label='To validator'
+            title='Newly selected validators'
+          />
+        </MetaInfo>
       )}
     </div>
   );
@@ -273,10 +261,6 @@ const ChangeValidatorTransactionConfirmation = styled(Component)<BaseTransaction
 
     '.form-space-sm .ant-form-item': {
       marginBottom: '0px'
-    },
-
-    '.alert-box': {
-      marginTop: token.marginSM
     },
 
     '.validator-group__info': {

@@ -3,6 +3,7 @@
 
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import { NotificationType } from '@subwallet/extension-base/background/KoniTypes';
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { YieldPoolType, YieldPositionInfo } from '@subwallet/extension-base/types';
 import { detectTranslate, isAccountAll } from '@subwallet/extension-base/utils';
 import { AlertModal, EmptyList, FilterModal, Layout } from '@subwallet/extension-koni-ui/components';
@@ -65,7 +66,7 @@ function Component ({ className, earningPositions, setEntryView, setLoading }: P
     return earningPositions
       .map((item): ExtraYieldPositionInfo => {
         const priceToken = assetInfoMap[item.balanceToken];
-        const price = priceMap[priceToken?.priceId || ''] || 0;
+        const price = priceMap[_getAssetPriceId(priceToken)] || 0;
 
         return {
           ...item,

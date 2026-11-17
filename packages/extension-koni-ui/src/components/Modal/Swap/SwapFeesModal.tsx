@@ -1,6 +1,7 @@
 // Copyright 2019-2022 @subwallet/extension-koni-ui authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { _getAssetPriceId } from '@subwallet/extension-base/services/chain-service/utils';
 import { CommonFeeComponent, SwapFeeType, SwapQuote } from '@subwallet/extension-base/types';
 import { detectTranslate } from '@subwallet/extension-base/utils';
 import { MetaInfo } from '@subwallet/extension-koni-ui/components';
@@ -61,8 +62,8 @@ const Component: FC<Props> = (props: Props) => {
     const asset = assetRegistryMap[feeItem.tokenSlug];
 
     if (asset) {
-      const { decimals, priceId } = asset;
-      const price = priceMap[priceId || ''] || 0;
+      const { decimals } = asset;
+      const price = priceMap[_getAssetPriceId(asset)] || 0;
 
       return new BigN(feeItem.amount).div(BN_TEN.pow(decimals || 0)).multipliedBy(price);
     }
