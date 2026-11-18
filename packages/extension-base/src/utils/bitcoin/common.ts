@@ -8,6 +8,11 @@ import { BitcoinAddressType } from '@subwallet/keyring/types';
 import { BtcSizeFeeEstimator, getBitcoinAddressInfo, validateBitcoinAddress } from '@subwallet/keyring/utils';
 import BigN from 'bignumber.js';
 
+type GetTransferableBitcoinUtxosOptions = {
+  forceRefreshProtectedUtxos?: boolean;
+  skipProtectedUtxos?: boolean;
+};
+
 // Source: https://github.com/leather-wallet/extension/blob/dev/src/app/common/transactions/bitcoin/utils.ts
 export function getSizeInfo (payload: {
   inputLength: number;
@@ -66,24 +71,37 @@ export function getSpendableAmount ({ feeRate,
   };
 }
 
-export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string) => {
+export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, address: string, options: GetTransferableBitcoinUtxosOptions = {}) => {
   try {
+    const { forceRefreshProtectedUtxos = false, skipProtectedUtxos = false } = options;
     const [utxos, runeTxsUtxos, inscriptionUtxos] = await Promise.all([
       bitcoinApi.api.getUtxos(address).catch((error) => {
         console.log('Error fetching UTXOs:', error);
 
         return [];
       }),
-      getRuneUtxos(bitcoinApi, address).catch((error) => {
-        console.log('Error fetching Rune UTXOs:', error);
+      skipProtectedUtxos
+        ? Promise.resolve([])
+        : getRuneUtxos(bitcoinApi, address).catch((error) => {
+          if (forceRefreshProtectedUtxos) {
+            throw error;
+          }
 
-        return [];
-      }),
-      getInscriptionUtxos(bitcoinApi, address).catch((error) => {
-        console.log('Error fetching Inscription UTXOs:', error);
+          console.log('Error fetching Rune UTXOs:', error);
 
-        return [];
-      })
+          return [];
+        }),
+      skipProtectedUtxos
+        ? Promise.resolve([])
+        : getInscriptionUtxos(bitcoinApi, address).catch((error) => {
+          if (forceRefreshProtectedUtxos) {
+            throw error;
+          }
+
+          console.log('Error fetching Inscription UTXOs:', error);
+
+          return [];
+        })
     ]);
 
     let filteredUtxos: UtxoResponseItem[];
@@ -100,7 +118,7 @@ export const getTransferableBitcoinUtxos = async (bitcoinApi: _BitcoinApi, addre
 
     // filter out dust utxos
     // filter out inscription utxos
-    filteredUtxos = filteredOutTxsUtxos(utxos, inscriptionUtxos);
+    filteredUtxos = filteredOutTxsUtxos(filteredUtxos, inscriptionUtxos);
 
     return filteredUtxos;
   } catch (error) {

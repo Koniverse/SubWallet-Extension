@@ -9,10 +9,12 @@ import { BehaviorSubject } from 'rxjs';
 
 import { _ApiOptions } from '../../handler/types';
 import { _BitcoinApi, _ChainConnectionStatus } from '../../types';
+import { BitcoinApiWithFallback } from './BitcoinFallbackApi';
 
-// const isBlockStreamProvider = (apiUrl: string): boolean => apiUrl === 'https://blockstream-testnet.openbit.app' || apiUrl === 'https://electrs.openbit.app';
-// const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
-// const MEMPOOL_TESTNET_V4_API_URL = 'https://mempool.space/testnet4/api/';
+const BLOCKSTREAM_MAINNET_API_URL = 'https://blockstream.info/api/';
+const BLOCKSTREAM_TESTNET_API_URL = 'https://blockstream.info/testnet/api/';
+const MEMPOOL_MAINNET_API_URL = 'https://mempool.space/api/';
+const MEMPOOL_TESTNET_API_URL = 'https://mempool.space/testnet/api/';
 
 export class BitcoinApi implements _BitcoinApi {
   chainSlug: string;
@@ -43,17 +45,23 @@ export class BitcoinApi implements _BitcoinApi {
   }
 
   private createApiStrategy (apiUrl: string): BitcoinApiStrategy {
-    const _apiUrl = 'https://blockstream.info/testnet/api/'; // todo: for test
     const isTestnet = apiUrl.includes('testnet');
-    const isBlockstreamUrl = apiUrl.includes('blockstream');
 
     if (isTestnet) {
-      return isBlockstreamUrl
-        ? new BlockStreamTestnetRequestStrategy(_apiUrl)
-        : new MempoolTestnetRequestStrategy(_apiUrl);
+      if (apiUrl.includes('mempool.space')) {
+        return new MempoolTestnetRequestStrategy(apiUrl);
+      }
+
+      return new BitcoinApiWithFallback(
+        new BlockStreamTestnetRequestStrategy(BLOCKSTREAM_TESTNET_API_URL),
+        new MempoolTestnetRequestStrategy(MEMPOOL_TESTNET_API_URL)
+      );
     }
 
-    return new SubWalletMainnetRequestStrategy(apiUrl);
+    return new BitcoinApiWithFallback(
+      new SubWalletMainnetRequestStrategy(BLOCKSTREAM_MAINNET_API_URL),
+      new MempoolTestnetRequestStrategy(MEMPOOL_MAINNET_API_URL)
+    );
   }
 
   get connectionStatus (): _ChainConnectionStatus {

@@ -249,7 +249,7 @@ export async function getRuneUtxos (bitcoinApi: _BitcoinApi, address: string) {
     const vout = responseRuneUtxo.vout;
     const utxoValue = responseRuneUtxo.satoshi;
 
-    if (txid && vout && utxoValue) {
+    if (txid && vout !== undefined && vout !== null && utxoValue) {
       const item = {
         txid,
         vout,
